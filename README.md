@@ -76,6 +76,60 @@
 | Servidor | Apache con `mod_rewrite` |
 | Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/` |
 
+## Instalación
+
+### 1) Copiar el proyecto al servidor web
+
+Puedes clonar el repositorio o copiar los archivos al `DocumentRoot` de Apache.
+
+### 2) Crear la base de datos SQLite
+
+Desde la raíz del proyecto:
+
+```bash
+sqlite3 podcast.sqlite < schema.sql
+```
+
+### 3) Crear carpetas de subida (si no existen)
+
+```bash
+mkdir -p audios images
+```
+
+### 4) Dar permisos de escritura al usuario del servidor web
+
+El usuario de Apache/Nginx (por ejemplo `www-data`) debe poder escribir en:
+- `podcast.sqlite`
+- `feed.xml`
+- `audios/`
+- `images/`
+
+Ejemplo (ajusta usuario/grupo a tu servidor):
+
+```bash
+chown -R www-data:www-data podcast.sqlite feed.xml audios images
+chmod 775 audios images
+chmod 664 podcast.sqlite feed.xml
+```
+
+### 5) Activar `mod_rewrite` y `.htaccess` en Apache
+
+- Habilita `mod_rewrite`.
+- Asegúrate de permitir overrides (`AllowOverride All`) en el virtual host o directorio del sitio.
+
+### 6) Acceso inicial al panel
+
+1. Abre `/admin.php`.
+2. Crea el primer usuario administrador.
+3. Configura metadatos del podcast en `podcast_management.php`.
+4. Crea episodios en `episodes_management.php`.
+
+### 7) Comprobaciones finales
+
+- Portada pública: `/`
+- Feed dinámico: `/feed.php`
+- Feed generado: `/feed.xml`
+
 ## Base de datos
 
 | Tabla | Uso |
