@@ -35,6 +35,26 @@ function slugify(string $value): string
     return $slug !== '' ? $slug : 'capitulo';
 }
 
+// Extrae el slug desde una URL guardada tipo /YYYY/MM/slug.
+function slugFromEpisodeLink(?string $link): ?string
+{
+    $raw = trim((string) $link);
+    if ($raw === '') {
+        return null;
+    }
+
+    $path = (string) parse_url($raw, PHP_URL_PATH);
+    if ($path === '') {
+        return null;
+    }
+
+    if (preg_match('#^/[0-9]{4}/[0-9]{2}/([a-z0-9-]+)/?$#', $path, $matches) === 1) {
+        return $matches[1];
+    }
+
+    return null;
+}
+
 // Fecha de publicación legible.
 function formatPublishedDate(?string $value): string
 {
@@ -108,7 +128,12 @@ if ($error === '') {
 
         // Varios episodios pueden compartir mes/año. El slug resuelve el definitivo.
         foreach ($rows as $row) {
-            if (slugify((string) ($row['title'] ?? '')) === $slug) {
+            $rowSlug = slugFromEpisodeLink((string) ($row['link'] ?? ''));
+            if ($rowSlug === null) {
+                $rowSlug = slugify((string) ($row['title'] ?? ''));
+            }
+
+            if ($rowSlug === $slug) {
                 $episode = $row;
                 break;
             }
