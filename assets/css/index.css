@@ -1,0 +1,198 @@
+/* =========================================================
+   Tema base (variables)
+   ========================================================= */
+    :root {
+      --bg: #f5f2eb;
+      --card: #fffefb;
+      --text: #1d2a33;
+      --muted: #5f6b73;
+      --accent: #0b7285;
+      --border: #d9d2c3;
+    }
+    /* Normalización mínima de cajas */
+    * { box-sizing: border-box; }
+
+    /* =========================================================
+       Estructura general de portada
+       ========================================================= */
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
+      color: var(--text);
+      padding: 1rem;
+    }
+    .container {
+      max-width: 940px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+    }
+    /* =========================================================
+       Cabecera pública (título + icono RSS)
+       ========================================================= */
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: .8rem;
+    }
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      gap: .35rem;
+    }
+    .rss-link img {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.12;
+    }
+    h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 a:hover {
+      text-decoration: underline;
+    }
+    .author {
+      margin: .35rem 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .desc {
+      margin: .8rem 0 0;
+      color: var(--muted);
+    }
+    /* =========================================================
+       Listado de episodios
+       ========================================================= */
+    .episode {
+      border-top: 1px solid var(--border);
+      padding-top: .9rem;
+      margin-top: .9rem;
+      display: grid;
+      grid-template-columns: 144px 1fr;
+      gap: .8rem;
+      align-items: start;
+    }
+    .episode:first-child {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    .cover {
+      width: 144px;
+      height: 144px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #ece7dc;
+    }
+    .episode-content {
+      min-width: 0;
+    }
+    h2 {
+      margin: 0 0 .35rem;
+      font-size: 1.2rem;
+    }
+    h2 a {
+      color: inherit;
+      text-decoration: none;
+    }
+    h2 a:hover {
+      text-decoration: underline;
+    }
+    .meta {
+      margin: 0 0 .5rem;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .player {
+      margin-top: .55rem;
+      width: min(520px, 100%);
+    }
+    /* =========================================================
+       Estados de contenido y paginación
+       ========================================================= */
+    .empty {
+      color: var(--muted);
+      margin: 0;
+    }
+    .error {
+      color: #b02a37;
+      margin: 0;
+    }
+    .pagination {
+      margin-top: 1rem;
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .site-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+      padding: .2rem 0 .8rem;
+    }
+    .site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+    .pagination .links {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+    .page-link {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .35rem .6rem;
+      text-decoration: none;
+      color: var(--text);
+      background: #fff;
+      font-size: .9rem;
+    }
+    .page-link.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    /* =========================================================
+       Ajustes responsive
+       ========================================================= */
+    @media (max-width: 620px) {
+      .header-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-actions {
+        align-items: start;
+      }
+      .episode {
+        grid-template-columns: 108px 1fr;
+      }
+      .cover {
+        width: 108px;
+        height: 108px;
+      }
+    }

@@ -1,0 +1,162 @@
+/* =========================================================
+   Tema base (variables)
+   ========================================================= */
+    :root {
+      --bg: #f5f2eb;
+      --card: #fffefb;
+      --text: #1d2a33;
+      --muted: #5f6b73;
+      --accent: #0b7285;
+      --border: #d9d2c3;
+    }
+    /* Normalización mínima de cajas */
+    * { box-sizing: border-box; }
+
+    /* =========================================================
+       Estructura general
+       ========================================================= */
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
+      color: var(--text);
+      padding: 1rem;
+    }
+    .container {
+      max-width: 940px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+    }
+    /* =========================================================
+       Cabecera (título + icono RSS)
+       ========================================================= */
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: .8rem;
+    }
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      gap: .35rem;
+    }
+    .rss-link img {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.12;
+    }
+    h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 a:hover {
+      text-decoration: underline;
+    }
+    .author {
+      margin: .35rem 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    /* =========================================================
+       Detalle de episodio (imagen + contenido)
+       ========================================================= */
+    .back {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .detail {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 220px 1fr;
+    }
+    .cover {
+      width: 220px;
+      height: 220px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #ece7dc;
+    }
+    .meta {
+      color: var(--muted);
+      margin: .45rem 0 .75rem;
+    }
+    .player {
+      width: min(620px, 100%);
+      margin-top: .8rem;
+    }
+    /* =========================================================
+       Metadatos de audio y enlaces
+       ========================================================= */
+    .audio-meta {
+      color: var(--muted);
+      margin: .3rem 0 .2rem;
+      font-size: .95rem;
+    }
+    .download {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      margin-left: .35rem;
+    }
+    .download:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       Estados y pie
+       ========================================================= */
+    .error {
+      color: #b02a37;
+      margin: 0;
+    }
+    .site-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+      padding: .2rem 0 .8rem;
+    }
+    .site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       Ajustes responsive
+       ========================================================= */
+    @media (max-width: 760px) {
+      .header-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-actions {
+        align-items: start;
+      }
+      .detail {
+        grid-template-columns: 1fr;
+      }
+      .cover {
+        width: 160px;
+        height: 160px;
+      }
+    }
