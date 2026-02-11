@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 // Este endpoint devuelve el RSS XML en vivo generado desde la base de datos.
 require_once __DIR__ . '/feed_builder.php';
+require_once __DIR__ . '/canonical_redirect.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
-    // Prioriza la URL canónica del feed estático en atom:link/self.
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $selfHref = $scheme . '://' . $host . '/feed.xml';
+    // Prioriza la URL principal del podcast para atom:link/self.
+    $selfHref = resolveFeedSelfHref($pdo);
 
     $xml = buildPodcastFeedXml($pdo, $selfHref);
 

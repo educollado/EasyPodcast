@@ -6,9 +6,11 @@ declare(strict_types=1);
 // - primera ejecución: crear usuario admin inicial
 // - siguientes ejecuciones: login/logout y acceso a gestión
 
+require_once __DIR__ . '/canonical_redirect.php';
 session_start();
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
 $error = '';
 $notice = '';
 

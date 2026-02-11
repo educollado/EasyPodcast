@@ -69,6 +69,63 @@ function normalizeEnclosureMime(?string $storedMime, string $audioUrl): string
     return $mime;
 }
 
+// Extrae esquema+host(+puerto) desde una URL para usarla como base canónica.
+function extractBaseUrlFromLink(?string $rawUrl): ?string
+{
+    $value = trim((string) $rawUrl);
+    if ($value === '') {
+        return null;
+    }
+
+    $parts = parse_url($value);
+    if (!is_array($parts) || empty($parts['host'])) {
+        return null;
+    }
+
+    $scheme = strtolower((string) ($parts['scheme'] ?? 'https'));
+    $host = (string) $parts['host'];
+    $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+
+    return $scheme . '://' . $host . $port;
+}
+
+// Base de runtime cuando no hay URL principal guardada todavía.
+function runtimeBaseUrl(): string
+{
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    return $scheme . '://' . $host;
+}
+
+// Resuelve la base preferida usando podcast.link y fallback al host actual.
+function resolveBaseUrl(PDO $pdo): string
+{
+    $tableExists = (bool) $pdo
+        ->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'podcast' LIMIT 1")
+        ->fetchColumn();
+
+    if ($tableExists) {
+        $podcast = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        if ($podcast) {
+            $fromLink = extractBaseUrlFromLink((string) ($podcast['link'] ?? ''));
+            if ($fromLink !== null) {
+                return $fromLink;
+            }
+        }
+    }
+
+    return runtimeBaseUrl();
+}
+
+// URL canónica del feed usada en atom:link/self.
+function resolveFeedSelfHref(PDO $pdo): string
+{
+    return rtrim(resolveBaseUrl($pdo), '/') . '/feed.xml';
+}
+
 // Construye un documento XML RSS 2.0 + iTunes completo desde la BD actual.
 function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
 {
