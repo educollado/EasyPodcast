@@ -1,126 +1,128 @@
 # EasyPodcast
 
-EasyPodcast es una aplicación ligera en **PHP + SQLite** para publicar una web de podcast y su feed RSS sin usar frameworks.
+> Aplicación ligera en **PHP + SQLite** para publicar un podcast con web pública, páginas de episodio y feed RSS.
 
 ## Sitio de referencia
 
-El sitio de referencia donde se van aplicando los cambios de este proyecto es:
+| Campo | Valor |
+|---|---|
+| URL | **https://www.aratospodcast.com** |
+| Tipo de proyecto | Podcast personal del autor |
 
-**https://www.aratospodcast.com**
+## Resumen rápido
 
-Este sitio corresponde al podcast personal del autor.
+| Área | Qué incluye |
+|---|---|
+| Web pública | Portada con episodios `published`, página individual por episodio, reproductor inline |
+| Feed | RSS dinámico (`feed.php`) y feed generado (`feed.xml`) |
+| Administración | Login, gestión del canal, alta/edición/borrado de episodios |
+| Subidas | Audio a `audios/`, imágenes a `images/` |
+| Estilos | CSS separado por página en `assets/css/` |
 
-## Qué hace el software
-
-EasyPodcast ofrece:
-- Portada pública con episodios publicados.
-- Página individual por episodio con URL amigable (`/YYYY/MM/slug`).
-- Feed RSS para plataformas de podcast.
-- Área de administración para gestionar el podcast y los episodios.
-- Subida de audios e imágenes.
-- Regeneración automática de `feed.xml` cuando se actualizan datos desde administración.
-
-## Funcionalidades principales
+## Funcionalidades
 
 ### Parte pública
-- `index.php` muestra solo episodios con estado `published`.
-- Cada episodio muestra:
-  - Imagen (la del episodio o fallback a la imagen general del podcast).
-  - Título, fecha, extracto y reproductor inline.
-- El título del episodio enlaza a su página individual.
-- Paginación de 20 episodios por página.
-- Acceso al feed desde `/feed.xml`.
 
-### Página individual de episodio
-- `episode.php` muestra un episodio publicado.
-- URL amigable: `/YYYY/MM/titulo-del-episodio`.
-- Muestra descripción completa, reproductor, duración, tamaño y enlace de descarga.
+- Portada (`index.php`) con:
+  - episodios publicados
+  - paginación de 20 en 20
+  - portada del episodio (o fallback a portada del podcast)
+  - extracto y reproductor
+- Página de episodio (`episode.php`) con:
+  - URL amigable `/YYYY/MM/slug`
+  - descripción completa
+  - duración, tamaño y descarga
+  - reproductor inline
 
 ### Feed RSS
-- `feed.php` genera RSS dinámico desde la base de datos.
-- `feed_builder.php` centraliza la lógica de generación del feed.
-- `feed.xml` se regenera automáticamente desde las pantallas de administración.
+
+- `feed.php`: genera RSS en tiempo real.
+- `feed_builder.php`: lógica común del feed.
+- `feed.xml`: se regenera automáticamente al guardar/editar/borrar desde administración.
 
 ### Administración
-- `admin.php`: acceso/login del panel.
-- `podcast_management.php`: gestión de metadatos del canal (`podcast`).
-- `episodes_management.php`: alta/edición/borrado de episodios (`episodes`).
-- Subidas:
-  - Audios a `audios/`
-  - Imágenes a `images/`
+
+| Página | Función |
+|---|---|
+| `admin.php` | Login/logout y acceso al panel |
+| `podcast_management.php` | Metadatos del podcast (tabla `podcast`) |
+| `episodes_management.php` | CRUD de episodios (tabla `episodes`) |
 
 ## Estructura del proyecto
 
-- `index.php`: portada pública
-- `episode.php`: página pública de episodio
-- `feed.php`: endpoint RSS dinámico
-- `feed_builder.php`: constructor del feed y escritura de `feed.xml`
-- `feed.xml`: feed generado
-- `admin.php`: panel de administración
-- `podcast_management.php`: gestión del podcast
-- `episodes_management.php`: gestión de episodios
-- `schema.sql`: esquema de base de datos
-- `podcast.sqlite`: base de datos SQLite
-- `audios/`: audios subidos
-- `images/`: imágenes subidas
-- `assets/css/`: hojas de estilo separadas (facilita crear temas)
-- `.htaccess`: HTTPS + rutas amigables
+| Ruta | Descripción |
+|---|---|
+| `index.php` | Portada pública |
+| `episode.php` | Página pública de episodio |
+| `feed.php` | Endpoint RSS dinámico |
+| `feed_builder.php` | Constructor de RSS + escritura de `feed.xml` |
+| `feed.xml` | Feed generado |
+| `admin.php` | Panel de administración |
+| `podcast_management.php` | Gestión del canal |
+| `episodes_management.php` | Gestión de episodios |
+| `schema.sql` | Esquema de base de datos |
+| `podcast.sqlite` | Base de datos SQLite |
+| `audios/` | Audios subidos |
+| `images/` | Imágenes subidas |
+| `assets/css/` | Hojas de estilo separadas (theming) |
+| `.htaccess` | HTTPS + rutas amigables |
 
 ## Requisitos
 
-- PHP 8+ (recomendado).
-- Extensiones PHP:
-  - `pdo_sqlite`
-  - `sqlite3`
-  - `fileinfo`
-  - `xmlwriter`
-- Apache con `mod_rewrite` activo (para URLs amigables).
-- Permisos de escritura para:
-  - `podcast.sqlite`
-  - `feed.xml`
-  - `audios/`
-  - `images/`
+| Componente | Requisito |
+|---|---|
+| PHP | 8+ recomendado |
+| Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter` |
+| Servidor | Apache con `mod_rewrite` |
+| Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/` |
 
 ## Base de datos
 
-La aplicación usa SQLite con estas tablas principales:
-- `podcast`: metadatos del canal (diseño de una sola fila).
-- `episodes`: metadatos y estado de publicación de episodios.
-- `management`: credenciales de administración.
+| Tabla | Uso |
+|---|---|
+| `podcast` | Metadatos del canal (una sola fila) |
+| `episodes` | Episodios y estado de publicación |
+| `management` | Credenciales de administración |
 
-Consulta `schema.sql` para el detalle.
+Ver detalle en `schema.sql`.
 
 ## Flujo de publicación
 
-1. Configura los metadatos del podcast en `podcast_management.php`.
+1. Configura el canal en `podcast_management.php`.
 2. Crea episodios en `episodes_management.php`.
-3. Marca el episodio como `published`.
-4. Las páginas públicas y el feed solo incluyen episodios `published`.
-5. Al guardar/editar/borrar desde administración, `feed.xml` se regenera automáticamente.
+3. Marca episodios como `published`.
+4. La web pública y el feed solo muestran `published`.
+5. El sistema regenera `feed.xml` automáticamente tras cambios.
 
 ## Modelo de URLs
 
-- Portada: `/`
-- Feed dinámico: `/feed.php`
-- Feed generado: `/feed.xml`
-- Detalle episodio: `/YYYY/MM/slug`
+| Recurso | URL |
+|---|---|
+| Portada | `/` |
+| Feed dinámico | `/feed.php` |
+| Feed generado | `/feed.xml` |
+| Episodio | `/YYYY/MM/slug` |
 
-## Temas y estilos
+## Personalización / temas
 
-Los estilos están separados por página dentro de `assets/css/`.
+Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 
-Puedes crear temas modificando esas hojas CSS sin tocar las plantillas PHP.
+| CSS | Página asociada |
+|---|---|
+| `assets/css/index.css` | Portada pública |
+| `assets/css/episode.css` | Página de episodio |
+| `assets/css/admin.css` | Login/panel admin |
+| `assets/css/podcast_management.css` | Gestión podcast |
+| `assets/css/episodes_management.css` | Gestión episodios |
 
 ## Notas
 
-- Si un episodio no tiene imagen, se usa la imagen del podcast.
-- El autor del episodio puede heredarse automáticamente desde la configuración del podcast.
-- El MIME del audio en el feed se normaliza para compatibilidad con plataformas de podcast.
+- Si un episodio no tiene imagen, se usa la del podcast.
+- El autor del episodio puede heredarse desde la configuración del podcast.
+- El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
 
-## Licencia (Free Software)
+## Licencia (Software Libre)
 
-EasyPodcast es **Software Libre**.
+EasyPodcast es **Software Libre** y se distribuye bajo **GNU GPL v3 o posterior (GPL-3.0-or-later)**.
 
-Este proyecto se distribuye bajo la licencia **GNU GPL v3 o posterior (GPL-3.0-or-later)**.
-
-Consulta el archivo `LICENSE` para más detalles.
+Consulta `LICENSE` para los términos completos.
