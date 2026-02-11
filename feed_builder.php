@@ -1,0 +1,233 @@
+<?php
+
+declare(strict_types=1);
+
+// Generador RSS compartido usado por:
+// - feed.php para salida dinámica
+// - flujos de administración para regenerar feed.xml tras cambios
+
+// Convierte fechas de BD/publicación a formato RSS.
+function toRssDate(?string $value): string
+{
+    if ($value === null || trim($value) === '') {
+        return date(DATE_RSS);
+    }
+
+    $ts = strtotime($value);
+    if ($ts === false) {
+        return date(DATE_RSS);
+    }
+
+    return date(DATE_RSS, $ts);
+}
+
+// Helper para la etiqueta explícita de iTunes con fallback al valor del podcast.
+function boolToItunesExplicit(?int $value, int $fallback = 0): string
+{
+    $effective = $value;
+    if ($effective === null) {
+        $effective = $fallback;
+    }
+
+    return ((int) $effective) === 1 ? 'yes' : 'no';
+}
+
+// Evita escribir etiquetas XML vacías en campos opcionales.
+function writeTextIfNotEmpty(XMLWriter $xml, string $name, ?string $value): void
+{
+    if ($value === null || trim($value) === '') {
+        return;
+    }
+
+    $xml->writeElement($name, $value);
+}
+
+// Si el MIME guardado es genérico, infiere el MIME por extensión del audio.
+function guessAudioMimeFromUrl(string $audioUrl): ?string
+{
+    $path = (string) parse_url($audioUrl, PHP_URL_PATH);
+    $ext = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+    $map = [
+        'mp3' => 'audio/mpeg',
+        'm4a' => 'audio/mp4',
+        'aac' => 'audio/aac',
+        'ogg' => 'audio/ogg',
+        'wav' => 'audio/wav',
+        'webm' => 'audio/webm',
+    ];
+    return $map[$ext] ?? null;
+}
+
+// Asegura que enclosure/type sea compatible con plataformas de podcast.
+function normalizeEnclosureMime(?string $storedMime, string $audioUrl): string
+{
+    $mime = strtolower(trim((string) $storedMime));
+    if ($mime === '' || $mime === 'application/octet-stream') {
+        return guessAudioMimeFromUrl($audioUrl) ?? 'audio/mpeg';
+    }
+
+    return $mime;
+}
+
+// Construye un documento XML RSS 2.0 + iTunes completo desde la BD actual.
+function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
+{
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+    if (!$podcast) {
+        throw new RuntimeException('No se encontró ningún registro en la tabla podcast.');
+    }
+
+    $episodesStmt = $pdo->prepare(
+        "SELECT *
+         FROM episodes
+         WHERE status = 'published'
+         ORDER BY datetime(pub_date) DESC"
+    );
+    $episodesStmt->execute();
+    $episodes = $episodesStmt->fetchAll();
+
+    $latestEpisodeDate = null;
+    if ($episodes) {
+        $latestEpisodeDate = $episodes[0]['pub_date'] ?? null;
+    }
+
+    $xml = new XMLWriter();
+    $xml->openMemory();
+    $xml->startDocument('1.0', 'UTF-8');
+    $xml->setIndent(true);
+
+    $xml->startElement('rss');
+    $xml->writeAttribute('version', '2.0');
+    $xml->writeAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+    $xml->writeAttribute('xmlns:itunes', 'http://www.itunes.com/dtds/podcast-1.0.dtd');
+
+    $xml->startElement('channel');
+
+    $xml->writeElement('title', (string) $podcast['title']);
+    $xml->writeElement('link', (string) $podcast['link']);
+    $xml->startElement('description');
+    $xml->writeCdata((string) $podcast['description']);
+    $xml->endElement();
+
+    writeTextIfNotEmpty($xml, 'language', $podcast['language'] ?? 'es-ES');
+    writeTextIfNotEmpty($xml, 'copyright', $podcast['copyright'] ?? null);
+
+    $xml->writeElement('pubDate', toRssDate($latestEpisodeDate));
+    $xml->writeElement('lastBuildDate', date(DATE_RSS));
+
+    $xml->startElement('atom:link');
+    $xml->writeAttribute('href', $selfHref);
+    $xml->writeAttribute('rel', 'self');
+    $xml->writeAttribute('type', 'application/rss+xml');
+    $xml->endElement();
+
+    writeTextIfNotEmpty($xml, 'itunes:author', $podcast['author'] ?? null);
+    $xml->writeElement('itunes:explicit', boolToItunesExplicit((int) ($podcast['explicit'] ?? 0)));
+    writeTextIfNotEmpty($xml, 'itunes:type', $podcast['itunes_type'] ?? 'episodic');
+
+    if (!empty($podcast['owner_name']) || !empty($podcast['owner_email'])) {
+        $xml->startElement('itunes:owner');
+        writeTextIfNotEmpty($xml, 'itunes:name', $podcast['owner_name'] ?? null);
+        writeTextIfNotEmpty($xml, 'itunes:email', $podcast['owner_email'] ?? null);
+        $xml->endElement();
+    }
+
+    if (!empty($podcast['category'])) {
+        $categories = array_filter(array_map('trim', explode(',', (string) $podcast['category'])));
+        foreach ($categories as $category) {
+            $xml->startElement('itunes:category');
+            $xml->writeAttribute('text', $category);
+            $xml->endElement();
+        }
+    }
+
+    if (!empty($podcast['image_url'])) {
+        $xml->startElement('itunes:image');
+        $xml->writeAttribute('href', (string) $podcast['image_url']);
+        $xml->endElement();
+
+        $xml->startElement('image');
+        $xml->writeElement('url', (string) $podcast['image_url']);
+        $xml->writeElement('title', (string) $podcast['title']);
+        $xml->writeElement('link', (string) $podcast['link']);
+        $xml->endElement();
+    }
+
+    $podcastExplicit = (int) ($podcast['explicit'] ?? 0);
+
+    // Cada episodio publicado se renderiza como un <item>.
+    foreach ($episodes as $episode) {
+        $xml->startElement('item');
+
+        $xml->writeElement('title', (string) $episode['title']);
+
+        $xml->startElement('description');
+        $xml->writeCdata((string) $episode['description']);
+        $xml->endElement();
+
+        $episodeLink = $episode['link'] ?: $episode['audio_url'];
+        writeTextIfNotEmpty($xml, 'link', $episodeLink);
+
+        $xml->startElement('guid');
+        $xml->writeAttribute('isPermaLink', 'false');
+        $xml->text((string) $episode['guid']);
+        $xml->endElement();
+
+        $xml->writeElement('pubDate', toRssDate($episode['pub_date'] ?? null));
+
+        $audioUrl = (string) $episode['audio_url'];
+        $enclosureMime = normalizeEnclosureMime($episode['audio_mime_type'] ?? null, $audioUrl);
+
+        $xml->startElement('enclosure');
+        $xml->writeAttribute('url', $audioUrl);
+        $xml->writeAttribute('length', (string) ((int) ($episode['audio_size_bytes'] ?? 0)));
+        $xml->writeAttribute('type', $enclosureMime);
+        $xml->endElement();
+
+        writeTextIfNotEmpty($xml, 'itunes:duration', $episode['duration'] ?? null);
+        writeTextIfNotEmpty($xml, 'itunes:author', $episode['author'] ?? null);
+        $xml->writeElement('itunes:explicit', boolToItunesExplicit(
+            isset($episode['explicit']) ? (int) $episode['explicit'] : null,
+            $podcastExplicit
+        ));
+
+        if (!empty($episode['season_number'])) {
+            $xml->writeElement('itunes:season', (string) ((int) $episode['season_number']));
+        }
+
+        if (!empty($episode['episode_number'])) {
+            $xml->writeElement('itunes:episode', (string) ((int) $episode['episode_number']));
+        }
+
+        if (!empty($episode['episode_type'])) {
+            $xml->writeElement('itunes:episodeType', (string) $episode['episode_type']);
+        }
+
+        if (!empty($episode['image_url'])) {
+            $xml->startElement('itunes:image');
+            $xml->writeAttribute('href', (string) $episode['image_url']);
+            $xml->endElement();
+        }
+
+        $xml->endElement();
+    }
+
+    $xml->endElement();
+    $xml->endElement();
+    $xml->endDocument();
+
+    return $xml->outputMemory();
+}
+
+// Persiste el RSS generado en un archivo feed.xml estático.
+function writePodcastFeedFile(PDO $pdo, string $filePath, string $selfHref): void
+{
+    $xml = buildPodcastFeedXml($pdo, $selfHref);
+    $result = @file_put_contents($filePath, $xml);
+    if ($result === false) {
+        throw new RuntimeException('No se pudo escribir ' . basename($filePath) . '.');
+    }
+}

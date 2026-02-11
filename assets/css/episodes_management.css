@@ -1,0 +1,187 @@
+/* =========================================================
+   Tema base (variables)
+   ========================================================= */
+    :root {
+      --bg: #f5f2eb;
+      --card: #fffefb;
+      --text: #1d2a33;
+      --muted: #5f6b73;
+      --accent: #0b7285;
+      --danger: #b02a37;
+      --ok: #2f855a;
+      --border: #d9d2c3;
+    }
+    /* Normalización mínima de cajas */
+    * { box-sizing: border-box; }
+
+    /* =========================================================
+       Estructura general
+       ========================================================= */
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
+      color: var(--text);
+      padding: 1rem;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+    }
+    /* =========================================================
+       Tipografía y layout del formulario
+       ========================================================= */
+    h1 {
+      margin: 0 0 .35rem;
+      font-size: 1.45rem;
+    }
+    p {
+      margin: .35rem 0 1rem;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .8rem;
+    }
+    @media (min-width: 760px) {
+      .grid.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    label {
+      display: grid;
+      gap: .35rem;
+      font-size: .92rem;
+    }
+    input, textarea, select {
+      padding: .65rem .7rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .98rem;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    /* =========================================================
+       Mensajes de error/éxito
+       ========================================================= */
+    .error {
+      background: #ffe3e6;
+      color: var(--danger);
+      border: 1px solid #ffc9cf;
+      padding: .65rem;
+      border-radius: 8px;
+      margin-bottom: .85rem;
+    }
+    .notice {
+      background: #e6ffef;
+      color: var(--ok);
+      border: 1px solid #c6f6d5;
+      padding: .65rem;
+      border-radius: 8px;
+      margin-bottom: .85rem;
+    }
+    .help {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-top: -.15rem;
+    }
+    /* =========================================================
+       Acciones principales y botones
+       ========================================================= */
+    .actions {
+      margin-top: .9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: .6rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: .7rem .9rem;
+      font-size: .96rem;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .back {
+      background: #5f6b73;
+    }
+    /* =========================================================
+       Tabla de capítulos existentes
+       ========================================================= */
+    .list-card {
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .93rem;
+    }
+    th, td {
+      text-align: left;
+      padding: .55rem .45rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .edit-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .edit-link:hover {
+      text-decoration: underline;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    /* =========================================================
+       Acciones por fila (editar/borrar)
+       ========================================================= */
+    .row-actions {
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .inline-form {
+      margin: 0;
+    }
+    .delete-text {
+      border: 0;
+      background: transparent;
+      color: #b02a37;
+      font: inherit;
+      font-weight: 700;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .small-btn {
+      margin-top: .35rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: .42rem .6rem;
+      font-size: .84rem;
+      cursor: pointer;
+      width: fit-content;
+    }
