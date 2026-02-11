@@ -146,7 +146,7 @@ $faviconUrl = $podcastImage;
   <link rel="icon" type="image/png" href="<?= esc($faviconUrl) ?>">
   <link rel="apple-touch-icon" href="<?= esc($faviconUrl) ?>">
   <?php endif; ?>
-  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="stylesheet" href="/assets/css/index.css">
 </head>
 <body>
   <div class="container">

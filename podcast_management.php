@@ -231,7 +231,7 @@ try {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestión Podcast</title>
-  <link rel="stylesheet" href="assets/css/podcast_management.css">
+  <link rel="stylesheet" href="/assets/css/podcast_management.css">
 </head>
 <body>
   <div class="container">
