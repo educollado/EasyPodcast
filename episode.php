@@ -5,7 +5,9 @@ declare(strict_types=1);
 // Página pública de detalle de episodio resuelta por URL amigable:
 // /YYYY/MM/episode-title-slug
 
+require_once __DIR__ . '/canonical_redirect.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
 
 // Helper básico de escape HTML para salida segura.
 function esc(string $value): string

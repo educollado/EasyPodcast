@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 // Panel de gestión de metadatos del podcast (una sola fila de canal).
 require_once __DIR__ . '/feed_builder.php';
+require_once __DIR__ . '/canonical_redirect.php';
 
 session_start();
 
@@ -13,6 +14,7 @@ if (!isset($_SESSION['admin_user'])) {
 }
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
 $error = '';
 $notice = '';
 
@@ -21,14 +23,15 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-// Construye URLs absolutas para assets subidos y enlace self del feed.
-function getBaseUrl(): string
+// Prioriza la URL principal enviada en el formulario para construir assets.
+function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
 {
-    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
-    $scheme = $isHttps ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    return $scheme . '://' . $host;
+    $fromForm = extractBaseUrlFromLink((string) ($form['link'] ?? ''));
+    if ($fromForm !== null) {
+        return $fromForm;
+    }
+
+    return resolveBaseUrl($pdo);
 }
 
 $form = [
@@ -131,7 +134,7 @@ try {
                         } elseif (!move_uploaded_file($tmpPath, $imagesDir . '/' . $fileName)) {
                             $error = 'No se pudo guardar la imagen subida.';
                         } else {
-                            $form['image_url'] = rtrim(getBaseUrl(), '/') . '/images/' . $fileName;
+                            $form['image_url'] = rtrim(resolvePodcastFormBaseUrl($form, $pdo), '/') . '/images/' . $fileName;
                         }
                     }
                 }
@@ -175,7 +178,7 @@ try {
                 $notice = 'Podcast actualizado correctamente.';
                 try {
                     // Mantiene feed.xml sincronizado con los últimos metadatos.
-                    writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', rtrim(getBaseUrl(), '/') . '/feed.xml');
+                    writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
                 } catch (Throwable $feedError) {
                     $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
                 }
@@ -204,7 +207,7 @@ try {
                 $notice = 'Podcast guardado correctamente.';
                 try {
                     // Genera feed.xml inmediatamente tras la creación inicial.
-                    writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', rtrim(getBaseUrl(), '/') . '/feed.xml');
+                    writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
                 } catch (Throwable $feedError) {
                     $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
                 }
