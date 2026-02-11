@@ -163,7 +163,6 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
     </header>
 
     <main class="card">
-      <p><a class="back" href="/">Volver a la portada</a></p>
       <?php if ($error !== ''): ?>
         <p class="error"><?= esc($error) ?></p>
       <?php else: ?>
