@@ -146,7 +146,7 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
   <link rel="icon" type="image/png" href="<?= esc($faviconUrl) ?>">
   <link rel="apple-touch-icon" href="<?= esc($faviconUrl) ?>">
   <?php endif; ?>
-  <link rel="stylesheet" href="assets/css/episode.css">
+  <link rel="stylesheet" href="/assets/css/episode.css">
 </head>
 <body>
   <div class="container">
