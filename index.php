@@ -87,6 +87,17 @@ function buildEpisodePath(string $pubDate, string $title): string
     return '/' . $year . '/' . $month . '/' . slugify($title);
 }
 
+// Usa el enlace guardado si existe; si no, construye uno desde fecha+título.
+function resolveEpisodeHref(?string $storedLink, string $pubDate, string $title): string
+{
+    $link = trim((string) $storedLink);
+    if ($link !== '') {
+        return $link;
+    }
+
+    return buildEpisodePath($pubDate, $title);
+}
+
 $podcast = null;
 $episodes = [];
 $error = '';
@@ -114,7 +125,7 @@ try {
 
     // Recupera solo episodios de la página actual (solo publicados).
     $episodesStmt = $pdo->prepare(
-        "SELECT id, title, description, pub_date, audio_url, duration, image_url
+        "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
          FROM episodes
          WHERE status = 'published'
          ORDER BY datetime(pub_date) DESC, id DESC
@@ -183,7 +194,7 @@ $faviconUrl = $podcastImage;
             <?php endif; ?>
             <div class="episode-content">
               <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
-              <h2><a href="<?= esc(buildEpisodePath((string) ($episode['pub_date'] ?? ''), $episodeTitle)) ?>"><?= esc($episodeTitle) ?></a></h2>
+              <h2><a href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle)) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta">
                 <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>
               </p>

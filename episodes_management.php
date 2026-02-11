@@ -470,8 +470,8 @@ try {
             }
         }
 
-        // Autogenera el enlace público del episodio si el usuario lo deja vacío.
-        if ($error === '' && $form['link'] === '') {
+        // Autogenera el enlace público solo al crear; en edición se respeta el valor actual.
+        if ($error === '' && !$isEditing && $form['link'] === '') {
             $form['link'] = buildEpisodePublicLink(getBaseUrl(), $pubDateNormalized, $form['title']);
         }
 
