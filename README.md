@@ -1,11 +1,5 @@
 # EasyPodcast
 
-![GitHub](https://img.shields.io/github/license/educollado/EasyPodcast)
-![GitHub last commit](https://img.shields.io/github/last-commit/educollado/EasyPodcast)
-![GitHub repo size](https://img.shields.io/github/repo-size/educollado/EasyPodcast)
-[![Follow on Mastodon](https://img.shields.io/mastodon/follow/1234567890?domain=https%3A%2F%2Fsocial.collado.eu&label=%40edu%40social.collado.eu&logo=mastodon&logoColor=white&style=for-the-badge)](https://social.collado.eu/@edu)
-
-
 EasyPodcast es una aplicación ligera en **PHP + SQLite** para publicar una web de podcast y su feed RSS sin usar frameworks.
 
 ## Sitio de referencia
