@@ -42,6 +42,14 @@
       margin: 0 0 .35rem;
       font-size: 1.45rem;
     }
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: .8rem;
+      flex-wrap: wrap;
+      margin-bottom: .45rem;
+    }
     p {
       margin: .35rem 0 1rem;
       color: var(--muted);
@@ -146,6 +154,9 @@
       text-decoration: none;
       font-weight: 700;
     }
+    .add-link {
+      white-space: nowrap;
+    }
     .edit-link:hover {
       text-decoration: underline;
     }
@@ -184,4 +195,23 @@
       font-size: .84rem;
       cursor: pointer;
       width: fit-content;
+    }
+    .pagination {
+      margin-top: .9rem;
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .page-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .page-link:hover {
+      text-decoration: underline;
+    }
+    .page-status {
+      color: var(--muted);
+      font-size: .92rem;
     }
