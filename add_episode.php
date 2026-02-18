@@ -11,6 +11,10 @@ require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/episode_helpers.php';
 require_once __DIR__ . '/lib/id3_service.php';
 
+// ---------------------------------------------------------------------------
+// Bootstrap de administración
+// ---------------------------------------------------------------------------
+
 session_start();
 
 if (!isset($_SESSION['admin_user'])) {
@@ -49,6 +53,10 @@ $form = [
     'author' => '',
     'status' => 'draft',
 ];
+
+// ---------------------------------------------------------------------------
+// Flujo principal de persistencia (validación + subida + guardado)
+// ---------------------------------------------------------------------------
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -159,6 +167,7 @@ try {
         foreach ($form as $key => $value) {
             $form[$key] = trim((string) ($_POST[$key] ?? ''));
         }
+        // Botón específico en edición para reescribir tags del MP3 actual.
         $rewriteAudioMetadata = $isEditing && isset($_POST['rewrite_audio_metadata']) && (string) $_POST['rewrite_audio_metadata'] === '1';
         $uploadedNewAudio = false;
 
@@ -311,6 +320,10 @@ try {
             }
         }
 
+        // Reescribe metadatos cuando:
+        // - estamos en edición
+        // - no se acaba de subir un audio nuevo
+        // - se pulsó el botón manual o la opción global está activa
         $shouldRewriteMetadata = $isEditing
             && !$uploadedNewAudio
             && ($rewriteAudioMetadata || $podcastDefaults['write_audio_metadata'] === 1);

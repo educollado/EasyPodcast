@@ -14,6 +14,7 @@ try {
     // Prioriza la URL principal del podcast para atom:link/self.
     $selfHref = resolveFeedSelfHref($pdo);
 
+    // Genera el XML completo en memoria y lo devuelve en esta request.
     $xml = buildPodcastFeedXml($pdo, $selfHref);
 
     header('Content-Type: application/rss+xml; charset=UTF-8');

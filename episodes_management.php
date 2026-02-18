@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+// Listado administrativo de episodios:
+// - paginación de resultados
+// - borrado con confirmación
+// - regeneración de feed tras borrado
+
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
 
@@ -70,6 +75,7 @@ try {
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate ON episodes(status, pub_date)");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Acción de borrado con redirección PRG para evitar reenvío de formulario.
         $deleteEpisodeId = (int) ($_POST['delete_episode_id'] ?? 0);
         $returnPage = max(1, (int) ($_POST['return_page'] ?? 1));
 

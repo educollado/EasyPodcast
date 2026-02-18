@@ -76,6 +76,7 @@ try {
           write_audio_metadata INTEGER NOT NULL DEFAULT 0
         )"
     );
+    // Migraciones ligeras de columnas en instalaciones existentes.
     $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
     $hasRssItemLimit = false;
     $hasWriteAudioMetadata = false;
@@ -222,7 +223,7 @@ try {
                     $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
                 }
             } else {
-                // Inserción inicial cuando aún no existe fila de podcast.
+                // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                 $stmt = $pdo->prepare(
                     'INSERT INTO podcast
                      (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, write_audio_metadata)
