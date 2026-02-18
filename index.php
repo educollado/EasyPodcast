@@ -33,26 +33,26 @@ function formatPublishedDate(?string $value): string
     return date('d/m/Y H:i', $ts);
 }
 
-// Genera un extracto de texto compacto para el listado.
-function firstChars(string $value, int $maxChars): string
+// Genera un extracto de texto compacto y marca si hubo recorte.
+function firstChars(string $value, int $maxChars): array
 {
     $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
     if ($clean === '') {
-        return '';
+        return ['text' => '', 'truncated' => false];
     }
 
     if (function_exists('mb_strlen') && function_exists('mb_substr')) {
         if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
-            return $clean;
+            return ['text' => $clean, 'truncated' => false];
         }
-        return mb_substr($clean, 0, $maxChars, 'UTF-8') . '...';
+        return ['text' => rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')), 'truncated' => true];
     }
 
     if (strlen($clean) <= $maxChars) {
-        return $clean;
+        return ['text' => $clean, 'truncated' => false];
     }
 
-    return substr($clean, 0, $maxChars) . '...';
+    return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
 }
 
 // Construye slugs seguros para URL desde títulos de episodio.
@@ -196,11 +196,18 @@ $faviconUrl = $podcastImage;
             <?php endif; ?>
             <div class="episode-content">
               <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
-              <h2><a href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle)) ?>"><?= esc($episodeTitle) ?></a></h2>
+              <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
+              <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 200); ?>
+              <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta">
                 <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>
               </p>
-              <p><?= esc(firstChars((string) ($episode['description'] ?? ''), 200)) ?></p>
+              <p>
+                <?= esc((string) $excerpt['text']) ?>
+                <?php if (!empty($excerpt['truncated'])): ?>
+                  <a href="<?= esc($episodeHref) ?>">[...]</a>
+                <?php endif; ?>
+              </p>
               <?php if (!empty($episode['audio_url'])): ?>
                 <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
                   Tu navegador no soporta audio HTML5.
