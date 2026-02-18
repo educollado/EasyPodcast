@@ -137,13 +137,26 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
         throw new RuntimeException('No se encontró ningún registro en la tabla podcast.');
     }
 
-    $episodesStmt = $pdo->prepare(
-        "SELECT *
-         FROM episodes
-         WHERE status = 'published'
-         ORDER BY datetime(pub_date) DESC"
-    );
-    $episodesStmt->execute();
+    $rssItemLimit = max(0, (int) ($podcast['rss_item_limit'] ?? 0));
+    if ($rssItemLimit > 0) {
+        $episodesStmt = $pdo->prepare(
+            "SELECT *
+             FROM episodes
+             WHERE status = 'published'
+             ORDER BY datetime(pub_date) DESC
+             LIMIT :limit"
+        );
+        $episodesStmt->bindValue(':limit', $rssItemLimit, PDO::PARAM_INT);
+        $episodesStmt->execute();
+    } else {
+        $episodesStmt = $pdo->prepare(
+            "SELECT *
+             FROM episodes
+             WHERE status = 'published'
+             ORDER BY datetime(pub_date) DESC"
+        );
+        $episodesStmt->execute();
+    }
     $episodes = $episodesStmt->fetchAll();
 
     $latestEpisodeDate = null;

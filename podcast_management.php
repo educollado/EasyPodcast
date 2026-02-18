@@ -47,6 +47,7 @@ $form = [
     'image_url' => '',
     'copyright' => '',
     'itunes_type' => 'episodic',
+    'rss_item_limit' => '0',
 ];
 
 try {
@@ -69,9 +70,21 @@ try {
           explicit INTEGER NOT NULL DEFAULT 0,
           image_url TEXT,
           copyright TEXT,
-          itunes_type TEXT DEFAULT 'episodic'
+          itunes_type TEXT DEFAULT 'episodic',
+          rss_item_limit INTEGER NOT NULL DEFAULT 0
         )"
     );
+    $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
+    $hasRssItemLimit = false;
+    foreach ($columns as $column) {
+        if (($column['name'] ?? '') === 'rss_item_limit') {
+            $hasRssItemLimit = true;
+            break;
+        }
+    }
+    if (!$hasRssItemLimit) {
+        $pdo->exec('ALTER TABLE podcast ADD COLUMN rss_item_limit INTEGER NOT NULL DEFAULT 0');
+    }
 
     // La app usa una sola fila de canal; se carga cuando existe.
     $existing = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
@@ -88,11 +101,21 @@ try {
                 $form[$key] = (string) ((int) ($_POST[$key] ?? 0));
                 continue;
             }
+            if ($key === 'rss_item_limit') {
+                $form[$key] = trim((string) ($_POST[$key] ?? '0'));
+                continue;
+            }
             $form[$key] = trim((string) ($_POST[$key] ?? ''));
         }
 
         if ($form['title'] === '' || $form['description'] === '' || $form['link'] === '') {
             $error = 'Título, descripción y enlace son obligatorios.';
+        } elseif (
+            $form['rss_item_limit'] === ''
+            || filter_var($form['rss_item_limit'], FILTER_VALIDATE_INT) === false
+            || (int) $form['rss_item_limit'] < 0
+        ) {
+            $error = 'La cantidad de elementos del feed debe ser un entero igual o mayor que 0.';
         } elseif (!in_array($form['itunes_type'], ['episodic', 'serial'], true)) {
             $error = 'El tipo de podcast debe ser episodic o serial.';
         } elseif ($form['owner_email'] !== '' && !filter_var($form['owner_email'], FILTER_VALIDATE_EMAIL)) {
@@ -157,7 +180,8 @@ try {
                          explicit = :explicit,
                          image_url = :image_url,
                          copyright = :copyright,
-                         itunes_type = :itunes_type
+                         itunes_type = :itunes_type,
+                         rss_item_limit = :rss_item_limit
                      WHERE id = :id'
                 );
                 $stmt->execute([
@@ -173,6 +197,7 @@ try {
                     ':image_url' => $form['image_url'],
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
+                    ':rss_item_limit' => (int) $form['rss_item_limit'],
                     ':id' => (int) $existing['id'],
                 ]);
                 $notice = 'Podcast actualizado correctamente.';
@@ -186,9 +211,9 @@ try {
                 // Inserción inicial cuando aún no existe fila de podcast.
                 $stmt = $pdo->prepare(
                     'INSERT INTO podcast
-                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type)
+                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit)
                      VALUES
-                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type)'
+                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit)'
                 );
                 $stmt->execute([
                     ':title' => $form['title'],
@@ -203,6 +228,7 @@ try {
                     ':image_url' => $form['image_url'],
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
+                    ':rss_item_limit' => (int) $form['rss_item_limit'],
                 ]);
                 $notice = 'Podcast guardado correctamente.';
                 try {
@@ -311,6 +337,11 @@ try {
               <option value="episodic" <?= $form['itunes_type'] === 'episodic' ? 'selected' : '' ?>>episodic</option>
               <option value="serial" <?= $form['itunes_type'] === 'serial' ? 'selected' : '' ?>>serial</option>
             </select>
+          </label>
+          <label>
+            Cantidad de elementos del Feed RSS
+            <input type="number" min="0" step="1" name="rss_item_limit" value="<?= esc($form['rss_item_limit']) ?>">
+            <small>Nota: 0 significa infinitos (sin límite).</small>
           </label>
         </div>
 
