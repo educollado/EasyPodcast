@@ -73,6 +73,7 @@ try {
     // La app está diseñada alrededor de una única fila de podcast.
     $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 
+    // Calcula paginación total antes de consultar la página actual.
     $totalEpisodes = (int) $pdo
         ->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")
         ->fetchColumn();
@@ -100,6 +101,7 @@ try {
 
 $podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
 $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
+// Fallback de autor: owner_name -> author.
 if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }

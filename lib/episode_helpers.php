@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+// ---------------------------------------------------------------------------
+// Helpers generales de episodio: nombres de fichero, fechas, slugs y rutas
+// ---------------------------------------------------------------------------
+
 // Genera nombres de fichero seguros y deterministas con timestamp + sufijo aleatorio.
 function buildSafeFileName(string $originalName, string $fallbackBase, string $extension): string
 {
@@ -143,6 +147,8 @@ function buildEpisodePublicLink(string $baseUrl, ?string $pubDate, string $title
         . slugifyForUrl($title);
 }
 
+// Resuelve la ruta local a /audios/<fichero> partiendo de una URL publica.
+// Se usa para poder reescribir metadatos sobre el fichero fisico existente.
 function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
 {
     $path = parse_url(trim($audioUrl), PHP_URL_PATH);
@@ -167,6 +173,8 @@ function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
     return $localPath;
 }
 
+// Resuelve la ruta local a /images/<fichero> partiendo de una URL publica.
+// Se usa para incrustar portada (frame APIC) en etiquetas ID3v2.
 function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 {
     $path = parse_url(trim($imageUrl), PHP_URL_PATH);

@@ -71,6 +71,7 @@ if ($error === '') {
 
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 
+        // Filtra por año/mes de URL y resuelve el episodio exacto por slug.
         $stmt = $pdo->prepare(
             "SELECT *
              FROM episodes
@@ -110,6 +111,7 @@ if ($error === '') {
 
 $podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
 $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
+// Fallback de autor: owner_name -> author.
 if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }

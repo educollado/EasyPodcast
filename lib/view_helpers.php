@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+// ---------------------------------------------------------------------------
+// Helpers de salida para vistas publicas/admin
+// ---------------------------------------------------------------------------
+
 // Helper básico de escape HTML para salida segura.
 function esc(string $value): string
 {
@@ -11,6 +15,7 @@ function esc(string $value): string
 // Convierte URLs en enlaces sin permitir HTML arbitrario.
 function renderTextWithLinks(string $value): string
 {
+    // Split conservando las URL para tratarlas de forma segura.
     $parts = preg_split('~(https?://[^\s<>"\']+)~iu', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
     if ($parts === false) {
         return nl2br(esc($value));
@@ -23,6 +28,7 @@ function renderTextWithLinks(string $value): string
         }
 
         if ($index % 2 === 1) {
+            // Recorta puntuacion final habitual para no romper enlaces.
             $url = rtrim($part, '.,;:!?)');
             $suffix = substr($part, strlen($url));
             if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) !== false) {

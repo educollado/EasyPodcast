@@ -7,6 +7,11 @@ declare(strict_types=1);
 // - siguientes ejecuciones: login/logout y acceso a gestión
 
 require_once __DIR__ . '/canonical_redirect.php';
+
+// ---------------------------------------------------------------------------
+// Bootstrap de sesión y contexto
+// ---------------------------------------------------------------------------
+
 session_start();
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
@@ -45,7 +50,9 @@ try {
         exit;
     }
 
-    // Un único formulario maneja modo setup y modo login normal.
+    // Un único formulario maneja:
+    // - setup inicial (no existe usuario admin)
+    // - login normal (ya existe al menos uno)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = trim((string) ($_POST['username'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
