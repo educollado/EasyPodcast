@@ -36,6 +36,9 @@
       padding: 1.25rem;
       box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
     }
+    .backups-card {
+      max-width: 940px;
+    }
     /* =========================================================
        Tipografía y textos
        ========================================================= */
@@ -124,9 +127,43 @@
       display: grid;
       gap: .7rem;
     }
+    .backup-groups {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .85rem;
+      margin-top: .95rem;
+      align-items: start;
+    }
+    .tool-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .9rem;
+    }
+    .tool-box h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .tool-box p {
+      margin: .35rem 0 .7rem;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+    .tool-box .db-tools {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
     .db-export {
       background: #2d6a4f;
       text-align: center;
+    }
+    .files-export {
+      background: #3a7d44;
+      text-align: center;
+    }
+    .files-import {
+      background: #3b5b92;
     }
     .db-import {
       background: #3b5b92;
@@ -147,6 +184,9 @@
       font-size: .92rem;
     }
     @media (max-width: 560px) {
+      .backup-groups {
+        grid-template-columns: 1fr;
+      }
       .actions .btn {
         width: 100%;
         text-align: center;
