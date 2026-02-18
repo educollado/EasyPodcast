@@ -15,7 +15,7 @@
 |---|---|
 | Web pública | Portada con episodios `published`, página individual por episodio, reproductor inline |
 | Feed | RSS dinámico (`feed.php`) y feed generado (`feed.xml`) |
-| Administración | Login, gestión del canal, alta/edición/borrado de episodios |
+| Administración | Login, gestión del canal, alta/edición/borrado de episodios, escritura de metadatos ID3 |
 | Subidas | Audio a `audios/`, imágenes a `images/` |
 | Estilos | CSS separado por página en `assets/css/` |
 
@@ -61,6 +61,10 @@
 | `admin.php` | Panel de administración |
 | `podcast_management.php` | Gestión del canal |
 | `episodes_management.php` | Gestión de episodios |
+| `add_episode.php` | Alta/edición de episodios y subida de audio/imagen |
+| `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
+| `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
+| `lib/view_helpers.php` | Helpers compartidos de vista (`esc`, enlaces, slug, fechas) |
 | `schema.sql` | Esquema de base de datos |
 | `podcast.sqlite` | Base de datos SQLite |
 | `audios/` | Audios subidos |
@@ -175,6 +179,7 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 - Si un episodio no tiene imagen, se usa la del podcast.
 - El autor del episodio puede heredarse desde la configuración del podcast.
 - El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
+- Si activas la opción en `podcast_management.php`, al subir/editar MP3 se escriben metadatos ID3 (incluida portada de episodio o fallback de podcast).
 
 ## Licencia (Software Libre)
 
