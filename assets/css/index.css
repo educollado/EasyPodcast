@@ -20,7 +20,8 @@
       font-family: "Georgia", "Times New Roman", serif;
       background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
       color: var(--text);
-      padding: 1rem;
+      padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+      line-height: 1.5;
     }
     .container {
       max-width: 940px;
@@ -55,10 +56,18 @@
       height: 28px;
       display: block;
     }
+    .rss-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      min-height: 40px;
+    }
     h1 {
       margin: 0;
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 4.2vw, 2rem);
       line-height: 1.12;
+      overflow-wrap: anywhere;
     }
     h1 a {
       color: inherit;
@@ -115,7 +124,9 @@
     }
     h2 {
       margin: 0 0 .35rem;
-      font-size: 1.2rem;
+      font-size: clamp(1.05rem, 2.8vw, 1.2rem);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
     }
     h2 a {
       color: inherit;
@@ -131,6 +142,7 @@
     }
     .excerpt {
       margin: 0;
+      overflow-wrap: anywhere;
     }
     .read-more {
       color: var(--accent);
@@ -185,11 +197,14 @@
     .page-link {
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: .35rem .6rem;
+      padding: .48rem .72rem;
       text-decoration: none;
       color: var(--text);
       background: #fff;
       font-size: .9rem;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
     }
     .page-link.active {
       background: var(--accent);
@@ -200,12 +215,16 @@
        Ajustes responsive
        ========================================================= */
     @media (max-width: 620px) {
+      .card {
+        padding: 1rem;
+      }
       .header-top {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: flex-start;
       }
       .header-actions {
-        align-items: start;
+        align-items: flex-end;
+        align-self: flex-start;
       }
       .episode {
         grid-template-columns: 108px 1fr;
@@ -213,5 +232,29 @@
       .cover {
         width: 108px;
         height: 108px;
+      }
+      .pagination {
+        align-items: flex-start;
+      }
+      .pagination .links {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: .2rem;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .episode {
+        grid-template-columns: 1fr;
+        gap: .65rem;
+      }
+      .cover {
+        width: min(100%, 180px);
+        height: auto;
+        aspect-ratio: 1 / 1;
+      }
+      .player {
+        width: 100%;
       }
     }
