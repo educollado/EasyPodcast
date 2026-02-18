@@ -4,7 +4,7 @@
 
 ## Versión
 
-**Versión actual: 0.2**
+**Versión actual: 0.3**
 
 ## Sitio de referencia
 
@@ -52,6 +52,7 @@
 | `admin.php` | Login/logout y acceso al panel |
 | `podcast_management.php` | Metadatos del podcast (tabla `podcast`) |
 | `episodes_management.php` | CRUD de episodios (tabla `episodes`) |
+| `backups.php` | Exportar/importar base de datos y ficheros (`images/`, `audios/`) |
 
 ## Estructura del proyecto
 
@@ -65,6 +66,7 @@
 | `admin.php` | Panel de administración |
 | `podcast_management.php` | Gestión del canal |
 | `episodes_management.php` | Gestión de episodios |
+| `backups.php` | Copias de seguridad de base de datos y ficheros |
 | `add_episode.php` | Alta/edición de episodios y subida de audio/imagen |
 | `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
 | `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
@@ -81,7 +83,7 @@
 | Componente | Requisito |
 |---|---|
 | PHP | 8+ recomendado |
-| Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter` |
+| Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd` |
 | Servidor | Apache con `mod_rewrite` |
 | Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/` |
 
@@ -132,6 +134,7 @@ chmod 664 podcast.sqlite feed.xml
 2. Crea el primer usuario administrador.
 3. Configura metadatos del podcast en `podcast_management.php`.
 4. Crea episodios en `episodes_management.php`.
+5. Gestiona copias de seguridad en `backups.php`.
 
 ### 7) Comprobaciones finales
 
@@ -184,6 +187,8 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 - El autor del episodio puede heredarse desde la configuración del podcast.
 - El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
 - Si activas la opción en `podcast_management.php`, al subir/editar MP3 se escriben metadatos ID3 (incluida portada de episodio o fallback de podcast).
+- Al guardar metadatos del podcast, se intenta regenerar `favicon.ico` automáticamente usando la imagen del podcast.
+- En `backups.php`, la exportación de ficheros genera un ZIP temporal para descarga; la importación acepta ZIP con rutas bajo `images/` y `audios/`.
 
 ## Licencia (Software Libre)
 

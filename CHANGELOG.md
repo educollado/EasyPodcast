@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3
+
+- Nueva página `backups.php` para copias de seguridad, separada del panel principal.
+- Exportación de base de datos SQLite desde administración.
+- Importación de base de datos con validación y backup previo en `backups/`.
+- Exportación de ficheros `images/` y `audios/` en ZIP descargable temporal.
+- Importación de ZIP de ficheros con validaciones de seguridad de rutas.
+- Reorganización visual en bloques separados: **Base de Datos** y **Ficheros**.
+- Mejoras responsive en portada, detalle de episodio y gestión de capítulos.
+- Nuevo botón **Visitar podcast** en el panel de administración.
+- Generación automática de `favicon.ico` al guardar metadatos del podcast.
+
 ## 0.2
 
 - Añadida escritura de metadatos ID3 directamente en ficheros MP3 desde la administración.
