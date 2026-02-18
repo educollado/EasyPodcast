@@ -17,6 +17,37 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+// Convierte URLs en enlaces sin permitir HTML arbitrario.
+function renderTextWithLinks(string $value): string
+{
+    $parts = preg_split('~(https?://[^\s<>"\']+)~iu', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+    if ($parts === false) {
+        return nl2br(esc($value));
+    }
+
+    $html = '';
+    foreach ($parts as $index => $part) {
+        if ($part === '') {
+            continue;
+        }
+
+        if ($index % 2 === 1) {
+            $url = rtrim($part, '.,;:!?)');
+            $suffix = substr($part, strlen($url));
+            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) !== false) {
+                $safeUrl = esc($url);
+                $html .= '<a href="' . $safeUrl . '" target="_blank" rel="noopener noreferrer">' . $safeUrl . '</a>';
+                $html .= esc($suffix);
+                continue;
+            }
+        }
+
+        $html .= esc($part);
+    }
+
+    return nl2br($html);
+}
+
 // Fecha de publicación legible usada en las tarjetas de episodio.
 function formatPublishedDate(?string $value): string
 {
@@ -174,7 +205,7 @@ $faviconUrl = $podcastImage;
         <p class="author"><?= esc($podcastAuthor) ?></p>
       <?php endif; ?>
       <?php if (!empty($podcast['description'])): ?>
-        <p class="desc"><?= nl2br(esc((string) $podcast['description'])) ?></p>
+        <p class="desc"><?= renderTextWithLinks((string) $podcast['description']) ?></p>
       <?php endif; ?>
     </header>
 

@@ -15,6 +15,37 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+// Convierte URLs en enlaces sin permitir HTML arbitrario.
+function renderTextWithLinks(string $value): string
+{
+    $parts = preg_split('~(https?://[^\s<>"\']+)~iu', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+    if ($parts === false) {
+        return nl2br(esc($value));
+    }
+
+    $html = '';
+    foreach ($parts as $index => $part) {
+        if ($part === '') {
+            continue;
+        }
+
+        if ($index % 2 === 1) {
+            $url = rtrim($part, '.,;:!?)');
+            $suffix = substr($part, strlen($url));
+            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) !== false) {
+                $safeUrl = esc($url);
+                $html .= '<a href="' . $safeUrl . '" target="_blank" rel="noopener noreferrer">' . $safeUrl . '</a>';
+                $html .= esc($suffix);
+                continue;
+            }
+        }
+
+        $html .= esc($part);
+    }
+
+    return nl2br($html);
+}
+
 // Mantiene el mismo algoritmo de slug usado en index.php.
 function slugify(string $value): string
 {
@@ -203,7 +234,7 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
             <h1><?= esc((string) ($episode['title'] ?? 'Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['description'])): ?>
-              <p><?= nl2br(esc((string) $episode['description'])) ?></p>
+              <p><?= renderTextWithLinks((string) $episode['description']) ?></p>
             <?php endif; ?>
             <?php if (!empty($episode['audio_url'])): ?>
               <p class="audio-meta">
