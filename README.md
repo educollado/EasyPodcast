@@ -28,6 +28,7 @@
   - paginación de 20 en 20
   - portada del episodio (o fallback a portada del podcast)
   - extracto y reproductor
+  - si el extracto se recorta, se muestra `[...]` enlazado al episodio completo
 - Página de episodio (`episode.php`) con:
   - URL amigable `/YYYY/MM/slug`
   - descripción completa
