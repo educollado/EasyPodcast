@@ -2,6 +2,10 @@
 
 > Aplicación ligera en **PHP + SQLite** para publicar un podcast con web pública, páginas de episodio y feed RSS.
 
+## Versión
+
+**Versión actual: 0.2**
+
 ## Sitio de referencia
 
 | Campo | Valor |
