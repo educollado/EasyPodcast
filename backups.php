@@ -202,9 +202,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                                 try {
                                     // Tras importar, sincroniza feed.xml con la nueva base.
                                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
-                                    $notice = 'Base de datos importada correctamente. Se creó backup y se regeneró feed.xml.';
+                                    $notice = 'Base de datos importada correctamente y feed.xml regenerado.';
                                 } catch (Throwable $feedError) {
-                                    $notice = 'Base de datos importada correctamente. Se creó backup, pero no se pudo regenerar feed.xml.';
+                                    $notice = 'Base de datos importada correctamente, pero no se pudo regenerar feed.xml.';
+                                }
+
+                                // Limpia el backup temporal tras importación satisfactoria.
+                                if (!@unlink($backupPath) && is_file($backupPath)) {
+                                    $notice .= ' (Aviso: no se pudo borrar el backup temporal en /backups)';
                                 }
                             }
                         }
