@@ -6,9 +6,11 @@ declare(strict_types=1);
 // - exportar la base de datos actual
 // - importar una base de datos con backup previo
 
+// Redirección canónica por host configurado en el podcast y utilidades del feed.
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/feed_builder.php';
 
+// El acceso a esta pantalla exige sesión de administrador activa.
 session_start();
 
 if (!isset($_SESSION['admin_user'])) {
@@ -17,21 +19,25 @@ if (!isset($_SESSION['admin_user'])) {
 }
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+// Fuerza el dominio canónico para evitar acciones de administración desde host alternativo.
 enforceCanonicalHostFromPodcastLink($dbPath);
 $error = '';
 $notice = '';
 
 function esc(string $value): string
 {
+    // Escape HTML centralizado para todo texto dinámico en la vista.
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
 function addDirectoryToZip(ZipArchive $zip, string $absoluteDir, string $zipRoot): int
 {
+    // Si el directorio no existe, no se considera error: simplemente no se añade.
     if (!is_dir($absoluteDir)) {
         return 0;
     }
 
+    // Crea explícitamente el directorio raíz dentro del ZIP (images/ o audios/).
     $zip->addEmptyDir($zipRoot);
 
     $dirLen = strlen($absoluteDir) + 1;
@@ -41,6 +47,7 @@ function addDirectoryToZip(ZipArchive $zip, string $absoluteDir, string $zipRoot
         RecursiveIteratorIterator::SELF_FIRST
     );
 
+    // Recorre recursivamente el árbol local y replica su estructura dentro del ZIP.
     foreach ($iterator as $item) {
         $path = $item->getPathname();
         $relativePath = substr($path, $dirLen);
@@ -62,6 +69,7 @@ function addDirectoryToZip(ZipArchive $zip, string $absoluteDir, string $zipRoot
 
 function normalizeZipPath(string $path): string
 {
+    // Normaliza separadores para tratar todas las rutas ZIP como POSIX.
     $normalized = str_replace('\\', '/', $path);
     while (strpos($normalized, '//') !== false) {
         $normalized = str_replace('//', '/', $normalized);
@@ -70,6 +78,8 @@ function normalizeZipPath(string $path): string
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'export_db') {
+    // Exportación directa de la base de datos actual.
+    // No crea copia persistente en servidor: transmite el fichero existente y termina.
     if (!is_file($dbPath)) {
         $error = 'No se encontró la base de datos para exportar.';
     } else {
@@ -85,6 +95,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_db') {
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'export_files') {
+    // Exportación de ficheros multimedia como ZIP temporal descargable.
     if (!class_exists('ZipArchive')) {
         $error = 'La extensión ZipArchive no está disponible en este servidor.';
     } else {
@@ -120,6 +131,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_files') {
                         header('Cache-Control: no-store, no-cache, must-revalidate');
                         header('Pragma: no-cache');
                         readfile($tmpZipPath);
+                        // Limpia el ZIP temporal para no dejar residuos en disco.
                         @unlink($tmpZipPath);
                         exit;
                     }
@@ -130,6 +142,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_files') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? '') === 'import_db') {
+    // Importación de base de datos SQLite.
+    // Flujo: validar subida -> validar estructura -> backup previo -> restaurar -> regenerar feed.
     if (!isset($_FILES['db_file']) || !is_array($_FILES['db_file'])) {
         $error = 'Selecciona un archivo de base de datos.';
     } else {
@@ -144,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
             $error = 'El archivo debe tener extensión .sqlite o .db.';
         } else {
             try {
+                // Verificación rápida de integridad funcional: la DB debe contener tablas clave.
                 $probe = new PDO('sqlite:' . $uploadedPath);
                 $probe->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -159,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                 } elseif (!class_exists('SQLite3')) {
                     $error = 'La extensión SQLite3 no está disponible en este servidor.';
                 } else {
+                    // Antes de sobrescribir, crea snapshot de seguridad de la base actual.
                     $backupDir = __DIR__ . '/backups';
                     if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true) && !is_dir($backupDir)) {
                         $error = 'No se pudo crear el directorio de backups.';
@@ -169,6 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                         } else {
                             $probe = null;
 
+                            // Restauración binaria usando API nativa de SQLite para minimizar riesgos.
                             $sourceDb = new SQLite3($uploadedPath, SQLITE3_OPEN_READONLY);
                             $targetDb = new SQLite3($dbPath, SQLITE3_OPEN_READWRITE);
                             $importOk = $sourceDb->backup($targetDb);
@@ -183,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                                 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
                                 try {
+                                    // Tras importar, sincroniza feed.xml con la nueva base.
                                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
                                     $notice = 'Base de datos importada correctamente. Se creó backup y se regeneró feed.xml.';
                                 } catch (Throwable $feedError) {
@@ -200,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ?? '') === 'import_files_zip') {
+    // Importación de ZIP de ficheros (solo se aceptan rutas bajo images/ y audios/).
     if (!class_exists('ZipArchive')) {
         $error = 'La extensión ZipArchive no está disponible en este servidor.';
     } elseif (!isset($_FILES['files_zip']) || !is_array($_FILES['files_zip'])) {
@@ -225,6 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
                 $foundValidEntries = 0;
                 $importError = '';
 
+                // Recorre entradas una a una para aplicar validación de ruta antes de escribir.
                 for ($i = 0; $i < $zip->numFiles; $i++) {
                     $entryStat = $zip->statIndex($i);
                     if (!is_array($entryStat) || !isset($entryStat['name'])) {
@@ -235,6 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
                         continue;
                     }
 
+                    // Bloqueo explícito de path traversal y nombres corruptos.
                     if (strpos($entryName, '../') !== false || str_contains($entryName, "\0")) {
                         $importError = 'El ZIP contiene rutas no permitidas.';
                         break;
@@ -242,6 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
 
                     $isAllowedRoot = str_starts_with($entryName, 'images/') || str_starts_with($entryName, 'audios/');
                     $isAllowedDir = ($entryName === 'images' || $entryName === 'audios');
+                    // Ignora cualquier ruta fuera de images/ o audios/.
                     if (!$isAllowedRoot && !$isAllowedDir) {
                         continue;
                     }
@@ -269,6 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
                         break;
                     }
 
+                    // Extracción en streaming para no cargar ficheros completos en memoria.
                     $stream = $zip->getStream((string) $entryStat['name']);
                     if ($stream === false) {
                         $importError = 'No se pudo leer un fichero dentro del ZIP.';
