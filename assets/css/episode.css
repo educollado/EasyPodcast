@@ -97,6 +97,14 @@
       color: var(--muted);
       margin: .45rem 0 .75rem;
     }
+    .desc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .desc a:hover {
+      text-decoration: underline;
+    }
     .player {
       width: min(620px, 100%);
       margin-top: .8rem;
