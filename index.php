@@ -233,10 +233,10 @@ $faviconUrl = $podcastImage;
               <p class="meta">
                 <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>
               </p>
-              <p>
+              <p class="excerpt">
                 <?= esc((string) $excerpt['text']) ?>
                 <?php if (!empty($excerpt['truncated'])): ?>
-                  <a href="<?= esc($episodeHref) ?>">[...]</a>
+                  <a class="read-more" href="<?= esc($episodeHref) ?>">[...]</a>
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
