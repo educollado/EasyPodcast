@@ -77,6 +77,14 @@
       margin: .8rem 0 0;
       color: var(--muted);
     }
+    .desc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .desc a:hover {
+      text-decoration: underline;
+    }
     /* =========================================================
        Listado de episodios
        ========================================================= */

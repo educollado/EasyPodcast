@@ -234,7 +234,7 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
             <h1><?= esc((string) ($episode['title'] ?? 'Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['description'])): ?>
-              <p><?= renderTextWithLinks((string) $episode['description']) ?></p>
+              <p class="desc"><?= renderTextWithLinks((string) $episode['description']) ?></p>
             <?php endif; ?>
             <?php if (!empty($episode['audio_url'])): ?>
               <p class="audio-meta">
