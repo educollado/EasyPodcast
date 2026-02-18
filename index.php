@@ -8,61 +8,9 @@ declare(strict_types=1);
 // - enlaza cada título a su URL amigable
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/view_helpers.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
-
-// Helper básico de escape HTML para salida segura.
-function esc(string $value): string
-{
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-}
-
-// Convierte URLs en enlaces sin permitir HTML arbitrario.
-function renderTextWithLinks(string $value): string
-{
-    $parts = preg_split('~(https?://[^\s<>"\']+)~iu', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
-    if ($parts === false) {
-        return nl2br(esc($value));
-    }
-
-    $html = '';
-    foreach ($parts as $index => $part) {
-        if ($part === '') {
-            continue;
-        }
-
-        if ($index % 2 === 1) {
-            $url = rtrim($part, '.,;:!?)');
-            $suffix = substr($part, strlen($url));
-            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) !== false) {
-                $safeUrl = esc($url);
-                $html .= '<a href="' . $safeUrl . '" target="_blank" rel="noopener noreferrer">' . $safeUrl . '</a>';
-                $html .= esc($suffix);
-                continue;
-            }
-        }
-
-        $html .= esc($part);
-    }
-
-    return nl2br($html);
-}
-
-// Fecha de publicación legible usada en las tarjetas de episodio.
-function formatPublishedDate(?string $value): string
-{
-    $raw = trim((string) $value);
-    if ($raw === '') {
-        return '';
-    }
-
-    $ts = strtotime($raw);
-    if ($ts === false) {
-        return $raw;
-    }
-
-    return date('d/m/Y H:i', $ts);
-}
 
 // Genera un extracto de texto compacto y marca si hubo recorte.
 function firstChars(string $value, int $maxChars): array
@@ -84,28 +32,6 @@ function firstChars(string $value, int $maxChars): array
     }
 
     return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
-}
-
-// Construye slugs seguros para URL desde títulos de episodio.
-function slugify(string $value): string
-{
-    $slug = trim($value);
-    if ($slug === '') {
-        return 'capitulo';
-    }
-
-    if (function_exists('iconv')) {
-        $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
-        if ($converted !== false) {
-            $slug = $converted;
-        }
-    }
-
-    $slug = strtolower($slug);
-    $slug = (string) preg_replace('/[^a-z0-9]+/', '-', $slug);
-    $slug = trim($slug, '-');
-
-    return $slug !== '' ? $slug : 'capitulo';
 }
 
 // Ruta amigable usada por .htaccess y episode.php.
