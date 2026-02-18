@@ -48,6 +48,7 @@ $form = [
     'copyright' => '',
     'itunes_type' => 'episodic',
     'rss_item_limit' => '0',
+    'write_audio_metadata' => '0',
 ];
 
 try {
@@ -71,19 +72,26 @@ try {
           image_url TEXT,
           copyright TEXT,
           itunes_type TEXT DEFAULT 'episodic',
-          rss_item_limit INTEGER NOT NULL DEFAULT 0
+          rss_item_limit INTEGER NOT NULL DEFAULT 0,
+          write_audio_metadata INTEGER NOT NULL DEFAULT 0
         )"
     );
     $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
     $hasRssItemLimit = false;
+    $hasWriteAudioMetadata = false;
     foreach ($columns as $column) {
         if (($column['name'] ?? '') === 'rss_item_limit') {
             $hasRssItemLimit = true;
-            break;
+        }
+        if (($column['name'] ?? '') === 'write_audio_metadata') {
+            $hasWriteAudioMetadata = true;
         }
     }
     if (!$hasRssItemLimit) {
         $pdo->exec('ALTER TABLE podcast ADD COLUMN rss_item_limit INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!$hasWriteAudioMetadata) {
+        $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
     }
 
     // La app usa una sola fila de canal; se carga cuando existe.
@@ -103,6 +111,10 @@ try {
             }
             if ($key === 'rss_item_limit') {
                 $form[$key] = trim((string) ($_POST[$key] ?? '0'));
+                continue;
+            }
+            if ($key === 'write_audio_metadata') {
+                $form[$key] = isset($_POST[$key]) ? '1' : '0';
                 continue;
             }
             $form[$key] = trim((string) ($_POST[$key] ?? ''));
@@ -181,7 +193,8 @@ try {
                          image_url = :image_url,
                          copyright = :copyright,
                          itunes_type = :itunes_type,
-                         rss_item_limit = :rss_item_limit
+                         rss_item_limit = :rss_item_limit,
+                         write_audio_metadata = :write_audio_metadata
                      WHERE id = :id'
                 );
                 $stmt->execute([
@@ -198,6 +211,7 @@ try {
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
+                    ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                     ':id' => (int) $existing['id'],
                 ]);
                 $notice = 'Podcast actualizado correctamente.';
@@ -211,9 +225,9 @@ try {
                 // Inserción inicial cuando aún no existe fila de podcast.
                 $stmt = $pdo->prepare(
                     'INSERT INTO podcast
-                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit)
+                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, write_audio_metadata)
                      VALUES
-                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit)'
+                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :write_audio_metadata)'
                 );
                 $stmt->execute([
                     ':title' => $form['title'],
@@ -229,6 +243,7 @@ try {
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
+                    ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                 ]);
                 $notice = 'Podcast guardado correctamente.';
                 try {
@@ -342,6 +357,11 @@ try {
             Cantidad de elementos del Feed RSS
             <input type="number" min="0" step="1" name="rss_item_limit" value="<?= esc($form['rss_item_limit']) ?>">
             <small>Nota: 0 significa infinitos (sin límite).</small>
+          </label>
+          <label class="inline-checkbox">
+            <input type="checkbox" name="write_audio_metadata" value="1" <?= $form['write_audio_metadata'] === '1' ? 'checked' : '' ?>>
+            <span>Escribir metadatos ID3 en MP3 al subir episodio</span>
+            <small>Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista.</small>
           </label>
         </div>
 

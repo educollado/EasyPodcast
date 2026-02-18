@@ -64,6 +64,21 @@
       gap: .35rem;
       font-size: .92rem;
     }
+    label.inline-checkbox {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      column-gap: .55rem;
+      row-gap: .2rem;
+    }
+    label.inline-checkbox input[type="checkbox"] {
+      margin: 0;
+      width: 1rem;
+      height: 1rem;
+    }
+    label.inline-checkbox small {
+      grid-column: 1 / -1;
+    }
     input, textarea, select {
       padding: .65rem .7rem;
       border: 1px solid var(--border);

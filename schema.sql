@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS podcast (
   image_url TEXT,
   copyright TEXT,
   itunes_type TEXT DEFAULT 'episodic',
-  rss_item_limit INTEGER NOT NULL DEFAULT 0
+  rss_item_limit INTEGER NOT NULL DEFAULT 0,
+  write_audio_metadata INTEGER NOT NULL DEFAULT 0
 );
 
 -- episodes: una fila por episodio.
