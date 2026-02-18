@@ -101,6 +101,7 @@
       display: flex;
       justify-content: space-between;
       gap: .6rem;
+      flex-wrap: wrap;
     }
     .btn {
       text-decoration: none;
@@ -115,4 +116,43 @@
     }
     .logout {
       background: #8a3b3b;
+    }
+    .db-tools {
+      margin-top: .95rem;
+      padding-top: .9rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      gap: .7rem;
+    }
+    .db-export {
+      background: #2d6a4f;
+      text-align: center;
+    }
+    .db-import {
+      background: #3b5b92;
+    }
+    .db-import-form {
+      display: grid;
+      gap: .45rem;
+    }
+    .db-import-form label {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .db-import-form input[type="file"] {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .45rem .5rem;
+      background: #fff;
+      font-size: .92rem;
+    }
+    @media (max-width: 560px) {
+      .actions .btn {
+        width: 100%;
+        text-align: center;
+      }
+      .db-tools .btn {
+        width: 100%;
+        text-align: center;
+      }
     }
