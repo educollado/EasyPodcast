@@ -120,6 +120,7 @@ $cover = trim((string) ($episode['image_url'] ?? ''));
 if ($cover === '') {
     $cover = trim((string) ($podcast['image_url'] ?? ''));
 }
+$coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [128, 160, 220, 320, 440, 512]) : ['src' => '', 'srcset' => ''];
 $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
 ?>
 <!doctype html>
@@ -154,7 +155,7 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
       <?php else: ?>
         <article class="detail">
           <?php if ($cover !== ''): ?>
-            <img class="cover" src="<?= esc($cover) ?>" alt="Portada del capítulo">
+            <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 220px, (max-width: 760px) 160px, 220px"<?php endif; ?> alt="Portada del capítulo">
           <?php else: ?>
             <div class="cover" aria-hidden="true"></div>
           <?php endif; ?>
