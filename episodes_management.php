@@ -150,40 +150,42 @@ try {
       <?php if (!$episodesList): ?>
         <p class="muted">Todavía no hay capítulos guardados.</p>
       <?php else: ?>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Título</th>
-              <th>Estado</th>
-              <th>Publicación</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($episodesList as $episode): ?>
+        <div class="table-wrap">
+          <table>
+            <thead>
               <tr>
-                <td><?= (int) ($episode['id'] ?? 0) ?></td>
-                <td>
-                  <?= esc((string) ($episode['title'] ?? '')) ?><br>
-                  <small class="muted"><?= esc((string) ($episode['guid'] ?? '')) ?></small>
-                </td>
-                <td><?= esc((string) ($episode['status'] ?? '')) ?></td>
-                <td><?= esc((string) ($episode['pub_date'] ?? '')) ?></td>
-                <td>
-                  <div class="row-actions">
-                    <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>">Editar</a>
-                    <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. ¿Continuar?');">
-                      <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
-                      <input type="hidden" name="return_page" value="<?= $currentPage ?>">
-                      <button class="delete-text" type="submit">Borrar</button>
-                    </form>
-                  </div>
-                </td>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Estado</th>
+                <th>Publicación</th>
+                <th>Acción</th>
               </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <?php foreach ($episodesList as $episode): ?>
+                <tr>
+                  <td><?= (int) ($episode['id'] ?? 0) ?></td>
+                  <td>
+                    <?= esc((string) ($episode['title'] ?? '')) ?><br>
+                    <small class="muted guid"><?= esc((string) ($episode['guid'] ?? '')) ?></small>
+                  </td>
+                  <td><?= esc((string) ($episode['status'] ?? '')) ?></td>
+                  <td><?= esc((string) ($episode['pub_date'] ?? '')) ?></td>
+                  <td>
+                    <div class="row-actions">
+                      <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>">Editar</a>
+                      <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. ¿Continuar?');">
+                        <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
+                        <input type="hidden" name="return_page" value="<?= $currentPage ?>">
+                        <button class="delete-text" type="submit">Borrar</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
 
         <nav class="pagination" aria-label="Paginación de capítulos">
           <?php if ($currentPage > 1): ?>

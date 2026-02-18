@@ -22,7 +22,8 @@
       font-family: "Georgia", "Times New Roman", serif;
       background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
       color: var(--text);
-      padding: 1rem;
+      padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+      line-height: 1.5;
     }
     .container {
       max-width: 980px;
@@ -134,10 +135,16 @@
     .list-card {
       margin-top: 1rem;
     }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: .93rem;
+      min-width: 640px;
     }
     th, td {
       text-align: left;
@@ -162,6 +169,12 @@
     }
     .muted {
       color: var(--muted);
+    }
+    .guid {
+      display: inline-block;
+      max-width: 34ch;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     /* =========================================================
        Acciones por fila (editar/borrar)
@@ -214,4 +227,39 @@
     .page-status {
       color: var(--muted);
       font-size: .92rem;
+    }
+    @media (max-width: 760px) {
+      .card {
+        padding: 1rem;
+      }
+      .title-row {
+        align-items: stretch;
+      }
+      .add-link {
+        width: 100%;
+        text-align: center;
+      }
+      .pagination {
+        gap: .5rem;
+        align-items: flex-start;
+      }
+      .page-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+      }
+      .page-status {
+        width: 100%;
+      }
+    }
+    @media (max-width: 520px) {
+      table {
+        min-width: 560px;
+      }
+      th, td {
+        padding: .52rem .38rem;
+      }
+      .guid {
+        max-width: 26ch;
+      }
     }
