@@ -129,6 +129,17 @@
       color: var(--muted);
       font-size: .92rem;
     }
+    .excerpt {
+      margin: 0;
+    }
+    .read-more {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .read-more:hover {
+      text-decoration: underline;
+    }
     .player {
       margin-top: .55rem;
       width: min(520px, 100%);
