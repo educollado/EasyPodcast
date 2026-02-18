@@ -34,6 +34,147 @@ function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
     return resolveBaseUrl($pdo);
 }
 
+function resolveLocalImagePathFromUrl(string $imageUrl): ?string
+{
+    $raw = trim($imageUrl);
+    if ($raw === '') {
+        return null;
+    }
+
+    $parsedPath = (string) parse_url($raw, PHP_URL_PATH);
+    $candidate = $parsedPath !== '' ? $parsedPath : $raw;
+
+    if ($candidate === '') {
+        return null;
+    }
+
+    if ($candidate[0] === '/') {
+        $candidate = __DIR__ . $candidate;
+    } else {
+        $candidate = __DIR__ . '/' . $candidate;
+    }
+
+    $real = realpath($candidate);
+    if ($real === false || !is_file($real)) {
+        return null;
+    }
+
+    $projectRoot = realpath(__DIR__);
+    if ($projectRoot === false) {
+        return null;
+    }
+
+    if (strpos($real, $projectRoot . DIRECTORY_SEPARATOR) !== 0 && $real !== $projectRoot) {
+        return null;
+    }
+
+    return $real;
+}
+
+function createPngBlobForIco(string $sourcePath, int $size): ?string
+{
+    if (!function_exists('imagecreatefromstring') || !function_exists('imagecreatetruecolor')) {
+        return null;
+    }
+
+    $raw = @file_get_contents($sourcePath);
+    if ($raw === false || $raw === '') {
+        return null;
+    }
+
+    $src = @imagecreatefromstring($raw);
+    if ($src === false) {
+        return null;
+    }
+
+    $dst = imagecreatetruecolor($size, $size);
+    if ($dst === false) {
+        imagedestroy($src);
+        return null;
+    }
+
+    imagealphablending($dst, false);
+    imagesavealpha($dst, true);
+    $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+    imagefilledrectangle($dst, 0, 0, $size, $size, $transparent);
+
+    $srcW = imagesx($src);
+    $srcH = imagesy($src);
+    imagecopyresampled($dst, $src, 0, 0, 0, 0, $size, $size, $srcW, $srcH);
+
+    ob_start();
+    imagepng($dst, null, 9);
+    $pngData = ob_get_clean();
+
+    imagedestroy($src);
+    imagedestroy($dst);
+
+    if (!is_string($pngData) || $pngData === '') {
+        return null;
+    }
+
+    return $pngData;
+}
+
+function buildIcoBinaryFromPngBlobs(array $pngBlobsBySize): string
+{
+    $count = count($pngBlobsBySize);
+    $header = pack('vvv', 0, 1, $count);
+    $entries = '';
+    $images = '';
+    $offset = 6 + (16 * $count);
+
+    foreach ($pngBlobsBySize as $size => $blob) {
+        $iconSize = (int) $size;
+        $sizeByte = $iconSize >= 256 ? 0 : $iconSize;
+        $length = strlen($blob);
+        $entries .= pack('CCCCvvVV', $sizeByte, $sizeByte, 0, 0, 1, 32, $length, $offset);
+        $images .= $blob;
+        $offset += $length;
+    }
+
+    return $header . $entries . $images;
+}
+
+function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
+{
+    $warning = '';
+
+    if ($imageUrl === '') {
+        return true;
+    }
+    if (!function_exists('imagecreatefromstring')) {
+        $warning = 'No se pudo generar favicon.ico (falta extension GD).';
+        return false;
+    }
+
+    $sourcePath = resolveLocalImagePathFromUrl($imageUrl);
+    if ($sourcePath === null) {
+        $warning = 'No se pudo generar favicon.ico (imagen del podcast no localizada en servidor).';
+        return false;
+    }
+
+    $sizes = [16, 32, 48];
+    $blobs = [];
+    foreach ($sizes as $size) {
+        $blob = createPngBlobForIco($sourcePath, $size);
+        if ($blob === null) {
+            $warning = 'No se pudo generar favicon.ico (fallo al convertir imagen).';
+            return false;
+        }
+        $blobs[$size] = $blob;
+    }
+
+    $icoBinary = buildIcoBinaryFromPngBlobs($blobs);
+    $targetPath = __DIR__ . '/favicon.ico';
+    if (@file_put_contents($targetPath, $icoBinary) === false) {
+        $warning = 'No se pudo escribir favicon.ico en disco.';
+        return false;
+    }
+
+    return true;
+}
+
 $form = [
     'title' => '',
     'description' => '',
@@ -222,6 +363,10 @@ try {
                 } catch (Throwable $feedError) {
                     $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
                 }
+                $faviconWarning = '';
+                if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
+                    $notice .= ' (Aviso: ' . $faviconWarning . ')';
+                }
             } else {
                 // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                 $stmt = $pdo->prepare(
@@ -252,6 +397,10 @@ try {
                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
                 } catch (Throwable $feedError) {
                     $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
+                }
+                $faviconWarning = '';
+                if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
+                    $notice .= ' (Aviso: ' . $faviconWarning . ')';
                 }
             }
 
