@@ -2,24 +2,11 @@
 
 declare(strict_types=1);
 
-// Portada pública:
-// - lista solo episodios publicados
-// - soporta paginación
-// - enlaza cada título a su URL amigable
-
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
-require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
-$dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
-enforceCanonicalHostFromPodcastLink($dbPath);
-if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
-    exit;
-}
-ob_start();
 
-// Genera un extracto de texto compacto y marca si hubo recorte.
 function firstChars(string $value, int $maxChars): array
 {
     $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
@@ -41,109 +28,119 @@ function firstChars(string $value, int $maxChars): array
     return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
 }
 
+function escapeSqlLike(string $value): string
+{
+    return str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $value);
+}
+
+$dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
+
 $podcast = null;
-$episodes = [];
-$error = '';
+$podcastTitle = 'Podcast';
+$podcastAuthor = '';
+$podcastImage = '';
+$baseSeoUrl = '';
+
+$query = trim((string) ($_GET['q'] ?? ''));
 $page = max(1, (int) ($_GET['page'] ?? 1));
 $perPage = 20;
 $totalEpisodes = 0;
 $totalPages = 1;
+$episodes = [];
+$error = '';
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    // La app está diseñada alrededor de una única fila de podcast.
     $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
+    $podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
+    $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
+    if ($podcastAuthor === '') {
+        $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
+    }
+    $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
+    $baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
+
     $configuredPerPage = (int) ($podcast['home_items_per_page'] ?? 20);
     if ($configuredPerPage >= 1) {
         $perPage = $configuredPerPage;
     }
 
-    // Calcula paginación total antes de consultar la página actual.
-    $totalEpisodes = (int) $pdo
-        ->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")
-        ->fetchColumn();
-    $totalPages = max(1, (int) ceil($totalEpisodes / $perPage));
-    if ($page > $totalPages) {
-        $page = $totalPages;
+    if ($query !== '') {
+        $term = '%' . escapeSqlLike($query) . '%';
+
+        $countStmt = $pdo->prepare(
+            "SELECT COUNT(*)
+             FROM episodes
+             WHERE status = 'published'
+               AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')"
+        );
+        $countStmt->execute([':term' => $term]);
+        $totalEpisodes = (int) $countStmt->fetchColumn();
+
+        $totalPages = max(1, (int) ceil($totalEpisodes / $perPage));
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+        $offset = ($page - 1) * $perPage;
+
+        $episodesStmt = $pdo->prepare(
+            "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
+             FROM episodes
+             WHERE status = 'published'
+               AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')
+             ORDER BY datetime(pub_date) DESC, id DESC
+             LIMIT :limit OFFSET :offset"
+        );
+        $episodesStmt->bindValue(':term', $term, PDO::PARAM_STR);
+        $episodesStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $episodesStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $episodesStmt->execute();
+        $episodes = $episodesStmt->fetchAll();
     }
-    $offset = ($page - 1) * $perPage;
-
-    // Recupera solo episodios de la página actual (solo publicados).
-    $episodesStmt = $pdo->prepare(
-        "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
-         FROM episodes
-         WHERE status = 'published'
-         ORDER BY datetime(pub_date) DESC, id DESC
-         LIMIT :limit OFFSET :offset"
-    );
-    $episodesStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-    $episodesStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $episodesStmt->execute();
-    $episodes = $episodesStmt->fetchAll();
 } catch (Throwable $e) {
-    $error = 'No se pudo cargar la portada: ' . $e->getMessage();
+    http_response_code(500);
+    $error = 'No se pudo realizar la búsqueda: ' . $e->getMessage();
 }
 
-$podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
-$podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
-// Fallback de autor: owner_name -> author.
-if ($podcastAuthor === '') {
-    $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
-}
-$podcastImage = trim((string) ($podcast['image_url'] ?? ''));
-$baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
-$canonicalPath = $page > 1 ? '/?page=' . $page : '/';
-$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
-$robotsContent = $error !== '' ? 'noindex,follow' : ($page > 1 ? 'noindex,follow' : 'index,follow');
-$prevUrl = null;
+$queryParams = ['q' => $query];
 if ($page > 1) {
-    $prevPath = $page === 2 ? '/' : '/?page=' . ($page - 1);
-    $prevUrl = toAbsoluteSeoUrl($prevPath, $baseSeoUrl);
+    $queryParams['page'] = $page;
 }
-$nextUrl = null;
-if ($page < $totalPages) {
-    $nextUrl = toAbsoluteSeoUrl('/?page=' . ($page + 1), $baseSeoUrl);
-}
-$metaDescription = compactMetaText((string) ($podcast['description'] ?? ''), 160);
-if ($metaDescription === '') {
-    $metaDescription = 'Podcast en EasyPodcast: episodios, reproductor y feed RSS.';
-}
+$canonicalPath = '/search.php' . ($query !== '' ? ('?' . http_build_query($queryParams)) : '');
+$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
+$robotsContent = 'noindex,follow';
+$metaDescription = $query === ''
+    ? 'Busca episodios por título o contenido.'
+    : ('Resultados para "' . $query . '" en ' . $podcastTitle . '.');
 $ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
 $rssUrl = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
-$seriesData = [
-    '@context' => 'https://schema.org',
-    '@type' => 'PodcastSeries',
-    'name' => $podcastTitle,
-    'url' => toAbsoluteSeoUrl('/', $baseSeoUrl),
-    'description' => (string) ($podcast['description'] ?? ''),
-    'inLanguage' => (string) ($podcast['language'] ?? 'es-ES'),
-];
-if ($podcastAuthor !== '') {
-    $seriesData['author'] = [
-        '@type' => 'Person',
-        'name' => $podcastAuthor,
-    ];
+
+$prevUrl = null;
+if ($query !== '' && $page > 1) {
+    $prevParams = ['q' => $query];
+    if ($page > 2) {
+        $prevParams['page'] = $page - 1;
+    }
+    $prevUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($prevParams), $baseSeoUrl);
 }
-if ($podcastImage !== '') {
-    $seriesData['image'] = $ogImage;
+$nextUrl = null;
+if ($query !== '' && $page < $totalPages) {
+    $nextParams = ['q' => $query, 'page' => $page + 1];
+    $nextUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($nextParams), $baseSeoUrl);
 }
-$seriesJsonLd = json_encode($seriesData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-if (!is_string($seriesJsonLd) || $seriesJsonLd === '') {
-    $seriesJsonLd = '{}';
-}
-if ($error !== '') {
-    header('X-Robots-Tag: noindex, nofollow, noarchive');
-}
+
+header('X-Robots-Tag: noindex, follow, noarchive');
 ?>
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= esc($podcastTitle) ?></title>
+  <title>Buscar | <?= esc($podcastTitle) ?></title>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
   <link rel="canonical" href="<?= esc($canonicalUrl) ?>">
@@ -156,14 +153,13 @@ if ($error !== '') {
   <link rel="alternate" type="application/rss+xml" title="<?= esc($podcastTitle) ?> RSS" href="<?= esc($rssUrl) ?>">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="<?= esc($podcastTitle) ?>">
-  <meta property="og:title" content="<?= esc($podcastTitle) ?>">
+  <meta property="og:title" content="Buscar | <?= esc($podcastTitle) ?>">
   <meta property="og:description" content="<?= esc($metaDescription) ?>">
   <meta property="og:url" content="<?= esc($canonicalUrl) ?>">
   <meta property="og:image" content="<?= esc($ogImage) ?>">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/index.css">
-  <script type="application/ld+json"><?= $seriesJsonLd ?></script>
 </head>
 <body>
   <div class="container">
@@ -177,13 +173,11 @@ if ($error !== '') {
       <?php if ($podcastAuthor !== ''): ?>
         <p class="author"><?= esc($podcastAuthor) ?></p>
       <?php endif; ?>
-      <?php if (!empty($podcast['description'])): ?>
-        <p class="desc"><?= renderTextWithLinks((string) $podcast['description']) ?></p>
-      <?php endif; ?>
+      <p class="desc">Busca en títulos y contenido de episodios publicados.</p>
     </header>
     <section class="card search-card">
       <form class="search-form" method="get" action="/search.php" role="search">
-        <input type="search" name="q" placeholder="Buscar episodios" aria-label="Buscar episodios">
+        <input type="search" name="q" value="<?= esc($query) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">
         <button type="submit">Buscar</button>
       </form>
     </section>
@@ -191,16 +185,17 @@ if ($error !== '') {
     <main class="card">
       <?php if ($error !== ''): ?>
         <p class="error"><?= esc($error) ?></p>
+      <?php elseif ($query === ''): ?>
+        <p class="empty">Escribe un término para buscar episodios.</p>
       <?php elseif (!$episodes): ?>
-        <p class="empty">Todavía no hay capítulos publicados.</p>
+        <p class="empty">No hay resultados para "<?= esc($query) ?>".</p>
       <?php else: ?>
+        <p class="meta">Resultados para "<?= esc($query) ?>": <?= (int) $totalEpisodes ?></p>
         <?php foreach ($episodes as $episode): ?>
           <article class="episode">
             <?php $episodeImage = trim((string) ($episode['image_url'] ?? '')); ?>
-            <?php // Usa portada del podcast cuando falta la portada del episodio. ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
-            <?php // Genera srcset responsive de miniaturas cuadradas y reutiliza variantes existentes. ?>
-            <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144,220]) : ['src' => '', 'srcset' => '']; ?>
+            <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 180px, (max-width: 620px) 108px, 144px"<?php endif; ?> alt="Portada del capítulo">
             <?php else: ?>
@@ -209,11 +204,9 @@ if ($error !== '') {
             <div class="episode-content">
               <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
               <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
-              <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 200); ?>
+              <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 240); ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
-              <p class="meta">
-                <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>
-              </p>
+              <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
               <p class="excerpt">
                 <?= esc((string) $excerpt['text']) ?>
                 <?php if (!empty($excerpt['truncated'])): ?>
@@ -229,17 +222,20 @@ if ($error !== '') {
           </article>
         <?php endforeach; ?>
         <?php if ($totalPages > 1): ?>
-          <nav class="pagination" aria-label="Paginación de capítulos">
+          <nav class="pagination" aria-label="Paginación de resultados">
             <span>Página <?= (int) $page ?> de <?= (int) $totalPages ?></span>
             <div class="links">
               <?php if ($page > 1): ?>
-                <a class="page-link" href="index.php?page=<?= $page - 1 ?>">Anterior</a>
+                <?php $prevParams = ['q' => $query, 'page' => $page - 1]; ?>
+                <a class="page-link" href="/search.php?<?= esc(http_build_query($prevParams)) ?>">Anterior</a>
               <?php endif; ?>
               <?php for ($p = 1; $p <= $totalPages; $p++): ?>
-                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="index.php?page=<?= $p ?>"><?= $p ?></a>
+                <?php $pageParams = ['q' => $query, 'page' => $p]; ?>
+                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="/search.php?<?= esc(http_build_query($pageParams)) ?>"><?= $p ?></a>
               <?php endfor; ?>
               <?php if ($page < $totalPages): ?>
-                <a class="page-link" href="index.php?page=<?= $page + 1 ?>">Siguiente</a>
+                <?php $nextParams = ['q' => $query, 'page' => $page + 1]; ?>
+                <a class="page-link" href="/search.php?<?= esc(http_build_query($nextParams)) ?>">Siguiente</a>
               <?php endif; ?>
             </div>
           </nav>
@@ -253,9 +249,3 @@ if ($error !== '') {
   </div>
 </body>
 </html>
-<?php
-$cachedOutput = ob_get_contents();
-if (is_string($cachedOutput)) {
-    storeWebCache($dbPath, $cachedOutput);
-}
-ob_end_flush();

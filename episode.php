@@ -191,6 +191,12 @@ if ($error !== '') {
         <p class="author"><?= esc($podcastAuthor) ?></p>
       <?php endif; ?>
     </header>
+    <section class="card search-card">
+      <form class="search-form" method="get" action="/search.php" role="search">
+        <input type="search" name="q" placeholder="Buscar episodios" aria-label="Buscar episodios">
+        <button type="submit">Buscar</button>
+      </form>
+    </section>
 
     <main class="card">
       <?php if ($error !== ''): ?>
