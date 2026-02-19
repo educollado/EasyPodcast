@@ -10,6 +10,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/sitemap_builder.php';
 
 // El acceso a esta pantalla exige sesión de administrador activa.
 session_start();
@@ -208,11 +209,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                                 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
                                 try {
-                                    // Tras importar, sincroniza feed.xml con la nueva base.
+                                    // Tras importar, sincroniza feed.xml/sitemap.xml con la nueva base.
                                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
-                                    $notice = 'Base de datos importada correctamente y feed.xml regenerado.';
+                                    writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
+                                    $notice = 'Base de datos importada correctamente y feed.xml/sitemap.xml regenerados.';
                                 } catch (Throwable $feedError) {
-                                    $notice = 'Base de datos importada correctamente, pero no se pudo regenerar feed.xml.';
+                                    $notice = 'Base de datos importada correctamente, pero no se pudo regenerar feed.xml/sitemap.xml.';
                                 }
                                 if (!clearWebCache()) {
                                     $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
@@ -350,6 +352,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
                 } else {
                     $notice = 'Ficheros importados correctamente. Archivos escritos: '
                         . $writtenFiles . '. Directorios creados: ' . $createdDirs . '.';
+                    try {
+                        $pdo = new PDO('sqlite:' . $dbPath);
+                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                        writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
+                    } catch (Throwable $sitemapError) {
+                        $notice .= ' (Aviso: no se pudo regenerar sitemap.xml)';
+                    }
                     if (!clearWebCache()) {
                         $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
                     }

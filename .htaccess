@@ -3,8 +3,6 @@ RewriteEngine on
 # Fuerza HTTPS en todas las rutas.
 RewriteCond %{HTTPS} !=on [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-# Sitemap dinámico accesible en /sitemap.xml.
-RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
 # Mantiene archivos/directorios existentes sin tocar por reglas de rewrite.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

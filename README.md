@@ -19,7 +19,7 @@
 |---|---|
 | Web pública | Portada con episodios `published`, página individual por episodio, reproductor inline |
 | Feed | RSS dinámico (`feed.php`) y feed generado (`feed.xml`) |
-| SEO/Indexación | `robots.txt` y `sitemap.xml` dinámico (`sitemap.php`) |
+| SEO/Indexación | `robots.txt` y `sitemap.xml` estático regenerable |
 | Caché | Caché pública en `cache/` (configurable desde administración) |
 | Administración | Login, gestión del canal, alta/edición/borrado de episodios, copias de seguridad y metadatos ID3 |
 | Subidas | Audio a `audios/`, imágenes a `images/` |
@@ -53,8 +53,8 @@
 ### SEO / Indexación
 
 - `robots.txt`: reglas de rastreo para buscadores.
-- `sitemap.php`: genera sitemap XML dinámico.
-- `/.htaccess`: publica el sitemap dinámico en `/sitemap.xml`.
+- `sitemap.xml`: sitemap XML estático.
+- Se regenera automáticamente tras cambios en administración (podcast/episodios/importaciones).
 
 ### Caché
 
@@ -79,7 +79,8 @@
 | `index.php` | Portada pública |
 | `episode.php` | Página pública de episodio |
 | `feed.php` | Endpoint RSS dinámico |
-| `sitemap.php` | Endpoint sitemap dinámico (servido como `/sitemap.xml`) |
+| `sitemap.xml` | Sitemap estático regenerado automáticamente |
+| `lib/sitemap_builder.php` | Constructor y escritura de `sitemap.xml` |
 | `feed_builder.php` | Constructor de RSS + escritura de `feed.xml` |
 | `feed.xml` | Feed generado |
 | `robots.txt` | Reglas para rastreadores web |
@@ -165,7 +166,7 @@ chmod 664 podcast.sqlite feed.xml favicon.ico
 - Portada pública: `/`
 - Feed dinámico: `/feed.php`
 - Feed generado: `/feed.xml`
-- Sitemap dinámico: `/sitemap.xml`
+- Sitemap: `/sitemap.xml`
 - Robots: `/robots.txt`
 
 ## Base de datos
@@ -193,7 +194,7 @@ Ver detalle en `schema.sql`.
 | Portada | `/` |
 | Feed dinámico | `/feed.php` |
 | Feed generado | `/feed.xml` |
-| Sitemap dinámico | `/sitemap.xml` |
+| Sitemap | `/sitemap.xml` |
 | Robots | `/robots.txt` |
 | Episodio | `/YYYY/MM/slug` |
 

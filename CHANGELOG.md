@@ -2,7 +2,7 @@
 
 ## 0.4
 
-- Nuevo `sitemap.php` dinámico y publicación en `/sitemap.xml` desde `.htaccess`.
+- Nuevo `sitemap.xml` estático con regeneración automática en cambios de administración.
 - Nuevo `robots.txt` con reglas de rastreo y referencia al sitemap.
 - Nuevo sistema de caché pública en `cache/` (`lib/cache_service.php`) para portada, detalle, feed y sitemap.
 - Opción en `podcast_management.php` para habilitar/deshabilitar caché (`cache_enabled`).

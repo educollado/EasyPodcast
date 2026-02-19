@@ -10,6 +10,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/sitemap_builder.php';
 
 session_start();
 
@@ -41,13 +42,13 @@ if (isset($_GET['status']) && $_GET['status'] === 'delete_error') {
     $error = 'No se encontró el capítulo que se intentó borrar.';
 }
 if (isset($_GET['status']) && $_GET['status'] === 'feed_warning') {
-    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar el feed.xml)';
+    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
 }
 if (isset($_GET['status']) && $_GET['status'] === 'cache_warning') {
     $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo limpiar completamente la caché)';
 }
 if (isset($_GET['status']) && $_GET['status'] === 'feed_cache_warning') {
-    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar el feed.xml ni limpiar completamente la caché)';
+    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar feed.xml/sitemap.xml ni limpiar completamente la caché)';
 }
 
 try {
@@ -95,6 +96,7 @@ try {
                 $feedOk = true;
                 try {
                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
+                    writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
                 } catch (Throwable $feedError) {
                     $feedOk = false;
                 }

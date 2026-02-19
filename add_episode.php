@@ -11,6 +11,7 @@ require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/episode_helpers.php';
 require_once __DIR__ . '/lib/id3_service.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/sitemap_builder.php';
 
 // ---------------------------------------------------------------------------
 // Bootstrap de administración
@@ -451,8 +452,9 @@ try {
             try {
                 // Regenera feed.xml después de insertar/actualizar.
                 writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
+                writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
             } catch (Throwable $feedError) {
-                $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
+                $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
             }
             if (!clearWebCache()) {
                 $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';

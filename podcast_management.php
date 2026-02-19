@@ -6,6 +6,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/sitemap_builder.php';
 
 session_start();
 
@@ -380,10 +381,11 @@ try {
                 ]);
                 $notice = 'Podcast actualizado correctamente.';
                 try {
-                    // Mantiene feed.xml sincronizado con los últimos metadatos.
+                    // Mantiene feed.xml/sitemap.xml sincronizados con los últimos metadatos.
                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
+                    writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
                 } catch (Throwable $feedError) {
-                    $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
+                    $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
                 }
                 $faviconWarning = '';
                 if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
@@ -419,10 +421,11 @@ try {
                 ]);
                 $notice = 'Podcast guardado correctamente.';
                 try {
-                    // Genera feed.xml inmediatamente tras la creación inicial.
+                    // Genera feed.xml/sitemap.xml inmediatamente tras la creación inicial.
                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
+                    writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
                 } catch (Throwable $feedError) {
-                    $notice .= ' (Aviso: no se pudo regenerar el feed.xml)';
+                    $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
                 }
                 $faviconWarning = '';
                 if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
