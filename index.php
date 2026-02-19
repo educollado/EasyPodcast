@@ -62,6 +62,65 @@ function resolveEpisodeHref(?string $storedLink, string $pubDate, string $title)
     return buildEpisodePath($pubDate, $title);
 }
 
+// Base absoluta para etiquetas SEO (canonical, OG, JSON-LD).
+function resolveSeoBaseUrl(?string $podcastLink): string
+{
+    $raw = trim((string) $podcastLink);
+    if ($raw !== '') {
+        $parts = parse_url($raw);
+        if (is_array($parts) && !empty($parts['host'])) {
+            $scheme = strtolower((string) ($parts['scheme'] ?? 'https'));
+            $host = (string) $parts['host'];
+            $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+            return $scheme . '://' . $host . $port;
+        }
+    }
+
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    return $scheme . '://' . $host;
+}
+
+// Convierte rutas relativas en URLs absolutas para OG/JSON-LD.
+function toAbsoluteSeoUrl(string $value, string $baseUrl): string
+{
+    $raw = trim($value);
+    if ($raw === '') {
+        return rtrim($baseUrl, '/');
+    }
+
+    $parts = parse_url($raw);
+    if (is_array($parts) && !empty($parts['scheme']) && !empty($parts['host'])) {
+        return $raw;
+    }
+
+    return rtrim($baseUrl, '/') . '/' . ltrim($raw, '/');
+}
+
+// Limpia y recorta texto para meta description.
+function compactMetaText(string $value, int $maxChars = 160): string
+{
+    $clean = trim(preg_replace('/\s+/u', ' ', strip_tags($value)) ?? '');
+    if ($clean === '') {
+        return '';
+    }
+
+    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+        if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
+            return $clean;
+        }
+        return rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')) . '...';
+    }
+
+    if (strlen($clean) <= $maxChars) {
+        return $clean;
+    }
+
+    return rtrim(substr($clean, 0, $maxChars)) . '...';
+}
+
 $podcast = null;
 $episodes = [];
 $error = '';
@@ -111,6 +170,49 @@ if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }
 $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
+$baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
+$canonicalPath = $page > 1 ? '/?page=' . $page : '/';
+$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
+$robotsContent = $error !== '' ? 'noindex,follow' : ($page > 1 ? 'noindex,follow' : 'index,follow');
+$prevUrl = null;
+if ($page > 1) {
+    $prevPath = $page === 2 ? '/' : '/?page=' . ($page - 1);
+    $prevUrl = toAbsoluteSeoUrl($prevPath, $baseSeoUrl);
+}
+$nextUrl = null;
+if ($page < $totalPages) {
+    $nextUrl = toAbsoluteSeoUrl('/?page=' . ($page + 1), $baseSeoUrl);
+}
+$metaDescription = compactMetaText((string) ($podcast['description'] ?? ''), 160);
+if ($metaDescription === '') {
+    $metaDescription = 'Podcast en EasyPodcast: episodios, reproductor y feed RSS.';
+}
+$ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
+$rssUrl = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
+$seriesData = [
+    '@context' => 'https://schema.org',
+    '@type' => 'PodcastSeries',
+    'name' => $podcastTitle,
+    'url' => toAbsoluteSeoUrl('/', $baseSeoUrl),
+    'description' => (string) ($podcast['description'] ?? ''),
+    'inLanguage' => (string) ($podcast['language'] ?? 'es-ES'),
+];
+if ($podcastAuthor !== '') {
+    $seriesData['author'] = [
+        '@type' => 'Person',
+        'name' => $podcastAuthor,
+    ];
+}
+if ($podcastImage !== '') {
+    $seriesData['image'] = $ogImage;
+}
+$seriesJsonLd = json_encode($seriesData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+if (!is_string($seriesJsonLd) || $seriesJsonLd === '') {
+    $seriesJsonLd = '{}';
+}
+if ($error !== '') {
+    header('X-Robots-Tag: noindex, nofollow, noarchive');
+}
 ?>
 <!doctype html>
 <html lang="es">
@@ -118,9 +220,26 @@ $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($podcastTitle) ?></title>
+  <meta name="robots" content="<?= esc($robotsContent) ?>">
+  <meta name="description" content="<?= esc($metaDescription) ?>">
+  <link rel="canonical" href="<?= esc($canonicalUrl) ?>">
+  <?php if ($prevUrl !== null): ?>
+  <link rel="prev" href="<?= esc($prevUrl) ?>">
+  <?php endif; ?>
+  <?php if ($nextUrl !== null): ?>
+  <link rel="next" href="<?= esc($nextUrl) ?>">
+  <?php endif; ?>
+  <link rel="alternate" type="application/rss+xml" title="<?= esc($podcastTitle) ?> RSS" href="<?= esc($rssUrl) ?>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="<?= esc($podcastTitle) ?>">
+  <meta property="og:title" content="<?= esc($podcastTitle) ?>">
+  <meta property="og:description" content="<?= esc($metaDescription) ?>">
+  <meta property="og:url" content="<?= esc($canonicalUrl) ?>">
+  <meta property="og:image" content="<?= esc($ogImage) ?>">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/index.css">
+  <script type="application/ld+json"><?= $seriesJsonLd ?></script>
 </head>
 <body>
   <div class="container">

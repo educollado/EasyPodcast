@@ -78,6 +78,7 @@ function buildPodcastSitemapXml(PDO $pdo): string
     $homeUrl = toAbsoluteUrl((string) ($podcast['link'] ?? ''), $baseUrl);
 
     $episodes = [];
+    $homeLastmodRaw = null;
     $episodesTableExists = (bool) $pdo
         ->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'episodes' LIMIT 1")
         ->fetchColumn();
@@ -90,6 +91,26 @@ function buildPodcastSitemapXml(PDO $pdo): string
         );
         $episodesStmt->execute();
         $episodes = $episodesStmt->fetchAll();
+        if ($episodes) {
+            $homeLastmodRaw = (string) ($episodes[0]['updated_at'] ?? $episodes[0]['pub_date'] ?? '');
+        }
+    }
+
+    if ($homeLastmodRaw === null || trim($homeLastmodRaw) === '') {
+        $podcastColumns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
+        $hasPodcastUpdatedAt = false;
+        foreach ($podcastColumns as $column) {
+            if (($column['name'] ?? '') === 'updated_at') {
+                $hasPodcastUpdatedAt = true;
+                break;
+            }
+        }
+        if ($hasPodcastUpdatedAt) {
+            $podcastUpdated = $pdo->query('SELECT updated_at FROM podcast ORDER BY id ASC LIMIT 1')->fetchColumn();
+            if (is_string($podcastUpdated) && trim($podcastUpdated) !== '') {
+                $homeLastmodRaw = $podcastUpdated;
+            }
+        }
     }
 
     $xml = new XMLWriter();
@@ -102,6 +123,9 @@ function buildPodcastSitemapXml(PDO $pdo): string
 
     $xml->startElement('url');
     $xml->writeElement('loc', $homeUrl);
+    if ($homeLastmodRaw !== null && trim($homeLastmodRaw) !== '') {
+        $xml->writeElement('lastmod', toSitemapLastmod($homeLastmodRaw));
+    }
     $xml->endElement();
 
     foreach ($episodes as $episode) {

@@ -23,6 +23,7 @@ if (!isset($_SESSION['admin_user'])) {
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 // Fuerza el dominio canónico para evitar acciones de administración desde host alternativo.
 enforceCanonicalHostFromPodcastLink($dbPath);
+header('X-Robots-Tag: noindex, nofollow, noarchive');
 $error = '';
 $notice = '';
 

@@ -17,6 +17,7 @@ if (!isset($_SESSION['admin_user'])) {
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+header('X-Robots-Tag: noindex, nofollow, noarchive');
 $error = '';
 $notice = '';
 
