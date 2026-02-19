@@ -4,7 +4,7 @@
 
 ## Versión
 
-**Versión actual: 0.4**
+**Versión actual: 0.5**
 
 ## Sitio de referencia
 
@@ -31,15 +31,21 @@
 
 - Portada (`index.php`) con:
   - episodios publicados
-  - paginación de 20 en 20
+  - paginación configurable desde administración (`home_items_per_page`)
   - portada del episodio (o fallback a portada del podcast)
   - extracto y reproductor
   - si el extracto se recorta, se muestra `[...]` enlazado al episodio completo
+  - buscador de episodios en cabecera
 - Página de episodio (`episode.php`) con:
   - URL amigable `/YYYY/MM/slug`
   - descripción completa
   - duración, tamaño y descarga
   - reproductor inline
+  - buscador de episodios en cabecera
+- Página de búsqueda (`search.php`) con:
+  - búsqueda por título y descripción en episodios `published`
+  - paginación de resultados
+  - reutiliza la cabecera pública común
 
 ### Feed RSS
 
@@ -49,6 +55,9 @@
 - El número de episodios del feed se controla con `rss_item_limit` en `podcast_management.php`:
   - `0` = sin límite
   - `N > 0` = máximo de `N` episodios publicados más recientes
+- El número de episodios por página en portada y búsqueda se controla con `home_items_per_page` en `podcast_management.php`:
+  - mínimo `1`
+  - valor por defecto `20`
 
 ### SEO / Indexación
 
@@ -78,6 +87,8 @@
 |---|---|
 | `index.php` | Portada pública |
 | `episode.php` | Página pública de episodio |
+| `search.php` | Página pública de búsqueda de episodios |
+| `header.php` | Cabecera pública compartida (título/autor/descripción + RSS + buscador) |
 | `feed.php` | Endpoint RSS dinámico |
 | `sitemap.xml` | Sitemap estático regenerado automáticamente |
 | `lib/sitemap_builder.php` | Constructor y escritura de `sitemap.xml` |
@@ -206,6 +217,7 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 |---|---|
 | `assets/css/index.css` | Portada pública |
 | `assets/css/episode.css` | Página de episodio |
+| `assets/css/header.css` | Cabecera pública compartida (index/episode/search) |
 | `assets/css/admin.css` | Login/panel admin |
 | `assets/css/podcast_management.css` | Gestión podcast |
 | `assets/css/episodes_management.css` | Gestión episodios |
