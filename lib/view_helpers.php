@@ -117,7 +117,8 @@ function resolveLocalImagePath(string $imageUrl): ?string
     return $real;
 }
 
-// Genera el nombre/URL de variante con sufijo de tamaño: foo.jpg -> foo-144x144.jpg
+// Genera el nombre/URL de variante con sufijo de tamaño en /images/generated/.
+// Ejemplo: /images/foo.jpg -> /images/generated/foo-144x144.jpg
 function buildSizedImageUrl(string $sourceUrl, int $size): ?string
 {
     $raw = trim($sourceUrl);
@@ -133,12 +134,11 @@ function buildSizedImageUrl(string $sourceUrl, int $size): ?string
 
     $ext = pathinfo($path, PATHINFO_EXTENSION);
     $base = pathinfo($path, PATHINFO_FILENAME);
-    $dir = (string) pathinfo($path, PATHINFO_DIRNAME);
     if ($ext === '' || $base === '') {
         return null;
     }
 
-    $variantPath = ($dir === '/' ? '' : $dir) . '/' . $base . '-' . $size . 'x' . $size . '.' . $ext;
+    $variantPath = '/images/generated/' . $base . '-' . $size . 'x' . $size . '.' . $ext;
 
     $query = isset($parts['query']) ? '?' . $parts['query'] : '';
     $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';

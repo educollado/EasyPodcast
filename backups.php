@@ -51,6 +51,13 @@ function addDirectoryToZip(ZipArchive $zip, string $absoluteDir, string $zipRoot
     foreach ($iterator as $item) {
         $path = $item->getPathname();
         $relativePath = substr($path, $dirLen);
+        $relativePathUnix = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
+
+        // No incluye variantes generadas automáticamente dentro de images/generated/.
+        if ($zipRoot === 'images' && ($relativePathUnix === 'generated' || str_starts_with($relativePathUnix, 'generated/'))) {
+            continue;
+        }
+
         $zipPath = $zipRoot . '/' . str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
 
         if ($item->isDir()) {
