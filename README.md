@@ -44,6 +44,9 @@
 - `feed.php`: genera RSS en tiempo real.
 - `feed_builder.php`: lógica común del feed.
 - `feed.xml`: se regenera automáticamente al guardar/editar/borrar desde administración.
+- El número de episodios del feed se controla con `rss_item_limit` en `podcast_management.php`:
+  - `0` = sin límite
+  - `N > 0` = máximo de `N` episodios publicados más recientes
 
 ### Administración
 
@@ -185,6 +188,7 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 
 - Si un episodio no tiene imagen, se usa la del podcast.
 - El autor del episodio puede heredarse desde la configuración del podcast.
+- En RSS, `rss_item_limit = 0` significa sin límite de episodios.
 - El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
 - Si activas la opción en `podcast_management.php`, al subir/editar MP3 se escriben metadatos ID3 (incluida portada de episodio o fallback de podcast).
 - Al guardar metadatos del podcast, se intenta regenerar `favicon.ico` automáticamente usando la imagen del podcast.
