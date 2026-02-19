@@ -56,6 +56,10 @@ try {
 
     // La app está diseñada alrededor de una única fila de podcast.
     $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
+    $configuredPerPage = (int) ($podcast['home_items_per_page'] ?? 20);
+    if ($configuredPerPage >= 1) {
+        $perPage = $configuredPerPage;
+    }
 
     // Calcula paginación total antes de consultar la página actual.
     $totalEpisodes = (int) $pdo

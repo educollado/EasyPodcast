@@ -192,6 +192,7 @@ $form = [
     'copyright' => '',
     'itunes_type' => 'episodic',
     'rss_item_limit' => '0',
+    'home_items_per_page' => '20',
     'write_audio_metadata' => '0',
     'cache_enabled' => '0',
 ];
@@ -218,6 +219,7 @@ try {
           copyright TEXT,
           itunes_type TEXT DEFAULT 'episodic',
           rss_item_limit INTEGER NOT NULL DEFAULT 0,
+          home_items_per_page INTEGER NOT NULL DEFAULT 20,
           write_audio_metadata INTEGER NOT NULL DEFAULT 0,
           cache_enabled INTEGER NOT NULL DEFAULT 0
         )"
@@ -225,11 +227,15 @@ try {
     // Migraciones ligeras de columnas en instalaciones existentes.
     $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
     $hasRssItemLimit = false;
+    $hasHomeItemsPerPage = false;
     $hasWriteAudioMetadata = false;
     $hasCacheEnabled = false;
     foreach ($columns as $column) {
         if (($column['name'] ?? '') === 'rss_item_limit') {
             $hasRssItemLimit = true;
+        }
+        if (($column['name'] ?? '') === 'home_items_per_page') {
+            $hasHomeItemsPerPage = true;
         }
         if (($column['name'] ?? '') === 'write_audio_metadata') {
             $hasWriteAudioMetadata = true;
@@ -240,6 +246,9 @@ try {
     }
     if (!$hasRssItemLimit) {
         $pdo->exec('ALTER TABLE podcast ADD COLUMN rss_item_limit INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!$hasHomeItemsPerPage) {
+        $pdo->exec('ALTER TABLE podcast ADD COLUMN home_items_per_page INTEGER NOT NULL DEFAULT 20');
     }
     if (!$hasWriteAudioMetadata) {
         $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
@@ -273,6 +282,10 @@ try {
                 $form[$key] = trim((string) ($_POST[$key] ?? '0'));
                 continue;
             }
+            if ($key === 'home_items_per_page') {
+                $form[$key] = trim((string) ($_POST[$key] ?? '20'));
+                continue;
+            }
             if ($key === 'write_audio_metadata') {
                 $form[$key] = isset($_POST[$key]) ? '1' : '0';
                 continue;
@@ -292,6 +305,12 @@ try {
             || (int) $form['rss_item_limit'] < 0
         ) {
             $error = 'La cantidad de elementos del feed debe ser un entero igual o mayor que 0.';
+        } elseif (
+            $form['home_items_per_page'] === ''
+            || filter_var($form['home_items_per_page'], FILTER_VALIDATE_INT) === false
+            || (int) $form['home_items_per_page'] < 1
+        ) {
+            $error = 'La cantidad de elementos de la portada debe ser un entero mayor o igual que 1.';
         } elseif (!in_array($form['itunes_type'], ['episodic', 'serial'], true)) {
             $error = 'El tipo de podcast debe ser episodic o serial.';
         } elseif ($form['owner_email'] !== '' && !filter_var($form['owner_email'], FILTER_VALIDATE_EMAIL)) {
@@ -358,6 +377,7 @@ try {
                          copyright = :copyright,
                          itunes_type = :itunes_type,
                          rss_item_limit = :rss_item_limit,
+                         home_items_per_page = :home_items_per_page,
                          write_audio_metadata = :write_audio_metadata,
                          cache_enabled = :cache_enabled
                      WHERE id = :id'
@@ -376,6 +396,7 @@ try {
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
+                    ':home_items_per_page' => (int) $form['home_items_per_page'],
                     ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                     ':cache_enabled' => (int) $form['cache_enabled'],
                     ':id' => (int) $existing['id'],
@@ -399,9 +420,9 @@ try {
                 // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                 $stmt = $pdo->prepare(
                     'INSERT INTO podcast
-                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, write_audio_metadata, cache_enabled)
+                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled)
                      VALUES
-                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :write_audio_metadata, :cache_enabled)'
+                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled)'
                 );
                 $stmt->execute([
                     ':title' => $form['title'],
@@ -417,6 +438,7 @@ try {
                     ':copyright' => $form['copyright'],
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
+                    ':home_items_per_page' => (int) $form['home_items_per_page'],
                     ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                     ':cache_enabled' => (int) $form['cache_enabled'],
                 ]);
@@ -540,6 +562,11 @@ try {
             Cantidad de elementos del Feed RSS
             <input type="number" min="0" step="1" name="rss_item_limit" value="<?= esc($form['rss_item_limit']) ?>">
             <small>Nota: 0 significa infinitos (sin límite).</small>
+          </label>
+          <label>
+            Cantidad de elementos de la portada
+            <input type="number" min="1" step="1" name="home_items_per_page" value="<?= esc($form['home_items_per_page']) ?>">
+            <small>Controla cuántos episodios se muestran por página en la portada.</small>
           </label>
           <label class="inline-checkbox">
             <input type="checkbox" name="write_audio_metadata" value="1" <?= $form['write_audio_metadata'] === '1' ? 'checked' : '' ?>>
