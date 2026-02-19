@@ -8,32 +8,14 @@ declare(strict_types=1);
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/seo_helpers.php';
+require_once __DIR__ . '/lib/public_episode_helpers.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
     exit;
 }
 ob_start();
-
-// Extrae el slug desde una URL guardada tipo /YYYY/MM/slug.
-function slugFromEpisodeLink(?string $link): ?string
-{
-    $raw = trim((string) $link);
-    if ($raw === '') {
-        return null;
-    }
-
-    $path = (string) parse_url($raw, PHP_URL_PATH);
-    if ($path === '') {
-        return null;
-    }
-
-    if (preg_match('#^/[0-9]{4}/[0-9]{2}/([a-z0-9-]+)/?$#', $path, $matches) === 1) {
-        return $matches[1];
-    }
-
-    return null;
-}
 
 // Muestra el tamaño de audio en unidades humanas.
 function formatBytes($bytes): string
@@ -52,65 +34,6 @@ function formatBytes($bytes): string
     }
 
     return number_format($value, $index === 0 ? 0 : 2, ',', '.') . ' ' . $units[$index];
-}
-
-// Base absoluta para etiquetas SEO (canonical, OG, JSON-LD).
-function resolveSeoBaseUrl(?string $podcastLink): string
-{
-    $raw = trim((string) $podcastLink);
-    if ($raw !== '') {
-        $parts = parse_url($raw);
-        if (is_array($parts) && !empty($parts['host'])) {
-            $scheme = strtolower((string) ($parts['scheme'] ?? 'https'));
-            $host = (string) $parts['host'];
-            $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
-            return $scheme . '://' . $host . $port;
-        }
-    }
-
-    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
-    $scheme = $isHttps ? 'https' : 'http';
-    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
-    return $scheme . '://' . $host;
-}
-
-// Convierte rutas relativas en URLs absolutas para OG/JSON-LD.
-function toAbsoluteSeoUrl(string $value, string $baseUrl): string
-{
-    $raw = trim($value);
-    if ($raw === '') {
-        return rtrim($baseUrl, '/');
-    }
-
-    $parts = parse_url($raw);
-    if (is_array($parts) && !empty($parts['scheme']) && !empty($parts['host'])) {
-        return $raw;
-    }
-
-    return rtrim($baseUrl, '/') . '/' . ltrim($raw, '/');
-}
-
-// Limpia y recorta texto para meta description.
-function compactMetaText(string $value, int $maxChars = 160): string
-{
-    $clean = trim(preg_replace('/\s+/u', ' ', strip_tags($value)) ?? '');
-    if ($clean === '') {
-        return '';
-    }
-
-    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
-        if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
-            return $clean;
-        }
-        return rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')) . '...';
-    }
-
-    if (strlen($clean) <= $maxChars) {
-        return $clean;
-    }
-
-    return rtrim(substr($clean, 0, $maxChars)) . '...';
 }
 
 $year = trim((string) ($_GET['year'] ?? ''));
