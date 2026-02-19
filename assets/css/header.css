@@ -39,6 +39,7 @@
   justify-content: center;
   min-width: 40px;
   min-height: 40px;
+  align-self: flex-end;
 }
 
 .search-form {
