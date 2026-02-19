@@ -125,6 +125,7 @@
 | `cache/` | Archivos de caché pública generados en runtime |
 | `audios/` | Audios subidos |
 | `images/` | Imágenes subidas |
+| `images/generated/` | Imágenes generadas automáticamente para títulos/ilustraciones de la web |
 | `assets/css/` | Hojas de estilo separadas (theming) |
 | `.htaccess` | HTTPS + rutas amigables |
 
@@ -241,6 +242,8 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 ## Notas
 
 - Si un episodio no tiene imagen, se usa la del podcast.
+- Las imágenes generadas automáticamente para títulos/ilustraciones se guardan en `images/generated/`.
+- Si se borran imágenes de `images/generated/`, la aplicación puede regenerarlas automáticamente cuando vuelven a ser necesarias.
 - El autor del episodio puede heredarse desde la configuración del podcast.
 - En RSS, `rss_item_limit = 0` significa sin límite de episodios.
 - El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
