@@ -61,9 +61,23 @@
 
 ### SEO / Indexación
 
+- Redirección canónica 301 de host/esquema según `podcast.link` (en `canonical_redirect.php`).
+- Etiquetas SEO en páginas públicas:
+  - `canonical`
+  - `meta robots` (index/noindex según contexto)
+  - `meta description` con recorte automático y fallback
+  - Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`)
+  - `link rel="alternate"` al RSS (`/feed.xml`)
+- Paginación SEO:
+  - portada y búsqueda incluyen `rel="prev"` / `rel="next"` cuando aplica
+  - páginas 2+ de portada se marcan como `noindex,follow`
+- Página de búsqueda (`search.php`) marcada como `noindex,follow` y `X-Robots-Tag: noindex, follow, noarchive`.
+- En errores de carga pública se envía `X-Robots-Tag: noindex, nofollow, noarchive`.
+- Datos estructurados JSON-LD:
+  - `PodcastSeries` en portada
+  - `PodcastEpisode` en detalle de episodio
 - `robots.txt`: reglas de rastreo para buscadores.
-- `sitemap.xml`: sitemap XML estático.
-- Se regenera automáticamente tras cambios en administración (podcast/episodios/importaciones).
+- `sitemap.xml`: sitemap XML estático regenerado automáticamente tras cambios en administración.
 
 ### Caché
 
@@ -100,8 +114,10 @@
 | `episodes_management.php` | Gestión de episodios |
 | `backups.php` | Copias de seguridad de base de datos y ficheros |
 | `add_episode.php` | Alta/edición de episodios y subida de audio/imagen |
+| `canonical_redirect.php` | Redirección 301 al host/esquema canónico definido en `podcast.link` |
 | `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
 | `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
+| `lib/seo_helpers.php` | Helpers SEO (`canonical`, URLs absolutas, `meta description`) |
 | `lib/view_helpers.php` | Helpers compartidos de vista (`esc`, enlaces, slug, fechas) |
 | `lib/cache_service.php` | Servicio de caché (lectura/escritura/limpieza) |
 | `schema.sql` | Esquema de base de datos |
