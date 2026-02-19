@@ -6,6 +6,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/cache_service.php';
 
 // Construye la ruta pública de episodio usando año/mes y slug.
 function buildEpisodePathForSitemap(string $pubDate, string $title): string
@@ -50,6 +51,9 @@ function toSitemapLastmod(?string $value): string
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+if (tryServeWebCache($dbPath, 'application/xml; charset=UTF-8')) {
+    exit;
+}
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -97,7 +101,9 @@ try {
     $xml->endDocument();
 
     header('Content-Type: application/xml; charset=UTF-8');
-    echo $xml->outputMemory();
+    $xmlOutput = $xml->outputMemory();
+    storeWebCache($dbPath, $xmlOutput);
+    echo $xmlOutput;
 } catch (Throwable $e) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=UTF-8');

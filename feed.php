@@ -5,9 +5,13 @@ declare(strict_types=1);
 // Este endpoint devuelve el RSS XML en vivo generado desde la base de datos.
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/cache_service.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+if (tryServeWebCache($dbPath, 'application/rss+xml; charset=UTF-8')) {
+    exit;
+}
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -18,6 +22,7 @@ try {
     $xml = buildPodcastFeedXml($pdo, $selfHref);
 
     header('Content-Type: application/rss+xml; charset=UTF-8');
+    storeWebCache($dbPath, $xml);
     echo $xml;
 } catch (Throwable $e) {
     http_response_code(500);

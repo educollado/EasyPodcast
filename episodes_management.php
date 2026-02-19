@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/cache_service.php';
 
 session_start();
 
@@ -41,6 +42,12 @@ if (isset($_GET['status']) && $_GET['status'] === 'delete_error') {
 }
 if (isset($_GET['status']) && $_GET['status'] === 'feed_warning') {
     $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar el feed.xml)';
+}
+if (isset($_GET['status']) && $_GET['status'] === 'cache_warning') {
+    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo limpiar completamente la caché)';
+}
+if (isset($_GET['status']) && $_GET['status'] === 'feed_cache_warning') {
+    $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar el feed.xml ni limpiar completamente la caché)';
 }
 
 try {
@@ -85,10 +92,19 @@ try {
 
             if ($deleteStmt->rowCount() > 0) {
                 $status = 'deleted';
+                $feedOk = true;
                 try {
                     writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
                 } catch (Throwable $feedError) {
+                    $feedOk = false;
+                }
+                $cacheOk = clearWebCache();
+                if (!$feedOk && !$cacheOk) {
+                    $status = 'feed_cache_warning';
+                } elseif (!$feedOk) {
                     $status = 'feed_warning';
+                } elseif (!$cacheOk) {
+                    $status = 'cache_warning';
                 }
                 header('Location: episodes_management.php?page=' . $returnPage . '&status=' . $status);
                 exit;

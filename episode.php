@@ -7,8 +7,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/cache_service.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
+    exit;
+}
+ob_start();
 
 // Extrae el slug desde una URL guardada tipo /YYYY/MM/slug.
 function slugFromEpisodeLink(?string $link): ?string
@@ -121,7 +126,6 @@ if ($cover === '') {
     $cover = trim((string) ($podcast['image_url'] ?? ''));
 }
 $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => ''];
-$faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
 ?>
 <!doctype html>
 <html lang="es">
@@ -129,10 +133,8 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($episode ? (string) ($episode['title'] ?? $podcastTitle) : $podcastTitle) ?></title>
-  <?php if ($faviconUrl !== ''): ?>
-  <link rel="icon" type="image/png" href="<?= esc($faviconUrl) ?>">
-  <link rel="apple-touch-icon" href="<?= esc($faviconUrl) ?>">
-  <?php endif; ?>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/episode.css">
 </head>
 <body>
@@ -192,3 +194,9 @@ $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
   </div>
 </body>
 </html>
+<?php
+$cachedOutput = ob_get_contents();
+if (is_string($cachedOutput)) {
+    storeWebCache($dbPath, $cachedOutput);
+}
+ob_end_flush();

@@ -9,8 +9,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/cache_service.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
+    exit;
+}
+ob_start();
 
 // Genera un extracto de texto compacto y marca si hubo recorte.
 function firstChars(string $value, int $maxChars): array
@@ -106,7 +111,6 @@ if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }
 $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
-$faviconUrl = $podcastImage;
 ?>
 <!doctype html>
 <html lang="es">
@@ -114,10 +118,8 @@ $faviconUrl = $podcastImage;
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($podcastTitle) ?></title>
-  <?php if ($faviconUrl !== ''): ?>
-  <link rel="icon" type="image/png" href="<?= esc($faviconUrl) ?>">
-  <link rel="apple-touch-icon" href="<?= esc($faviconUrl) ?>">
-  <?php endif; ?>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/index.css">
 </head>
 <body>
@@ -202,3 +204,9 @@ $faviconUrl = $podcastImage;
   </div>
 </body>
 </html>
+<?php
+$cachedOutput = ob_get_contents();
+if (is_string($cachedOutput)) {
+    storeWebCache($dbPath, $cachedOutput);
+}
+ob_end_flush();

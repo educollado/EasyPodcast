@@ -5,6 +5,7 @@ declare(strict_types=1);
 // Panel de gestión de metadatos del podcast (una sola fila de canal).
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/cache_service.php';
 
 session_start();
 
@@ -190,6 +191,7 @@ $form = [
     'itunes_type' => 'episodic',
     'rss_item_limit' => '0',
     'write_audio_metadata' => '0',
+    'cache_enabled' => '0',
 ];
 
 try {
@@ -214,13 +216,15 @@ try {
           copyright TEXT,
           itunes_type TEXT DEFAULT 'episodic',
           rss_item_limit INTEGER NOT NULL DEFAULT 0,
-          write_audio_metadata INTEGER NOT NULL DEFAULT 0
+          write_audio_metadata INTEGER NOT NULL DEFAULT 0,
+          cache_enabled INTEGER NOT NULL DEFAULT 0
         )"
     );
     // Migraciones ligeras de columnas en instalaciones existentes.
     $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
     $hasRssItemLimit = false;
     $hasWriteAudioMetadata = false;
+    $hasCacheEnabled = false;
     foreach ($columns as $column) {
         if (($column['name'] ?? '') === 'rss_item_limit') {
             $hasRssItemLimit = true;
@@ -228,12 +232,18 @@ try {
         if (($column['name'] ?? '') === 'write_audio_metadata') {
             $hasWriteAudioMetadata = true;
         }
+        if (($column['name'] ?? '') === 'cache_enabled') {
+            $hasCacheEnabled = true;
+        }
     }
     if (!$hasRssItemLimit) {
         $pdo->exec('ALTER TABLE podcast ADD COLUMN rss_item_limit INTEGER NOT NULL DEFAULT 0');
     }
     if (!$hasWriteAudioMetadata) {
         $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!$hasCacheEnabled) {
+        $pdo->exec('ALTER TABLE podcast ADD COLUMN cache_enabled INTEGER NOT NULL DEFAULT 0');
     }
 
     // La app usa una sola fila de canal; se carga cuando existe.
@@ -244,7 +254,13 @@ try {
         }
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['cache_action'] ?? '') === 'clear_cache') {
+        if (clearWebCache()) {
+            $notice = 'Caché borrada correctamente.';
+        } else {
+            $error = 'No se pudo borrar completamente la caché.';
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Hidrata el formulario con POST para preservar datos si hay errores de validación.
         foreach ($form as $key => $value) {
             if ($key === 'explicit') {
@@ -256,6 +272,10 @@ try {
                 continue;
             }
             if ($key === 'write_audio_metadata') {
+                $form[$key] = isset($_POST[$key]) ? '1' : '0';
+                continue;
+            }
+            if ($key === 'cache_enabled') {
                 $form[$key] = isset($_POST[$key]) ? '1' : '0';
                 continue;
             }
@@ -336,7 +356,8 @@ try {
                          copyright = :copyright,
                          itunes_type = :itunes_type,
                          rss_item_limit = :rss_item_limit,
-                         write_audio_metadata = :write_audio_metadata
+                         write_audio_metadata = :write_audio_metadata,
+                         cache_enabled = :cache_enabled
                      WHERE id = :id'
                 );
                 $stmt->execute([
@@ -354,6 +375,7 @@ try {
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
                     ':write_audio_metadata' => (int) $form['write_audio_metadata'],
+                    ':cache_enabled' => (int) $form['cache_enabled'],
                     ':id' => (int) $existing['id'],
                 ]);
                 $notice = 'Podcast actualizado correctamente.';
@@ -367,13 +389,16 @@ try {
                 if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
                     $notice .= ' (Aviso: ' . $faviconWarning . ')';
                 }
+                if (!clearWebCache()) {
+                    $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                }
             } else {
                 // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                 $stmt = $pdo->prepare(
                     'INSERT INTO podcast
-                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, write_audio_metadata)
+                     (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, write_audio_metadata, cache_enabled)
                      VALUES
-                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :write_audio_metadata)'
+                     (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :write_audio_metadata, :cache_enabled)'
                 );
                 $stmt->execute([
                     ':title' => $form['title'],
@@ -390,6 +415,7 @@ try {
                     ':itunes_type' => $form['itunes_type'],
                     ':rss_item_limit' => (int) $form['rss_item_limit'],
                     ':write_audio_metadata' => (int) $form['write_audio_metadata'],
+                    ':cache_enabled' => (int) $form['cache_enabled'],
                 ]);
                 $notice = 'Podcast guardado correctamente.';
                 try {
@@ -401,6 +427,9 @@ try {
                 $faviconWarning = '';
                 if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
                     $notice .= ' (Aviso: ' . $faviconWarning . ')';
+                }
+                if (!clearWebCache()) {
+                    $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
                 }
             }
 
@@ -513,6 +542,11 @@ try {
             <span>Escribir metadatos ID3 en MP3 al subir episodio</span>
             <small>Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista.</small>
           </label>
+          <label class="inline-checkbox">
+            <input type="checkbox" name="cache_enabled" value="1" <?= $form['cache_enabled'] === '1' ? 'checked' : '' ?>>
+            <span>Habilitar caché pública en /cache</span>
+            <small>Aplica a portada, episodio, feed y sitemap.</small>
+          </label>
         </div>
 
         <div class="grid" style="margin-top: .8rem;">
@@ -525,6 +559,12 @@ try {
         <div class="actions">
           <a class="btn back" href="admin.php">Volver al panel</a>
           <button class="btn" type="submit">Guardar podcast</button>
+        </div>
+      </form>
+      <form method="post" action="podcast_management.php" style="margin-top: .8rem;">
+        <input type="hidden" name="cache_action" value="clear_cache">
+        <div class="actions">
+          <button class="btn" type="submit">Borrar caché</button>
         </div>
       </form>
     </main>

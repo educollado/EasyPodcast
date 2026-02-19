@@ -9,6 +9,7 @@ declare(strict_types=1);
 // Redirección canónica por host configurado en el podcast y utilidades del feed.
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/feed_builder.php';
+require_once __DIR__ . '/lib/cache_service.php';
 
 // El acceso a esta pantalla exige sesión de administrador activa.
 session_start();
@@ -213,6 +214,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
                                 } catch (Throwable $feedError) {
                                     $notice = 'Base de datos importada correctamente, pero no se pudo regenerar feed.xml.';
                                 }
+                                if (!clearWebCache()) {
+                                    $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                                }
 
                                 // Limpia el backup temporal tras importación satisfactoria.
                                 if (!@unlink($backupPath) && is_file($backupPath)) {
@@ -346,6 +350,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
                 } else {
                     $notice = 'Ficheros importados correctamente. Archivos escritos: '
                         . $writtenFiles . '. Directorios creados: ' . $createdDirs . '.';
+                    if (!clearWebCache()) {
+                        $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                    }
                 }
             }
         }
