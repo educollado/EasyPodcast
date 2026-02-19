@@ -16,6 +16,14 @@ RewriteRule ^([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$ episode.php?year=$1&month=$2&
 </IfModule>
 # Evita listado de directorios.
 Options -Indexes
+# Limite maximo de subida por peticion HTTP (128 MiB).
+LimitRequestBody 134217728
+# Ajustes PHP de subida cuando se usa mod_php.
+<IfModule mod_php.c>
+php_value upload_max_filesize 128M
+php_value post_max_size 128M
+php_value max_file_uploads 50
+</IfModule>
 # Cabeceras para Strict Transport y Permision Policy
 <IfModule mod_headers.c>
 Header set Strict-Transport-Security "max-age=31536000; preload" env=HTTPS

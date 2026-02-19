@@ -26,6 +26,7 @@ enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 $error = '';
 $notice = '';
+const MEDIA_PART_MAX_BYTES = 133169152; // 127 MiB
 
 function esc(string $value): string
 {
@@ -33,48 +34,156 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-function addDirectoryToZip(ZipArchive $zip, string $absoluteDir, string $zipRoot): int
+/**
+ * @return array<int, array{abs:string, zip:string, size:int}>
+ */
+function collectMediaFiles(string $absoluteDir, string $zipRoot): array
 {
-    // Si el directorio no existe, no se considera error: simplemente no se añade.
     if (!is_dir($absoluteDir)) {
-        return 0;
+        return [];
     }
 
-    // Crea explícitamente el directorio raíz dentro del ZIP (images/ o audios/).
-    $zip->addEmptyDir($zipRoot);
-
     $dirLen = strlen($absoluteDir) + 1;
-    $filesAdded = 0;
+    $files = [];
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($absoluteDir, FilesystemIterator::SKIP_DOTS),
         RecursiveIteratorIterator::SELF_FIRST
     );
 
-    // Recorre recursivamente el árbol local y replica su estructura dentro del ZIP.
     foreach ($iterator as $item) {
+        if (!$item->isFile()) {
+            continue;
+        }
+
         $path = $item->getPathname();
         $relativePath = substr($path, $dirLen);
         $relativePathUnix = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
 
-        // No incluye variantes generadas automáticamente dentro de images/generated/.
         if ($zipRoot === 'images' && ($relativePathUnix === 'generated' || str_starts_with($relativePathUnix, 'generated/'))) {
             continue;
         }
 
-        $zipPath = $zipRoot . '/' . str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
-
-        if ($item->isDir()) {
-            $zip->addEmptyDir($zipPath);
+        $size = $item->getSize();
+        if ($size === false || $size < 0) {
             continue;
         }
 
-        if ($item->isFile()) {
-            $zip->addFile($path, $zipPath);
+        $files[] = [
+            'abs' => $path,
+            'zip' => $zipRoot . '/' . str_replace(DIRECTORY_SEPARATOR, '/', $relativePath),
+            'size' => (int) $size,
+        ];
+    }
+
+    usort($files, static fn(array $a, array $b): int => strcmp($a['zip'], $b['zip']));
+    return $files;
+}
+
+/**
+ * @param array<int, array{abs:string, zip:string, size:int}> $files
+ * @return array{parts:array<int, array{files:array<int, array{abs:string, zip:string, size:int}>, bytes:int}>, skipped:array<int, array{abs:string, zip:string, size:int}>}
+ */
+function splitMediaFilesIntoParts(array $files, int $maxBytes): array
+{
+    $parts = [];
+    $skipped = [];
+    $currentFiles = [];
+    $currentBytes = 0;
+
+    foreach ($files as $file) {
+        if ($file['size'] > $maxBytes) {
+            $skipped[] = $file;
+            continue;
+        }
+
+        if ($currentBytes > 0 && ($currentBytes + $file['size']) > $maxBytes) {
+            $parts[] = ['files' => $currentFiles, 'bytes' => $currentBytes];
+            $currentFiles = [];
+            $currentBytes = 0;
+        }
+
+        $currentFiles[] = $file;
+        $currentBytes += $file['size'];
+    }
+
+    if ($currentFiles !== []) {
+        $parts[] = ['files' => $currentFiles, 'bytes' => $currentBytes];
+    }
+
+    return ['parts' => $parts, 'skipped' => $skipped];
+}
+
+/**
+ * @return array{parts:array<int, array{files:array<int, array{abs:string, zip:string, size:int}>, bytes:int}>, skipped:array<int, array{abs:string, zip:string, size:int}>, totalFiles:int, totalBytes:int, exportedFiles:int}
+ */
+function buildMediaExportPlan(string $absoluteDir, string $zipRoot): array
+{
+    $files = collectMediaFiles($absoluteDir, $zipRoot);
+    $split = splitMediaFilesIntoParts($files, MEDIA_PART_MAX_BYTES);
+    $parts = $split['parts'];
+    $skipped = $split['skipped'];
+    $totalBytes = 0;
+    $exportedFiles = 0;
+    foreach ($parts as $part) {
+        $totalBytes += $part['bytes'];
+        $exportedFiles += count($part['files']);
+    }
+
+    return [
+        'parts' => $parts,
+        'skipped' => $skipped,
+        'totalFiles' => count($files),
+        'totalBytes' => $totalBytes,
+        'exportedFiles' => $exportedFiles,
+    ];
+}
+
+function mediaPathToHref(string $zipPath): string
+{
+    $segments = explode('/', ltrim($zipPath, '/'));
+    $encoded = array_map(static fn(string $segment): string => rawurlencode($segment), $segments);
+    return '/' . implode('/', $encoded);
+}
+
+/**
+ * @param array<int, array{abs:string, zip:string, size:int}> $partFiles
+ */
+function streamZipPart(array $partFiles, string $downloadName, string $zipRoot): void
+{
+    $tmpZipPath = tempnam(sys_get_temp_dir(), 'easy_podcast_part_');
+    if ($tmpZipPath === false) {
+        throw new RuntimeException('No se pudo preparar el archivo temporal para exportar.');
+    }
+
+    $zip = new ZipArchive();
+    $openResult = $zip->open($tmpZipPath, ZipArchive::OVERWRITE);
+    if ($openResult !== true) {
+        @unlink($tmpZipPath);
+        throw new RuntimeException('No se pudo crear el archivo ZIP de exportación.');
+    }
+
+    $zip->addEmptyDir($zipRoot);
+    $filesAdded = 0;
+    foreach ($partFiles as $file) {
+        if (is_file($file['abs'])) {
+            $zip->addFile($file['abs'], $file['zip']);
             $filesAdded++;
         }
     }
+    $zip->close();
 
-    return $filesAdded;
+    if ($filesAdded === 0) {
+        @unlink($tmpZipPath);
+        throw new RuntimeException('No hay archivos para exportar en esta parte.');
+    }
+
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $downloadName . '"');
+    header('Content-Length: ' . (string) filesize($tmpZipPath));
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Pragma: no-cache');
+    readfile($tmpZipPath);
+    @unlink($tmpZipPath);
 }
 
 function normalizeZipPath(string $path): string
@@ -85,6 +194,172 @@ function normalizeZipPath(string $path): string
         $normalized = str_replace('//', '/', $normalized);
     }
     return ltrim($normalized, '/');
+}
+
+/**
+ * @param array<string, mixed> $filesField
+ * @return array<int, array{name:string, tmp_name:string, error:int}>
+ */
+function normalizeUploadedFilesList(array $filesField): array
+{
+    $names = $filesField['name'] ?? [];
+    $tmpNames = $filesField['tmp_name'] ?? [];
+    $errors = $filesField['error'] ?? [];
+
+    if (!is_array($names)) {
+        return [[
+            'name' => (string) ($filesField['name'] ?? ''),
+            'tmp_name' => (string) ($filesField['tmp_name'] ?? ''),
+            'error' => (int) ($filesField['error'] ?? UPLOAD_ERR_NO_FILE),
+        ]];
+    }
+
+    $normalized = [];
+    foreach ($names as $idx => $name) {
+        $normalized[] = [
+            'name' => (string) $name,
+            'tmp_name' => (string) ($tmpNames[$idx] ?? ''),
+            'error' => (int) ($errors[$idx] ?? UPLOAD_ERR_NO_FILE),
+        ];
+    }
+
+    return $normalized;
+}
+
+function sanitizeAudioFilename(string $originalName): string
+{
+    $name = basename($originalName);
+    $name = preg_replace('/[^A-Za-z0-9._-]+/', '-', $name) ?? '';
+    $name = trim((string) $name, '-._');
+    if ($name === '') {
+        $name = 'audio-' . date('Ymd-His');
+    }
+
+    $ext = strtolower((string) pathinfo($name, PATHINFO_EXTENSION));
+    $base = (string) pathinfo($name, PATHINFO_FILENAME);
+    if ($ext !== 'mp3') {
+        $ext = 'mp3';
+    }
+    if ($base === '') {
+        $base = 'audio-' . date('Ymd-His');
+    }
+
+    return $base . '.' . $ext;
+}
+
+function resolveUniquePath(string $dir, string $filename): string
+{
+    $ext = (string) pathinfo($filename, PATHINFO_EXTENSION);
+    $base = (string) pathinfo($filename, PATHINFO_FILENAME);
+    $candidate = $dir . '/' . $filename;
+    $counter = 1;
+    while (is_file($candidate)) {
+        $suffix = '-' . $counter;
+        $candidate = $dir . '/' . $base . $suffix . ($ext !== '' ? '.' . $ext : '');
+        $counter++;
+    }
+    return $candidate;
+}
+
+/**
+ * @return array{written:int, dirs:int, valid:int}
+ */
+function importZipIntoMedia(string $uploadedPath): array
+{
+    $zip = new ZipArchive();
+    $openResult = $zip->open($uploadedPath);
+    if ($openResult !== true) {
+        throw new RuntimeException('No se pudo abrir el ZIP para importar ficheros.');
+    }
+
+    $writtenFiles = 0;
+    $createdDirs = 0;
+    $foundValidEntries = 0;
+
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $entryStat = $zip->statIndex($i);
+        if (!is_array($entryStat) || !isset($entryStat['name'])) {
+            continue;
+        }
+        $entryName = normalizeZipPath((string) $entryStat['name']);
+        if ($entryName === '') {
+            continue;
+        }
+
+        if (strpos($entryName, '../') !== false || str_contains($entryName, "\0")) {
+            $zip->close();
+            throw new RuntimeException('El ZIP contiene rutas no permitidas.');
+        }
+
+        $isAllowedRoot = str_starts_with($entryName, 'images/') || str_starts_with($entryName, 'audios/');
+        $isAllowedDir = ($entryName === 'images' || $entryName === 'audios');
+        if (!$isAllowedRoot && !$isAllowedDir) {
+            continue;
+        }
+        $foundValidEntries++;
+
+        $targetPath = __DIR__ . '/' . $entryName;
+        $isDirEntry = str_ends_with($entryName, '/')
+            || (isset($entryStat['size']) && (int) $entryStat['size'] === 0 && str_ends_with($entryName, '/'));
+
+        if ($isDirEntry || $isAllowedDir) {
+            $dirPath = rtrim($targetPath, '/');
+            if (!is_dir($dirPath)) {
+                if (!mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
+                    $zip->close();
+                    throw new RuntimeException('No se pudo crear un directorio durante la importación.');
+                }
+                $createdDirs++;
+            }
+            continue;
+        }
+
+        $parentDir = dirname($targetPath);
+        if (!is_dir($parentDir) && !mkdir($parentDir, 0755, true) && !is_dir($parentDir)) {
+            $zip->close();
+            throw new RuntimeException('No se pudo preparar directorios para extraer ficheros.');
+        }
+
+        $stream = $zip->getStream((string) $entryStat['name']);
+        if ($stream === false) {
+            $zip->close();
+            throw new RuntimeException('No se pudo leer un fichero dentro del ZIP.');
+        }
+        $out = fopen($targetPath, 'wb');
+        if ($out === false) {
+            fclose($stream);
+            $zip->close();
+            throw new RuntimeException('No se pudo escribir un fichero en destino.');
+        }
+
+        while (!feof($stream)) {
+            $chunk = fread($stream, 8192);
+            if ($chunk === false) {
+                fclose($out);
+                fclose($stream);
+                $zip->close();
+                throw new RuntimeException('Error al leer datos del ZIP.');
+            }
+            if ($chunk !== '' && fwrite($out, $chunk) === false) {
+                fclose($out);
+                fclose($stream);
+                $zip->close();
+                throw new RuntimeException('Error al guardar un fichero importado.');
+            }
+        }
+
+        fclose($out);
+        fclose($stream);
+        $writtenFiles++;
+    }
+
+    $zip->close();
+
+    if ($foundValidEntries === 0) {
+        throw new RuntimeException('El ZIP no contiene rutas válidas de images/ o audios/.');
+    }
+
+    return ['written' => $writtenFiles, 'dirs' => $createdDirs, 'valid' => $foundValidEntries];
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'export_db') {
@@ -104,48 +379,40 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_db') {
     }
 }
 
-if (isset($_GET['action']) && $_GET['action'] === 'export_files') {
-    // Exportación de ficheros multimedia como ZIP temporal descargable.
+if (isset($_GET['action']) && $_GET['action'] === 'export_media_part') {
+    // Exportación de ficheros multimedia en partes <= 127 MiB.
     if (!class_exists('ZipArchive')) {
         $error = 'La extensión ZipArchive no está disponible en este servidor.';
     } else {
-        $imagesDir = __DIR__ . '/images';
-        $audiosDir = __DIR__ . '/audios';
+        $type = (string) ($_GET['type'] ?? '');
+        $part = max(1, (int) ($_GET['part'] ?? 1));
+        $isImages = $type === 'images';
+        $isAudios = $type === 'audios';
 
-        if (!is_dir($imagesDir) && !is_dir($audiosDir)) {
-            $error = 'No existen los directorios images ni audios para exportar.';
+        if (!$isImages && !$isAudios) {
+            $error = 'Tipo de exportación inválido.';
         } else {
-            $tmpZipPath = tempnam(sys_get_temp_dir(), 'easy_podcast_media_');
-            if ($tmpZipPath === false) {
-                $error = 'No se pudo preparar el archivo temporal para exportar.';
-            } else {
-                $zip = new ZipArchive();
-                $openResult = $zip->open($tmpZipPath, ZipArchive::OVERWRITE);
-                if ($openResult !== true) {
-                    @unlink($tmpZipPath);
-                    $error = 'No se pudo crear el archivo ZIP de exportación.';
-                } else {
-                    $filesCount = 0;
-                    $filesCount += addDirectoryToZip($zip, $imagesDir, 'images');
-                    $filesCount += addDirectoryToZip($zip, $audiosDir, 'audios');
-                    $zip->close();
+            $zipRoot = $isImages ? 'images' : 'audios';
+            $sourceDir = __DIR__ . '/' . $zipRoot;
 
-                    if ($filesCount === 0) {
-                        @unlink($tmpZipPath);
-                        $error = 'No hay archivos en images/audios para exportar.';
-                    } else {
-                        $downloadName = 'easy_podcast_files_' . date('Ymd_His') . '.zip';
-                        header('Content-Type: application/zip');
-                        header('Content-Disposition: attachment; filename="' . $downloadName . '"');
-                        header('Content-Length: ' . (string) filesize($tmpZipPath));
-                        header('Cache-Control: no-store, no-cache, must-revalidate');
-                        header('Pragma: no-cache');
-                        readfile($tmpZipPath);
-                        // Limpia el ZIP temporal para no dejar residuos en disco.
-                        @unlink($tmpZipPath);
-                        exit;
-                    }
+            try {
+                $plan = buildMediaExportPlan($sourceDir, $zipRoot);
+                if ($plan['totalFiles'] === 0) {
+                    $error = 'No hay archivos para exportar en ' . $zipRoot . '/.';
+                } elseif (count($plan['parts']) === 0) {
+                    $error = 'No hay ficheros exportables en ZIP para ' . $zipRoot
+                        . '/. Descarga manualmente los que superan 127 MB desde la lista inferior.';
+                } elseif (!isset($plan['parts'][$part - 1])) {
+                    $error = 'La parte solicitada no existe para ' . $zipRoot . '.';
+                } else {
+                    $downloadName = 'easy_podcast_' . $zipRoot
+                        . '_part' . str_pad((string) $part, 3, '0', STR_PAD_LEFT)
+                        . '_' . date('Ymd_His') . '.zip';
+                    streamZipPart($plan['parts'][$part - 1]['files'], $downloadName, $zipRoot);
+                    exit;
                 }
+            } catch (Throwable $e) {
+                $error = $e->getMessage();
             }
         }
     }
@@ -237,136 +504,150 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ?? '') === 'import_files_zip') {
-    // Importación de ZIP de ficheros (solo se aceptan rutas bajo images/ y audios/).
-    if (!class_exists('ZipArchive')) {
-        $error = 'La extensión ZipArchive no está disponible en este servidor.';
-    } elseif (!isset($_FILES['files_zip']) || !is_array($_FILES['files_zip'])) {
-        $error = 'Selecciona un ZIP de ficheros.';
+    // Importación de ZIP(s) de media y/o audios MP3 sueltos.
+    $zipUploads = isset($_FILES['files_zip']) && is_array($_FILES['files_zip'])
+        ? normalizeUploadedFilesList($_FILES['files_zip'])
+        : [];
+    $audioUploads = isset($_FILES['audio_files']) && is_array($_FILES['audio_files'])
+        ? normalizeUploadedFilesList($_FILES['audio_files'])
+        : [];
+
+    $hasZipCandidate = false;
+    foreach ($zipUploads as $upload) {
+        if (!((int) $upload['error'] === UPLOAD_ERR_NO_FILE && (string) $upload['name'] === '')) {
+            $hasZipCandidate = true;
+            break;
+        }
+    }
+    $hasAudioCandidate = false;
+    foreach ($audioUploads as $upload) {
+        if (!((int) $upload['error'] === UPLOAD_ERR_NO_FILE && (string) $upload['name'] === '')) {
+            $hasAudioCandidate = true;
+            break;
+        }
+    }
+
+    if (!$hasZipCandidate && !$hasAudioCandidate) {
+        $error = 'Selecciona al menos un ZIP o un audio MP3.';
     } else {
-        $uploadError = (int) ($_FILES['files_zip']['error'] ?? UPLOAD_ERR_NO_FILE);
-        $uploadedPath = (string) ($_FILES['files_zip']['tmp_name'] ?? '');
-        $originalName = strtolower((string) ($_FILES['files_zip']['name'] ?? ''));
-        $isZip = preg_match('/\.zip$/', $originalName) === 1;
+        $archivesProcessed = 0;
+        $writtenFiles = 0;
+        $createdDirs = 0;
+        $audiosUploaded = 0;
 
-        if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
-            $error = 'No se pudo subir el ZIP de ficheros.';
-        } elseif (!$isZip) {
-            $error = 'El archivo debe tener extensión .zip.';
-        } else {
-            $zip = new ZipArchive();
-            $openResult = $zip->open($uploadedPath);
-            if ($openResult !== true) {
-                $error = 'No se pudo abrir el ZIP para importar ficheros.';
-            } else {
-                $writtenFiles = 0;
-                $createdDirs = 0;
-                $foundValidEntries = 0;
-                $importError = '';
+        if ($hasZipCandidate && !class_exists('ZipArchive')) {
+            $error = 'La extensión ZipArchive no está disponible en este servidor.';
+        }
 
-                // Recorre entradas una a una para aplicar validación de ruta antes de escribir.
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    $entryStat = $zip->statIndex($i);
-                    if (!is_array($entryStat) || !isset($entryStat['name'])) {
-                        continue;
-                    }
-                    $entryName = normalizeZipPath((string) $entryStat['name']);
-                    if ($entryName === '') {
-                        continue;
-                    }
+        if ($error === '') {
+            foreach ($zipUploads as $upload) {
+                $uploadError = (int) $upload['error'];
+                $uploadedPath = (string) $upload['tmp_name'];
+                $originalName = strtolower((string) $upload['name']);
 
-                    // Bloqueo explícito de path traversal y nombres corruptos.
-                    if (strpos($entryName, '../') !== false || str_contains($entryName, "\0")) {
-                        $importError = 'El ZIP contiene rutas no permitidas.';
-                        break;
-                    }
-
-                    $isAllowedRoot = str_starts_with($entryName, 'images/') || str_starts_with($entryName, 'audios/');
-                    $isAllowedDir = ($entryName === 'images' || $entryName === 'audios');
-                    // Ignora cualquier ruta fuera de images/ o audios/.
-                    if (!$isAllowedRoot && !$isAllowedDir) {
-                        continue;
-                    }
-                    $foundValidEntries++;
-
-                    $targetPath = __DIR__ . '/' . $entryName;
-                    $isDirEntry = str_ends_with($entryName, '/')
-                        || (isset($entryStat['size']) && (int) $entryStat['size'] === 0 && str_ends_with($entryName, '/'));
-
-                    if ($isDirEntry || $isAllowedDir) {
-                        $dirPath = rtrim($targetPath, '/');
-                        if (!is_dir($dirPath)) {
-                            if (!mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
-                                $importError = 'No se pudo crear un directorio durante la importación.';
-                                break;
-                            }
-                            $createdDirs++;
-                        }
-                        continue;
-                    }
-
-                    $parentDir = dirname($targetPath);
-                    if (!is_dir($parentDir) && !mkdir($parentDir, 0755, true) && !is_dir($parentDir)) {
-                        $importError = 'No se pudo preparar directorios para extraer ficheros.';
-                        break;
-                    }
-
-                    // Extracción en streaming para no cargar ficheros completos en memoria.
-                    $stream = $zip->getStream((string) $entryStat['name']);
-                    if ($stream === false) {
-                        $importError = 'No se pudo leer un fichero dentro del ZIP.';
-                        break;
-                    }
-                    $out = fopen($targetPath, 'wb');
-                    if ($out === false) {
-                        fclose($stream);
-                        $importError = 'No se pudo escribir un fichero en destino.';
-                        break;
-                    }
-
-                    while (!feof($stream)) {
-                        $chunk = fread($stream, 8192);
-                        if ($chunk === false) {
-                            $importError = 'Error al leer datos del ZIP.';
-                            break;
-                        }
-                        if ($chunk !== '' && fwrite($out, $chunk) === false) {
-                            $importError = 'Error al guardar un fichero importado.';
-                            break;
-                        }
-                    }
-
-                    fclose($out);
-                    fclose($stream);
-
-                    if ($importError !== '') {
-                        break;
-                    }
-                    $writtenFiles++;
+                if ($uploadError === UPLOAD_ERR_NO_FILE && $originalName === '') {
+                    continue;
+                }
+                if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
+                    $error = 'No se pudo subir uno de los ZIP de ficheros.';
+                    break;
+                }
+                if (preg_match('/\.zip$/', $originalName) !== 1) {
+                    $error = 'Todos los ficheros ZIP deben tener extensión .zip.';
+                    break;
                 }
 
-                $zip->close();
-
-                if ($importError !== '') {
-                    $error = $importError;
-                } elseif ($foundValidEntries === 0) {
-                    $error = 'El ZIP no contiene rutas válidas de images/ o audios/.';
-                } else {
-                    $notice = 'Ficheros importados correctamente. Archivos escritos: '
-                        . $writtenFiles . '. Directorios creados: ' . $createdDirs . '.';
-                    try {
-                        $pdo = new PDO('sqlite:' . $dbPath);
-                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-                        writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
-                    } catch (Throwable $sitemapError) {
-                        $notice .= ' (Aviso: no se pudo regenerar sitemap.xml)';
-                    }
-                    if (!clearWebCache()) {
-                        $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
-                    }
+                try {
+                    $result = importZipIntoMedia($uploadedPath);
+                    $writtenFiles += $result['written'];
+                    $createdDirs += $result['dirs'];
+                    $archivesProcessed++;
+                } catch (Throwable $e) {
+                    $error = $e->getMessage();
+                    break;
                 }
             }
         }
+
+        if ($error === '') {
+            $audiosDir = __DIR__ . '/audios';
+            if (!is_dir($audiosDir) && !mkdir($audiosDir, 0755, true) && !is_dir($audiosDir)) {
+                $error = 'No se pudo crear el directorio audios/.';
+            } else {
+                foreach ($audioUploads as $upload) {
+                    $uploadError = (int) $upload['error'];
+                    $uploadedPath = (string) $upload['tmp_name'];
+                    $originalName = (string) $upload['name'];
+                    $lowerName = strtolower($originalName);
+
+                    if ($uploadError === UPLOAD_ERR_NO_FILE && $originalName === '') {
+                        continue;
+                    }
+                    if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
+                        $error = 'No se pudo subir uno de los audios MP3.';
+                        break;
+                    }
+                    if (preg_match('/\.mp3$/', $lowerName) !== 1) {
+                        $error = 'Todos los audios sueltos deben tener extensión .mp3.';
+                        break;
+                    }
+
+                    $safeName = sanitizeAudioFilename($originalName);
+                    $targetPath = resolveUniquePath($audiosDir, $safeName);
+                    if (!move_uploaded_file($uploadedPath, $targetPath)) {
+                        $error = 'No se pudo guardar uno de los audios MP3 en audios/.';
+                        break;
+                    }
+                    $audiosUploaded++;
+                }
+            }
+        }
+
+        if ($error === '' && $archivesProcessed === 0 && $audiosUploaded === 0) {
+            $error = 'Selecciona al menos un ZIP o un audio MP3.';
+        } elseif ($error === '') {
+            $notice = 'Importacion completada. ZIP procesados: ' . $archivesProcessed
+                . '. Archivos escritos desde ZIP: ' . $writtenFiles
+                . '. Directorios creados: ' . $createdDirs
+                . '. Audios MP3 subidos: ' . $audiosUploaded . '.';
+            try {
+                $pdo = new PDO('sqlite:' . $dbPath);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
+            } catch (Throwable $sitemapError) {
+                $notice .= ' (Aviso: no se pudo regenerar sitemap.xml)';
+            }
+            if (!clearWebCache()) {
+                $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+            }
+        }
+    }
+}
+
+$imagesExport = ['parts' => [], 'skipped' => [], 'totalFiles' => 0, 'totalBytes' => 0, 'exportedFiles' => 0, 'error' => ''];
+$audiosExport = ['parts' => [], 'skipped' => [], 'totalFiles' => 0, 'totalBytes' => 0, 'exportedFiles' => 0, 'error' => ''];
+if (class_exists('ZipArchive')) {
+    try {
+        $imagesPlan = buildMediaExportPlan(__DIR__ . '/images', 'images');
+        $imagesExport['parts'] = $imagesPlan['parts'];
+        $imagesExport['skipped'] = $imagesPlan['skipped'];
+        $imagesExport['totalFiles'] = $imagesPlan['totalFiles'];
+        $imagesExport['totalBytes'] = $imagesPlan['totalBytes'];
+        $imagesExport['exportedFiles'] = $imagesPlan['exportedFiles'];
+    } catch (Throwable $e) {
+        $imagesExport['error'] = $e->getMessage();
+    }
+
+    try {
+        $audiosPlan = buildMediaExportPlan(__DIR__ . '/audios', 'audios');
+        $audiosExport['parts'] = $audiosPlan['parts'];
+        $audiosExport['skipped'] = $audiosPlan['skipped'];
+        $audiosExport['totalFiles'] = $audiosPlan['totalFiles'];
+        $audiosExport['totalBytes'] = $audiosPlan['totalBytes'];
+        $audiosExport['exportedFiles'] = $audiosPlan['exportedFiles'];
+    } catch (Throwable $e) {
+        $audiosExport['error'] = $e->getMessage();
     }
 }
 ?>
@@ -408,14 +689,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ??
 
       <section class="tool-box" aria-label="Bloque ficheros">
         <h2>Ficheros</h2>
-        <p>Exporta o importa el ZIP con carpetas <code>images/</code> y <code>audios/</code>.</p>
+        <p>Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB.</p>
         <div class="db-tools">
-          <a class="btn files-export" href="backups.php?action=export_files">Exportar ficheros (images y audios)</a>
+          <div>
+            <strong>Exportar imágenes</strong>
+            <?php if ($imagesExport['error'] !== ''): ?>
+              <p class="error"><?= esc((string) $imagesExport['error']) ?></p>
+            <?php elseif ($imagesExport['totalFiles'] === 0): ?>
+              <p>No hay ficheros en <code>images/</code>.</p>
+            <?php else: ?>
+              <p>
+                Total: <?= (int) $imagesExport['totalFiles'] ?> ficheros.
+                Exportables en ZIP: <?= (int) $imagesExport['exportedFiles'] ?> en <?= count($imagesExport['parts']) ?> parte(s).
+              </p>
+              <?php foreach ($imagesExport['parts'] as $idx => $part): ?>
+                <a class="btn files-export" href="backups.php?action=export_media_part&amp;type=images&amp;part=<?= $idx + 1 ?>">
+                  Descargar imágenes parte <?= $idx + 1 ?> (<?= number_format($part['bytes'] / 1048576, 2) ?> MB)
+                </a>
+              <?php endforeach; ?>
+              <?php if (count($imagesExport['skipped']) > 0): ?>
+                <p class="error">
+                  Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP.
+                  Descargalos manualmente:
+                </p>
+                <?php foreach ($imagesExport['skipped'] as $skipped): ?>
+                  <p>
+                    <a href="<?= esc(mediaPathToHref((string) $skipped['zip'])) ?>" target="_blank" rel="noopener">
+                      <?= esc((string) $skipped['zip']) ?>
+                    </a>
+                    (<?= number_format(((int) $skipped['size']) / 1048576, 2) ?> MB)
+                  </p>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
+
+          <div>
+            <strong>Exportar audios</strong>
+            <?php if ($audiosExport['error'] !== ''): ?>
+              <p class="error"><?= esc((string) $audiosExport['error']) ?></p>
+            <?php elseif ($audiosExport['totalFiles'] === 0): ?>
+              <p>No hay ficheros en <code>audios/</code>.</p>
+            <?php else: ?>
+              <p>
+                Total: <?= (int) $audiosExport['totalFiles'] ?> ficheros.
+                Exportables en ZIP: <?= (int) $audiosExport['exportedFiles'] ?> en <?= count($audiosExport['parts']) ?> parte(s)
+                y <?= count($audiosExport['skipped']) ?> audios no exportables en ZIP.
+              </p>
+              <?php foreach ($audiosExport['parts'] as $idx => $part): ?>
+                <a class="btn files-export" href="backups.php?action=export_media_part&amp;type=audios&amp;part=<?= $idx + 1 ?>">
+                  Descargar audios parte <?= $idx + 1 ?> (<?= number_format($part['bytes'] / 1048576, 2) ?> MB)
+                </a>
+              <?php endforeach; ?>
+              <?php if (count($audiosExport['skipped']) > 0): ?>
+                <p class="error">
+                  Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP.
+                  Descargalos manualmente:
+                </p>
+                <?php foreach ($audiosExport['skipped'] as $skipped): ?>
+                  <p>
+                    <a href="<?= esc(mediaPathToHref((string) $skipped['zip'])) ?>" target="_blank" rel="noopener">
+                      <?= esc((string) $skipped['zip']) ?>
+                    </a>
+                    (<?= number_format(((int) $skipped['size']) / 1048576, 2) ?> MB)
+                  </p>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
+
           <form class="db-import-form" method="post" action="backups.php" enctype="multipart/form-data">
             <input type="hidden" name="files_action" value="import_files_zip">
-            <label for="files_zip">Importar ficheros (ZIP)</label>
-            <input id="files_zip" type="file" name="files_zip" accept=".zip" required>
-            <button class="btn files-import" type="submit">Importar ficheros</button>
+            <label for="files_zip">Importar ficheros (uno o varios ZIP o audios)</label>
+            <input id="files_zip" type="file" name="files_zip[]" accept=".zip" multiple>
+            <label for="audio_files">Audios MP3 sueltos (opcional)</label>
+            <input id="audio_files" type="file" name="audio_files[]" accept=".mp3,audio/mpeg" multiple>
+            <button class="btn files-import" type="submit">Importar ZIP(s) y/o audios</button>
           </form>
         </div>
       </section>
