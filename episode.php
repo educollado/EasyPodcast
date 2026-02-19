@@ -102,6 +102,7 @@ $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
 if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }
+$podcastDescription = trim((string) ($podcast['description'] ?? ''));
 $cover = trim((string) ($episode['image_url'] ?? ''));
 // Fallback de imagen del episodio a imagen del podcast.
 if ($cover === '') {
@@ -176,27 +177,12 @@ if ($error !== '') {
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/episode.css">
+  <link rel="stylesheet" href="/assets/css/header.css">
   <script type="application/ld+json"><?= $episodeJsonLd ?></script>
 </head>
 <body>
   <div class="container">
-    <header class="card">
-      <div class="header-top">
-        <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
-        <div class="header-actions">
-          <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
-        </div>
-      </div>
-      <?php if ($podcastAuthor !== ''): ?>
-        <p class="author"><?= esc($podcastAuthor) ?></p>
-      <?php endif; ?>
-    </header>
-    <section class="card search-card">
-      <form class="search-form" method="get" action="/search.php" role="search">
-        <input type="search" name="q" placeholder="Buscar episodios" aria-label="Buscar episodios">
-        <button type="submit">Buscar</button>
-      </form>
-    </section>
+    <?php require __DIR__ . '/header.php'; ?>
 
     <main class="card">
       <?php if ($error !== ''): ?>

@@ -1,0 +1,141 @@
+/* =========================================================
+   Cabecera compartida (index, episode, search)
+   ========================================================= */
+.podcast-header,
+.header-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: .9rem;
+}
+
+.podcast-header-left {
+  min-width: 0;
+}
+
+.podcast-header-right,
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: .35rem;
+  justify-self: end;
+  min-width: 280px;
+}
+
+.header-box {
+  padding: 0;
+}
+
+.rss-link img {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.rss-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.search-form {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+}
+
+.search-form input[type="search"] {
+  width: 210px;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .45rem .6rem;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+}
+
+.search-form button {
+  border: 0;
+  border-radius: 8px;
+  padding: .55rem .7rem;
+  font: inherit;
+  font-size: .95rem;
+  color: #fff;
+  background: #0b7285;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  filter: brightness(0.95);
+}
+
+.author {
+  margin: .35rem 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.desc {
+  margin: .8rem 0 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.desc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.desc a:hover {
+  text-decoration: underline;
+}
+
+/* Evita que episode.php cambie la cabecera antes de tiempo */
+@media (max-width: 760px) {
+  .podcast-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .podcast-header-right {
+    justify-self: end;
+    min-width: 280px;
+    align-items: end;
+    width: auto;
+  }
+}
+
+/* Apilado en móvil */
+@media (max-width: 620px) {
+  .podcast-header {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .podcast-header-right {
+    justify-self: stretch;
+    min-width: 0;
+    align-items: stretch;
+    width: 100%;
+  }
+}
+
+@media (max-width: 460px) {
+  .search-form {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .search-form input[type="search"] {
+    width: 100%;
+  }
+}

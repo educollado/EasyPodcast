@@ -39,6 +39,7 @@ enforceCanonicalHostFromPodcastLink($dbPath);
 $podcast = null;
 $podcastTitle = 'Podcast';
 $podcastAuthor = '';
+$podcastDescription = '';
 $podcastImage = '';
 $baseSeoUrl = '';
 
@@ -61,6 +62,7 @@ try {
     if ($podcastAuthor === '') {
         $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
     }
+    $podcastDescription = trim((string) ($podcast['description'] ?? ''));
     $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
     $baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
 
@@ -160,27 +162,12 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/index.css">
+  <link rel="stylesheet" href="/assets/css/header.css">
 </head>
 <body>
   <div class="container">
-    <header class="card">
-      <div class="header-top">
-        <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
-        <div class="header-actions">
-          <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
-        </div>
-      </div>
-      <?php if ($podcastAuthor !== ''): ?>
-        <p class="author"><?= esc($podcastAuthor) ?></p>
-      <?php endif; ?>
-      <p class="desc">Busca en títulos y contenido de episodios publicados.</p>
-    </header>
-    <section class="card search-card">
-      <form class="search-form" method="get" action="/search.php" role="search">
-        <input type="search" name="q" value="<?= esc($query) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">
-        <button type="submit">Buscar</button>
-      </form>
-    </section>
+    <?php $searchQuery = $query; ?>
+    <?php require __DIR__ . '/header.php'; ?>
 
     <main class="card">
       <?php if ($error !== ''): ?>

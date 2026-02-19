@@ -39,26 +39,25 @@
     /* =========================================================
        Cabecera (título + icono RSS)
        ========================================================= */
-    .header-top {
-      display: flex;
-      justify-content: space-between;
+    .podcast-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: start;
-      gap: .8rem;
+      gap: .9rem;
     }
-    .header-actions {
+    .podcast-header-left {
+      min-width: 0;
+    }
+    .podcast-header-right {
       display: flex;
       flex-direction: column;
       align-items: end;
       gap: .35rem;
+      justify-self: end;
+      min-width: 280px;
     }
-    .header-actions .rss-link {
-      order: 1;
-    }
-    .search-card {
-      display: flex;
-      justify-content: flex-end;
-      padding-top: .9rem;
-      padding-bottom: .9rem;
+    .header-box {
+      padding: 0;
     }
     .search-form {
       display: flex;
@@ -67,7 +66,7 @@
       width: min(540px, 100%);
     }
     .search-form input[type="search"] {
-      width: min(420px, 100%);
+      width: min(210px, 100%);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: .45rem .6rem;
@@ -117,6 +116,7 @@
       margin: .35rem 0 0;
       color: var(--muted);
       font-size: 1rem;
+      font-weight: 700;
     }
     /* =========================================================
        Detalle de episodio (imagen + contenido)
@@ -145,6 +145,8 @@
       overflow-wrap: anywhere;
     }
     .desc {
+      margin: .8rem 0 0;
+      color: var(--muted);
       overflow-wrap: anywhere;
     }
     .desc a {
@@ -209,13 +211,15 @@
       .card {
         padding: 1rem;
       }
-      .header-top {
-        flex-direction: row;
+      .podcast-header {
+        grid-template-columns: 1fr;
         align-items: flex-start;
       }
-      .header-actions {
-        align-items: flex-end;
-        align-self: flex-start;
+      .podcast-header-right {
+        justify-self: stretch;
+        min-width: 0;
+        align-items: stretch;
+        width: 100%;
       }
       .detail {
         grid-template-columns: 1fr;
@@ -231,9 +235,6 @@
     }
 
     @media (max-width: 460px) {
-      .search-card {
-        justify-content: stretch;
-      }
       .cover {
         width: min(100%, 220px);
         height: auto;

@@ -93,6 +93,7 @@ $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
 if ($podcastAuthor === '') {
     $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
 }
+$podcastDescription = trim((string) ($podcast['description'] ?? ''));
 $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
 $baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
 $canonicalPath = $page > 1 ? '/?page=' . $page : '/';
@@ -163,30 +164,12 @@ if ($error !== '') {
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/index.css">
+  <link rel="stylesheet" href="/assets/css/header.css">
   <script type="application/ld+json"><?= $seriesJsonLd ?></script>
 </head>
 <body>
   <div class="container">
-    <header class="card">
-      <div class="header-top">
-        <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
-        <div class="header-actions">
-          <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
-        </div>
-      </div>
-      <?php if ($podcastAuthor !== ''): ?>
-        <p class="author"><?= esc($podcastAuthor) ?></p>
-      <?php endif; ?>
-      <?php if (!empty($podcast['description'])): ?>
-        <p class="desc"><?= renderTextWithLinks((string) $podcast['description']) ?></p>
-      <?php endif; ?>
-    </header>
-    <section class="card search-card">
-      <form class="search-form" method="get" action="/search.php" role="search">
-        <input type="search" name="q" placeholder="Buscar episodios" aria-label="Buscar episodios">
-        <button type="submit">Buscar</button>
-      </form>
-    </section>
+    <?php require __DIR__ . '/header.php'; ?>
 
     <main class="card">
       <?php if ($error !== ''): ?>

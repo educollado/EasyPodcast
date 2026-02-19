@@ -39,26 +39,27 @@
     /* =========================================================
        Cabecera pública (título + icono RSS)
        ========================================================= */
+    .podcast-header,
     .header-top {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: start;
-      gap: .8rem;
+      gap: .9rem;
     }
+    .podcast-header-left {
+      min-width: 0;
+    }
+    .podcast-header-right,
     .header-actions {
       display: flex;
       flex-direction: column;
       align-items: end;
       gap: .35rem;
+      justify-self: end;
+      min-width: 280px;
     }
-    .header-actions .rss-link {
-      order: 1;
-    }
-    .search-card {
-      display: flex;
-      justify-content: flex-end;
-      padding-top: .9rem;
-      padding-bottom: .9rem;
+    .header-box {
+      padding: 0;
     }
     .search-form {
       display: flex;
@@ -69,7 +70,7 @@
       margin-left: auto;
     }
     .search-form input[type="search"] {
-      width: 420px;
+      width: 210px;
       max-width: 100%;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -258,13 +259,15 @@
       .card {
         padding: 1rem;
       }
-      .header-top {
-        flex-direction: row;
+      .podcast-header {
+        grid-template-columns: 1fr;
         align-items: flex-start;
       }
-      .header-actions {
-        align-items: flex-end;
-        align-self: flex-start;
+      .podcast-header-right {
+        justify-self: stretch;
+        min-width: 0;
+        align-items: stretch;
+        width: 100%;
       }
       .episode {
         grid-template-columns: 108px 1fr;
@@ -285,9 +288,6 @@
     }
 
     @media (max-width: 460px) {
-      .search-card {
-        justify-content: stretch;
-      }
       .episode {
         grid-template-columns: 1fr;
         gap: .65rem;
