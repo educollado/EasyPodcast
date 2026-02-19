@@ -3,10 +3,23 @@ RewriteEngine on
 # Fuerza HTTPS en todas las rutas.
 RewriteCond %{HTTPS} !=on [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# Sitemap dinámico accesible en /sitemap.xml.
+RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
 # Mantiene archivos/directorios existentes sin tocar por reglas de rewrite.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 # Ruta amigable de episodio: /YYYY/MM/slug -> parámetros de episode.php.
 RewriteRule ^([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$ episode.php?year=$1&month=$2&slug=$3 [L,QSA]
+</IfModule>
+# Cabeceras para Strict Transport y Permision Policy
+<IfModule mod_headers.c>
+Header set Strict-Transport-Security "max-age=31536000; preload" env=HTTPS
+Header always set Content-Security-Policy "upgrade-insecure-requests"
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Expect-CT "max-age=7776000, enforce"
+Header always set Referrer-Policy: "no-referrer-when-downgrade"
+Header always set Permissions-Policy "geolocation=(); midi=();notifications=();push=();sync-xhr=();accelerometer=(); gyroscope=(); magnetometer=(); payment=(); camera=(); microphone=();usb=(); xr=();speaker=(self);vibrate=();fullscreen=(self);"
+Header always append X-Frame-Options SAMEORIGIN
 </IfModule>

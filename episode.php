@@ -120,7 +120,7 @@ $cover = trim((string) ($episode['image_url'] ?? ''));
 if ($cover === '') {
     $cover = trim((string) ($podcast['image_url'] ?? ''));
 }
-$coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [128, 160, 220, 320, 440, 512]) : ['src' => '', 'srcset' => ''];
+$coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => ''];
 $faviconUrl = trim((string) ($podcast['image_url'] ?? ''));
 ?>
 <!doctype html>

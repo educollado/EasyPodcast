@@ -149,7 +149,7 @@ $faviconUrl = $podcastImage;
             <?php // Usa portada del podcast cuando falta la portada del episodio. ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
             <?php // Genera srcset responsive de miniaturas cuadradas y reutiliza variantes existentes. ?>
-            <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [96, 128, 144, 192, 256, 320]) : ['src' => '', 'srcset' => '']; ?>
+            <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144,220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 180px, (max-width: 620px) 108px, 144px"<?php endif; ?> alt="Portada del capítulo">
             <?php else: ?>
