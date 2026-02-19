@@ -34,7 +34,7 @@
   - paginación configurable desde administración (`home_items_per_page`)
   - portada del episodio (o fallback a portada del podcast)
   - extracto y reproductor
-  - si el extracto se recorta, se muestra `[...]` enlazado al episodio completo
+  - si el extracto se recorta, se muestra `[Leer más]` enlazado al episodio completo
   - buscador de episodios en cabecera
 - Página de episodio (`episode.php`) con:
   - URL amigable `/YYYY/MM/slug`
