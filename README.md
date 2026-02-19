@@ -4,7 +4,7 @@
 
 ## Versión
 
-**Versión actual: 0.3**
+**Versión actual: 0.4**
 
 ## Sitio de referencia
 
@@ -19,7 +19,9 @@
 |---|---|
 | Web pública | Portada con episodios `published`, página individual por episodio, reproductor inline |
 | Feed | RSS dinámico (`feed.php`) y feed generado (`feed.xml`) |
-| Administración | Login, gestión del canal, alta/edición/borrado de episodios, escritura de metadatos ID3 |
+| SEO/Indexación | `robots.txt` y `sitemap.xml` dinámico (`sitemap.php`) |
+| Caché | Caché pública en `cache/` (configurable desde administración) |
+| Administración | Login, gestión del canal, alta/edición/borrado de episodios, copias de seguridad y metadatos ID3 |
 | Subidas | Audio a `audios/`, imágenes a `images/` |
 | Estilos | CSS separado por página en `assets/css/` |
 
@@ -48,6 +50,19 @@
   - `0` = sin límite
   - `N > 0` = máximo de `N` episodios publicados más recientes
 
+### SEO / Indexación
+
+- `robots.txt`: reglas de rastreo para buscadores.
+- `sitemap.php`: genera sitemap XML dinámico.
+- `/.htaccess`: publica el sitemap dinámico en `/sitemap.xml`.
+
+### Caché
+
+- Caché de páginas/feeds en `cache/`.
+- Se activa/desactiva en `podcast_management.php` (`cache_enabled`).
+- Botón de borrado manual de caché en `podcast_management.php`.
+- Se limpia automáticamente al guardar/borrar/importar datos desde administración.
+
 ### Administración
 
 | Página | Función |
@@ -64,8 +79,10 @@
 | `index.php` | Portada pública |
 | `episode.php` | Página pública de episodio |
 | `feed.php` | Endpoint RSS dinámico |
+| `sitemap.php` | Endpoint sitemap dinámico (servido como `/sitemap.xml`) |
 | `feed_builder.php` | Constructor de RSS + escritura de `feed.xml` |
 | `feed.xml` | Feed generado |
+| `robots.txt` | Reglas para rastreadores web |
 | `admin.php` | Panel de administración |
 | `podcast_management.php` | Gestión del canal |
 | `episodes_management.php` | Gestión de episodios |
@@ -74,8 +91,10 @@
 | `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
 | `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
 | `lib/view_helpers.php` | Helpers compartidos de vista (`esc`, enlaces, slug, fechas) |
+| `lib/cache_service.php` | Servicio de caché (lectura/escritura/limpieza) |
 | `schema.sql` | Esquema de base de datos |
 | `podcast.sqlite` | Base de datos SQLite |
+| `cache/` | Archivos de caché pública generados en runtime |
 | `audios/` | Audios subidos |
 | `images/` | Imágenes subidas |
 | `assets/css/` | Hojas de estilo separadas (theming) |
@@ -88,7 +107,7 @@
 | PHP | 8+ recomendado |
 | Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd` |
 | Servidor | Apache con `mod_rewrite` |
-| Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/` |
+| Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/`, `cache/`, `favicon.ico` |
 
 ## Instalación
 
@@ -117,13 +136,15 @@ El usuario de Apache/Nginx (por ejemplo `www-data`) debe poder escribir en:
 - `feed.xml`
 - `audios/`
 - `images/`
+- `cache/`
+- `favicon.ico`
 
 Ejemplo (ajusta usuario/grupo a tu servidor):
 
 ```bash
-chown -R www-data:www-data podcast.sqlite feed.xml audios images
-chmod 775 audios images
-chmod 664 podcast.sqlite feed.xml
+chown -R www-data:www-data podcast.sqlite feed.xml audios images cache favicon.ico
+chmod 775 audios images cache
+chmod 664 podcast.sqlite feed.xml favicon.ico
 ```
 
 ### 5) Activar `mod_rewrite` y `.htaccess` en Apache
@@ -144,6 +165,8 @@ chmod 664 podcast.sqlite feed.xml
 - Portada pública: `/`
 - Feed dinámico: `/feed.php`
 - Feed generado: `/feed.xml`
+- Sitemap dinámico: `/sitemap.xml`
+- Robots: `/robots.txt`
 
 ## Base de datos
 
@@ -170,6 +193,8 @@ Ver detalle en `schema.sql`.
 | Portada | `/` |
 | Feed dinámico | `/feed.php` |
 | Feed generado | `/feed.xml` |
+| Sitemap dinámico | `/sitemap.xml` |
+| Robots | `/robots.txt` |
 | Episodio | `/YYYY/MM/slug` |
 
 ## Personalización / temas
@@ -192,6 +217,8 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 - El MIME del audio en RSS se normaliza para compatibilidad con plataformas.
 - Si activas la opción en `podcast_management.php`, al subir/editar MP3 se escriben metadatos ID3 (incluida portada de episodio o fallback de podcast).
 - Al guardar metadatos del podcast, se intenta regenerar `favicon.ico` automáticamente usando la imagen del podcast.
+- La portada y el detalle de episodio usan `/favicon.ico` como icono del sitio para evitar descargas de imágenes grandes.
+- La caché pública se guarda en `cache/` y se invalida automáticamente en cambios de administración.
 - En `backups.php`, la exportación de ficheros genera un ZIP temporal para descarga; la importación acepta ZIP con rutas bajo `images/` y `audios/`.
 
 ## Licencia (Software Libre)

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4
+
+- Nuevo `sitemap.php` dinámico y publicación en `/sitemap.xml` desde `.htaccess`.
+- Nuevo `robots.txt` con reglas de rastreo y referencia al sitemap.
+- Nuevo sistema de caché pública en `cache/` (`lib/cache_service.php`) para portada, detalle, feed y sitemap.
+- Opción en `podcast_management.php` para habilitar/deshabilitar caché (`cache_enabled`).
+- Nuevo botón en `podcast_management.php` para borrar caché manualmente.
+- Invalidación automática de caché tras cambios en administración (guardar podcast, crear/editar/borrar episodios, importaciones de backups).
+- Portada y detalle de episodio ahora usan `/favicon.ico` para evitar descargar imágenes grandes como icono.
+- Miniaturas responsive unificadas a variantes `144x144` y `220x220` en portada y detalle.
+- `schema.sql` actualizado con la columna `cache_enabled` en tabla `podcast`.
+
 ## 0.3
 
 - Nueva página `backups.php` para copias de seguridad, separada del panel principal.
