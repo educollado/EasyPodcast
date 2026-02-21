@@ -38,7 +38,7 @@
   - buscador de episodios en cabecera
 - Página de episodio (`episode.php`) con:
   - URL amigable `/YYYY/MM/slug`
-  - descripción completa
+  - descripción completa renderizada como Markdown
   - duración, tamaño y descarga
   - reproductor inline
   - buscador de episodios en cabecera
@@ -113,7 +113,7 @@
 | `podcast_management.php` | Gestión del canal |
 | `episodes_management.php` | Gestión de episodios |
 | `backups.php` | Copias de seguridad de base de datos y ficheros |
-| `add_episode.php` | Alta/edición de episodios y subida de audio/imagen |
+| `add_episode.php` | Alta/edición de episodios y subida de audio/imagen (editor Markdown con barra de herramientas) |
 | `canonical_redirect.php` | Redirección 301 al host/esquema canónico definido en `podcast.link` |
 | `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
 | `lib/episode_save_handler.php` | Validación de formulario, persistencia BD y efectos post-guardado de episodios |
@@ -306,6 +306,21 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 | `assets/css/admin.css` | Login/panel admin |
 | `assets/css/podcast_management.css` | Gestión podcast |
 | `assets/css/episodes_management.css` | Gestión episodios |
+
+## Editor de descripción (Markdown)
+
+El campo descripción de cada episodio usa [EasyMDE](https://github.com/Ionaru/easy-markdown-editor) como editor con barra de herramientas. El contenido se guarda como Markdown en la base de datos y se renderiza a HTML en la página pública del episodio.
+
+Markdown soportado en el editor y renderizado:
+
+- `**negrita**` → **negrita**
+- `*cursiva*` → *cursiva*
+- `# Título`, `## Subtítulo`, `### Sub`
+- `- item` o `* item` → lista con viñetas
+- `1. item` → lista numerada
+- `[texto](https://...)` → enlace
+
+El renderizado lo realiza `renderMarkdown()` en `lib/view_helpers.php` (PHP puro, sin dependencias externas). El feed RSS almacena el Markdown en texto plano.
 
 ## Notas
 
