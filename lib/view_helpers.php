@@ -95,6 +95,25 @@ function renderMarkdownInline(string $text): string
 }
 
 /**
+ * Elimina sintaxis Markdown básica y devuelve texto plano.
+ * Útil para generar extractos sin riesgo de cortar marcadores a mitad.
+ */
+function stripMarkdown(string $text): string
+{
+    // Negrita e itálica: **texto** y *texto* → texto
+    $text = (string) preg_replace('/\*\*([^*]+)\*\*/u', '$1', $text);
+    $text = (string) preg_replace('/\*([^*]+)\*/u', '$1', $text);
+    // Enlaces: [texto](url) → texto
+    $text = (string) preg_replace('/\[([^\]]+)\]\([^\)]+\)/u', '$1', $text);
+    // Encabezados: # Título → Título
+    $text = (string) preg_replace('/^#{1,6}\s+/mu', '', $text);
+    // Marcadores de lista: - item y 1. item → item
+    $text = (string) preg_replace('/^[-*]\s+/mu', '', $text);
+    $text = (string) preg_replace('/^\d+\.\s+/mu', '', $text);
+    return $text;
+}
+
+/**
  * Convierte texto Markdown sencillo a HTML seguro.
  * Soporta: encabezados (#/##/###), listas (-/* y 1.), negrita, cursiva, enlaces y párrafos.
  * No se permite HTML arbitrario; todo el texto libre se escapa con esc().

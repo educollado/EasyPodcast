@@ -89,7 +89,7 @@ if ($error !== '') {
             <div class="episode-content">
               <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
               <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
-              <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 200); ?>
+              <?php $excerpt = firstChars(stripMarkdown((string) ($episode['description'] ?? '')), 200); ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta">
                 <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>
