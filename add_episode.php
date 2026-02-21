@@ -33,6 +33,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></title>
   <link rel="stylesheet" href="/assets/css/episodes_management.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 </head>
 <body>
   <div class="container">
@@ -78,8 +79,8 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
 
         <div class="grid" style="margin-top: .8rem;">
           <label>
-            Descripción *
-            <textarea name="description" required><?= esc($form['description']) ?></textarea>
+            Descripción * <span style="font-weight:400;color:#5f6b73;font-size:.85rem;">(admite Markdown: **negrita**, *cursiva*, listas, enlaces)</span>
+            <textarea id="description" name="description" required><?= esc($form['description']) ?></textarea>
           </label>
         </div>
 
@@ -162,6 +163,27 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
       </form>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script>
+    (function () {
+      var descArea = document.getElementById('description');
+      if (descArea) {
+        new EasyMDE({
+          element: descArea,
+          toolbar: [
+            'bold', 'italic', 'heading', '|',
+            'unordered-list', 'ordered-list', '|',
+            'link', '|',
+            'preview'
+          ],
+          spellChecker: false,
+          forceSync: true,
+          status: false,
+          minHeight: '140px'
+        });
+      }
+    })();
+  </script>
   <script>
     (function () {
       var audioInput = document.getElementById('audio_file');

@@ -52,6 +52,107 @@ function renderTextWithLinks(string $value): string
 }
 
 /**
+ * Aplica formato Markdown inline (negrita, cursiva, enlaces) a una línea de texto.
+ * Las partes sin formato se escapan con esc(); el HTML generado es seguro.
+ */
+function renderMarkdownInline(string $text): string
+{
+    $parts = preg_split(
+        '/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/u',
+        $text,
+        -1,
+        PREG_SPLIT_DELIM_CAPTURE
+    );
+
+    if ($parts === false) {
+        return esc($text);
+    }
+
+    $html = '';
+    foreach ($parts as $i => $part) {
+        if ($i % 2 === 0) {
+            $html .= esc($part);
+        } elseif (str_starts_with($part, '**')) {
+            $html .= '<strong>' . esc(substr($part, 2, -2)) . '</strong>';
+        } elseif (str_starts_with($part, '*')) {
+            $html .= '<em>' . esc(substr($part, 1, -1)) . '</em>';
+        } elseif (str_starts_with($part, '[')) {
+            if (preg_match('/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/', $part, $m)
+                && filter_var($m[2], FILTER_VALIDATE_URL) !== false) {
+                $html .= '<a href="' . esc($m[2]) . '" target="_blank" rel="noopener noreferrer">' . esc($m[1]) . '</a>';
+            } else {
+                $html .= esc($part);
+            }
+        } else {
+            $html .= esc($part);
+        }
+    }
+
+    return $html;
+}
+
+/**
+ * Convierte texto Markdown sencillo a HTML seguro.
+ * Soporta: encabezados (#/##/###), listas (-/* y 1.), negrita, cursiva, enlaces y párrafos.
+ * No se permite HTML arbitrario; todo el texto libre se escapa con esc().
+ */
+function renderMarkdown(string $value): string
+{
+    $value = str_replace(["\r\n", "\r"], "\n", $value);
+    $rawBlocks = preg_split('/\n{2,}/', $value);
+    if ($rawBlocks === false) {
+        return '<p>' . renderMarkdownInline($value) . '</p>';
+    }
+
+    $html = '';
+    foreach ($rawBlocks as $block) {
+        $block = trim($block);
+        if ($block === '') {
+            continue;
+        }
+
+        $lines = explode("\n", $block);
+
+        // Encabezado (bloque de una sola línea que empieza por #)
+        if (count($lines) === 1 && preg_match('/^(#{1,3})\s+(.+)$/', $lines[0], $m)) {
+            $level = strlen($m[1]);
+            $html .= '<h' . $level . '>' . renderMarkdownInline(trim($m[2])) . '</h' . $level . ">\n";
+            continue;
+        }
+
+        // Lista no ordenada
+        if (preg_match('/^[-*]\s/', $lines[0])) {
+            $html .= "<ul>\n";
+            foreach ($lines as $line) {
+                if (preg_match('/^[-*]\s+(.+)$/', $line, $m)) {
+                    $html .= '<li>' . renderMarkdownInline(trim($m[1])) . "</li>\n";
+                }
+            }
+            $html .= "</ul>\n";
+            continue;
+        }
+
+        // Lista ordenada
+        if (preg_match('/^\d+\.\s/', $lines[0])) {
+            $html .= "<ol>\n";
+            foreach ($lines as $line) {
+                if (preg_match('/^\d+\.\s+(.+)$/', $line, $m)) {
+                    $html .= '<li>' . renderMarkdownInline(trim($m[1])) . "</li>\n";
+                }
+            }
+            $html .= "</ol>\n";
+            continue;
+        }
+
+        // Párrafo normal: saltos de línea simples → <br>
+        $lineHtml = array_map('renderMarkdownInline', $lines);
+        $html .= '<p>' . implode("<br>\n", $lineHtml) . "</p>\n";
+    }
+
+    return $html !== '' ? $html : '<p></p>';
+}
+
+/**
  * Genera un extracto de texto compacto e indica si fue recortado.
  *
  * @return array{text: string, truncated: bool}

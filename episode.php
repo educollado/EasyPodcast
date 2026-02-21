@@ -82,7 +82,7 @@ if ($error !== '') {
             <h1><?= esc((string) ($episode['title'] ?? 'Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['description'])): ?>
-              <p class="desc"><?= renderTextWithLinks((string) $episode['description']) ?></p>
+              <div class="desc"><?= renderMarkdown((string) $episode['description']) ?></div>
             <?php endif; ?>
             <?php if (!empty($episode['audio_url'])): ?>
               <p class="audio-meta">

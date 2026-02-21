@@ -149,6 +149,23 @@
       color: var(--muted);
       overflow-wrap: anywhere;
     }
+    .desc p {
+      margin: .4rem 0;
+      color: var(--muted);
+    }
+    .desc h2, .desc h3 {
+      color: var(--text);
+      margin: .85rem 0 .3rem;
+      font-size: 1.05rem;
+    }
+    .desc ul, .desc ol {
+      color: var(--muted);
+      padding-left: 1.5rem;
+      margin: .4rem 0;
+    }
+    .desc li {
+      margin: .2rem 0;
+    }
     .desc a {
       color: var(--accent);
       text-decoration: none;

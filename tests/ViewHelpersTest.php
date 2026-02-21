@@ -133,6 +133,95 @@ test('renderTextWithLinks: múltiples URLs generan múltiples enlaces', function
 });
 
 // =============================================================================
+// renderMarkdownInline
+// =============================================================================
+
+test('renderMarkdownInline: texto plano se escapa', function () {
+    assert_eq('&lt;hola&gt;', renderMarkdownInline('<hola>'));
+});
+
+test('renderMarkdownInline: **texto** genera <strong>', function () {
+    assert_eq('<strong>hola</strong>', renderMarkdownInline('**hola**'));
+});
+
+test('renderMarkdownInline: *texto* genera <em>', function () {
+    assert_eq('<em>mundo</em>', renderMarkdownInline('*mundo*'));
+});
+
+test('renderMarkdownInline: enlace Markdown genera <a> seguro', function () {
+    $result = renderMarkdownInline('[ver](https://example.com)');
+    assert_contains('href="https://example.com"', $result);
+    assert_contains('target="_blank"', $result);
+    assert_contains('>ver<', $result);
+});
+
+test('renderMarkdownInline: URL inválida en enlace Markdown se escapa', function () {
+    $result = renderMarkdownInline('[ver](javascript:alert(1))');
+    assert_true(!str_contains($result, '<a '));
+});
+
+test('renderMarkdownInline: mezcla texto + negrita + texto', function () {
+    $result = renderMarkdownInline('Hola **mundo** adios');
+    assert_contains('<strong>mundo</strong>', $result);
+    assert_contains('Hola ', $result);
+    assert_contains(' adios', $result);
+});
+
+// =============================================================================
+// renderMarkdown
+// =============================================================================
+
+test('renderMarkdown: texto plano genera párrafo', function () {
+    $result = renderMarkdown('Hola mundo');
+    assert_contains('<p>', $result);
+    assert_contains('Hola mundo', $result);
+});
+
+test('renderMarkdown: dos bloques generan dos párrafos', function () {
+    $result = renderMarkdown("Primero\n\nSegundo");
+    assert_eq(2, substr_count($result, '<p>'));
+});
+
+test('renderMarkdown: # genera <h1>', function () {
+    $result = renderMarkdown('# Título');
+    assert_contains('<h1>Título</h1>', $result);
+});
+
+test('renderMarkdown: ## genera <h2>', function () {
+    $result = renderMarkdown('## Subtítulo');
+    assert_contains('<h2>Subtítulo</h2>', $result);
+});
+
+test('renderMarkdown: lista con - genera <ul><li>', function () {
+    $result = renderMarkdown("- uno\n- dos");
+    assert_contains('<ul>', $result);
+    assert_contains('<li>uno</li>', $result);
+    assert_contains('<li>dos</li>', $result);
+});
+
+test('renderMarkdown: lista ordenada genera <ol><li>', function () {
+    $result = renderMarkdown("1. primero\n2. segundo");
+    assert_contains('<ol>', $result);
+    assert_contains('<li>primero</li>', $result);
+});
+
+test('renderMarkdown: negrita dentro de párrafo', function () {
+    $result = renderMarkdown('Un **texto** en negrita');
+    assert_contains('<strong>texto</strong>', $result);
+});
+
+test('renderMarkdown: HTML en entrada se escapa', function () {
+    $result = renderMarkdown('<script>alert(1)</script>');
+    assert_true(!str_contains($result, '<script>'));
+    assert_contains('&lt;script&gt;', $result);
+});
+
+test('renderMarkdown: salto de línea simple genera <br>', function () {
+    $result = renderMarkdown("línea uno\nlínea dos");
+    assert_contains('<br>', $result);
+});
+
+// =============================================================================
 // firstChars
 // =============================================================================
 
