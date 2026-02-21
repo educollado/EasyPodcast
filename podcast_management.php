@@ -9,6 +9,7 @@ require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/sitemap_builder.php';
 
 session_start();
+require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
     header('Location: admin.php');
@@ -266,12 +267,14 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['cache_action'] ?? '') === 'clear_cache') {
+        csrf_verify();
         if (clearWebCache()) {
             $notice = 'Caché borrada correctamente.';
         } else {
             $error = 'No se pudo borrar completamente la caché.';
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_verify();
         // Hidrata el formulario con POST para preservar datos si hay errores de validación.
         foreach ($form as $key => $value) {
             if ($key === 'explicit') {
@@ -497,6 +500,7 @@ try {
       <?php endif; ?>
 
       <form method="post" action="podcast_management.php" autocomplete="off" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <div class="grid two">
           <label>
             Título *
@@ -593,6 +597,7 @@ try {
         </div>
       </form>
       <form method="post" action="podcast_management.php" style="margin-top: .8rem;">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <input type="hidden" name="cache_action" value="clear_cache">
         <div class="actions">
           <button class="btn" type="submit">Borrar caché</button>

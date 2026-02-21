@@ -13,6 +13,7 @@ require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/sitemap_builder.php';
 
 session_start();
+require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
     header('Location: admin.php');
@@ -84,6 +85,7 @@ try {
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate ON episodes(status, pub_date)");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_verify();
         // Acción de borrado con redirección PRG para evitar reenvío de formulario.
         $deleteEpisodeId = (int) ($_POST['delete_episode_id'] ?? 0);
         $returnPage = max(1, (int) ($_POST['return_page'] ?? 1));
@@ -194,6 +196,7 @@ try {
                     <div class="row-actions">
                       <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>">Editar</a>
                       <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. ¿Continuar?');">
+                        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                         <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                         <input type="hidden" name="return_page" value="<?= $currentPage ?>">
                         <button class="delete-text" type="submit">Borrar</button>

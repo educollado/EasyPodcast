@@ -14,6 +14,7 @@ require_once __DIR__ . '/lib/sitemap_builder.php';
 
 // El acceso a esta pantalla exige sesión de administrador activa.
 session_start();
+require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
     header('Location: admin.php');
@@ -419,6 +420,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_media_part') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? '') === 'import_db') {
+    csrf_verify();
     // Importación de base de datos SQLite.
     // Flujo: validar subida -> validar estructura -> backup previo -> restaurar -> regenerar feed.
     if (!isset($_FILES['db_file']) || !is_array($_FILES['db_file'])) {
@@ -504,6 +506,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['db_action'] ?? ''
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['files_action'] ?? '') === 'import_files_zip') {
+    csrf_verify();
     // Importación de ZIP(s) de media y/o audios MP3 sueltos.
     $zipUploads = isset($_FILES['files_zip']) && is_array($_FILES['files_zip'])
         ? normalizeUploadedFilesList($_FILES['files_zip'])
@@ -679,6 +682,7 @@ if (class_exists('ZipArchive')) {
         <div class="db-tools">
           <a class="btn db-export" href="backups.php?action=export_db">Exportar base de datos</a>
           <form class="db-import-form" method="post" action="backups.php" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="db_action" value="import_db">
             <label for="db_file">Importar base de datos</label>
             <input id="db_file" type="file" name="db_file" accept=".sqlite,.db" required>
@@ -759,6 +763,7 @@ if (class_exists('ZipArchive')) {
           </div>
 
           <form class="db-import-form" method="post" action="backups.php" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="files_action" value="import_files_zip">
             <label for="files_zip">Importar ficheros (uno o varios ZIP o audios)</label>
             <input id="files_zip" type="file" name="files_zip[]" accept=".zip" multiple>

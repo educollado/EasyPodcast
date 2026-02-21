@@ -18,6 +18,7 @@ require_once __DIR__ . '/lib/sitemap_builder.php';
 // ---------------------------------------------------------------------------
 
 session_start();
+require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
     header('Location: admin.php');
@@ -160,6 +161,7 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_verify();
         // Flujo de creación/actualización.
         $postedEpisodeId = (int) ($_POST['episode_id'] ?? 0);
         if ($postedEpisodeId > 0) {
@@ -503,6 +505,7 @@ try {
       <?php endif; ?>
 
       <form method="post" action="add_episode.php<?= $isEditing && $editingEpisodeId !== null ? '?episode_id=' . (int) $editingEpisodeId : '' ?>" autocomplete="off" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <?php if ($isEditing && $editingEpisodeId !== null): ?>
           <input type="hidden" name="episode_id" value="<?= (int) $editingEpisodeId ?>">
         <?php endif; ?>

@@ -13,6 +13,7 @@ require_once __DIR__ . '/canonical_redirect.php';
 // ---------------------------------------------------------------------------
 
 session_start();
+require_once __DIR__ . '/lib/csrf.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
@@ -56,6 +57,7 @@ try {
     // - setup inicial (no existe usuario admin)
     // - login normal (ya existe al menos uno)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_verify();
         $username = trim((string) ($_POST['username'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
 
@@ -173,6 +175,7 @@ $isSetupMode = ($adminCount === 0);
       <?php endif; ?>
 
       <form method="post" action="admin.php" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
           Usuario
           <input type="text" name="username" maxlength="120" required>
