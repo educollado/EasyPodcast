@@ -222,6 +222,59 @@ Ver detalle en `schema.sql`.
 
 El sistema usa `PRAGMA user_version` de SQLite para versionar el esquema sin tablas extra. Al arrancar cada request, `lib/migration_runner.php` comprueba la versión actual y aplica sólo las migraciones pendientes. Las instalaciones nuevas parten ya con `user_version = 1` gracias a `schema.sql`; las existentes se actualizan automáticamente en el primer acceso.
 
+#### Cómo añadir una nueva migración
+
+Edita `lib/migration_runner.php` y haz dos cosas:
+
+**1. Añade el bloque condicional en `runMigrations()`:**
+
+```php
+if ($version < 2) {
+    migration_v2($pdo);
+    $pdo->exec('PRAGMA user_version = 2');
+}
+```
+
+**2. Implementa la función de migración:**
+
+```php
+function migration_v2(PDO $pdo): void
+{
+    // Ejemplo: crear una tabla nueva
+    $pdo->exec('
+        CREATE TABLE IF NOT EXISTS episode_tags (
+            episode_id INTEGER NOT NULL,
+            tag TEXT NOT NULL,
+            PRIMARY KEY (episode_id, tag),
+            FOREIGN KEY (episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+        )
+    ');
+
+    // Ejemplo: añadir una columna nueva a una tabla existente
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(episodes)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('nueva_columna', $existing, true)) {
+        $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
+    }
+}
+```
+
+> Para columnas nuevas en tablas existentes, comprueba siempre con `PRAGMA table_info` antes del `ALTER TABLE` para que la migración sea idempotente.
+
+**3. Actualiza también `schema.sql`** para que las instalaciones nuevas ya incluyan los cambios y el `PRAGMA user_version` refleje la versión más reciente:
+
+```sql
+PRAGMA user_version = 2;
+```
+
+#### Historial de versiones
+
+| Versión | Cambios |
+|---|---|
+| 1 | Añade `rss_item_limit`, `home_items_per_page`, `write_audio_metadata`, `cache_enabled` a `podcast` |
+
 ## Flujo de publicación
 
 1. Configura el canal en `podcast_management.php`.
