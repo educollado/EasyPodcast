@@ -218,6 +218,10 @@ chmod 664 podcast.sqlite feed.xml favicon.ico
 
 Ver detalle en `schema.sql`.
 
+### Migraciones de esquema
+
+El sistema usa `PRAGMA user_version` de SQLite para versionar el esquema sin tablas extra. Al arrancar cada request, `lib/migration_runner.php` comprueba la versión actual y aplica sólo las migraciones pendientes. Las instalaciones nuevas parten ya con `user_version = 1` gracias a `schema.sql`; las existentes se actualizan automáticamente en el primer acceso.
+
 ## Flujo de publicación
 
 1. Configura el canal en `podcast_management.php`.
