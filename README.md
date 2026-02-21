@@ -250,10 +250,6 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 | `assets/css/podcast_management.css` | Gestión podcast |
 | `assets/css/episodes_management.css` | Gestión episodios |
 
-## Limitaciones conocidas
-
-- **Sin migraciones de base de datos.** No existe sistema de versionado del esquema. Si el esquema cambia entre versiones, el usuario debe aplicar los cambios manualmente sobre `podcast.sqlite` (por ejemplo con `sqlite3` o un cliente SQL).
-
 ## Notas
 
 - Si un episodio no tiene imagen, se usa la del podcast.
