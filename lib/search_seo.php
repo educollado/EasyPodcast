@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/seo_helpers.php';
+
+// Construye todas las variables SEO para la página de búsqueda. Función pura (sin BD).
+function buildSearchSeoData(?array $podcast, string $query, int $page, int $totalPages): array
+{
+    $p = $podcast ?? [];
+
+    $podcastTitle       = trim((string) ($p['title'] ?? 'Podcast'));
+    $podcastAuthor      = trim((string) ($p['owner_name'] ?? ''));
+    // Fallback de autor: owner_name -> author.
+    if ($podcastAuthor === '') {
+        $podcastAuthor  = trim((string) ($p['author'] ?? ''));
+    }
+    $podcastDescription = trim((string) ($p['description'] ?? ''));
+    $podcastImage       = trim((string) ($p['image_url'] ?? ''));
+    $baseSeoUrl         = resolveSeoBaseUrl((string) ($p['link'] ?? ''));
+
+    $queryParams   = ['q' => $query];
+    if ($page > 1) {
+        $queryParams['page'] = $page;
+    }
+    $canonicalPath = '/search.php' . ($query !== '' ? ('?' . http_build_query($queryParams)) : '');
+    $canonicalUrl  = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
+    $robotsContent = 'noindex,follow';
+
+    $metaDescription = $query === ''
+        ? 'Busca episodios por título o contenido.'
+        : ('Resultados para "' . $query . '" en ' . $podcastTitle . '.');
+
+    $ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
+    $rssUrl  = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
+
+    // URLs de paginación para <link rel="prev/next">.
+    $prevUrl = null;
+    if ($query !== '' && $page > 1) {
+        $prevParams = ['q' => $query];
+        if ($page > 2) {
+            $prevParams['page'] = $page - 1;
+        }
+        $prevUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($prevParams), $baseSeoUrl);
+    }
+    $nextUrl = null;
+    if ($query !== '' && $page < $totalPages) {
+        $nextParams = ['q' => $query, 'page' => $page + 1];
+        $nextUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($nextParams), $baseSeoUrl);
+    }
+
+    return compact(
+        'podcastTitle', 'podcastAuthor', 'podcastDescription', 'podcastImage',
+        'baseSeoUrl', 'canonicalUrl', 'robotsContent', 'prevUrl', 'nextUrl',
+        'metaDescription', 'ogImage', 'rssUrl'
+    );
+}

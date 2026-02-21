@@ -6,14 +6,10 @@ declare(strict_types=1);
 // - crear/actualizar/borrar episodios
 // - gestionar subidas de audio/imagen
 // - regenerar feed.xml automáticamente tras escrituras relevantes
-require_once __DIR__ . '/feed_builder.php';
-require_once __DIR__ . '/canonical_redirect.php';
-require_once __DIR__ . '/lib/episode_helpers.php';
-require_once __DIR__ . '/lib/episode_save_handler.php';
 
-// ---------------------------------------------------------------------------
-// Bootstrap de administración
-// ---------------------------------------------------------------------------
+require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/add_episode_query.php';
 
 session_start();
 require_once __DIR__ . '/lib/csrf.php';
@@ -26,122 +22,9 @@ if (!isset($_SESSION['admin_user'])) {
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
-$error = '';
-$notice = '';
-$id3Notice = '';
-$editingEpisodeId = null;
-$isEditing = false;
 
-function esc(string $value): string
-{
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-}
-
-// Inicializamos $form y $podcastDefaults fuera del try para que el bloque HTML
-// de la parte inferior siempre tenga variables definidas, incluso si la excepción
-// se lanza antes de conectar a la BD (p.ej. fallo al abrir el fichero SQLite).
-$podcastDefaults = ['title' => '', 'image_url' => '', 'author' => '', 'write_audio_metadata' => 0];
-$form = episodeFormDefaults($podcastDefaults);
-
-// ---------------------------------------------------------------------------
-// Flujo principal de persistencia (validación + subida + guardado)
-// ---------------------------------------------------------------------------
-
-try {
-    $pdo = new PDO('sqlite:' . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-    // Asegura que la tabla de episodios exista antes de procesar acciones.
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS episodes (
-          id INTEGER PRIMARY KEY,
-          guid TEXT NOT NULL UNIQUE,
-          title TEXT NOT NULL,
-          description TEXT NOT NULL,
-          link TEXT,
-          pub_date TEXT NOT NULL,
-          audio_url TEXT NOT NULL,
-          audio_mime_type TEXT NOT NULL,
-          audio_size_bytes INTEGER NOT NULL,
-          duration TEXT,
-          explicit INTEGER,
-          season_number INTEGER,
-          episode_number INTEGER,
-          episode_type TEXT,
-          image_url TEXT,
-          author TEXT,
-          status TEXT NOT NULL DEFAULT 'draft',
-          created_at TEXT DEFAULT (datetime('now')),
-          updated_at TEXT DEFAULT (datetime('now'))
-        )"
-    );
-
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate ON episodes(status, pub_date)");
-
-    $podcastDefaults = loadPodcastDefaults($pdo);
-    $form = episodeFormDefaults($podcastDefaults);
-
-    // Cargador de modo edición.
-    $requestedEpisodeId = (int) ($_GET['episode_id'] ?? 0);
-    if ($requestedEpisodeId > 0 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-        $editStmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-        $editStmt->execute([':id' => $requestedEpisodeId]);
-        $episodeToEdit = $editStmt->fetch();
-        if ($episodeToEdit) {
-            $editingEpisodeId = $requestedEpisodeId;
-            $isEditing = true;
-            foreach ($form as $key => $value) {
-                if ($key === 'pub_date') {
-                    $form[$key] = formatDateTimeLocal((string) ($episodeToEdit[$key] ?? ''));
-                } elseif ($key === 'explicit') {
-                    $rawExplicit = $episodeToEdit[$key];
-                    $form[$key] = $rawExplicit === null ? '' : (string) ((int) $rawExplicit);
-                } else {
-                    $form[$key] = trim((string) ($episodeToEdit[$key] ?? ''));
-                }
-            }
-        } else {
-            $error = 'No se encontró el capítulo solicitado para editar.';
-        }
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        csrf_verify();
-        $postedEpisodeId = (int) ($_POST['episode_id'] ?? 0);
-        if ($postedEpisodeId > 0) {
-            $editingEpisodeId = $postedEpisodeId;
-            $isEditing = true;
-        }
-        // Iteramos sobre las claves de $form (no sobre $_POST) para no aceptar
-        // campos arbitrarios que el cliente pudiera añadir de forma maliciosa.
-        foreach ($form as $key => $_) {
-            $form[$key] = trim((string) ($_POST[$key] ?? ''));
-        }
-        // rewrite_audio_metadata solo tiene sentido en edición; en creación se ignora.
-        $rewriteAudioMetadata = $isEditing && ($_POST['rewrite_audio_metadata'] ?? '') === '1';
-
-        $result    = saveEpisode($pdo, $form, $isEditing, $editingEpisodeId, $podcastDefaults, $_FILES, $rewriteAudioMetadata);
-        $form      = $result['form'];
-        $error     = $result['error'];
-        $notice    = $result['notice'];
-        $id3Notice = $result['id3Notice'];
-        // saveEpisode devuelve pub_date en formato SQL ('Y-m-d H:i:s') o como el usuario
-        // lo envió; lo convertimos al formato que espera <input type="datetime-local">.
-        $form['pub_date'] = formatDateTimeLocal($form['pub_date']);
-    }
-
-} catch (Throwable $e) {
-    $message = $e->getMessage();
-    if (stripos($message, 'UNIQUE constraint failed: episodes.guid') !== false) {
-        $error = 'El GUID ya existe. Usa otro valor o déjalo vacío para generarlo automáticamente.';
-    } else {
-        http_response_code(500);
-        header('Content-Type: text/plain; charset=UTF-8');
-        echo 'Error en add_episode.php: ' . $message . "\n";
-        exit;
-    }
-}
+$data = loadAddEpisodeData($dbPath);
+extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
 ?>
 <!doctype html>
 <html lang="es">

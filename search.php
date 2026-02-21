@@ -6,134 +6,22 @@ require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
-
-function firstChars(string $value, int $maxChars): array
-{
-    $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
-    if ($clean === '') {
-        return ['text' => '', 'truncated' => false];
-    }
-
-    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
-        if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
-            return ['text' => $clean, 'truncated' => false];
-        }
-        return ['text' => rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')), 'truncated' => true];
-    }
-
-    if (strlen($clean) <= $maxChars) {
-        return ['text' => $clean, 'truncated' => false];
-    }
-
-    return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
-}
-
-function escapeSqlLike(string $value): string
-{
-    return str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $value);
-}
+require_once __DIR__ . '/lib/search_query.php';
+require_once __DIR__ . '/lib/search_seo.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 
-$podcast = null;
-$podcastTitle = 'Podcast';
-$podcastAuthor = '';
-$podcastDescription = '';
-$podcastImage = '';
-$baseSeoUrl = '';
+$query         = trim((string) ($_GET['q'] ?? ''));
+$requestedPage = max(1, (int) ($_GET['page'] ?? 1));
 
-$query = trim((string) ($_GET['q'] ?? ''));
-$page = max(1, (int) ($_GET['page'] ?? 1));
-$perPage = 20;
-$totalEpisodes = 0;
-$totalPages = 1;
-$episodes = [];
-$error = '';
+$data = loadSearchData($dbPath, $query, $requestedPage);
+extract($data);  // podcast, episodes, query, page, perPage, totalEpisodes, totalPages, error
 
-try {
-    $pdo = new PDO('sqlite:' . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-    $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
-    $podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
-    $podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
-    if ($podcastAuthor === '') {
-        $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
-    }
-    $podcastDescription = trim((string) ($podcast['description'] ?? ''));
-    $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
-    $baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
-
-    $configuredPerPage = (int) ($podcast['home_items_per_page'] ?? 20);
-    if ($configuredPerPage >= 1) {
-        $perPage = $configuredPerPage;
-    }
-
-    if ($query !== '') {
-        $term = '%' . escapeSqlLike($query) . '%';
-
-        $countStmt = $pdo->prepare(
-            "SELECT COUNT(*)
-             FROM episodes
-             WHERE status = 'published'
-               AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')"
-        );
-        $countStmt->execute([':term' => $term]);
-        $totalEpisodes = (int) $countStmt->fetchColumn();
-
-        $totalPages = max(1, (int) ceil($totalEpisodes / $perPage));
-        if ($page > $totalPages) {
-            $page = $totalPages;
-        }
-        $offset = ($page - 1) * $perPage;
-
-        $episodesStmt = $pdo->prepare(
-            "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
-             FROM episodes
-             WHERE status = 'published'
-               AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')
-             ORDER BY datetime(pub_date) DESC, id DESC
-             LIMIT :limit OFFSET :offset"
-        );
-        $episodesStmt->bindValue(':term', $term, PDO::PARAM_STR);
-        $episodesStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-        $episodesStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $episodesStmt->execute();
-        $episodes = $episodesStmt->fetchAll();
-    }
-} catch (Throwable $e) {
-    http_response_code(500);
-    $error = 'No se pudo realizar la búsqueda: ' . $e->getMessage();
-}
-
-$queryParams = ['q' => $query];
-if ($page > 1) {
-    $queryParams['page'] = $page;
-}
-$canonicalPath = '/search.php' . ($query !== '' ? ('?' . http_build_query($queryParams)) : '');
-$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
-$robotsContent = 'noindex,follow';
-$metaDescription = $query === ''
-    ? 'Busca episodios por título o contenido.'
-    : ('Resultados para "' . $query . '" en ' . $podcastTitle . '.');
-$ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-$rssUrl = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
-
-$prevUrl = null;
-if ($query !== '' && $page > 1) {
-    $prevParams = ['q' => $query];
-    if ($page > 2) {
-        $prevParams['page'] = $page - 1;
-    }
-    $prevUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($prevParams), $baseSeoUrl);
-}
-$nextUrl = null;
-if ($query !== '' && $page < $totalPages) {
-    $nextParams = ['q' => $query, 'page' => $page + 1];
-    $nextUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($nextParams), $baseSeoUrl);
-}
+$seo = buildSearchSeoData($podcast, $query, $page, $totalPages);
+extract($seo);   // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
+                 // baseSeoUrl, canonicalUrl, robotsContent, prevUrl, nextUrl,
+                 // metaDescription, ogImage, rssUrl
 
 header('X-Robots-Tag: noindex, follow, noarchive');
 ?>
