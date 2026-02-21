@@ -57,6 +57,8 @@ function renderTextWithLinks(string $value): string
  */
 function renderMarkdownInline(string $text): string
 {
+    // preg_split con PREG_SPLIT_DELIM_CAPTURE divide el texto en fragmentos alternos:
+    // índices pares → texto plano (se escapa con esc()), índices impares → token Markdown capturado.
     $parts = preg_split(
         '/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/u',
         $text,
@@ -71,6 +73,7 @@ function renderMarkdownInline(string $text): string
     $html = '';
     foreach ($parts as $i => $part) {
         if ($i % 2 === 0) {
+            // Texto plano: escapar siempre para evitar inyección HTML.
             $html .= esc($part);
         } elseif (str_starts_with($part, '**')) {
             $html .= '<strong>' . esc(substr($part, 2, -2)) . '</strong>';
@@ -98,7 +101,9 @@ function renderMarkdownInline(string $text): string
  */
 function renderMarkdown(string $value): string
 {
+    // Normalizar saltos de línea para tratar \r\n y \r igual que \n.
     $value = str_replace(["\r\n", "\r"], "\n", $value);
+    // Dos o más líneas en blanco consecutivas separan bloques (párrafos, listas, encabezados).
     $rawBlocks = preg_split('/\n{2,}/', $value);
     if ($rawBlocks === false) {
         return '<p>' . renderMarkdownInline($value) . '</p>';

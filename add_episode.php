@@ -33,6 +33,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></title>
   <link rel="stylesheet" href="/assets/css/episodes_management.css">
+  <!-- EasyMDE: editor Markdown con barra de herramientas (solo en admin, cargado desde CDN) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 </head>
 <body>
@@ -165,6 +166,9 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
   </div>
   <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
   <script>
+    // Inicializa EasyMDE sobre el textarea de descripción.
+    // forceSync: true mantiene el textarea original sincronizado en cada pulsación,
+    // de modo que el formulario envía el Markdown al hacer submit sin JS adicional.
     (function () {
       var descArea = document.getElementById('description');
       if (descArea) {
@@ -177,7 +181,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
             'preview'
           ],
           spellChecker: false,
-          forceSync: true,
+          forceSync: true,  // imprescindible para que el submit recoja el contenido del editor
           status: false,
           minHeight: '140px'
         });
