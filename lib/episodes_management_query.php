@@ -7,8 +7,13 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
 
-// Carga datos del listado de episodios. Gestiona el borrado (POST/PRG) antes de cargar la lista.
-// En caso de POST, redirige y termina la ejecución. En caso de error de BD, responde 500 y termina.
+/**
+ * Carga los datos del listado de episodios para el panel administrativo.
+ * En POST gestiona el borrado con patrón PRG (redirige y termina).
+ * En error de BD responde HTTP 500 y termina la ejecución.
+ *
+ * @return array{episodesList:array, currentPage:int, totalEpisodes:int, totalPages:int, error:string, notice:string}
+ */
 function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
 {
     $error        = '';

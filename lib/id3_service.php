@@ -8,7 +8,10 @@ require_once __DIR__ . '/episode_helpers.php';
 // Normalizacion de texto para ID3
 // ---------------------------------------------------------------------------
 
-// Convierte texto UTF-8 a ISO-8859-1 con fallback simple para ID3v1.
+/**
+ * Convierte texto UTF-8 a ISO-8859-1 con fallback ASCII para etiquetas ID3v1.
+ * Usa iconv cuando está disponible; si no, elimina caracteres no ASCII.
+ */
 function toId3Latin1(string $value): string
 {
     $trimmed = trim($value);
@@ -26,7 +29,10 @@ function toId3Latin1(string $value): string
     return preg_replace('/[^\x20-\x7E]/', '', $trimmed) ?? '';
 }
 
-// ID3v1 usa campos de longitud fija rellenados con bytes nulos.
+/**
+ * Construye un campo de longitud fija para ID3v1, rellenado con bytes nulos.
+ * Recorta el valor a $length caracteres Latin-1 y completa el resto con \0.
+ */
 function buildId3FixedField(string $value, int $length): string
 {
     $latin1 = toId3Latin1($value);
@@ -35,7 +41,10 @@ function buildId3FixedField(string $value, int $length): string
     return str_pad($trimmed, $length, "\0");
 }
 
-// El comentario en ID3v1 es corto; limpiamos HTML, espacios y recortamos.
+/**
+ * Genera el campo de comentario para ID3v1 a partir de texto con HTML.
+ * Elimina tags HTML y espacios extras antes de truncar a $maxLength en Latin-1.
+ */
 function summarizeId3Comment(string $value, int $maxLength): string
 {
     $plain = trim((string) preg_replace('/\s+/', ' ', strip_tags($value)));
@@ -46,7 +55,12 @@ function summarizeId3Comment(string $value, int $maxLength): string
     return substr(toId3Latin1($plain), 0, $maxLength);
 }
 
-// Mapea los datos del formulario/Podcast al diccionario de metadatos ID3.
+/**
+ * Mapea los datos del formulario de episodio y defaults de podcast al array de metadatos ID3.
+ * El campo 'image_path' resuelve la ruta local de la portada para el frame APIC.
+ *
+ * @return array{title:string, artist:string, album:string, year:string, comment:string, track:string, image_path:?string}
+ */
 function buildEpisodeId3Metadata(array $form, array $podcastDefaults): array
 {
     $pubDateForTag = normalizeDateTime((string) ($form['pub_date'] ?? ''));
@@ -75,7 +89,9 @@ function buildEpisodeId3Metadata(array $form, array $podcastDefaults): array
 // Utilidades binarias para cabeceras ID3v2 (syncsafe integer)
 // ---------------------------------------------------------------------------
 
-// Codifica tamano ID3v2 en formato syncsafe (4 bytes de 7 bits utiles).
+/**
+ * Codifica un entero en formato syncsafe de 4 bytes (7 bits útiles por byte) para cabeceras ID3v2.
+ */
 function encodeId3SyncSafeSize(int $size): string
 {
     return chr(($size >> 21) & 0x7F)
@@ -84,7 +100,10 @@ function encodeId3SyncSafeSize(int $size): string
         . chr($size & 0x7F);
 }
 
-// Decodifica tamano syncsafe; devuelve null si los bytes no son validos.
+/**
+ * Decodifica un tamaño syncsafe de 4 bytes de una cabecera ID3v2.
+ * Devuelve null si alguno de los bytes tiene el bit 7 activo (formato inválido).
+ */
 function decodeId3SyncSafeSize(string $bytes): ?int
 {
     if (strlen($bytes) !== 4) {
@@ -106,7 +125,10 @@ function decodeId3SyncSafeSize(string $bytes): ?int
 // Constructores de frames ID3v2.3
 // ---------------------------------------------------------------------------
 
-// Construye un frame de texto genérico (TIT2, TPE1, TALB, TYER, TRCK, etc.).
+/**
+ * Construye un frame de texto ID3v2.3 genérico (TIT2, TPE1, TALB, TYER, TRCK, etc.).
+ * El payload usa codificación UTF-8 (byte 0x03).
+ */
 function buildId3v23TextFrame(string $frameId, string $text): string
 {
     $payload = chr(3) . trim($text); // UTF-8
@@ -121,7 +143,9 @@ function buildId3v23TextFrame(string $frameId, string $text): string
     return $header . $payload;
 }
 
-// Frame COMM con idioma spa y descripcion corta vacia.
+/**
+ * Construye un frame COMM (comentario) ID3v2.3 con idioma "spa" y descripción corta vacía.
+ */
 function buildId3v23CommentFrame(string $comment): string
 {
     $payload = chr(3) . 'spa' . "\0" . trim($comment); // UTF-8, lang spa, shortdesc vacío
@@ -136,7 +160,11 @@ function buildId3v23CommentFrame(string $comment): string
     return $header . $payload;
 }
 
-// Frame APIC para incrustar portada. Solo acepta MIME de imagen comunes.
+/**
+ * Construye un frame APIC (Picture Attached) ID3v2.3 para incrustar la portada.
+ * Solo acepta MIME image/jpeg, image/png, image/gif e image/webp.
+ * Devuelve null si el fichero no existe, está vacío o su MIME no está permitido.
+ */
 function buildId3v23ApicFrame(string $imagePath): ?string
 {
     $imageData = @file_get_contents($imagePath);
@@ -168,7 +196,13 @@ function buildId3v23ApicFrame(string $imagePath): ?string
 // Escritura ID3v2.3 e ID3v1.1
 // ---------------------------------------------------------------------------
 
-// Escribe un tag ID3v2.3 nuevo al inicio del MP3, preservando el audio.
+/**
+ * Escribe un tag ID3v2.3 al inicio del MP3 preservando el audio original.
+ * Descarta cualquier tag ID3v2 existente antes de escribir el nuevo.
+ * Usa un fichero temporal + rename atómico para evitar corrupción parcial.
+ *
+ * @param array{title?:string, artist?:string, album?:string, year?:string, comment?:string, track?:string, image_path?:string} $metadata
+ */
 function writeId3v23Tag(string $filePath, array $metadata): bool
 {
     // Leemos el fichero original para copiar su contenido despues del nuevo tag.
@@ -261,7 +295,12 @@ function writeId3v23Tag(string $filePath, array $metadata): bool
     return true;
 }
 
-// Escribe una etiqueta ID3v1.1 al final de un MP3 sin depender de binarios externos.
+/**
+ * Escribe una etiqueta ID3v1.1 al final de un MP3, sin depender de binarios externos.
+ * Reemplaza el TAG existente si lo hay para evitar duplicados.
+ *
+ * @param array{title?:string, artist?:string, album?:string, year?:string, comment?:string, track?:string} $metadata
+ */
 function writeId3v1Tag(string $filePath, array $metadata): bool
 {
     $handle = @fopen($filePath, 'c+b');
@@ -323,7 +362,10 @@ function writeId3v1Tag(string $filePath, array $metadata): bool
     }
 }
 
-// Escritura completa recomendada: ID3v2.3 (lectores modernos) + ID3v1.1 (compat).
+/**
+ * Escribe tags ID3v2.3 e ID3v1.1 en un MP3 para máxima compatibilidad.
+ * Primero escribe ID3v2.3 (lectores modernos) y luego ID3v1.1 (compatibilidad legacy).
+ */
 function writeMp3Id3Tags(string $filePath, array $metadata): bool
 {
     if (!writeId3v23Tag($filePath, $metadata)) {

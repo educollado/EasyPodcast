@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-// Base absoluta para etiquetas SEO (canonical, OG, JSON-LD).
+/**
+ * Base absoluta para etiquetas SEO (canonical, OG, JSON-LD).
+ * Prefiere la URL de podcast.link; cae en el host actual como fallback.
+ */
 function resolveSeoBaseUrl(?string $podcastLink): string
 {
     $raw = trim((string) $podcastLink);
@@ -23,7 +26,10 @@ function resolveSeoBaseUrl(?string $podcastLink): string
     return $scheme . '://' . $host;
 }
 
-// Convierte rutas relativas en URLs absolutas para OG/JSON-LD.
+/**
+ * Convierte rutas relativas en URLs absolutas para OG/JSON-LD.
+ * Si $value ya es una URL absoluta, la devuelve sin modificar.
+ */
 function toAbsoluteSeoUrl(string $value, string $baseUrl): string
 {
     $raw = trim($value);
@@ -39,7 +45,10 @@ function toAbsoluteSeoUrl(string $value, string $baseUrl): string
     return rtrim($baseUrl, '/') . '/' . ltrim($raw, '/');
 }
 
-// Limpia y recorta texto para meta description.
+/**
+ * Limpia y recorta texto para meta description.
+ * Usa mb_* cuando está disponible para respetar caracteres multibyte.
+ */
 function compactMetaText(string $value, int $maxChars = 160): string
 {
     $clean = trim(preg_replace('/\s+/u', ' ', strip_tags($value)) ?? '');

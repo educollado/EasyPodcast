@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
-// Carga datos de portada: podcast, episodios paginados y metadatos de paginación.
+/**
+ * Carga los datos de la portada: podcast, episodios publicados paginados y metadatos de paginación.
+ * Si hay error de BD devuelve la clave 'error' con el mensaje; el resto de claves quedan en sus valores por defecto.
+ *
+ * @return array{podcast:?array, episodes:array, page:int, perPage:int, totalEpisodes:int, totalPages:int, error:string}
+ */
 function loadHomeData(string $dbPath, int $requestedPage): array
 {
     $podcast = null;

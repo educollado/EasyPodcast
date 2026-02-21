@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/seo_helpers.php';
 
-// Construye todas las variables SEO para la página de búsqueda. Función pura (sin BD).
+/**
+ * Construye todas las variables SEO para la página de búsqueda. Función pura (sin acceso a BD).
+ * La búsqueda siempre es noindex; incluye prev/next para paginación de resultados.
+ *
+ * @return array{podcastTitle:string, podcastAuthor:string, podcastDescription:string, podcastImage:string, baseSeoUrl:string, canonicalUrl:string, robotsContent:string, prevUrl:?string, nextUrl:?string, metaDescription:string, ogImage:string, rssUrl:string}
+ */
 function buildSearchSeoData(?array $podcast, string $query, int $page, int $totalPages): array
 {
     $p = $podcast ?? [];

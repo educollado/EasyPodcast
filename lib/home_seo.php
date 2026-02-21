@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/seo_helpers.php';
 
-// Construye todas las variables SEO/JSON-LD para la portada. Función pura (sin BD).
+/**
+ * Construye todas las variables SEO/JSON-LD para la portada. Función pura (sin acceso a BD).
+ * Las páginas de paginación y errores se marcan con robots noindex.
+ *
+ * @return array{podcastTitle:string, podcastAuthor:string, podcastDescription:string, podcastImage:string, baseSeoUrl:string, canonicalUrl:string, robotsContent:string, prevUrl:?string, nextUrl:?string, metaDescription:string, ogImage:string, rssUrl:string, seriesJsonLd:string}
+ */
 function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $error): array
 {
     $p = $podcast ?? [];

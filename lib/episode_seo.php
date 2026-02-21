@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/seo_helpers.php';
 
-// Construye todas las variables SEO/JSON-LD para la página de detalle de episodio. Función pura (sin BD).
+/**
+ * Construye todas las variables SEO/JSON-LD para la página de detalle de episodio.
+ * Función pura (sin acceso a BD). Genera JSON-LD PodcastEpisode solo cuando el episodio existe.
+ *
+ * @return array{podcastTitle:string, podcastAuthor:string, podcastDescription:string, cover:string, baseSeoUrl:string, canonicalUrl:string, robotsContent:string, episodeTitle:string, pageTitle:string, metaDescription:string, ogImage:string, rssUrl:string, episodeJsonLd:string}
+ */
 function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, string $month, string $slug, string $error): array
 {
     $p = $podcast ?? [];

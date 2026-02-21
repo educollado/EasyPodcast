@@ -11,7 +11,10 @@ require_once __DIR__ . '/csrf.php';
 // Helpers de URL
 // ---------------------------------------------------------------------------
 
-// Prioriza la URL principal enviada en el formulario para construir assets.
+/**
+ * Resuelve la URL base para construir assets del podcast.
+ * Prioriza la URL del formulario (podcast.link); cae en la URL de BD o host actual como fallback.
+ */
 function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
 {
     $fromForm = extractBaseUrlFromLink((string) ($form['link'] ?? ''));
@@ -22,8 +25,11 @@ function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
     return resolveBaseUrl($pdo);
 }
 
-// Resuelve la ruta local de un fichero de imagen a partir de su URL relativa o absoluta.
-// Devuelve null si la ruta no existe o queda fuera de la raíz del proyecto.
+/**
+ * Resuelve la ruta local de un fichero de imagen a partir de su URL relativa o absoluta.
+ * Verifica que la ruta resuelta no escape de la raíz del proyecto (protección path traversal).
+ * Devuelve null si la ruta no existe como fichero o queda fuera del proyecto.
+ */
 function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 {
     $raw = trim($imageUrl);
@@ -65,7 +71,10 @@ function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 // Helpers de favicon (GD)
 // ---------------------------------------------------------------------------
 
-// Genera un blob PNG redimensionado a $size×$size desde el fichero de origen.
+/**
+ * Genera un blob PNG redimensionado a $size×$size desde el fichero de imagen fuente.
+ * Requiere la extensión GD. Devuelve null si no hay GD, el fichero no existe o GD falla.
+ */
 function createPngBlobForIco(string $sourcePath, int $size): ?string
 {
     if (!function_exists('imagecreatefromstring') || !function_exists('imagecreatetruecolor')) {
@@ -111,7 +120,12 @@ function createPngBlobForIco(string $sourcePath, int $size): ?string
     return $pngData;
 }
 
-// Construye el binario ICO a partir de blobs PNG indexados por tamaño.
+/**
+ * Construye el binario ICO (formato Windows Icon) a partir de blobs PNG indexados por tamaño.
+ * Cada clave del array es el tamaño en píxeles; el valor es el blob PNG correspondiente.
+ *
+ * @param array<int, string> $pngBlobsBySize Mapa tamaño → blob PNG
+ */
 function buildIcoBinaryFromPngBlobs(array $pngBlobsBySize): string
 {
     $count = count($pngBlobsBySize);
@@ -132,7 +146,10 @@ function buildIcoBinaryFromPngBlobs(array $pngBlobsBySize): string
     return $header . $entries . $images;
 }
 
-// Regenera favicon.ico a partir de la imagen del podcast. Devuelve false y rellena $warning si falla.
+/**
+ * Regenera favicon.ico a partir de la imagen del podcast en los tamaños 16, 32 y 48 px.
+ * Devuelve false y rellena $warning con el motivo del fallo si no puede generar el ICO.
+ */
 function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
 {
     $warning = '';
@@ -176,8 +193,13 @@ function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
 // Función principal
 // ---------------------------------------------------------------------------
 
-// Gestiona la tabla de podcast, migraciones, y las acciones POST (guardar / borrar caché).
-// En caso de error de BD no recuperable, responde 500 y termina.
+/**
+ * Carga y procesa los datos del panel de gestión del podcast.
+ * En POST: guarda los metadatos, regenera feed.xml/sitemap.xml y favicon.ico.
+ * En error de BD no recuperable responde HTTP 500 y termina la ejecución.
+ *
+ * @return array{form:array, error:string, notice:string}
+ */
 function loadPodcastManagementData(string $dbPath): array
 {
     $error  = '';

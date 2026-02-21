@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/view_helpers.php';
 
-// Ruta amigable usada por .htaccess y episode.php.
+/**
+ * Construye la ruta amigable /YYYY/MM/slug usada por .htaccess y episode.php.
+ * Si pubDate no es parseable, usa la fecha actual.
+ */
 function buildEpisodePath(string $pubDate, string $title): string
 {
     $ts = strtotime($pubDate);
@@ -16,7 +19,9 @@ function buildEpisodePath(string $pubDate, string $title): string
     return '/' . $year . '/' . $month . '/' . slugify($title);
 }
 
-// Usa el enlace guardado si existe; si no, construye uno desde fecha+título.
+/**
+ * Devuelve el enlace del episodio: el almacenado en BD si existe, o uno generado desde fecha+título.
+ */
 function resolveEpisodeHref(?string $storedLink, string $pubDate, string $title): string
 {
     $link = trim((string) $storedLink);
@@ -27,7 +32,10 @@ function resolveEpisodeHref(?string $storedLink, string $pubDate, string $title)
     return buildEpisodePath($pubDate, $title);
 }
 
-// Extrae el slug desde una URL guardada tipo /YYYY/MM/slug.
+/**
+ * Extrae el slug desde una URL guardada en formato /YYYY/MM/slug.
+ * Devuelve null si el enlace está vacío o no coincide con el patrón.
+ */
 function slugFromEpisodeLink(?string $link): ?string
 {
     $raw = trim((string) $link);

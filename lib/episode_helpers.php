@@ -6,7 +6,10 @@ declare(strict_types=1);
 // Helpers generales de episodio: nombres de fichero, fechas, slugs y rutas
 // ---------------------------------------------------------------------------
 
-// Genera nombres de fichero seguros y deterministas con timestamp + sufijo aleatorio.
+/**
+ * Genera nombres de fichero seguros y deterministas con timestamp + sufijo aleatorio.
+ * Elimina caracteres no ASCII del nombre original para evitar path traversal.
+ */
 function buildSafeFileName(string $originalName, string $fallbackBase, string $extension): string
 {
     $base = strtolower((string) preg_replace('/[^a-zA-Z0-9_-]+/', '-', pathinfo($originalName, PATHINFO_FILENAME)));
@@ -18,7 +21,10 @@ function buildSafeFileName(string $originalName, string $fallbackBase, string $e
     return $base . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
 }
 
-// Resuelve formatos de audio aceptados por MIME (con fallback por extensión).
+/**
+ * Resuelve formatos de audio aceptados por MIME (con fallback por extensión).
+ * Devuelve la extensión normalizada o null si el formato no está permitido.
+ */
 function resolveAudioExtension(string $mimeType, string $originalName): ?string
 {
     $allowedAudios = [
@@ -64,7 +70,11 @@ function resolveAudioExtension(string $mimeType, string $originalName): ?string
     return null;
 }
 
-// Normaliza varios formatos de fecha UI/API a datetime SQL.
+/**
+ * Normaliza varios formatos de fecha UI/API a datetime SQL (Y-m-d H:i:s).
+ * Acepta datetime-local HTML5 (Y-m-d\TH:i), SQL y cadenas libres.
+ * Devuelve null si el valor está vacío o no es parseable.
+ */
 function normalizeDateTime(?string $value): ?string
 {
     $raw = trim((string) $value);
@@ -88,7 +98,10 @@ function normalizeDateTime(?string $value): ?string
     return date('Y-m-d H:i:s', $ts);
 }
 
-// Convierte datetime almacenado al formato de <input type="datetime-local">.
+/**
+ * Convierte datetime almacenado al formato de <input type="datetime-local"> (Y-m-d\TH:i).
+ * Si el valor es nulo o inválido devuelve el momento actual.
+ */
 function formatDateTimeLocal(?string $value): string
 {
     $normalized = normalizeDateTime($value);
@@ -104,13 +117,19 @@ function formatDateTimeLocal(?string $value): string
     return $dt->format('Y-m-d\\TH:i');
 }
 
-// Fallback de GUID cuando el usuario no lo proporciona.
+/**
+ * Genera un GUID único para el episodio cuando el usuario no lo proporciona.
+ * Formato: ep-YYYYmmddHHiiss-<8 hex aleatorios>.
+ */
 function generateGuid(): string
 {
     return 'ep-' . date('YmdHis') . '-' . bin2hex(random_bytes(8));
 }
 
-// Usa la misma estrategia de slug que en las páginas públicas.
+/**
+ * Convierte texto a slug seguro para URL usando la misma estrategia que las páginas públicas.
+ * Usa iconv para transliterar caracteres no ASCII cuando está disponible.
+ */
 function slugifyForUrl(string $value): string
 {
     $slug = trim($value);
@@ -132,7 +151,10 @@ function slugifyForUrl(string $value): string
     return $slug !== '' ? $slug : 'capitulo';
 }
 
-// Construye URL pública del episodio en formato /YYYY/MM/slug.
+/**
+ * Construye la URL pública del episodio en formato /YYYY/MM/slug.
+ * Si pubDate no es válida, usa la fecha actual como fallback.
+ */
 function buildEpisodePublicLink(string $baseUrl, ?string $pubDate, string $title): string
 {
     $normalized = normalizeDateTime($pubDate);
@@ -147,8 +169,11 @@ function buildEpisodePublicLink(string $baseUrl, ?string $pubDate, string $title
         . slugifyForUrl($title);
 }
 
-// Resuelve la ruta local a /audios/<fichero> partiendo de una URL publica.
-// Se usa para poder reescribir metadatos sobre el fichero fisico existente.
+/**
+ * Resuelve la ruta local a /audios/<fichero> partiendo de una URL pública.
+ * Se usa para poder reescribir metadatos ID3 sobre el fichero físico existente.
+ * Devuelve null si la URL no apunta a un fichero local en /audios/ o no existe.
+ */
 function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
 {
     $path = parse_url(trim($audioUrl), PHP_URL_PATH);
@@ -173,8 +198,11 @@ function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
     return $localPath;
 }
 
-// Resuelve la ruta local a /images/<fichero> partiendo de una URL publica.
-// Se usa para incrustar portada (frame APIC) en etiquetas ID3v2.
+/**
+ * Resuelve la ruta local a /images/<fichero> partiendo de una URL pública.
+ * Se usa para incrustar portada (frame APIC) en etiquetas ID3v2.
+ * Devuelve null si la URL no apunta a un fichero local en /images/ o no existe.
+ */
 function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 {
     $path = parse_url(trim($imageUrl), PHP_URL_PATH);

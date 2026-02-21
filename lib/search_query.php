@@ -2,13 +2,21 @@
 
 declare(strict_types=1);
 
-// Escapa caracteres especiales de LIKE en SQLite.
+/**
+ * Escapa los caracteres especiales de LIKE en SQLite (\, %, _).
+ * Necesario para búsquedas de texto libre sin inyección de wildcards.
+ */
 function escapeSqlLike(string $value): string
 {
     return str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $value);
 }
 
-// Carga datos de búsqueda: podcast, episodios coincidentes y metadatos de paginación.
+/**
+ * Carga los datos de búsqueda: podcast, episodios que coinciden con la query y paginación.
+ * Si $query está vacía devuelve listas vacías sin ejecutar ninguna consulta de episodios.
+ *
+ * @return array{podcast:?array, episodes:array, page:int, perPage:int, totalEpisodes:int, totalPages:int, error:string}
+ */
 function loadSearchData(string $dbPath, string $query, int $requestedPage): array
 {
     $podcast      = null;

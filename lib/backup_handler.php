@@ -117,6 +117,10 @@ function buildMediaExportPlan(string $absoluteDir, string $zipRoot): array
     ];
 }
 
+/**
+ * Convierte la ruta ZIP de un fichero multimedia a una URL relativa correctamente codificada.
+ * Cada segmento de ruta se codifica con rawurlencode para soportar caracteres especiales.
+ */
 function mediaPathToHref(string $zipPath): string
 {
     $segments = explode('/', ltrim($zipPath, '/'));
@@ -165,6 +169,9 @@ function streamZipPart(array $partFiles, string $downloadName, string $zipRoot):
     @unlink($tmpZipPath);
 }
 
+/**
+ * Normaliza los separadores de ruta de una entrada ZIP a formato POSIX y elimina la barra inicial.
+ */
 function normalizeZipPath(string $path): string
 {
     // Normaliza separadores para tratar todas las rutas ZIP como POSIX.
@@ -205,6 +212,10 @@ function normalizeUploadedFilesList(array $filesField): array
     return $normalized;
 }
 
+/**
+ * Sanea el nombre de un fichero de audio MP3 para guardarlo de forma segura en /audios/.
+ * Elimina caracteres no ASCII y asegura que la extensión sea .mp3.
+ */
 function sanitizeAudioFilename(string $originalName): string
 {
     $name = basename($originalName);
@@ -226,6 +237,10 @@ function sanitizeAudioFilename(string $originalName): string
     return $base . '.' . $ext;
 }
 
+/**
+ * Devuelve una ruta única en $dir para $filename añadiendo un contador numérico si ya existe.
+ * Evita sobrescribir ficheros existentes al importar audios MP3.
+ */
 function resolveUniquePath(string $dir, string $filename): string
 {
     $ext = (string) pathinfo($filename, PATHINFO_EXTENSION);

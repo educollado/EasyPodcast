@@ -6,7 +6,10 @@ declare(strict_types=1);
 // - feed.php para salida dinámica
 // - flujos de administración para regenerar feed.xml tras cambios
 
-// Convierte fechas de BD/publicación a formato RSS.
+/**
+ * Convierte una fecha de BD o publicación al formato RFC 2822 requerido por RSS.
+ * Si el valor está vacío o no es parseable, devuelve la fecha actual.
+ */
 function toRssDate(?string $value): string
 {
     if ($value === null || trim($value) === '') {
@@ -21,7 +24,10 @@ function toRssDate(?string $value): string
     return date(DATE_RSS, $ts);
 }
 
-// Helper para la etiqueta explícita de iTunes con fallback al valor del podcast.
+/**
+ * Devuelve "yes" o "no" para la etiqueta itunes:explicit.
+ * Si $value es null, usa $fallback (valor del podcast padre) como valor efectivo.
+ */
 function boolToItunesExplicit(?int $value, int $fallback = 0): string
 {
     $effective = $value;
@@ -32,7 +38,10 @@ function boolToItunesExplicit(?int $value, int $fallback = 0): string
     return ((int) $effective) === 1 ? 'yes' : 'no';
 }
 
-// Evita escribir etiquetas XML vacías en campos opcionales.
+/**
+ * Escribe un elemento de texto XML solo si el valor no está vacío.
+ * Evita añadir etiquetas vacías para campos opcionales del feed.
+ */
 function writeTextIfNotEmpty(XMLWriter $xml, string $name, ?string $value): void
 {
     if ($value === null || trim($value) === '') {
@@ -42,7 +51,10 @@ function writeTextIfNotEmpty(XMLWriter $xml, string $name, ?string $value): void
     $xml->writeElement($name, $value);
 }
 
-// Si el MIME guardado es genérico, infiere el MIME por extensión del audio.
+/**
+ * Infiere el MIME de audio por la extensión de la URL cuando el MIME almacenado es genérico.
+ * Devuelve null si la extensión no es reconocida.
+ */
 function guessAudioMimeFromUrl(string $audioUrl): ?string
 {
     $path = (string) parse_url($audioUrl, PHP_URL_PATH);
@@ -58,7 +70,10 @@ function guessAudioMimeFromUrl(string $audioUrl): ?string
     return $map[$ext] ?? null;
 }
 
-// Asegura que enclosure/type sea compatible con plataformas de podcast.
+/**
+ * Asegura que el MIME del enclosure sea compatible con plataformas de podcast.
+ * Sustituye MIMEs vacíos o genéricos (application/octet-stream) por el inferido de la URL.
+ */
 function normalizeEnclosureMime(?string $storedMime, string $audioUrl): string
 {
     $mime = strtolower(trim((string) $storedMime));
@@ -69,7 +84,10 @@ function normalizeEnclosureMime(?string $storedMime, string $audioUrl): string
     return $mime;
 }
 
-// Extrae esquema+host(+puerto) desde una URL para usarla como base canónica.
+/**
+ * Extrae esquema + host (+ puerto opcional) de una URL para usarla como base canónica.
+ * Devuelve null si la URL está vacía o no tiene host válido.
+ */
 function extractBaseUrlFromLink(?string $rawUrl): ?string
 {
     $value = trim((string) $rawUrl);
@@ -89,7 +107,10 @@ function extractBaseUrlFromLink(?string $rawUrl): ?string
     return $scheme . '://' . $host . $port;
 }
 
-// Base de runtime cuando no hay URL principal guardada todavía.
+/**
+ * Devuelve la URL base construida desde el host y esquema de la request actual.
+ * Se usa como fallback cuando podcast.link no está configurado.
+ */
 function runtimeBaseUrl(): string
 {
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -100,7 +121,10 @@ function runtimeBaseUrl(): string
     return $scheme . '://' . $host;
 }
 
-// Resuelve la base preferida usando podcast.link y fallback al host actual.
+/**
+ * Resuelve la URL base preferida usando podcast.link si está configurado.
+ * Cae en la URL del host actual como fallback si la tabla o el campo no existen.
+ */
 function resolveBaseUrl(PDO $pdo): string
 {
     $tableExists = (bool) $pdo
@@ -120,13 +144,20 @@ function resolveBaseUrl(PDO $pdo): string
     return runtimeBaseUrl();
 }
 
-// URL canónica del feed usada en atom:link/self.
+/**
+ * Devuelve la URL canónica del feed (base + /feed.xml) para la etiqueta atom:link rel="self".
+ */
 function resolveFeedSelfHref(PDO $pdo): string
 {
     return rtrim(resolveBaseUrl($pdo), '/') . '/feed.xml';
 }
 
-// Construye un documento XML RSS 2.0 + iTunes completo desde la BD actual.
+/**
+ * Construye un documento XML RSS 2.0 + iTunes completo desde la BD actual.
+ * Respeta rss_item_limit (0 = sin límite). Lanza RuntimeException si no hay datos de podcast.
+ *
+ * @throws RuntimeException Si no existe ningún registro en la tabla podcast.
+ */
 function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
 {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -292,7 +323,11 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
     return $xml->outputMemory();
 }
 
-// Persiste el RSS generado en un archivo feed.xml estático.
+/**
+ * Persiste el RSS generado en el archivo feed.xml estático indicado por $filePath.
+ *
+ * @throws RuntimeException Si no se puede escribir el fichero.
+ */
 function writePodcastFeedFile(PDO $pdo, string $filePath, string $selfHref): void
 {
     $xml = buildPodcastFeedXml($pdo, $selfHref);

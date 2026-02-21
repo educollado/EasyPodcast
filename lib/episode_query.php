@@ -5,8 +5,13 @@ declare(strict_types=1);
 require_once __DIR__ . '/view_helpers.php';
 require_once __DIR__ . '/public_episode_helpers.php';
 
-// Carga podcast y episodio resolviendo la URL amigable /YYYY/MM/slug.
-// Devuelve httpStatus 404/500 en error para que el dispatcher llame a http_response_code().
+/**
+ * Carga el podcast y el episodio resolviendo la URL amigable /YYYY/MM/slug.
+ * Devuelve httpStatus 404 si el episodio no existe o los parámetros son inválidos,
+ * y 500 en caso de error de BD. El dispatcher debe llamar a http_response_code().
+ *
+ * @return array{podcast:?array, episode:?array, error:string, httpStatus:int}
+ */
 function loadEpisodeData(string $dbPath, string $year, string $month, string $slug): array
 {
     $podcast = null;

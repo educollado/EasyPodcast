@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/lib/migration_runner.php';
 
-// Determina si la petición actual llega por HTTPS (incluye proxy común).
+/**
+ * Determina si la petición actual llega por HTTPS.
+ * Comprueba $_SERVER['HTTPS'], SERVER_PORT y el header X-Forwarded-Proto de proxies.
+ */
 function isHttpsRequest(): bool
 {
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -19,7 +22,11 @@ function isHttpsRequest(): bool
     return $forwardedProto === 'https';
 }
 
-// Aplica redirección 301 al host/esquema canónico definido en podcast.link.
+/**
+ * Aplica redirección 301 al host/esquema canónico definido en podcast.link.
+ * No actúa en CLI ni si las cabeceras ya han sido enviadas.
+ * Si hay error de lectura en BD, no bloquea la request y retorna silenciosamente.
+ */
 function enforceCanonicalHostFromPodcastLink(string $dbPath): void
 {
     if (PHP_SAPI === 'cli' || headers_sent()) {

@@ -6,13 +6,19 @@ declare(strict_types=1);
 // Helpers de salida para vistas publicas/admin
 // ---------------------------------------------------------------------------
 
-// Helper básico de escape HTML para salida segura.
+/**
+ * Escapa HTML para salida segura en plantillas.
+ * Equivale a htmlspecialchars con ENT_QUOTES + UTF-8.
+ */
 function esc(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-// Convierte URLs en enlaces sin permitir HTML arbitrario.
+/**
+ * Convierte URLs en texto a elementos <a> seguros, escapando todo lo demás.
+ * Las partes sin URL se escapan con esc(); no se permite HTML arbitrario.
+ */
 function renderTextWithLinks(string $value): string
 {
     // Split conservando las URL para tratarlas de forma segura.
@@ -45,7 +51,11 @@ function renderTextWithLinks(string $value): string
     return nl2br($html);
 }
 
-// Genera un extracto de texto compacto y marca si hubo recorte.
+/**
+ * Genera un extracto de texto compacto e indica si fue recortado.
+ *
+ * @return array{text: string, truncated: bool}
+ */
 function firstChars(string $value, int $maxChars): array
 {
     $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
@@ -67,7 +77,10 @@ function firstChars(string $value, int $maxChars): array
     return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
 }
 
-// Muestra el tamaño de audio en unidades humanas.
+/**
+ * Devuelve el tamaño en bytes formateado en unidades humanas (B, KB, MB...).
+ * Devuelve cadena vacía si el valor es 0 o negativo.
+ */
 function formatBytes(mixed $bytes): string
 {
     $size = (int) $bytes;
@@ -86,7 +99,10 @@ function formatBytes(mixed $bytes): string
     return number_format($value, $index === 0 ? 0 : 2, ',', '.') . ' ' . $units[$index];
 }
 
-// Construye slugs seguros para URL desde texto.
+/**
+ * Convierte texto a slug seguro para URL.
+ * Transliteral caracteres no ASCII con iconv cuando está disponible.
+ */
 function slugify(string $value): string
 {
     $slug = trim($value);
@@ -108,7 +124,10 @@ function slugify(string $value): string
     return $slug !== '' ? $slug : 'capitulo';
 }
 
-// Fecha de publicación legible.
+/**
+ * Devuelve la fecha de publicación en formato d/m/Y H:i legible para el usuario.
+ * Devuelve cadena vacía si el valor está vacío o no es parseable.
+ */
 function formatPublishedDate(?string $value): string
 {
     $raw = trim((string) $value);
@@ -124,7 +143,11 @@ function formatPublishedDate(?string $value): string
     return date('d/m/Y H:i', $ts);
 }
 
-// Convierte URL de imagen local a ruta de disco dentro del proyecto.
+/**
+ * Convierte URL de imagen local a ruta absoluta de disco dentro del proyecto.
+ * Verifica que la ruta resuelta no escape de la raíz del proyecto.
+ * Devuelve null si no existe el fichero o la ruta es inválida.
+ */
 function resolveLocalImagePath(string $imageUrl): ?string
 {
     $raw = trim($imageUrl);
@@ -158,8 +181,11 @@ function resolveLocalImagePath(string $imageUrl): ?string
     return $real;
 }
 
-// Genera el nombre/URL de variante con sufijo de tamaño en /images/generated/.
-// Ejemplo: /images/foo.jpg -> /images/generated/foo-144x144.jpg
+/**
+ * Genera la URL de una variante cuadrada con sufijo de tamaño en /images/generated/.
+ * Ejemplo: /images/foo.jpg -> /images/generated/foo-144x144.jpg
+ * Devuelve null si la URL fuente no tiene path o extensión válidos.
+ */
 function buildSizedImageUrl(string $sourceUrl, int $size): ?string
 {
     $raw = trim($sourceUrl);
@@ -203,7 +229,11 @@ function buildSizedImageUrl(string $sourceUrl, int $size): ?string
     return $scheme . '://' . $auth . $host . $port . $variantPath . $query . $fragment;
 }
 
-// Crea (si no existe) y devuelve una variante cuadrada local de la imagen.
+/**
+ * Crea (si no existe) y devuelve una variante cuadrada redimensionada de la imagen.
+ * Si no se puede generar la variante, devuelve la URL original sin modificar.
+ * Requiere la extensión GD de PHP.
+ */
 function ensureSquareImageVariant(string $sourceUrl, int $size): string
 {
     $raw = trim($sourceUrl);
@@ -291,7 +321,13 @@ function ensureSquareImageVariant(string $sourceUrl, int $size): string
     return $variantUrl;
 }
 
-// Construye fuentes responsive (src/srcset) para variantes cuadradas.
+/**
+ * Construye src y srcset responsive para variantes cuadradas generadas.
+ * Omite tamaños superiores a la resolución original de la imagen.
+ *
+ * @param int[] $preferredSizes Lista de anchos deseados en píxeles.
+ * @return array{src: string, srcset: string}
+ */
 function buildResponsiveSquareImageSources(string $sourceUrl, array $preferredSizes): array
 {
     $raw = trim($sourceUrl);

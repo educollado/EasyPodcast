@@ -6,9 +6,14 @@ require_once __DIR__ . '/episode_helpers.php';
 require_once __DIR__ . '/episode_save_handler.php';
 require_once __DIR__ . '/csrf.php';
 
-// Prepara todos los datos del formulario de añadir/editar episodio.
-// Gestiona el modo edición (GET con episode_id) y el guardado (POST).
-// En caso de error de BD no recuperable, responde 500 y termina.
+/**
+ * Prepara todos los datos del formulario de añadir/editar episodio.
+ * - GET con episode_id: carga el episodio en el formulario (modo edición).
+ * - POST: guarda el episodio y devuelve el estado actualizado del formulario.
+ * En error de BD no recuperable responde HTTP 500 y termina la ejecución.
+ *
+ * @return array{form:array, isEditing:bool, editingEpisodeId:?int, error:string, notice:string, id3Notice:string}
+ */
 function loadAddEpisodeData(string $dbPath): array
 {
     $error            = '';

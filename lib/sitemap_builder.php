@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../feed_builder.php';
 
-// Slug simple para sitemap sin depender de view_helpers.php.
+/**
+ * Convierte texto a slug URL-safe para el sitemap.
+ * Implementación independiente de view_helpers.php para evitar dependencia circular.
+ */
 function slugifyForSitemap(string $value): string
 {
     $slug = trim($value);
@@ -26,7 +29,9 @@ function slugifyForSitemap(string $value): string
     return $slug !== '' ? $slug : 'capitulo';
 }
 
-// Construye la ruta pública de episodio usando año/mes y slug.
+/**
+ * Construye la ruta pública del episodio (/YYYY/MM/slug) para incluir en el sitemap.
+ */
 function buildEpisodePathForSitemap(string $pubDate, string $title): string
 {
     $ts = strtotime($pubDate);
@@ -40,7 +45,10 @@ function buildEpisodePathForSitemap(string $pubDate, string $title): string
     return '/' . $year . '/' . $month . '/' . slugifyForSitemap($title);
 }
 
-// Devuelve URL absoluta para una URL almacenada o una ruta relativa.
+/**
+ * Devuelve URL absoluta para una URL almacenada o una ruta relativa.
+ * Si $value ya es absoluta (tiene scheme + host), la devuelve sin modificar.
+ */
 function toAbsoluteUrl(string $value, string $baseUrl): string
 {
     $raw = trim($value);
@@ -56,7 +64,10 @@ function toAbsoluteUrl(string $value, string $baseUrl): string
     return rtrim($baseUrl, '/') . '/' . ltrim($raw, '/');
 }
 
-// Normaliza fecha para etiqueta <lastmod> en formato W3C.
+/**
+ * Normaliza una fecha para la etiqueta <lastmod> del sitemap en formato ISO 8601 (W3C).
+ * Si el valor no es parseable, usa la fecha actual.
+ */
 function toSitemapLastmod(?string $value): string
 {
     $ts = strtotime((string) $value);
@@ -67,7 +78,10 @@ function toSitemapLastmod(?string $value): string
     return date('c', $ts);
 }
 
-// Genera el XML completo de sitemap usando los episodios publicados.
+/**
+ * Genera el XML completo del sitemap usando los episodios publicados.
+ * Incluye la portada y un <url> por episodio ordenado por fecha descendente.
+ */
 function buildPodcastSitemapXml(PDO $pdo): string
 {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -147,7 +161,12 @@ function buildPodcastSitemapXml(PDO $pdo): string
     return $xml->outputMemory();
 }
 
-// Persiste el sitemap en un archivo estático sitemap.xml.
+/**
+ * Persiste el sitemap generado en un archivo estático sitemap.xml.
+ * Usa escritura atómica (temporal + rename) para evitar que el fichero quede incompleto.
+ *
+ * @throws RuntimeException Si no se puede construir o escribir el sitemap.
+ */
 function writePodcastSitemapFile(PDO $pdo, string $targetPath): void
 {
     $xml = buildPodcastSitemapXml($pdo);

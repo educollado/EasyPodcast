@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+/**
+ * Devuelve el token CSRF de la sesión actual, creándolo si no existe.
+ * Requiere que la sesión esté activa antes de llamar a esta función.
+ */
 function csrf_token(): string
 {
     if (empty($_SESSION['csrf_token'])) {
@@ -10,6 +14,10 @@ function csrf_token(): string
     return (string) $_SESSION['csrf_token'];
 }
 
+/**
+ * Verifica el token CSRF enviado en POST contra el almacenado en sesión.
+ * Termina la ejecución con HTTP 403 si la verificación falla.
+ */
 function csrf_verify(): void
 {
     $submitted = (string) ($_POST['csrf_token'] ?? '');
