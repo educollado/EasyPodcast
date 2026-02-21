@@ -12,6 +12,9 @@ require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
+require_once __DIR__ . '/lib/home_query.php';
+require_once __DIR__ . '/lib/home_seo.php';
+
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
@@ -19,122 +22,16 @@ if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
 }
 ob_start();
 
-// Genera un extracto de texto compacto y marca si hubo recorte.
-function firstChars(string $value, int $maxChars): array
-{
-    $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
-    if ($clean === '') {
-        return ['text' => '', 'truncated' => false];
-    }
+$requestedPage = max(1, (int) ($_GET['page'] ?? 1));
 
-    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
-        if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
-            return ['text' => $clean, 'truncated' => false];
-        }
-        return ['text' => rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')), 'truncated' => true];
-    }
+$data = loadHomeData($dbPath, $requestedPage);
+extract($data);  // podcast, episodes, page, perPage, totalEpisodes, totalPages, error
 
-    if (strlen($clean) <= $maxChars) {
-        return ['text' => $clean, 'truncated' => false];
-    }
+$seo = buildHomeSeoData($podcast, $page, $totalPages, $error);
+extract($seo);   // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
+                 // baseSeoUrl, canonicalUrl, robotsContent, prevUrl, nextUrl,
+                 // metaDescription, ogImage, rssUrl, seriesJsonLd
 
-    return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
-}
-
-$podcast = null;
-$episodes = [];
-$error = '';
-$page = max(1, (int) ($_GET['page'] ?? 1));
-$perPage = 20;
-$totalEpisodes = 0;
-$totalPages = 1;
-
-try {
-    $pdo = new PDO('sqlite:' . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-    // La app está diseñada alrededor de una única fila de podcast.
-    $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
-    $configuredPerPage = (int) ($podcast['home_items_per_page'] ?? 20);
-    if ($configuredPerPage >= 1) {
-        $perPage = $configuredPerPage;
-    }
-
-    // Calcula paginación total antes de consultar la página actual.
-    $totalEpisodes = (int) $pdo
-        ->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")
-        ->fetchColumn();
-    $totalPages = max(1, (int) ceil($totalEpisodes / $perPage));
-    if ($page > $totalPages) {
-        $page = $totalPages;
-    }
-    $offset = ($page - 1) * $perPage;
-
-    // Recupera solo episodios de la página actual (solo publicados).
-    $episodesStmt = $pdo->prepare(
-        "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
-         FROM episodes
-         WHERE status = 'published'
-         ORDER BY datetime(pub_date) DESC, id DESC
-         LIMIT :limit OFFSET :offset"
-    );
-    $episodesStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-    $episodesStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $episodesStmt->execute();
-    $episodes = $episodesStmt->fetchAll();
-} catch (Throwable $e) {
-    $error = 'No se pudo cargar la portada: ' . $e->getMessage();
-}
-
-$podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
-$podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
-// Fallback de autor: owner_name -> author.
-if ($podcastAuthor === '') {
-    $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
-}
-$podcastDescription = trim((string) ($podcast['description'] ?? ''));
-$podcastImage = trim((string) ($podcast['image_url'] ?? ''));
-$baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
-$canonicalPath = $page > 1 ? '/?page=' . $page : '/';
-$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
-$robotsContent = $error !== '' ? 'noindex,follow' : ($page > 1 ? 'noindex,follow' : 'index,follow');
-$prevUrl = null;
-if ($page > 1) {
-    $prevPath = $page === 2 ? '/' : '/?page=' . ($page - 1);
-    $prevUrl = toAbsoluteSeoUrl($prevPath, $baseSeoUrl);
-}
-$nextUrl = null;
-if ($page < $totalPages) {
-    $nextUrl = toAbsoluteSeoUrl('/?page=' . ($page + 1), $baseSeoUrl);
-}
-$metaDescription = compactMetaText((string) ($podcast['description'] ?? ''), 160);
-if ($metaDescription === '') {
-    $metaDescription = 'Podcast en EasyPodcast: episodios, reproductor y feed RSS.';
-}
-$ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-$rssUrl = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
-$seriesData = [
-    '@context' => 'https://schema.org',
-    '@type' => 'PodcastSeries',
-    'name' => $podcastTitle,
-    'url' => toAbsoluteSeoUrl('/', $baseSeoUrl),
-    'description' => (string) ($podcast['description'] ?? ''),
-    'inLanguage' => (string) ($podcast['language'] ?? 'es-ES'),
-];
-if ($podcastAuthor !== '') {
-    $seriesData['author'] = [
-        '@type' => 'Person',
-        'name' => $podcastAuthor,
-    ];
-}
-if ($podcastImage !== '') {
-    $seriesData['image'] = $ogImage;
-}
-$seriesJsonLd = json_encode($seriesData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-if (!is_string($seriesJsonLd) || $seriesJsonLd === '') {
-    $seriesJsonLd = '{}';
-}
 if ($error !== '') {
     header('X-Robots-Tag: noindex, nofollow, noarchive');
 }

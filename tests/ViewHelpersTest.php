@@ -131,3 +131,40 @@ test('renderTextWithLinks: múltiples URLs generan múltiples enlaces', function
     $result = renderTextWithLinks('https://a.com y https://b.com');
     assert_eq(2, substr_count($result, '<a '));
 });
+
+// =============================================================================
+// firstChars
+// =============================================================================
+
+test('firstChars: cadena vacía → text vacío sin truncado', function () {
+    assert_eq(['text' => '', 'truncated' => false], firstChars('', 100));
+});
+
+test('firstChars: texto corto no se trunca', function () {
+    $result = firstChars('Hola mundo', 20);
+    assert_eq('Hola mundo', $result['text']);
+    assert_true(!$result['truncated']);
+});
+
+test('firstChars: texto largo se trunca', function () {
+    $result = firstChars('ABCDEFGHIJ', 5);
+    assert_eq('ABCDE', $result['text']);
+    assert_true($result['truncated']);
+});
+
+test('firstChars: espacios múltiples normalizados', function () {
+    $result = firstChars("Hola  \n  mundo", 50);
+    assert_eq('Hola mundo', $result['text']);
+    assert_true(!$result['truncated']);
+});
+
+test('firstChars: texto de exactamente maxChars no se trunca', function () {
+    $text = str_repeat('x', 10);
+    $result = firstChars($text, 10);
+    assert_eq($text, $result['text']);
+    assert_true(!$result['truncated']);
+});
+
+test('firstChars: solo espacios → text vacío sin truncado', function () {
+    assert_eq(['text' => '', 'truncated' => false], firstChars('   ', 100));
+});

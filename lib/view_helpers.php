@@ -45,6 +45,28 @@ function renderTextWithLinks(string $value): string
     return nl2br($html);
 }
 
+// Genera un extracto de texto compacto y marca si hubo recorte.
+function firstChars(string $value, int $maxChars): array
+{
+    $clean = trim(preg_replace('/\s+/', ' ', $value) ?? '');
+    if ($clean === '') {
+        return ['text' => '', 'truncated' => false];
+    }
+
+    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+        if (mb_strlen($clean, 'UTF-8') <= $maxChars) {
+            return ['text' => $clean, 'truncated' => false];
+        }
+        return ['text' => rtrim(mb_substr($clean, 0, $maxChars, 'UTF-8')), 'truncated' => true];
+    }
+
+    if (strlen($clean) <= $maxChars) {
+        return ['text' => $clean, 'truncated' => false];
+    }
+
+    return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
+}
+
 // Construye slugs seguros para URL desde texto.
 function slugify(string $value): string
 {
