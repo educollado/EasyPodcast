@@ -230,39 +230,6 @@ function loadPodcastManagementData(string $dbPath): array
             )"
         );
 
-        // Migraciones ligeras de columnas en instalaciones existentes.
-        $columns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
-        $hasRssItemLimit      = false;
-        $hasHomeItemsPerPage  = false;
-        $hasWriteAudioMetadata = false;
-        $hasCacheEnabled      = false;
-        foreach ($columns as $column) {
-            if (($column['name'] ?? '') === 'rss_item_limit') {
-                $hasRssItemLimit = true;
-            }
-            if (($column['name'] ?? '') === 'home_items_per_page') {
-                $hasHomeItemsPerPage = true;
-            }
-            if (($column['name'] ?? '') === 'write_audio_metadata') {
-                $hasWriteAudioMetadata = true;
-            }
-            if (($column['name'] ?? '') === 'cache_enabled') {
-                $hasCacheEnabled = true;
-            }
-        }
-        if (!$hasRssItemLimit) {
-            $pdo->exec('ALTER TABLE podcast ADD COLUMN rss_item_limit INTEGER NOT NULL DEFAULT 0');
-        }
-        if (!$hasHomeItemsPerPage) {
-            $pdo->exec('ALTER TABLE podcast ADD COLUMN home_items_per_page INTEGER NOT NULL DEFAULT 20');
-        }
-        if (!$hasWriteAudioMetadata) {
-            $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
-        }
-        if (!$hasCacheEnabled) {
-            $pdo->exec('ALTER TABLE podcast ADD COLUMN cache_enabled INTEGER NOT NULL DEFAULT 0');
-        }
-
         // La app usa una sola fila de canal; se carga cuando existe.
         $existing = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
         if ($existing) {

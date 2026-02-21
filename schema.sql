@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS podcast (
   copyright TEXT,
   itunes_type TEXT DEFAULT 'episodic',
   rss_item_limit INTEGER NOT NULL DEFAULT 0,
+  home_items_per_page INTEGER NOT NULL DEFAULT 20,
   write_audio_metadata INTEGER NOT NULL DEFAULT 0,
   cache_enabled INTEGER NOT NULL DEFAULT 0
 );
@@ -44,6 +45,8 @@ CREATE TABLE IF NOT EXISTS episodes (
 -- Acelera consultas públicas/feed por estado de publicación y fecha.
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
+
+PRAGMA user_version = 1;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

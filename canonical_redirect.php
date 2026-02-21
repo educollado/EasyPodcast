@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/lib/migration_runner.php';
+
 // Determina si la petición actual llega por HTTPS (incluye proxy común).
 function isHttpsRequest(): bool
 {
@@ -23,6 +25,8 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
     if (PHP_SAPI === 'cli' || headers_sent()) {
         return;
     }
+
+    runMigrations($dbPath);
 
     $httpHost = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
     if ($httpHost === '') {

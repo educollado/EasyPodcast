@@ -109,20 +109,6 @@ function loadPodcastDefaults(PDO $pdo): array
         return $defaults;
     }
 
-    // Migración no destructiva: añade la columna si la BD viene de una versión anterior
-    // que no la tenía. ALTER TABLE en SQLite es seguro si la columna ya existe en el PRAGMA.
-    $podcastColumns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
-    $hasWriteAudioMetadata = false;
-    foreach ($podcastColumns as $col) {
-        if (($col['name'] ?? '') === 'write_audio_metadata') {
-            $hasWriteAudioMetadata = true;
-            break;
-        }
-    }
-    if (!$hasWriteAudioMetadata) {
-        $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
-    }
-
     $podcastData = $pdo->query('SELECT title, image_url, owner_name, write_audio_metadata FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
     if ($podcastData) {
         $defaults['title']                = trim((string) ($podcastData['title'] ?? ''));
