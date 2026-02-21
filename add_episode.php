@@ -9,9 +9,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/feed_builder.php';
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/episode_helpers.php';
-require_once __DIR__ . '/lib/id3_service.php';
-require_once __DIR__ . '/lib/cache_service.php';
-require_once __DIR__ . '/lib/sitemap_builder.php';
+require_once __DIR__ . '/lib/episode_save_handler.php';
 
 // ---------------------------------------------------------------------------
 // Bootstrap de administración
@@ -39,24 +37,9 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$form = [
-    'guid' => '',
-    'title' => '',
-    'description' => '',
-    'link' => '',
-    'pub_date' => date('Y-m-d\\TH:i'),
-    'audio_url' => '',
-    'audio_mime_type' => 'audio/mpeg',
-    'audio_size_bytes' => '',
-    'duration' => '',
-    'explicit' => '',
-    'season_number' => '',
-    'episode_number' => '',
-    'episode_type' => '',
-    'image_url' => '',
-    'author' => '',
-    'status' => 'draft',
-];
+// Fallback para $form antes del bloque try (en caso de excepción temprana).
+$podcastDefaults = ['title' => '', 'image_url' => '', 'author' => '', 'write_audio_metadata' => 0];
+$form = episodeFormDefaults($podcastDefaults);
 
 // ---------------------------------------------------------------------------
 // Flujo principal de persistencia (validación + subida + guardado)
@@ -94,47 +77,8 @@ try {
 
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate ON episodes(status, pub_date)");
 
-    // Valores por defecto heredados del podcast cuando hay campos vacíos.
-    $podcastDefaults = [
-        'title' => '',
-        'image_url' => '',
-        'author' => '',
-        'write_audio_metadata' => 0,
-    ];
-    $podcastTableExists = (bool) $pdo
-        ->query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'podcast' LIMIT 1")
-        ->fetchColumn();
-    if ($podcastTableExists) {
-        $podcastColumns = $pdo->query('PRAGMA table_info(podcast)')->fetchAll();
-        $hasWriteAudioMetadata = false;
-        foreach ($podcastColumns as $podcastColumn) {
-            if (($podcastColumn['name'] ?? '') === 'write_audio_metadata') {
-                $hasWriteAudioMetadata = true;
-                break;
-            }
-        }
-        if (!$hasWriteAudioMetadata) {
-            $pdo->exec('ALTER TABLE podcast ADD COLUMN write_audio_metadata INTEGER NOT NULL DEFAULT 0');
-        }
-
-        $podcastStmt = $pdo->query('SELECT title, image_url, owner_name, write_audio_metadata FROM podcast ORDER BY id ASC LIMIT 1');
-        $podcastData = $podcastStmt->fetch();
-        if ($podcastData) {
-            $podcastDefaults['title'] = trim((string) ($podcastData['title'] ?? ''));
-            $podcastDefaults['image_url'] = trim((string) ($podcastData['image_url'] ?? ''));
-            $podcastDefaults['author'] = trim((string) ($podcastData['owner_name'] ?? ''));
-            $podcastDefaults['write_audio_metadata'] = (int) ($podcastData['write_audio_metadata'] ?? 0);
-        }
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        if ($podcastDefaults['image_url'] !== '') {
-            $form['image_url'] = $podcastDefaults['image_url'];
-        }
-        if ($podcastDefaults['author'] !== '') {
-            $form['author'] = $podcastDefaults['author'];
-        }
-    }
+    $podcastDefaults = loadPodcastDefaults($pdo);
+    $form = episodeFormDefaults($podcastDefaults);
 
     // Cargador de modo edición.
     $requestedEpisodeId = (int) ($_GET['episode_id'] ?? 0);
@@ -162,311 +106,21 @@ try {
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         csrf_verify();
-        // Flujo de creación/actualización.
         $postedEpisodeId = (int) ($_POST['episode_id'] ?? 0);
         if ($postedEpisodeId > 0) {
             $editingEpisodeId = $postedEpisodeId;
             $isEditing = true;
         }
-
-        foreach ($form as $key => $value) {
+        foreach ($form as $key => $_) {
             $form[$key] = trim((string) ($_POST[$key] ?? ''));
         }
-        // Botón específico en edición para reescribir tags del MP3 actual.
-        $rewriteAudioMetadata = $isEditing && isset($_POST['rewrite_audio_metadata']) && (string) $_POST['rewrite_audio_metadata'] === '1';
-        $uploadedNewAudio = false;
+        $rewriteAudioMetadata = $isEditing && ($_POST['rewrite_audio_metadata'] ?? '') === '1';
 
-        // Bloque principal de validación.
-        if (!in_array($form['explicit'], ['', '0', '1'], true)) {
-            $error = 'El valor de explícito no es válido.';
-        } elseif (!in_array($form['status'], ['draft', 'published'], true)) {
-            $error = 'El estado debe ser draft o published.';
-        } elseif ($form['episode_type'] !== '' && !in_array($form['episode_type'], ['full', 'trailer', 'bonus'], true)) {
-            $error = 'El tipo de episodio debe ser full, trailer o bonus.';
-        } elseif ($form['title'] === '' || $form['description'] === '' || $form['pub_date'] === '') {
-            $error = 'Título, descripción y fecha de publicación son obligatorios.';
-        }
-
-        $pubDateNormalized = normalizeDateTime($form['pub_date']);
-        if ($error === '' && $pubDateNormalized === null) {
-            $error = 'La fecha de publicación no es válida.';
-        }
-
-        $numericFields = [
-            'audio_size_bytes' => false,
-            'season_number' => true,
-            'episode_number' => true,
-        ];
-        foreach ($numericFields as $field => $allowEmpty) {
-            $value = $form[$field];
-            if ($value === '' && $allowEmpty) {
-                continue;
-            }
-            if ($value === '') {
-                continue;
-            }
-            if (!ctype_digit($value) || (int) $value < 0) {
-                $error = 'Revisa los campos numéricos: deben ser enteros positivos.';
-                break;
-            }
-        }
-
-        if ($error === '') {
-            // Subida opcional de portada del episodio.
-            $uploadedImage = $_FILES['image_file'] ?? null;
-            if (is_array($uploadedImage) && (int) ($uploadedImage['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-                $imageError = (int) ($uploadedImage['error'] ?? UPLOAD_ERR_OK);
-                if ($imageError !== UPLOAD_ERR_OK) {
-                    $error = 'No se pudo subir la imagen del capítulo.';
-                } else {
-                    $tmpPath = (string) ($uploadedImage['tmp_name'] ?? '');
-                    $originalName = (string) ($uploadedImage['name'] ?? '');
-                    $finfo = new finfo(FILEINFO_MIME_TYPE);
-                    $mimeType = (string) $finfo->file($tmpPath);
-                    $allowedImages = [
-                        'image/jpeg' => 'jpg',
-                        'image/png' => 'png',
-                        'image/gif' => 'gif',
-                        'image/webp' => 'webp',
-                    ];
-
-                    if (!isset($allowedImages[$mimeType])) {
-                        $error = 'La imagen debe ser jpg, png, gif o webp.';
-                    } else {
-                        $fileName = buildSafeFileName($originalName, 'episode-image', $allowedImages[$mimeType]);
-                        $imagesDir = __DIR__ . '/images';
-                        if (!is_dir($imagesDir) && !mkdir($imagesDir, 0755, true) && !is_dir($imagesDir)) {
-                            $error = 'No se pudo crear la carpeta /images.';
-                        } elseif (!move_uploaded_file($tmpPath, $imagesDir . '/' . $fileName)) {
-                            $error = 'No se pudo guardar la imagen subida.';
-                        } else {
-                            $form['image_url'] = rtrim(resolveBaseUrl($pdo), '/') . '/images/' . $fileName;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($error === '') {
-            // Subida opcional de audio. Si existe, sobreescribe URL/MIME/tamaño desde fichero.
-            $uploadedAudio = $_FILES['audio_file'] ?? null;
-            if (is_array($uploadedAudio) && (int) ($uploadedAudio['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-                $audioError = (int) ($uploadedAudio['error'] ?? UPLOAD_ERR_OK);
-                if ($audioError !== UPLOAD_ERR_OK) {
-                    $error = 'No se pudo subir el audio del capítulo.';
-                } else {
-                    $tmpPath = (string) ($uploadedAudio['tmp_name'] ?? '');
-                    $originalName = (string) ($uploadedAudio['name'] ?? '');
-                    $finfo = new finfo(FILEINFO_MIME_TYPE);
-                    $mimeType = (string) $finfo->file($tmpPath);
-                    $audioExtension = resolveAudioExtension($mimeType, $originalName);
-
-                    if ($audioExtension === null) {
-                        $detectedMime = $mimeType !== '' ? $mimeType : 'desconocido';
-                        $detectedExtension = strtolower((string) pathinfo($originalName, PATHINFO_EXTENSION));
-                        if ($detectedExtension === '') {
-                            $detectedExtension = 'sin extensión';
-                        }
-                        $error = 'El audio debe ser mp3, m4a, aac, ogg, wav o webm. MIME detectado: '
-                            . $detectedMime . '. Extensión detectada: ' . $detectedExtension . '.';
-                    } else {
-                        $fileName = buildSafeFileName($originalName, 'episode-audio', $audioExtension);
-                        $audiosDir = __DIR__ . '/audios';
-                        $targetPath = $audiosDir . '/' . $fileName;
-
-                        if (!is_dir($audiosDir) && !mkdir($audiosDir, 0755, true) && !is_dir($audiosDir)) {
-                            $error = 'No se pudo crear la carpeta /audios.';
-                        } elseif (!move_uploaded_file($tmpPath, $targetPath)) {
-                            $error = 'No se pudo guardar el audio subido. Revisa upload_tmp_dir/open_basedir en PHP.';
-                        } else {
-                            $uploadedNewAudio = true;
-                            if ($audioExtension === 'mp3' && $podcastDefaults['write_audio_metadata'] === 1) {
-                                $id3Metadata = buildEpisodeId3Metadata($form, $podcastDefaults);
-
-                                if (!writeMp3Id3Tags($targetPath, $id3Metadata)) {
-                                    $id3Notice = 'Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido.';
-                                }
-                            }
-
-                            $fileSize = filesize($targetPath);
-                            if ($fileSize === false) {
-                                $error = 'No se pudo leer el tamaño del audio subido.';
-                            } else {
-                                $form['audio_url'] = rtrim(resolveBaseUrl($pdo), '/') . '/audios/' . $fileName;
-                                $form['audio_mime_type'] = $mimeType !== '' ? $mimeType : 'audio/mpeg';
-                                $form['audio_size_bytes'] = (string) $fileSize;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($error === '') {
-            if ($form['audio_url'] === '') {
-                $error = 'Debes indicar la URL de audio o subir un fichero de audio.';
-            } elseif ($form['audio_mime_type'] === '') {
-                $error = 'El MIME del audio es obligatorio.';
-            } elseif ($form['audio_size_bytes'] === '' || !ctype_digit($form['audio_size_bytes']) || (int) $form['audio_size_bytes'] <= 0) {
-                $error = 'El tamaño del audio debe ser un entero mayor que 0.';
-            }
-        }
-
-        // Valores fallback heredados de la configuración del podcast.
-        if ($error === '' && $form['image_url'] === '') {
-            if ($podcastDefaults['image_url'] !== '') {
-                $form['image_url'] = $podcastDefaults['image_url'];
-            }
-        }
-
-        if ($error === '' && $form['author'] === '') {
-            if ($podcastDefaults['author'] !== '') {
-                $form['author'] = $podcastDefaults['author'];
-            }
-        }
-
-        // Reescribe metadatos cuando:
-        // - estamos en edición
-        // - no se acaba de subir un audio nuevo
-        // - se pulsó el botón manual o la opción global está activa
-        $shouldRewriteMetadata = $isEditing
-            && !$uploadedNewAudio
-            && ($rewriteAudioMetadata || $podcastDefaults['write_audio_metadata'] === 1);
-
-        if ($error === '' && $shouldRewriteMetadata) {
-            if ($podcastDefaults['write_audio_metadata'] !== 1) {
-                $id3Notice = 'Aviso: activa primero "Escribir metadatos ID3 en MP3 al subir episodio" en Gestión Podcast.';
-            } else {
-                $existingAudioPath = resolveLocalAudioPathFromUrl($form['audio_url']);
-                if ($existingAudioPath === null) {
-                    $id3Notice = 'Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos.';
-                } elseif (strtolower((string) pathinfo($existingAudioPath, PATHINFO_EXTENSION)) !== 'mp3') {
-                    $id3Notice = 'Aviso: la actualización manual de metadatos solo está disponible para MP3.';
-                } else {
-                    $hashBefore = hash_file('sha1', $existingAudioPath) ?: null;
-                    $id3Metadata = buildEpisodeId3Metadata($form, $podcastDefaults);
-                    if (!writeMp3Id3Tags($existingAudioPath, $id3Metadata)) {
-                        $id3Notice = 'Aviso: no se pudieron actualizar las etiquetas ID3 del MP3 existente.';
-                    } else {
-                        $fileSize = filesize($existingAudioPath);
-                        if ($fileSize !== false) {
-                            $form['audio_size_bytes'] = (string) $fileSize;
-                        }
-                        $hashAfter = hash_file('sha1', $existingAudioPath) ?: null;
-                        if ($hashBefore !== null && $hashAfter !== null && $hashBefore === $hashAfter) {
-                            $id3Notice = 'Metadatos ID3 revisados: el MP3 ya tenía esos valores.';
-                        } else {
-                            $id3Notice = 'Metadatos ID3 actualizados en el MP3 existente.';
-                        }
-                    }
-                }
-            }
-        }
-
-        // Autogenera el enlace público solo al crear; en edición se respeta el valor actual.
-        if ($error === '' && !$isEditing && $form['link'] === '') {
-            $form['link'] = buildEpisodePublicLink(resolveBaseUrl($pdo), $pubDateNormalized, $form['title']);
-        }
-
-        if ($error === '') {
-            if ($form['guid'] === '') {
-                $form['guid'] = generateGuid();
-            }
-
-            if ($isEditing && $editingEpisodeId !== null) {
-                // Actualiza un episodio existente.
-                $stmt = $pdo->prepare(
-                    'UPDATE episodes
-                     SET guid = :guid,
-                         title = :title,
-                         description = :description,
-                         link = :link,
-                         pub_date = :pub_date,
-                         audio_url = :audio_url,
-                         audio_mime_type = :audio_mime_type,
-                         audio_size_bytes = :audio_size_bytes,
-                         duration = :duration,
-                         explicit = :explicit,
-                         season_number = :season_number,
-                         episode_number = :episode_number,
-                         episode_type = :episode_type,
-                         image_url = :image_url,
-                         author = :author,
-                         status = :status,
-                         updated_at = datetime(\'now\')
-                     WHERE id = :id'
-                );
-            } else {
-                // Inserta un episodio nuevo.
-                $stmt = $pdo->prepare(
-                    'INSERT INTO episodes
-                     (guid, title, description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, duration, explicit, season_number, episode_number, episode_type, image_url, author, status, updated_at)
-                     VALUES
-                     (:guid, :title, :description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes, :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
-                );
-            }
-
-            $params = [
-                ':guid' => $form['guid'],
-                ':title' => $form['title'],
-                ':description' => $form['description'],
-                ':link' => $form['link'] !== '' ? $form['link'] : null,
-                ':pub_date' => $pubDateNormalized,
-                ':audio_url' => $form['audio_url'],
-                ':audio_mime_type' => $form['audio_mime_type'],
-                ':audio_size_bytes' => (int) $form['audio_size_bytes'],
-                ':duration' => $form['duration'] !== '' ? $form['duration'] : null,
-                ':explicit' => $form['explicit'] !== '' ? (int) $form['explicit'] : null,
-                ':season_number' => $form['season_number'] !== '' ? (int) $form['season_number'] : null,
-                ':episode_number' => $form['episode_number'] !== '' ? (int) $form['episode_number'] : null,
-                ':episode_type' => $form['episode_type'] !== '' ? $form['episode_type'] : null,
-                ':image_url' => $form['image_url'] !== '' ? $form['image_url'] : null,
-                ':author' => $form['author'] !== '' ? $form['author'] : null,
-                ':status' => $form['status'],
-            ];
-            if ($isEditing && $editingEpisodeId !== null) {
-                $params[':id'] = $editingEpisodeId;
-            }
-            $stmt->execute($params);
-
-            if ($isEditing && $editingEpisodeId !== null) {
-                $notice = 'Capítulo actualizado correctamente.';
-            } else {
-                $notice = 'Capítulo guardado correctamente.';
-                $form = [
-                    'guid' => '',
-                    'title' => '',
-                    'description' => '',
-                    'link' => '',
-                    'pub_date' => date('Y-m-d\\TH:i'),
-                    'audio_url' => '',
-                    'audio_mime_type' => 'audio/mpeg',
-                    'audio_size_bytes' => '',
-                    'duration' => '',
-                    'explicit' => '',
-                    'season_number' => '',
-                    'episode_number' => '',
-                    'episode_type' => '',
-                    'image_url' => $podcastDefaults['image_url'],
-                    'author' => $podcastDefaults['author'],
-                    'status' => 'draft',
-                ];
-            }
-            try {
-                // Regenera feed.xml después de insertar/actualizar.
-                writePodcastFeedFile($pdo, __DIR__ . '/feed.xml', resolveFeedSelfHref($pdo));
-                writePodcastSitemapFile($pdo, __DIR__ . '/sitemap.xml');
-            } catch (Throwable $feedError) {
-                $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
-            }
-            if (!clearWebCache()) {
-                $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
-            }
-            if ($id3Notice !== '') {
-                $notice .= ' (' . $id3Notice . ')';
-            }
-        }
-
+        $result    = saveEpisode($pdo, $form, $isEditing, $editingEpisodeId, $podcastDefaults, $_FILES, $rewriteAudioMetadata);
+        $form      = $result['form'];
+        $error     = $result['error'];
+        $notice    = $result['notice'];
+        $id3Notice = $result['id3Notice'];
         $form['pub_date'] = formatDateTimeLocal($form['pub_date']);
     }
 
