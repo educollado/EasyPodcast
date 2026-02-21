@@ -4,7 +4,7 @@
 
 ## Versión
 
-**Versión actual: 0.5**
+**Versión actual: 0.6**
 
 ## Sitio de referencia
 
