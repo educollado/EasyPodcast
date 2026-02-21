@@ -121,8 +121,16 @@
 | `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
 | `lib/seo_helpers.php` | Helpers SEO (`canonical`, URLs absolutas, `meta description`) |
 | `lib/view_helpers.php` | Helpers compartidos de vista (`esc`, enlaces, slug, fechas) |
+| `lib/public_episode_helpers.php` | Resolución de rutas y slugs para episodios públicos |
 | `lib/cache_service.php` | Servicio de caché (lectura/escritura/limpieza) |
 | `lib/csrf.php` | Protección CSRF para formularios de administración |
+| `lib/search_query.php` | Consulta SQL y paginación de búsqueda (`search.php`) |
+| `lib/search_seo.php` | Metadatos SEO de la página de búsqueda |
+| `lib/episodes_management_query.php` | Consultas SQL y acciones CRUD de gestión de episodios |
+| `lib/add_episode_query.php` | Orquestación del formulario de alta/edición de episodio |
+| `lib/podcast_management_handler.php` | Acciones POST de gestión del canal (metadatos, caché, favicon) |
+| `lib/admin_query.php` | Autenticación: login, setup inicial y logout |
+| `lib/backup_handler.php` | Exportación/importación de base de datos y ficheros multimedia |
 | `schema.sql` | Esquema de base de datos |
 | `podcast.sqlite` | Base de datos SQLite |
 | `cache/` | Archivos de caché pública generados en runtime |
