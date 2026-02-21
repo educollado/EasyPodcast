@@ -37,7 +37,9 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-// Fallback para $form antes del bloque try (en caso de excepción temprana).
+// Inicializamos $form y $podcastDefaults fuera del try para que el bloque HTML
+// de la parte inferior siempre tenga variables definidas, incluso si la excepción
+// se lanza antes de conectar a la BD (p.ej. fallo al abrir el fichero SQLite).
 $podcastDefaults = ['title' => '', 'image_url' => '', 'author' => '', 'write_audio_metadata' => 0];
 $form = episodeFormDefaults($podcastDefaults);
 
@@ -111,9 +113,12 @@ try {
             $editingEpisodeId = $postedEpisodeId;
             $isEditing = true;
         }
+        // Iteramos sobre las claves de $form (no sobre $_POST) para no aceptar
+        // campos arbitrarios que el cliente pudiera añadir de forma maliciosa.
         foreach ($form as $key => $_) {
             $form[$key] = trim((string) ($_POST[$key] ?? ''));
         }
+        // rewrite_audio_metadata solo tiene sentido en edición; en creación se ignora.
         $rewriteAudioMetadata = $isEditing && ($_POST['rewrite_audio_metadata'] ?? '') === '1';
 
         $result    = saveEpisode($pdo, $form, $isEditing, $editingEpisodeId, $podcastDefaults, $_FILES, $rewriteAudioMetadata);
@@ -121,6 +126,8 @@ try {
         $error     = $result['error'];
         $notice    = $result['notice'];
         $id3Notice = $result['id3Notice'];
+        // saveEpisode devuelve pub_date en formato SQL ('Y-m-d H:i:s') o como el usuario
+        // lo envió; lo convertimos al formato que espera <input type="datetime-local">.
         $form['pub_date'] = formatDateTimeLocal($form['pub_date']);
     }
 
