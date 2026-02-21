@@ -168,3 +168,31 @@ test('firstChars: texto de exactamente maxChars no se trunca', function () {
 test('firstChars: solo espacios → text vacío sin truncado', function () {
     assert_eq(['text' => '', 'truncated' => false], firstChars('   ', 100));
 });
+
+// =============================================================================
+// formatBytes
+// =============================================================================
+
+test('formatBytes: 0 → cadena vacía', function () {
+    assert_eq('', formatBytes(0));
+});
+
+test('formatBytes: negativo → cadena vacía', function () {
+    assert_eq('', formatBytes(-1));
+});
+
+test('formatBytes: bytes pequeños → en B sin decimales', function () {
+    assert_eq('512 B', formatBytes(512));
+});
+
+test('formatBytes: 1024 bytes → 1,00 KB', function () {
+    assert_eq('1,00 KB', formatBytes(1024));
+});
+
+test('formatBytes: 1 MB exacto → 1,00 MB', function () {
+    assert_eq('1,00 MB', formatBytes(1024 * 1024));
+});
+
+test('formatBytes: 1 GB exacto → 1,00 GB', function () {
+    assert_eq('1,00 GB', formatBytes(1024 * 1024 * 1024));
+});

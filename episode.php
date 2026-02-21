@@ -10,6 +10,9 @@ require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
+require_once __DIR__ . '/lib/episode_query.php';
+require_once __DIR__ . '/lib/episode_seo.php';
+
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
@@ -17,143 +20,24 @@ if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
 }
 ob_start();
 
-// Muestra el tamaño de audio en unidades humanas.
-function formatBytes($bytes): string
-{
-    $size = (int) $bytes;
-    if ($size <= 0) {
-        return '';
-    }
-
-    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    $index = 0;
-    $value = (float) $size;
-    while ($value >= 1024 && $index < count($units) - 1) {
-        $value /= 1024;
-        $index++;
-    }
-
-    return number_format($value, $index === 0 ? 0 : 2, ',', '.') . ' ' . $units[$index];
-}
-
-$year = trim((string) ($_GET['year'] ?? ''));
+$year  = trim((string) ($_GET['year'] ?? ''));
 $month = trim((string) ($_GET['month'] ?? ''));
-$slug = trim((string) ($_GET['slug'] ?? ''));
+$slug  = trim((string) ($_GET['slug'] ?? ''));
 
-$podcast = null;
-$episode = null;
-$error = '';
+$data = loadEpisodeData($dbPath, $year, $month, $slug);
+extract($data);  // podcast, episode, error, httpStatus
 
-// Valida parámetros de ruta al inicio para devolver 404 consistente.
-if (!preg_match('/^\d{4}$/', $year) || !preg_match('/^\d{2}$/', $month) || !preg_match('/^[a-z0-9-]+$/', $slug)) {
-    http_response_code(404);
-    $error = 'Capítulo no encontrado.';
+if ($httpStatus !== 200) {
+    http_response_code($httpStatus);
 }
 
-if ($error === '') {
-    try {
-        $pdo = new PDO('sqlite:' . $dbPath);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+$seo = buildEpisodeSeoData($podcast, $episode, $year, $month, $slug, $error);
+extract($seo);   // podcastTitle, podcastAuthor, podcastDescription, cover,
+                 // baseSeoUrl, canonicalUrl, robotsContent, episodeTitle, pageTitle,
+                 // metaDescription, ogImage, rssUrl, episodeJsonLd
 
-        $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
-
-        // Filtra por año/mes de URL y resuelve el episodio exacto por slug.
-        $stmt = $pdo->prepare(
-            "SELECT *
-             FROM episodes
-             WHERE status = 'published'
-               AND strftime('%Y', pub_date) = :year
-               AND strftime('%m', pub_date) = :month
-             ORDER BY datetime(pub_date) DESC, id DESC"
-        );
-        $stmt->execute([
-            ':year' => $year,
-            ':month' => $month,
-        ]);
-        $rows = $stmt->fetchAll();
-
-        // Varios episodios pueden compartir mes/año. El slug resuelve el definitivo.
-        foreach ($rows as $row) {
-            $rowSlug = slugFromEpisodeLink((string) ($row['link'] ?? ''));
-            if ($rowSlug === null) {
-                $rowSlug = slugify((string) ($row['title'] ?? ''));
-            }
-
-            if ($rowSlug === $slug) {
-                $episode = $row;
-                break;
-            }
-        }
-
-        if (!$episode) {
-            http_response_code(404);
-            $error = 'Capítulo no encontrado.';
-        }
-    } catch (Throwable $e) {
-        http_response_code(500);
-        $error = 'No se pudo cargar el capítulo: ' . $e->getMessage();
-    }
-}
-
-$podcastTitle = trim((string) ($podcast['title'] ?? 'Podcast'));
-$podcastAuthor = trim((string) ($podcast['owner_name'] ?? ''));
-// Fallback de autor: owner_name -> author.
-if ($podcastAuthor === '') {
-    $podcastAuthor = trim((string) ($podcast['author'] ?? ''));
-}
-$podcastDescription = trim((string) ($podcast['description'] ?? ''));
-$cover = trim((string) ($episode['image_url'] ?? ''));
-// Fallback de imagen del episodio a imagen del podcast.
-if ($cover === '') {
-    $cover = trim((string) ($podcast['image_url'] ?? ''));
-}
 $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => ''];
-$baseSeoUrl = resolveSeoBaseUrl((string) ($podcast['link'] ?? ''));
-$canonicalPath = '/' . $year . '/' . $month . '/' . $slug;
-$canonicalUrl = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
-$robotsContent = $error !== '' ? 'noindex,follow' : 'index,follow';
-$episodeTitle = (string) ($episode['title'] ?? $podcastTitle);
-$pageTitle = $episode ? ($episodeTitle . ' | ' . $podcastTitle) : $podcastTitle;
-$metaDescription = compactMetaText((string) ($episode['description'] ?? ''), 160);
-if ($metaDescription === '') {
-    $metaDescription = compactMetaText((string) ($podcast['description'] ?? ''), 160);
-}
-if ($metaDescription === '') {
-    $metaDescription = 'Escucha este episodio en ' . $podcastTitle . '.';
-}
-$ogImage = $cover !== '' ? toAbsoluteSeoUrl($cover, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-$rssUrl = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
-$episodeJsonLd = '{}';
-if ($episode) {
-    $episodeData = [
-        '@context' => 'https://schema.org',
-        '@type' => 'PodcastEpisode',
-        'name' => $episodeTitle,
-        'url' => $canonicalUrl,
-        'description' => (string) ($episode['description'] ?? ''),
-        'datePublished' => (string) ($episode['pub_date'] ?? ''),
-        'dateModified' => (string) ($episode['updated_at'] ?? $episode['pub_date'] ?? ''),
-        'partOfSeries' => [
-            '@type' => 'PodcastSeries',
-            'name' => $podcastTitle,
-            'url' => toAbsoluteSeoUrl('/', $baseSeoUrl),
-        ],
-    ];
-    if (!empty($episode['audio_url'])) {
-        $episodeData['associatedMedia'] = [
-            '@type' => 'MediaObject',
-            'contentUrl' => toAbsoluteSeoUrl((string) $episode['audio_url'], $baseSeoUrl),
-        ];
-    }
-    if ($cover !== '') {
-        $episodeData['image'] = $ogImage;
-    }
-    $encodedEpisodeData = json_encode($episodeData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    if (is_string($encodedEpisodeData) && $encodedEpisodeData !== '') {
-        $episodeJsonLd = $encodedEpisodeData;
-    }
-}
+
 if ($error !== '') {
     header('X-Robots-Tag: noindex, nofollow, noarchive');
 }

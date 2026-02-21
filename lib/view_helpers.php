@@ -67,6 +67,25 @@ function firstChars(string $value, int $maxChars): array
     return ['text' => rtrim(substr($clean, 0, $maxChars)), 'truncated' => true];
 }
 
+// Muestra el tamaño de audio en unidades humanas.
+function formatBytes(mixed $bytes): string
+{
+    $size = (int) $bytes;
+    if ($size <= 0) {
+        return '';
+    }
+
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    $index = 0;
+    $value = (float) $size;
+    while ($value >= 1024 && $index < count($units) - 1) {
+        $value /= 1024;
+        $index++;
+    }
+
+    return number_format($value, $index === 0 ? 0 : 2, ',', '.') . ' ' . $units[$index];
+}
+
 // Construye slugs seguros para URL desde texto.
 function slugify(string $value): string
 {
