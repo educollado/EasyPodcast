@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5
+
+- Refactorización de `add_episode.php`: la lógica POST (~350 líneas) se extrae a dos nuevas librerías, dejando el controlador con ~280 líneas.
+- Nuevo `lib/upload_service.php`: subida de imagen y audio del episodio, escritura de tags ID3 inmediatamente tras subida y reescritura de metadatos en edición.
+- Nuevo `lib/episode_save_handler.php`: validación pura del formulario (`validateEpisodeForm`), carga de defaults del podcast con migración no destructiva (`loadPodcastDefaults`), inicialización del formulario (`episodeFormDefaults`) y orquestación completa del guardado (`saveEpisode`).
+- Protección CSRF en todos los formularios de administración (`lib/csrf.php`): generación de token con `csrf_token()` y verificación con `csrf_verify()`.
+- Suite de tests ampliada a 107 tests (24 nuevos que cubren `validateEpisodeForm` y `episodeFormDefaults` sin dependencias de BD ni ficheros).
+
 ## 0.4
 
 - Nuevo `sitemap.xml` estático con regeneración automática en cambios de administración.

@@ -116,10 +116,13 @@
 | `add_episode.php` | Alta/edición de episodios y subida de audio/imagen |
 | `canonical_redirect.php` | Redirección 301 al host/esquema canónico definido en `podcast.link` |
 | `lib/episode_helpers.php` | Utilidades de episodios (fechas, slug, rutas, MIME) |
+| `lib/episode_save_handler.php` | Validación de formulario, persistencia BD y efectos post-guardado de episodios |
+| `lib/upload_service.php` | Subida de imagen/audio del episodio y escritura de metadatos ID3 tras subida |
 | `lib/id3_service.php` | Escritura de metadatos ID3 para MP3 |
 | `lib/seo_helpers.php` | Helpers SEO (`canonical`, URLs absolutas, `meta description`) |
 | `lib/view_helpers.php` | Helpers compartidos de vista (`esc`, enlaces, slug, fechas) |
 | `lib/cache_service.php` | Servicio de caché (lectura/escritura/limpieza) |
+| `lib/csrf.php` | Protección CSRF para formularios de administración |
 | `schema.sql` | Esquema de base de datos |
 | `podcast.sqlite` | Base de datos SQLite |
 | `cache/` | Archivos de caché pública generados en runtime |
