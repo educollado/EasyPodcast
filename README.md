@@ -261,3 +261,4 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 EasyPodcast es **Software Libre** y se distribuye bajo **GNU GPL v3 o posterior (GPL-3.0-or-later)**.
 
 Consulta `LICENSE` para los términos completos.
+
