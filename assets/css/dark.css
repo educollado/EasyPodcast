@@ -1,0 +1,17 @@
+/* =========================================================
+   Modo oscuro — cargado último para ganar en cascada.
+   Usa html[data-theme="dark"] (especificidad 0,1,1)
+   que supera a :root (0,1,0) de index.css / episode.css.
+   ========================================================= */
+html[data-theme="dark"] {
+  --bg:     #0f1923;
+  --card:   #1a2530;
+  --text:   #e8e0d0;
+  --muted:  #8a9aa5;
+  --accent: #38b2c8;
+  --border: #2a3a48;
+}
+
+html[data-theme="dark"] body {
+  background: radial-gradient(circle at top left, #0d1520 0%, var(--bg) 40%, #080f18 100%);
+}

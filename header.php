@@ -19,7 +19,10 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
       <?php endif; ?>
     </div>
     <div class="podcast-header-right header-box">
-      <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
+      <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro">🌙</button>
+        <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
+      </div>
       <form class="search-form" method="get" action="/search.php" role="search">
         <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">
         <button type="submit">Buscar</button>
@@ -27,3 +30,26 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
     </div>
   </div>
 </header>
+<script>
+(function () {
+  var btn  = document.getElementById('themeToggle');
+  var html = document.documentElement;
+
+  function applyIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+
+  btn.addEventListener('click', function () {
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.removeAttribute('data-theme');
+      localStorage.removeItem('theme');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+    applyIcon();
+  });
+
+  applyIcon();
+}());
+</script>

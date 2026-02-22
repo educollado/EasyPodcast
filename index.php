@@ -60,8 +60,10 @@ if ($error !== '') {
   <meta property="og:image" content="<?= esc($ogImage) ?>">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
+  <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/index.css">
   <link rel="stylesheet" href="/assets/css/header.css">
+  <link rel="stylesheet" href="/assets/css/dark.css">
   <script type="application/ld+json"><?= $seriesJsonLd ?></script>
 </head>
 <body>
