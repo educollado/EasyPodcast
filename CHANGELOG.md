@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6
+
+- Editor Markdown con vista previa en tiempo real para la descripción de episodios en administración (`lib/markdown_editor.php`).
+- Renderizado de Markdown en la web pública: descripción de episodio en detalle y en el feed RSS.
+- Extractos de portada sin sintaxis Markdown (se limpia antes de mostrar el resumen).
+- Sistema centralizado de migraciones de BD basado en `PRAGMA user_version` (`lib/migration_runner.php`); la versión actual es 1.
+- Refactorización de `index.php`, `episode.php` y las páginas de administración: separación de lógica y presentación.
+- PHPDoc y comentarios inline añadidos en todos los ficheros PHP.
+
 ## 0.5
 
 - Refactorización de `add_episode.php`: la lógica POST (~350 líneas) se extrae a dos nuevas librerías, dejando el controlador con ~280 líneas.
