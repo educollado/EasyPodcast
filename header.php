@@ -20,7 +20,7 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
     </div>
     <div class="podcast-header-right header-box">
       <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
-        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro">🌙</button>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro"></button>
         <a class="rss-link" href="/feed.xml" aria-label="Feed RSS">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             <circle cx="5" cy="19" r="3"/>
@@ -45,8 +45,12 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
   var btn  = document.getElementById('themeToggle');
   var html = document.documentElement;
 
+  // SVG luna (negro) para modo claro; SVG sol (amarillo) para modo oscuro.
+  var MOON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#1d2a33" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  var SUN  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="4" fill="#f5c518"/><path stroke="#f5c518" stroke-width="2" stroke-linecap="round" fill="none" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+
   function applyIcon() {
-    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    btn.innerHTML = html.getAttribute('data-theme') === 'dark' ? SUN : MOON;
   }
 
   btn.addEventListener('click', function () {
