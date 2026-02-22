@@ -78,7 +78,7 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
                   <td>
                     <div class="row-actions">
                       <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>">Editar</a>
-                      <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. ¿Continuar?');">
+                      <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?');">
                         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                         <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                         <input type="hidden" name="return_page" value="<?= $currentPage ?>">

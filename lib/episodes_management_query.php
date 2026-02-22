@@ -6,6 +6,7 @@ require_once __DIR__ . '/../feed_builder.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/episode_helpers.php';
 
 /**
  * Carga los datos del listado de episodios para el panel administrativo.
@@ -75,10 +76,39 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
             $returnPage      = max(1, (int) ($_POST['return_page'] ?? 1));
 
             if ($deleteEpisodeId > 0) {
+                // Guardar URLs de archivos antes de borrar el registro.
+                $fetchStmt = $pdo->prepare('SELECT audio_url, image_url FROM episodes WHERE id = :id');
+                $fetchStmt->execute([':id' => $deleteEpisodeId]);
+                $episodeFiles = $fetchStmt->fetch() ?: [];
+
                 $deleteStmt = $pdo->prepare('DELETE FROM episodes WHERE id = :id');
                 $deleteStmt->execute([':id' => $deleteEpisodeId]);
 
                 if ($deleteStmt->rowCount() > 0) {
+                    // Eliminar archivos huérfanos si ningún otro episodio los usa.
+                    $audioUrl = (string) ($episodeFiles['audio_url'] ?? '');
+                    if ($audioUrl !== '') {
+                        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE audio_url = :url');
+                        $cntStmt->execute([':url' => $audioUrl]);
+                        if ((int) $cntStmt->fetchColumn() === 0) {
+                            $localAudio = resolveLocalAudioPathFromUrl($audioUrl);
+                            if ($localAudio !== null) {
+                                @unlink($localAudio);
+                            }
+                        }
+                    }
+                    $imageUrl = (string) ($episodeFiles['image_url'] ?? '');
+                    if ($imageUrl !== '') {
+                        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE image_url = :url');
+                        $cntStmt->execute([':url' => $imageUrl]);
+                        if ((int) $cntStmt->fetchColumn() === 0) {
+                            $localImage = resolveLocalImagePathFromUrl($imageUrl);
+                            if ($localImage !== null) {
+                                @unlink($localImage);
+                            }
+                        }
+                    }
+
                     $status = 'deleted';
                     $feedOk = true;
                     try {
