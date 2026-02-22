@@ -27,19 +27,24 @@
   padding: 0;
 }
 
-.rss-link img {
-  width: 28px;
-  height: 28px;
-  display: block;
-}
-
 .rss-link {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .45rem .55rem;
+  cursor: pointer;
+  color: var(--text);
+  min-width: 40px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  min-height: 40px;
-  align-self: flex-end;
+  text-decoration: none;
+}
+
+.rss-link:hover {
+  background: var(--border);
+  color: #f26522;
 }
 
 .search-form {

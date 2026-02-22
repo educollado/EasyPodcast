@@ -21,7 +21,13 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
     <div class="podcast-header-right header-box">
       <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro">🌙</button>
-        <a class="rss-link" href="/feed.xml"><img src="/rss.png" alt="RSS"></a>
+        <a class="rss-link" href="/feed.xml" aria-label="Feed RSS">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="19" r="3"/>
+            <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z"/>
+            <path d="M4 11a9 9 0 0 1 9 9h-3a6 6 0 0 0-6-6z"/>
+          </svg>
+        </a>
       </div>
       <form class="search-form" method="get" action="/search.php" role="search">
         <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">

@@ -92,18 +92,7 @@
     .search-form button:hover {
       filter: brightness(0.95);
     }
-    .rss-link img {
-      width: 28px;
-      height: 28px;
-      display: block;
-    }
-    .rss-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 40px;
-      min-height: 40px;
-    }
+    /* .rss-link definido en header.css */
     h1 {
       margin: 0;
       font-size: clamp(1.5rem, 4.2vw, 2rem);
