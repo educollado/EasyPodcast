@@ -7,6 +7,8 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 RewriteRule ^(?:podcast\.sqlite|schema\.sql|AGENTS\.md)$ - [F,L,NC]
 RewriteRule ^backups(?:/|$) - [F,L,NC]
 RewriteRule ^\.git - [F,L,NC]
+# Sirve robots.txt dinámicamente para que el dominio sea siempre correcto.
+RewriteRule ^robots\.txt$ robots.php [L]
 # Mantiene archivos/directorios existentes sin tocar por reglas de rewrite.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
