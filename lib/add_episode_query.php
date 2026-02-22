@@ -85,6 +85,25 @@ function loadAddEpisodeData(string $dbPath): array
             }
         }
 
+        // Autorrellenar campos al crear un episodio nuevo (GET sin episode_id).
+        // Carga el último episodio guardado (por pub_date DESC, id DESC) y:
+        //   - season_number  → misma temporada que el último episodio.
+        //   - episode_number → número del último + 1 (siguiente de la serie).
+        //   - episode_type   → mismo tipo (full, trailer, bonus…) que el último.
+        // En modo edición o POST este bloque no se ejecuta, para no pisar los
+        // valores reales del episodio que se está modificando.
+        if (!$isEditing && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $lastStmt = $pdo->query(
+                'SELECT season_number, episode_number, episode_type FROM episodes ORDER BY datetime(pub_date) DESC, id DESC LIMIT 1'
+            );
+            $lastEpisode = $lastStmt ? $lastStmt->fetch() : false;
+            if ($lastEpisode) {
+                $form['season_number'] = (string) ((int) ($lastEpisode['season_number'] ?? 0));
+                $form['episode_number'] = (string) ((int) ($lastEpisode['episode_number'] ?? 0) + 1);
+                $form['episode_type']   = (string) ($lastEpisode['episode_type'] ?? '');
+            }
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             csrf_verify();
             $postedEpisodeId = (int) ($_POST['episode_id'] ?? 0);
