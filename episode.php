@@ -105,8 +105,7 @@ if ($error !== '') {
       <?php endif; ?>
     </main>
     <footer class="site-footer">
-      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>
-      from <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
+      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> from <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
     </footer>
   </div>
 </body>
