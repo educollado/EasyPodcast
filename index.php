@@ -129,9 +129,7 @@ if ($error !== '') {
         <?php endif; ?>
       <?php endif; ?>
     </main>
-    <footer class="site-footer">
-      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> with ❤️ by <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
-    </footer>
+    <?php require __DIR__ . '/footer.php'; ?>
   </div>
 </body>
 </html>
