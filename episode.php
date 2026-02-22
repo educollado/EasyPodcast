@@ -84,10 +84,11 @@ if ($error !== '') {
           <div>
             <h1><?= esc((string) ($episode['title'] ?? 'Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
-            <?php if (!empty($episode['description'])): ?>
-              <div class="desc"><?= renderMarkdown((string) $episode['description']) ?></div>
-            <?php endif; ?>
             <?php if (!empty($episode['audio_url'])): ?>
+              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
+                Tu navegador no soporta audio HTML5.
+              </audio>
+              <?php // Duración, tamaño y descarga debajo del reproductor. ?>
               <p class="audio-meta">
                 <?php if (!empty($episode['duration'])): ?>
                   Duración: <?= esc((string) $episode['duration']) ?>
@@ -99,9 +100,10 @@ if ($error !== '') {
                 <?php endif; ?>
                 <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download>Descargar</a>
               </p>
-              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
-                Tu navegador no soporta audio HTML5.
-              </audio>
+            <?php endif; ?>
+            <?php if (!empty($episode['description'])): ?>
+              <hr>
+              <div class="desc"><?= renderMarkdown((string) $episode['description']) ?></div>
             <?php endif; ?>
           </div>
         </article>
