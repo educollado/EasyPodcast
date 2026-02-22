@@ -121,7 +121,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
       <?php endif; ?>
     </main>
     <footer class="site-footer">
-      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> with ❤️ from <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
+      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> with ❤️ by <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
     </footer>
   </div>
 </body>

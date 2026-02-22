@@ -88,21 +88,21 @@ if ($error !== '') {
               <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
                 Tu navegador no soporta audio HTML5.
               </audio>
-              <?php // Duración, tamaño y descarga debajo del reproductor. ?>
+              <?php // Metadatos de audio: enlace de descarga con duración y tamaño entre paréntesis. ?>
+              <?php
+                $duration    = trim((string) ($episode['duration'] ?? ''));
+                $readableSize = formatBytes($episode['audio_size_bytes'] ?? 0);
+                // Construye la parte entre paréntesis solo con los datos disponibles.
+                $metaParts = [];
+                if ($duration !== '')    $metaParts[] = 'Duración: ' . $duration;
+                if ($readableSize !== '') $metaParts[] = $readableSize;
+                $metaParens = $metaParts ? ' (' . implode(' — ', $metaParts) . ')' : '';
+              ?>
               <p class="audio-meta">
-                <?php if (!empty($episode['duration'])): ?>
-                  Duración: <?= esc((string) $episode['duration']) ?>
-                <?php endif; ?>
-                <?php $readableSize = formatBytes($episode['audio_size_bytes'] ?? 0); ?>
-                <?php if ($readableSize !== ''): ?>
-                  <?php if (!empty($episode['duration'])): ?> · <?php endif; ?>
-                  Tamaño: <?= esc($readableSize) ?>
-                <?php endif; ?>
-                <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download>Descargar</a>
+                <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download>Descargar</a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['description'])): ?>
-              <hr>
               <div class="desc"><?= renderMarkdown((string) $episode['description']) ?></div>
             <?php endif; ?>
           </div>
@@ -110,7 +110,7 @@ if ($error !== '') {
       <?php endif; ?>
     </main>
     <footer class="site-footer">
-      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> with ❤️ from <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
+      <a href="https://github.com/educollado/EasyPodcast" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, made in <strong>Europe</strong> with ❤️ by <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>
     </footer>
   </div>
 </body>
