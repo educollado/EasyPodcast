@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7
+
+- Modo oscuro con toggle 🌙/☀️ en la cabecera pública: preferencia guardada en `localStorage` del navegador, sin cambios en BD.
+- Script anti-FOUC en `<head>` para aplicar el tema antes del primer render y evitar parpadeo.
+- CSS de modo oscuro en `assets/css/dark.css` con `html[data-theme="dark"]` (especificidad superior a `:root`).
+- Reordenación del contenido en la página de episodio: título → fecha → reproductor → metadatos → descripción.
+- Nuevo formato de metadatos de audio: `Descargar (Duración: X — Y MB)`.
+- Pie de página actualizado: *EasyPodcast, made in **Europe** with ❤️ by Eduardo Collado*.
+
 ## 0.6
 
 - Editor Markdown con vista previa en tiempo real para la descripción de episodios en administración (`lib/markdown_editor.php`).

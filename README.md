@@ -4,7 +4,7 @@
 
 ## Versión
 
-**Versión actual: 0.6**
+**Versión actual: 0.7**
 
 ## Sitio de referencia
 
@@ -38,9 +38,9 @@
   - buscador de episodios en cabecera
 - Página de episodio (`episode.php`) con:
   - URL amigable `/YYYY/MM/slug`
-  - descripción completa renderizada como Markdown
-  - duración, tamaño y descarga
   - reproductor inline
+  - enlace de descarga con duración y tamaño: `Descargar (Duración: X — Y MB)`
+  - descripción completa renderizada como Markdown
   - buscador de episodios en cabecera
 - Página de búsqueda (`search.php`) con:
   - búsqueda por título y descripción en episodios `published`
@@ -302,7 +302,8 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 |---|---|
 | `assets/css/index.css` | Portada pública |
 | `assets/css/episode.css` | Página de episodio |
-| `assets/css/header.css` | Cabecera pública compartida (index/episode/search) |
+| `assets/css/header.css` | Cabecera pública compartida (index/episode/search) + botón modo oscuro |
+| `assets/css/dark.css` | Modo oscuro (variables y fondo; cargado el último para ganar en cascada) |
 | `assets/css/admin.css` | Login/panel admin |
 | `assets/css/podcast_management.css` | Gestión podcast |
 | `assets/css/episodes_management.css` | Gestión episodios |
