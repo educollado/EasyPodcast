@@ -31,6 +31,10 @@ $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
   </div>
 </header>
 <script>
+// Toggle de modo oscuro.
+// El script vive aquí (justo tras el botón en el DOM) para poder adjuntar
+// el listener sin esperar DOMContentLoaded.
+// La preferencia se persiste en localStorage; la BD no se toca.
 (function () {
   var btn  = document.getElementById('themeToggle');
   var html = document.documentElement;

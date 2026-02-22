@@ -49,6 +49,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <meta property="og:image" content="<?= esc($ogImage) ?>">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
+  <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/index.css">
   <link rel="stylesheet" href="/assets/css/header.css">
