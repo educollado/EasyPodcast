@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/lib/view_helpers.php';
+
 // Generador RSS compartido usado por:
 // - feed.php para salida dinámica
 // - flujos de administración para regenerar feed.xml tras cambios
@@ -210,7 +212,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
     $xml->writeElement('title', (string) $podcast['title']);
     $xml->writeElement('link', (string) $podcast['link']);
     $xml->startElement('description');
-    $xml->writeCdata((string) $podcast['description']);
+    $xml->writeCdata(stripMarkdown((string) $podcast['description']));
     $xml->endElement();
 
     writeTextIfNotEmpty($xml, 'language', $podcast['language'] ?? 'es-ES');
@@ -266,7 +268,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
         $xml->writeElement('title', (string) $episode['title']);
 
         $xml->startElement('description');
-        $xml->writeCdata((string) $episode['description']);
+        $xml->writeCdata(stripMarkdown((string) $episode['description']));
         $xml->endElement();
 
         $episodeLink = $episode['link'] ?: $episode['audio_url'];
