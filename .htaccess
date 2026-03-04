@@ -1,3 +1,7 @@
+# Páginas de error personalizadas.
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+
 <IfModule mod_rewrite.c>
 RewriteEngine on
 # Fuerza HTTPS en todas las rutas.
