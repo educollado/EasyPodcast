@@ -33,10 +33,11 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Capítulos Existentes</title>
-  <link rel="stylesheet" href="/assets/css/episodes_management.css">
+  <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
-  <div class="container">
+  <?php $currentAdminPage = 'episodes'; require __DIR__ . '/admin_nav.php'; ?>
+  <div class="admin-wrap">
     <section class="card list-card">
       <div class="title-row">
         <h1>Capítulos Existentes</h1>
@@ -103,9 +104,6 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
         </nav>
       <?php endif; ?>
 
-      <div class="actions">
-        <a class="btn back" href="admin.php">Volver al panel</a>
-      </div>
     </section>
   </div>
 </body>

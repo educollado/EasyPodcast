@@ -29,10 +29,11 @@ extract($data);  // form, error, notice
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestión Podcast</title>
-  <link rel="stylesheet" href="/assets/css/podcast_management.css">
+  <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
-  <div class="container">
+  <?php $currentAdminPage = 'podcast'; require __DIR__ . '/admin_nav.php'; ?>
+  <div class="admin-wrap">
     <main class="card">
       <h1>Gestión Podcast</h1>
       <p>Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>.</p>
@@ -139,14 +140,12 @@ extract($data);  // form, error, notice
 
         <div class="actions">
           <a class="btn back" href="admin.php">Volver al panel</a>
+          <form method="post" action="podcast_management.php" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+            <input type="hidden" name="cache_action" value="clear_cache">
+            <button class="btn back" type="submit">Borrar caché</button>
+          </form>
           <button class="btn" type="submit">Guardar podcast</button>
-        </div>
-      </form>
-      <form method="post" action="podcast_management.php" style="margin-top: .8rem;">
-        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
-        <input type="hidden" name="cache_action" value="clear_cache">
-        <div class="actions">
-          <button class="btn" type="submit">Borrar caché</button>
         </div>
       </form>
     </main>

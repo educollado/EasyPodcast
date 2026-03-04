@@ -32,12 +32,13 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></title>
-  <link rel="stylesheet" href="/assets/css/episodes_management.css">
+  <link rel="stylesheet" href="/assets/css/admin-common.css">
   <!-- EasyMDE: editor Markdown con barra de herramientas (solo en admin, cargado desde CDN) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 </head>
 <body>
-  <div class="container">
+  <?php $currentAdminPage = 'add'; require __DIR__ . '/admin_nav.php'; ?>
+  <div class="admin-wrap">
     <main class="card">
       <h1><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></h1>
       <p><?= $isEditing ? 'Edita el capítulo seleccionado.' : 'Completa los datos para insertar un episodio en la tabla <strong>episodes</strong>.' ?></p>
@@ -164,7 +165,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
       </form>
     </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js" defer></script>
   <script>
     // Inicializa EasyMDE sobre el textarea de descripción.
     // forceSync: true mantiene el textarea original sincronizado en cada pulsación,

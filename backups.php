@@ -33,10 +33,12 @@ extract($data); // error, notice, imagesExport, audiosExport
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Copias de seguridad</title>
-  <link rel="stylesheet" href="/assets/css/admin.css">
+  <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
-  <main class="card backups-card">
+  <?php $currentAdminPage = 'backups'; require __DIR__ . '/admin_nav.php'; ?>
+  <div class="admin-wrap">
+  <main class="card">
     <h1>Copias de seguridad</h1>
     <p>Gestiona por separado la base de datos y los ficheros multimedia.</p>
 
@@ -149,9 +151,9 @@ extract($data); // error, notice, imagesExport, audiosExport
     </div>
 
     <div class="actions">
-      <a class="btn manage" href="admin.php">Volver al panel</a>
-      <a class="btn logout" href="admin.php?logout=1">Cerrar sesión</a>
+      <a class="btn back" href="admin.php">Volver al panel</a>
     </div>
   </main>
+  </div>
 </body>
 </html>
