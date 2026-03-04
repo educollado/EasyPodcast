@@ -15,7 +15,13 @@ require_once __DIR__ . '/lib/episode_seo.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
-if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
+
+// Detecta sesión de admin para permitir previsualización de borradores.
+session_start();
+$isAdminPreview = isset($_SESSION['admin_user']);
+
+// No sirve caché si hay sesión de admin (podría haber drafts o cambios recientes).
+if (!$isAdminPreview && tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
     exit;
 }
 ob_start();
@@ -24,8 +30,10 @@ $year  = trim((string) ($_GET['year'] ?? ''));
 $month = trim((string) ($_GET['month'] ?? ''));
 $slug  = trim((string) ($_GET['slug'] ?? ''));
 
-$data = loadEpisodeData($dbPath, $year, $month, $slug);
+$data = loadEpisodeData($dbPath, $year, $month, $slug, $isAdminPreview);
 extract($data);  // podcast, episode, error, httpStatus
+
+$isDraft = $episode !== null && ($episode['status'] ?? '') === 'draft';
 
 if ($httpStatus !== 200) {
     http_response_code($httpStatus);
@@ -71,6 +79,12 @@ if ($error !== '') {
   <div class="container">
     <?php require __DIR__ . '/header.php'; ?>
 
+    <?php if ($isDraft): ?>
+    <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600;color:#664d03;">
+      <span aria-hidden="true">✏️</span> Borrador — Esta página no está publicada y solo es visible para administradores.
+    </div>
+    <?php endif; ?>
+
     <main class="card">
       <?php if ($error !== ''): ?>
         <p class="error"><?= esc($error) ?></p>
@@ -115,7 +129,8 @@ if ($error !== '') {
 </html>
 <?php
 $cachedOutput = ob_get_contents();
-if (is_string($cachedOutput)) {
+// No cachear borradores ni vistas de admin.
+if (!$isAdminPreview && is_string($cachedOutput)) {
     storeWebCache($dbPath, $cachedOutput);
 }
 ob_end_flush();

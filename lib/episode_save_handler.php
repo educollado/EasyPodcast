@@ -32,13 +32,13 @@ function validateEpisodeForm(array $form): ?string
         return 'El tipo de episodio debe ser full, trailer o bonus.';
     }
 
-    if (($form['title'] ?? '') === '' || ($form['description'] ?? '') === '' || ($form['pub_date'] ?? '') === '') {
-        return 'Título, descripción y fecha de publicación son obligatorios.';
+    if (($form['title'] ?? '') === '' || ($form['description'] ?? '') === '') {
+        return 'Título y descripción son obligatorios.';
     }
 
-    // Separamos la comprobación "vacío" (arriba) de "formato inválido" (aquí)
-    // para dar mensajes de error diferenciados al usuario.
-    if (normalizeDateTime($form['pub_date']) === null) {
+    // Valida el formato solo si pub_date viene informado (puede llegar vacío cuando
+    // saveEpisode aún no lo ha auto-completado, o en tests que pasen un valor explícito).
+    if (($form['pub_date'] ?? '') !== '' && normalizeDateTime($form['pub_date']) === null) {
         return 'La fecha de publicación no es válida.';
     }
 
@@ -72,8 +72,9 @@ function episodeFormDefaults(array $podcastDefaults): array
         'title'            => '',
         'description'      => '',
         'link'             => '',
-        // pub_date se inicializa al momento actual para que el campo no quede vacío.
-        'pub_date'         => date('Y-m-d\\TH:i'),
+        // pub_date se gestiona automáticamente: no se muestra en el formulario.
+        // Se asigna en saveEpisode según el estado del episodio.
+        'pub_date'         => '',
         'audio_url'        => '',
         'audio_mime_type'  => 'audio/mpeg',
         'audio_size_bytes' => '',
@@ -145,6 +146,39 @@ function saveEpisode(
     array $files,
     bool $rewriteAudioMetadata
 ): array {
+    // 0. Estado previo del episodio (solo en edición).
+    // Necesitamos saber si el episodio estaba en draft para detectar la primera publicación
+    // y asignar la fecha real de publicación en ese momento.
+    $previousStatus  = null;
+    $existingPubDate = null;
+    if ($isEditing && $episodeId !== null) {
+        $prevStmt = $pdo->prepare('SELECT status, pub_date FROM episodes WHERE id = :id LIMIT 1');
+        $prevStmt->execute([':id' => $episodeId]);
+        $prev = $prevStmt->fetch();
+        if ($prev) {
+            $previousStatus  = (string) ($prev['status'] ?? '');
+            $existingPubDate = (string) ($prev['pub_date'] ?? '');
+        }
+    }
+
+    // ¿Es la primera vez que este episodio se publica?
+    $isFirstPublish = $form['status'] === 'published'
+        && $isEditing
+        && $previousStatus === 'draft';
+
+    // Auto-asignación de pub_date (el formulario ya no expone este campo):
+    // - Episodio nuevo (draft o published): fecha actual (momento de creación).
+    // - Re-edición de draft sin cambio de estado: conserva la fecha de creación almacenada.
+    // - Primera publicación (draft → published): actualiza a la fecha actual (momento de publicación).
+    // - Re-edición de published: conserva la fecha de publicación original.
+    if (!$isEditing) {
+        $form['pub_date'] = date('Y-m-d\\TH:i');
+    } elseif ($isFirstPublish) {
+        $form['pub_date'] = date('Y-m-d\\TH:i');
+    } else {
+        $form['pub_date'] = $existingPubDate !== '' ? $existingPubDate : date('Y-m-d\\TH:i');
+    }
+
     // 1. Validación básica del formulario.
     // Se hace antes de cualquier operación de I/O para fallar rápido.
     $validationError = validateEpisodeForm($form);
@@ -227,9 +261,11 @@ function saveEpisode(
         }
     }
 
-    // 7. Link público autogenerado solo al crear.
-    // En edición se respeta el link existente para no romper URLs indexadas.
-    if (!$isEditing && $form['link'] === '') {
+    // 7. Link público: se genera al crear o al publicar por primera vez (draft → published).
+    // En la primera publicación se regenera con la fecha real de publicación aunque ya
+    // hubiera un link provisional basado en la fecha de creación del borrador.
+    // En re-edición de episodios publicados se respeta el link existente para no romper URLs indexadas.
+    if (!$isEditing || $isFirstPublish) {
         $form['link'] = buildEpisodePublicLink($baseUrl, $pubDateNormalized, $form['title']);
     }
 

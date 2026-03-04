@@ -124,8 +124,8 @@ function loadAddEpisodeData(string $dbPath): array
             $error     = $result['error'];
             $notice    = $result['notice'];
             $id3Notice = $result['id3Notice'];
-            // saveEpisode devuelve pub_date en formato SQL; se convierte al formato de datetime-local.
-            $form['pub_date'] = formatDateTimeLocal($form['pub_date']);
+            // pub_date ya no se muestra en el formulario; se limpia para no exponer la fecha interna.
+            $form['pub_date'] = '';
         }
     } catch (Throwable $e) {
         $message = $e->getMessage();

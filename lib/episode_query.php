@@ -9,10 +9,11 @@ require_once __DIR__ . '/public_episode_helpers.php';
  * Carga el podcast y el episodio resolviendo la URL amigable /YYYY/MM/slug.
  * Devuelve httpStatus 404 si el episodio no existe o los parámetros son inválidos,
  * y 500 en caso de error de BD. El dispatcher debe llamar a http_response_code().
+ * Si $allowDraft es true también busca entre episodios en estado 'draft' (solo para admin).
  *
  * @return array{podcast:?array, episode:?array, error:string, httpStatus:int}
  */
-function loadEpisodeData(string $dbPath, string $year, string $month, string $slug): array
+function loadEpisodeData(string $dbPath, string $year, string $month, string $slug, bool $allowDraft = false): array
 {
     $podcast = null;
     $episode = null;
@@ -32,10 +33,14 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 
         // Filtra por año/mes de URL y resuelve el episodio exacto por slug.
+        // Con $allowDraft también se incluyen borradores (solo para previsualización de admin).
+        $statusClause = $allowDraft
+            ? "status IN ('published', 'draft')"
+            : "status = 'published'";
         $stmt = $pdo->prepare(
             "SELECT *
              FROM episodes
-             WHERE status = 'published'
+             WHERE $statusClause
                AND strftime('%Y', pub_date) = :year
                AND strftime('%m', pub_date) = :month
              ORDER BY datetime(pub_date) DESC, id DESC"

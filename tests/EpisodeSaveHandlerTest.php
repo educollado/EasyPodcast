@@ -37,19 +37,20 @@ test('validateEpisodeForm: formulario válido → null', function () {
 test('validateEpisodeForm: título vacío → error de obligatorio', function () {
     $form = makeValidForm();
     $form['title'] = '';
-    assert_eq('Título, descripción y fecha de publicación son obligatorios.', validateEpisodeForm($form));
+    assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
 });
 
 test('validateEpisodeForm: descripción vacía → error de obligatorio', function () {
     $form = makeValidForm();
     $form['description'] = '';
-    assert_eq('Título, descripción y fecha de publicación son obligatorios.', validateEpisodeForm($form));
+    assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
 });
 
-test('validateEpisodeForm: pub_date vacío → error de obligatorio', function () {
+test('validateEpisodeForm: pub_date vacío → null (se asigna automáticamente)', function () {
+    // pub_date ya no es obligatorio en el formulario; saveEpisode lo auto-asigna.
     $form = makeValidForm();
     $form['pub_date'] = '';
-    assert_eq('Título, descripción y fecha de publicación son obligatorios.', validateEpisodeForm($form));
+    assert_null(validateEpisodeForm($form));
 });
 
 test('validateEpisodeForm: explicit inválido → error', function () {

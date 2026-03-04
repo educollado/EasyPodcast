@@ -62,8 +62,11 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
             <input type="text" name="guid" value="<?= esc($form['guid']) ?>" placeholder="Si está vacío se genera automáticamente">
           </label>
           <label>
-            Fecha de publicación *
-            <input id="pub_date" type="datetime-local" name="pub_date" value="<?= esc($form['pub_date']) ?>" required>
+            Estado
+            <select name="status">
+              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
+              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
+            </select>
           </label>
         </div>
 
@@ -146,13 +149,6 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
             Autor
             <input type="text" name="author" value="<?= esc($form['author']) ?>">
           </label>
-          <label>
-            Estado
-            <select name="status">
-              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
-              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
-            </select>
-          </label>
         </div>
 
         <div class="actions">
@@ -196,7 +192,6 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
       var durationInput = document.getElementById('duration');
       var mimeInput = document.getElementById('audio_mime_type');
       var titleInput = document.getElementById('title');
-      var pubDateInput = document.getElementById('pub_date');
       var linkInput = document.getElementById('episode_link');
       var generateLinkButton = document.getElementById('generate_link_button');
 
@@ -225,18 +220,16 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
       }
 
       function buildEpisodeLink() {
-        if (!titleInput || !pubDateInput || !linkInput) {
+        if (!titleInput || !linkInput) {
           return;
         }
         var title = (titleInput.value || '').trim();
         if (!title) {
           return;
         }
-        var rawDate = (pubDateInput.value || '').trim();
-        var date = rawDate ? new Date(rawDate) : new Date();
-        if (!Number.isFinite(date.getTime())) {
-          date = new Date();
-        }
+        // pub_date ya no existe en el formulario; el servidor la asigna automáticamente.
+        // Para previsualizar la URL usamos la fecha actual como aproximación.
+        var date = new Date();
         var year = String(date.getFullYear());
         var month = String(date.getMonth() + 1).padStart(2, '0');
         linkInput.value = window.location.origin + '/' + year + '/' + month + '/' + slugify(title);
