@@ -104,7 +104,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <input type="url" name="audio_url" value="<?= esc($form['audio_url']) ?>">
             <span class="help">Si subes audio, esta URL se rellena automáticamente con /audios/fichero.</span>
           </label>
-          <label>
+          <label style="align-self: start">
             O subir audio del capítulo
             <input id="audio_file" type="file" name="audio_file" accept="audio/*">
           </label>
@@ -136,6 +136,15 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             Número de episodio
             <input type="number" name="episode_number" min="0" step="1" value="<?= esc($form['episode_number']) ?>">
           </label>
+          <label>
+            Imagen del capítulo (URL)
+            <input type="url" name="image_url" value="<?= esc($form['image_url']) ?>">
+            <span class="help">Si subes imagen, esta URL se rellena automáticamente con /images/fichero.</span>
+          </label>
+          <label style="align-self: start">
+            O subir imagen del capítulo
+            <input type="file" name="image_file" accept="image/*">
+          </label>
           <label style="align-self: start">
             Tipo de episodio
             <select name="episode_type">
@@ -144,15 +153,6 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
               <option value="trailer" <?= $form['episode_type'] === 'trailer' ? 'selected' : '' ?>>trailer</option>
               <option value="bonus" <?= $form['episode_type'] === 'bonus' ? 'selected' : '' ?>>bonus</option>
             </select>
-          </label>
-          <label>
-            Imagen del capítulo (URL)
-            <input type="url" name="image_url" value="<?= esc($form['image_url']) ?>">
-            <span class="help">Si subes imagen, esta URL se rellena automáticamente con /images/fichero.</span>
-          </label>
-          <label>
-            O subir imagen del capítulo
-            <input type="file" name="image_file" accept="image/*">
           </label>
           <label>
             Autor
