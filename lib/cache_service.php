@@ -145,6 +145,36 @@ function storeWebCache(string $dbPath, string $body): void
 }
 
 /**
+ * Borra todas las variantes de imagen generadas en images/generated/.
+ * Devuelve true si todos los ficheros se eliminaron correctamente, false si alguno falló.
+ */
+function clearImageCache(): bool
+{
+    $dir = dirname(__DIR__) . '/images/generated';
+    if (!is_dir($dir)) {
+        return true;
+    }
+
+    $ok = true;
+    $entries = @scandir($dir);
+    if (!is_array($entries)) {
+        return false;
+    }
+
+    foreach ($entries as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $path = $dir . '/' . $entry;
+        if (is_file($path) && !@unlink($path)) {
+            $ok = false;
+        }
+    }
+
+    return $ok;
+}
+
+/**
  * Borra todos los ficheros del directorio de caché.
  * Devuelve true si todos los ficheros se eliminaron correctamente, false si alguno falló.
  */

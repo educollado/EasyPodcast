@@ -170,7 +170,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
       </form>
     </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
   <script>
     // Inicializa EasyMDE sobre el textarea de descripción.
     // forceSync: true mantiene el textarea original sincronizado en cada pulsación,

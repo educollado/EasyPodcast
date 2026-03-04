@@ -221,7 +221,9 @@ function loadPodcastManagementData(string $dbPath): array
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['cache_action'] ?? '') === 'clear_cache') {
             csrf_verify();
-            if (clearWebCache()) {
+            $webOk   = clearWebCache();
+            $imageOk = clearImageCache();
+            if ($webOk && $imageOk) {
                 $notice = 'Caché borrada correctamente.';
             } else {
                 $error = 'No se pudo borrar completamente la caché.';

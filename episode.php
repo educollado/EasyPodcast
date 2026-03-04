@@ -129,8 +129,9 @@ if ($error !== '') {
 </html>
 <?php
 $cachedOutput = ob_get_contents();
-// No cachear borradores ni vistas de admin.
-if (!$isAdminPreview && is_string($cachedOutput)) {
+// No cachear borradores (podrían verse en caché por usuarios no autenticados).
+// Los admins siguen viendo siempre contenido fresco (tryServeWebCache los salta).
+if (!$isDraft && is_string($cachedOutput)) {
     storeWebCache($dbPath, $cachedOutput);
 }
 ob_end_flush();
