@@ -4,7 +4,14 @@
 
 ## Versión
 
-**Versión actual: 0.7**
+**Versión actual: 0.8**
+
+## Novedades 0.8
+
+- Rediseño visual completo del frontend público (`index.php`, `episode.php`, `search.php`, `header.php` y `footer.php`).
+- Rediseño visual del panel de administración con navegación compartida y estilos comunes.
+- `robots.txt` dinámico (servido por `robots.php`) con `Sitemap` calculado a partir del dominio configurado en BD.
+- El feed RSS limpia sintaxis Markdown en descripciones para publicar texto plano.
 
 ## Sitio de referencia
 
@@ -19,7 +26,7 @@
 |---|---|
 | Web pública | Portada con episodios `published`, página individual por episodio, reproductor inline |
 | Feed | RSS dinámico (`feed.php`) y feed generado (`feed.xml`) |
-| SEO/Indexación | `robots.txt` y `sitemap.xml` estático regenerable |
+| SEO/Indexación | `robots.txt` dinámico + `sitemap.xml` estático regenerable |
 | Caché | Caché pública en `cache/` (configurable desde administración) |
 | Administración | Login, gestión del canal, alta/edición/borrado de episodios, copias de seguridad y metadatos ID3 |
 | Subidas | Audio a `audios/`, imágenes a `images/` |
@@ -76,7 +83,7 @@
 - Datos estructurados JSON-LD:
   - `PodcastSeries` en portada
   - `PodcastEpisode` en detalle de episodio
-- `robots.txt`: reglas de rastreo para buscadores.
+- `robots.txt` dinámico servido por `robots.php` (rewrite en `.htaccess`) con `Sitemap` calculado desde `podcast.link`.
 - `sitemap.xml`: sitemap XML estático regenerado automáticamente tras cambios en administración.
 
 ### Caché
@@ -103,13 +110,15 @@
 | `episode.php` | Página pública de episodio |
 | `search.php` | Página pública de búsqueda de episodios |
 | `header.php` | Cabecera pública compartida (título/autor/descripción + RSS + buscador) |
+| `footer.php` | Pie público compartido para páginas públicas |
 | `feed.php` | Endpoint RSS dinámico |
 | `sitemap.xml` | Sitemap estático regenerado automáticamente |
 | `lib/sitemap_builder.php` | Constructor y escritura de `sitemap.xml` |
 | `feed_builder.php` | Constructor de RSS + escritura de `feed.xml` |
 | `feed.xml` | Feed generado |
-| `robots.txt` | Reglas para rastreadores web |
+| `robots.php` | Generador dinámico de `robots.txt` |
 | `admin.php` | Panel de administración |
+| `admin_nav.php` | Navegación compartida del panel admin |
 | `podcast_management.php` | Gestión del canal |
 | `episodes_management.php` | Gestión de episodios |
 | `backups.php` | Copias de seguridad de base de datos y ficheros |
@@ -300,10 +309,12 @@ Para crear temas, modifica o reemplaza los archivos de `assets/css/`.
 
 | CSS | Página asociada |
 |---|---|
+| `assets/css/common.css` | Estilos base compartidos de la parte pública |
 | `assets/css/index.css` | Portada pública |
 | `assets/css/episode.css` | Página de episodio |
 | `assets/css/header.css` | Cabecera pública compartida (index/episode/search) + botón modo oscuro |
 | `assets/css/dark.css` | Modo oscuro (variables y fondo; cargado el último para ganar en cascada) |
+| `assets/css/admin-common.css` | Estilos base compartidos del área de administración |
 | `assets/css/admin.css` | Login/panel admin |
 | `assets/css/podcast_management.css` | Gestión podcast |
 | `assets/css/episodes_management.css` | Gestión episodios |
@@ -342,4 +353,3 @@ El renderizado lo realiza `renderMarkdown()` en `lib/view_helpers.php` (PHP puro
 EasyPodcast es **Software Libre** y se distribuye bajo **GNU GPL v3 o posterior (GPL-3.0-or-later)**.
 
 Consulta `LICENSE` para los términos completos.
-

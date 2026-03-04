@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8
+
+- Rediseño visual completo del frontend público (`index.php`, `episode.php`, `search.php`, `header.php` y CSS asociados).
+- Rediseño visual del panel de administración con navegación compartida (`admin_nav.php`) y estilos comunes (`assets/css/admin-common.css`).
+- `robots.txt` pasa a servirse de forma dinámica desde `robots.php` (rewrite en `.htaccess`) usando el dominio configurado en `podcast.link`.
+- Footer público extraído a parcial reutilizable (`footer.php`) con enlace `rel="me"` a Mastodon para verificación.
+- Sustitución de iconografía raster/emojis por SVG inline (icono RSS y toggle de tema).
+- Feed RSS: limpieza de sintaxis Markdown en descripciones para publicar texto plano.
+
 ## 0.7
 
 - Modo oscuro con toggle 🌙/☀️ en la cabecera pública: preferencia guardada en `localStorage` del navegador, sin cambios en BD.
