@@ -83,10 +83,165 @@ extract($data);  // form, error, notice
             Owner email
             <input type="email" name="owner_email" value="<?= esc($form['owner_email']) ?>">
           </label>
-          <label>
-            Categorías (separadas por coma)
-            <input type="text" name="category" value="<?= esc($form['category']) ?>" placeholder="Technology, Education">
-          </label>
+          <div class="label-block">
+            Categorías <small>(máx. 3 — Apple Podcasts)</small>
+            <div class="category-picker">
+              <div class="category-chips" id="category-chips"></div>
+              <select id="category-select">
+                <option value="">Añadir categoría...</option>
+                <optgroup label="Arts">
+                  <option value="Arts">Arts</option>
+                  <option value="Books">Books</option>
+                  <option value="Design">Design</option>
+                  <option value="Fashion &amp; Beauty">Fashion &amp; Beauty</option>
+                  <option value="Food">Food</option>
+                  <option value="Performing Arts">Performing Arts</option>
+                  <option value="Visual Arts">Visual Arts</option>
+                </optgroup>
+                <optgroup label="Business">
+                  <option value="Business">Business</option>
+                  <option value="Careers">Careers</option>
+                  <option value="Entrepreneurship">Entrepreneurship</option>
+                  <option value="Investing">Investing</option>
+                  <option value="Management">Management</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Non-Profit">Non-Profit</option>
+                </optgroup>
+                <optgroup label="Comedy">
+                  <option value="Comedy">Comedy</option>
+                  <option value="Comedy Interviews">Comedy Interviews</option>
+                  <option value="Improv">Improv</option>
+                  <option value="Stand-Up">Stand-Up</option>
+                </optgroup>
+                <optgroup label="Education">
+                  <option value="Education">Education</option>
+                  <option value="Courses">Courses</option>
+                  <option value="How To">How To</option>
+                  <option value="Language Learning">Language Learning</option>
+                  <option value="Self-Improvement">Self-Improvement</option>
+                </optgroup>
+                <optgroup label="Fiction">
+                  <option value="Fiction">Fiction</option>
+                  <option value="Comedy Fiction">Comedy Fiction</option>
+                  <option value="Drama">Drama</option>
+                  <option value="Science Fiction">Science Fiction</option>
+                </optgroup>
+                <optgroup label="Government">
+                  <option value="Government">Government</option>
+                </optgroup>
+                <optgroup label="History">
+                  <option value="History">History</option>
+                </optgroup>
+                <optgroup label="Health &amp; Fitness">
+                  <option value="Health &amp; Fitness">Health &amp; Fitness</option>
+                  <option value="Alternative Health">Alternative Health</option>
+                  <option value="Fitness">Fitness</option>
+                  <option value="Medicine">Medicine</option>
+                  <option value="Mental Health">Mental Health</option>
+                  <option value="Nutrition">Nutrition</option>
+                  <option value="Sexuality">Sexuality</option>
+                </optgroup>
+                <optgroup label="Kids &amp; Family">
+                  <option value="Kids &amp; Family">Kids &amp; Family</option>
+                  <option value="Education for Kids">Education for Kids</option>
+                  <option value="Parenting">Parenting</option>
+                  <option value="Pets &amp; Animals">Pets &amp; Animals</option>
+                  <option value="Stories for Kids">Stories for Kids</option>
+                </optgroup>
+                <optgroup label="Leisure">
+                  <option value="Leisure">Leisure</option>
+                  <option value="Animation &amp; Manga">Animation &amp; Manga</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Aviation">Aviation</option>
+                  <option value="Crafts">Crafts</option>
+                  <option value="Games">Games</option>
+                  <option value="Hobbies">Hobbies</option>
+                  <option value="Home &amp; Garden">Home &amp; Garden</option>
+                  <option value="Video Games">Video Games</option>
+                </optgroup>
+                <optgroup label="Music">
+                  <option value="Music">Music</option>
+                  <option value="Music Commentary">Music Commentary</option>
+                  <option value="Music History">Music History</option>
+                  <option value="Music Interviews">Music Interviews</option>
+                </optgroup>
+                <optgroup label="News">
+                  <option value="News">News</option>
+                  <option value="Business News">Business News</option>
+                  <option value="Daily News">Daily News</option>
+                  <option value="Entertainment News">Entertainment News</option>
+                  <option value="News Commentary">News Commentary</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Sports News">Sports News</option>
+                  <option value="Tech News">Tech News</option>
+                </optgroup>
+                <optgroup label="Religion &amp; Spirituality">
+                  <option value="Religion &amp; Spirituality">Religion &amp; Spirituality</option>
+                  <option value="Buddhism">Buddhism</option>
+                  <option value="Christianity">Christianity</option>
+                  <option value="Hinduism">Hinduism</option>
+                  <option value="Islam">Islam</option>
+                  <option value="Judaism">Judaism</option>
+                  <option value="Religion">Religion</option>
+                  <option value="Spirituality">Spirituality</option>
+                </optgroup>
+                <optgroup label="Science">
+                  <option value="Science">Science</option>
+                  <option value="Astronomy">Astronomy</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Earth Sciences">Earth Sciences</option>
+                  <option value="Life Sciences">Life Sciences</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Natural Sciences">Natural Sciences</option>
+                  <option value="Nature">Nature</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Social Sciences">Social Sciences</option>
+                </optgroup>
+                <optgroup label="Society &amp; Culture">
+                  <option value="Society &amp; Culture">Society &amp; Culture</option>
+                  <option value="Documentary">Documentary</option>
+                  <option value="Personal Journals">Personal Journals</option>
+                  <option value="Philosophy">Philosophy</option>
+                  <option value="Places &amp; Travel">Places &amp; Travel</option>
+                  <option value="Relationships">Relationships</option>
+                </optgroup>
+                <optgroup label="Sports">
+                  <option value="Sports">Sports</option>
+                  <option value="Baseball">Baseball</option>
+                  <option value="Basketball">Basketball</option>
+                  <option value="Cricket">Cricket</option>
+                  <option value="Fantasy Sports">Fantasy Sports</option>
+                  <option value="Football">Football</option>
+                  <option value="Golf">Golf</option>
+                  <option value="Hockey">Hockey</option>
+                  <option value="Rugby">Rugby</option>
+                  <option value="Running">Running</option>
+                  <option value="Soccer">Soccer</option>
+                  <option value="Swimming">Swimming</option>
+                  <option value="Tennis">Tennis</option>
+                  <option value="Track">Track</option>
+                  <option value="Volleyball">Volleyball</option>
+                  <option value="Wilderness">Wilderness</option>
+                  <option value="Wrestling">Wrestling</option>
+                </optgroup>
+                <optgroup label="Technology">
+                  <option value="Technology">Technology</option>
+                </optgroup>
+                <optgroup label="True Crime">
+                  <option value="True Crime">True Crime</option>
+                </optgroup>
+                <optgroup label="TV &amp; Film">
+                  <option value="TV &amp; Film">TV &amp; Film</option>
+                  <option value="After Shows">After Shows</option>
+                  <option value="Film History">Film History</option>
+                  <option value="Film Interviews">Film Interviews</option>
+                  <option value="Film Reviews">Film Reviews</option>
+                  <option value="TV Reviews">TV Reviews</option>
+                </optgroup>
+              </select>
+              <input type="hidden" name="category" id="category-hidden" value="<?= esc($form['category']) ?>">
+            </div>
+          </div>
           <label>
             Explícito
             <select name="explicit">
@@ -140,15 +295,65 @@ extract($data);  // form, error, notice
 
         <div class="actions">
           <a class="btn back" href="admin.php">Volver al panel</a>
-          <form method="post" action="podcast_management.php" style="margin:0;">
-            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
-            <input type="hidden" name="cache_action" value="clear_cache">
-            <button class="btn back" type="submit">Borrar caché</button>
-          </form>
+          <button class="btn back" type="submit" form="cache-form">Borrar caché</button>
           <button class="btn" type="submit">Guardar podcast</button>
         </div>
       </form>
+      <!-- Formulario separado para borrar caché (fuera del form principal para evitar anidamiento inválido) -->
+      <form id="cache-form" method="post" action="podcast_management.php" style="display:none;">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+        <input type="hidden" name="cache_action" value="clear_cache">
+      </form>
     </main>
   </div>
+  <script>
+  // Selector de categorías Apple Podcasts — máx. 3, almacenadas en hidden input.
+  (function () {
+    var MAX = 3;
+    var hidden = document.getElementById('category-hidden');
+    var chipsEl = document.getElementById('category-chips');
+    var sel = document.getElementById('category-select');
+
+    // Carga valores ya guardados (el hidden viene con el valor de BD).
+    var selected = hidden.value
+      ? hidden.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+      : [];
+
+    function render() {
+      chipsEl.innerHTML = '';
+      selected.forEach(function (cat) {
+        var chip = document.createElement('span');
+        chip.className = 'chip';
+        var text = document.createTextNode(cat + ' ');
+        chip.appendChild(text);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip-remove';
+        btn.textContent = '×';
+        btn.setAttribute('aria-label', 'Eliminar ' + cat);
+        btn.onclick = function () { remove(cat); };
+        chip.appendChild(btn);
+        chipsEl.appendChild(chip);
+      });
+      hidden.value = selected.join(', ');
+      sel.disabled = selected.length >= MAX;
+      sel.value = '';
+    }
+
+    function remove(cat) {
+      selected = selected.filter(function (c) { return c !== cat; });
+      render();
+    }
+
+    sel.addEventListener('change', function () {
+      var val = this.value;
+      if (!val || selected.length >= MAX) { this.value = ''; return; }
+      if (selected.indexOf(val) === -1) { selected.push(val); }
+      render();
+    });
+
+    render();
+  })();
+  </script>
 </body>
 </html>

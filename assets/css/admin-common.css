@@ -560,6 +560,69 @@ th {
 .db-import:hover { background: #2c4470; }
 
 /* =========================================================
+   Selector de categorías
+   ========================================================= */
+
+/* Contenedor que imita el label en cuanto a disposición vertical */
+.label-block {
+  display: grid;
+  gap: .3rem;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.category-picker {
+  display: grid;
+  gap: .45rem;
+}
+
+/* Zona de chips (puede estar vacía) */
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  min-height: 1.6rem;
+}
+
+/* Chip individual */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  background: rgba(181, 71, 14, .1);
+  color: var(--accent-dark);
+  border: 1px solid rgba(181, 71, 14, .25);
+  border-radius: 20px;
+  padding: .22rem .55rem .22rem .7rem;
+  font-size: .84rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.chip-remove {
+  background: none;
+  border: none;
+  color: var(--accent-dark);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  opacity: .6;
+  transition: opacity .12s;
+}
+
+.chip-remove:hover { opacity: 1; }
+
+/* Select deshabilitado al llegar al límite */
+#category-select:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 @media (max-width: 760px) {

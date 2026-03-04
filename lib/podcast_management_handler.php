@@ -294,8 +294,15 @@ function loadPodcastManagementData(string $dbPath): array
                 $form[$key] = trim((string) ($_POST[$key] ?? ''));
             }
 
+            // Valida que no supere el límite de 3 categorías de Apple Podcasts.
+            $catCount = $form['category'] !== ''
+                ? count(array_filter(array_map('trim', explode(',', $form['category']))))
+                : 0;
+
             if ($form['title'] === '' || $form['description'] === '' || $form['link'] === '') {
                 $error = 'Título, descripción y enlace son obligatorios.';
+            } elseif ($catCount > 3) {
+                $error = 'No se pueden seleccionar más de 3 categorías.';
             } elseif (
                 $form['rss_item_limit'] === ''
                 || filter_var($form['rss_item_limit'], FILTER_VALIDATE_INT) === false
