@@ -150,9 +150,6 @@ extract($data); // error, notice, imagesExport, audiosExport
       </section>
     </div>
 
-    <div class="actions">
-      <a class="btn back" href="admin.php">Volver al panel</a>
-    </div>
   </main>
   </div>
 </body>

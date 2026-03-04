@@ -294,7 +294,6 @@ extract($data);  // form, error, notice
         </div>
 
         <div class="actions">
-          <a class="btn back" href="admin.php">Volver al panel</a>
           <button class="btn back" type="submit" form="cache-form">Borrar caché</button>
           <button class="btn" type="submit">Guardar podcast</button>
         </div>

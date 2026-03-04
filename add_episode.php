@@ -161,7 +161,6 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         </div>
 
         <div class="actions">
-          <a class="btn back" href="episodes_management.php">Volver a capítulos</a>
           <?php if ($isEditing): ?>
             <a class="btn" href="<?= esc(resolveEpisodeHref($form['link'], '', $form['title'])) ?>" target="_blank">Vista previa</a>
             <button class="btn" type="submit" name="rewrite_audio_metadata" value="1">Actualizar metadatos del MP3 actual</button>
