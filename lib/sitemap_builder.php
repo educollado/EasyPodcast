@@ -3,31 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../feed_builder.php';
-
-/**
- * Convierte texto a slug URL-safe para el sitemap.
- * Implementación independiente de view_helpers.php para evitar dependencia circular.
- */
-function slugifyForSitemap(string $value): string
-{
-    $slug = trim($value);
-    if ($slug === '') {
-        return 'capitulo';
-    }
-
-    if (function_exists('iconv')) {
-        $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
-        if ($converted !== false) {
-            $slug = $converted;
-        }
-    }
-
-    $slug = strtolower($slug);
-    $slug = (string) preg_replace('/[^a-z0-9]+/', '-', $slug);
-    $slug = trim($slug, '-');
-
-    return $slug !== '' ? $slug : 'capitulo';
-}
+require_once __DIR__ . '/view_helpers.php';
 
 /**
  * Construye la ruta pública del episodio (/YYYY/MM/slug) para incluir en el sitemap.
@@ -42,7 +18,7 @@ function buildEpisodePathForSitemap(string $pubDate, string $title): string
     $year = date('Y', $ts);
     $month = date('m', $ts);
 
-    return '/' . $year . '/' . $month . '/' . slugifyForSitemap($title);
+    return '/' . $year . '/' . $month . '/' . slugify($title);
 }
 
 /**

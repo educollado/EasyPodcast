@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS episodes (
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   link TEXT,
-  pub_date TEXT NOT NULL,
+  pub_date TEXT,
   audio_url TEXT NOT NULL,
   audio_mime_type TEXT NOT NULL,
   audio_size_bytes INTEGER NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
 
-PRAGMA user_version = 1;
+PRAGMA user_version = 3;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

@@ -135,7 +135,7 @@ function loadPodcastDefaults(PDO $pdo): array
  * @param array  $podcastDefaults
  * @param array  $files                $_FILES
  * @param bool   $rewriteAudioMetadata Reescritura manual de ID3 en edición
- * @return array{error: string, notice: string, id3Notice: string, form: array}
+ * @return array{error: string, notice: string, form: array}
  */
 function saveEpisode(
     PDO $pdo,
@@ -161,36 +161,37 @@ function saveEpisode(
         }
     }
 
-    // ¿Es la primera vez que este episodio se publica?
-    $isFirstPublish = $form['status'] === 'published'
-        && $isEditing
-        && $previousStatus === 'draft';
+    // Asignación de pub_date:
+    // - Si el usuario introdujo una fecha en el formulario, se respeta siempre.
+    // - Si el campo viene vacío:
+    //     · Draft: sin fecha (NULL en BD).
+    //     · Published sin fecha previa: asigna la fecha actual (momento de publicación).
+    //     · Published con fecha ya existente: conserva la fecha original.
+    $hasPreviousPubDate = ($existingPubDate !== null && $existingPubDate !== '');
+    $userProvidedDate   = trim($form['pub_date']) !== '';
 
-    // Auto-asignación de pub_date (el formulario ya no expone este campo):
-    // - Episodio nuevo (draft o published): fecha actual (momento de creación).
-    // - Re-edición de draft sin cambio de estado: conserva la fecha de creación almacenada.
-    // - Primera publicación (draft → published): actualiza a la fecha actual (momento de publicación).
-    // - Re-edición de published: conserva la fecha de publicación original.
-    if (!$isEditing) {
-        $form['pub_date'] = date('Y-m-d\\TH:i');
-    } elseif ($isFirstPublish) {
-        $form['pub_date'] = date('Y-m-d\\TH:i');
+    if ($userProvidedDate) {
+        // El usuario eligió una fecha explícita: se usa tal cual (ya validada arriba).
+    } elseif ($form['status'] === 'published') {
+        $form['pub_date'] = $hasPreviousPubDate ? $existingPubDate : date('Y-m-d\\TH:i');
     } else {
-        $form['pub_date'] = $existingPubDate !== '' ? $existingPubDate : date('Y-m-d\\TH:i');
+        $form['pub_date'] = '';
     }
+
+    // Primera publicación: episodio publicado sin fecha previa → regenerar link con fecha real.
+    $isFirstPublish = $form['status'] === 'published' && !$hasPreviousPubDate;
 
     // 1. Validación básica del formulario.
     // Se hace antes de cualquier operación de I/O para fallar rápido.
     $validationError = validateEpisodeForm($form);
     if ($validationError !== null) {
-        return ['error' => $validationError, 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => $validationError, 'notice' => '', 'form' => $form];
     }
 
     // Normalizamos la fecha aquí una vez; la usaremos en el link autogenerado y en la BD.
     $pubDateNormalized = normalizeDateTime($form['pub_date']);
     $baseUrl = resolveBaseUrl($pdo);
 
-    // dirname(__DIR__) sube un nivel desde lib/ hasta la raíz del proyecto.
     $imagesDir = dirname(__DIR__) . '/images';
     $audiosDir = dirname(__DIR__) . '/audios';
 
@@ -200,7 +201,7 @@ function saveEpisode(
     $imageFileData = is_array($files['image_file'] ?? null) ? $files['image_file'] : ['error' => UPLOAD_ERR_NO_FILE];
     $imageResult = handleImageUpload($imageFileData, $baseUrl, $imagesDir);
     if ($imageResult['error'] !== null) {
-        return ['error' => $imageResult['error'], 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => $imageResult['error'], 'notice' => '', 'form' => $form];
     }
     if ($imageResult['url'] !== null) {
         // Solo sobreescribimos image_url si se subió imagen nueva; si no, conservamos
@@ -212,7 +213,7 @@ function saveEpisode(
     $audioFileData = is_array($files['audio_file'] ?? null) ? $files['audio_file'] : ['error' => UPLOAD_ERR_NO_FILE];
     $audioResult = handleAudioUpload($audioFileData, $form, $podcastDefaults, $baseUrl, $audiosDir);
     if ($audioResult['error'] !== null) {
-        return ['error' => $audioResult['error'], 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => $audioResult['error'], 'notice' => '', 'form' => $form];
     }
     $id3Notice = '';
     if ($audioResult['uploaded']) {
@@ -227,13 +228,13 @@ function saveEpisode(
     // Se comprueba aquí (y no en validateEpisodeForm) porque la URL y el tamaño
     // pueden provenir del fichero recién subido y no existir aún en el formulario inicial.
     if ($form['audio_url'] === '') {
-        return ['error' => 'Debes indicar la URL de audio o subir un fichero de audio.', 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => 'Debes indicar la URL de audio o subir un fichero de audio.', 'notice' => '', 'form' => $form];
     }
     if ($form['audio_mime_type'] === '') {
-        return ['error' => 'El MIME del audio es obligatorio.', 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => 'El MIME del audio es obligatorio.', 'notice' => '', 'form' => $form];
     }
     if ($form['audio_size_bytes'] === '' || !ctype_digit($form['audio_size_bytes']) || (int) $form['audio_size_bytes'] <= 0) {
-        return ['error' => 'El tamaño del audio debe ser un entero mayor que 0.', 'notice' => '', 'id3Notice' => '', 'form' => $form];
+        return ['error' => 'El tamaño del audio debe ser un entero mayor que 0.', 'notice' => '', 'form' => $form];
     }
 
     // 5. Fallbacks de defaults del podcast.
@@ -361,5 +362,5 @@ function saveEpisode(
         $notice .= ' (' . $id3Notice . ')';
     }
 
-    return ['error' => '', 'notice' => $notice, 'id3Notice' => $id3Notice, 'form' => $form];
+    return ['error' => '', 'notice' => $notice, 'form' => $form];
 }

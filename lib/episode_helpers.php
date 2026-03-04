@@ -6,6 +6,8 @@ declare(strict_types=1);
 // Helpers generales de episodio: nombres de fichero, fechas, slugs y rutas
 // ---------------------------------------------------------------------------
 
+require_once __DIR__ . '/view_helpers.php';
+
 /**
  * Genera nombres de fichero seguros y deterministas con timestamp + sufijo aleatorio.
  * Elimina caracteres no ASCII del nombre original para evitar path traversal.
@@ -100,18 +102,18 @@ function normalizeDateTime(?string $value): ?string
 
 /**
  * Convierte datetime almacenado al formato de <input type="datetime-local"> (Y-m-d\TH:i).
- * Si el valor es nulo o inválido devuelve el momento actual.
+ * Devuelve cadena vacía si el valor es nulo, vacío o no parseable.
  */
 function formatDateTimeLocal(?string $value): string
 {
     $normalized = normalizeDateTime($value);
     if ($normalized === null) {
-        return date('Y-m-d\\TH:i');
+        return '';
     }
 
     $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $normalized);
     if (!$dt instanceof DateTimeImmutable) {
-        return date('Y-m-d\\TH:i');
+        return '';
     }
 
     return $dt->format('Y-m-d\\TH:i');
@@ -124,31 +126,6 @@ function formatDateTimeLocal(?string $value): string
 function generateGuid(): string
 {
     return 'ep-' . date('YmdHis') . '-' . bin2hex(random_bytes(8));
-}
-
-/**
- * Convierte texto a slug seguro para URL usando la misma estrategia que las páginas públicas.
- * Usa iconv para transliterar caracteres no ASCII cuando está disponible.
- */
-function slugifyForUrl(string $value): string
-{
-    $slug = trim($value);
-    if ($slug === '') {
-        return 'capitulo';
-    }
-
-    if (function_exists('iconv')) {
-        $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
-        if ($converted !== false) {
-            $slug = $converted;
-        }
-    }
-
-    $slug = strtolower($slug);
-    $slug = (string) preg_replace('/[^a-z0-9]+/', '-', $slug);
-    $slug = trim($slug, '-');
-
-    return $slug !== '' ? $slug : 'capitulo';
 }
 
 /**
@@ -166,7 +143,7 @@ function buildEpisodePublicLink(string $baseUrl, ?string $pubDate, string $title
     return rtrim($baseUrl, '/') . '/'
         . date('Y', $ts) . '/'
         . date('m', $ts) . '/'
-        . slugifyForUrl($title);
+        . slugify($title);
 }
 
 /**
@@ -199,30 +176,43 @@ function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
 }
 
 /**
- * Resuelve la ruta local a /images/<fichero> partiendo de una URL pública.
- * Se usa para incrustar portada (frame APIC) en etiquetas ID3v2.
- * Devuelve null si la URL no apunta a un fichero local en /images/ o no existe.
+ * Resuelve la ruta local de un fichero de imagen a partir de su URL relativa o absoluta.
+ * Verifica que la ruta resuelta no escape de la raíz del proyecto (protección path traversal).
+ * Devuelve null si la ruta no existe como fichero o queda fuera del proyecto.
  */
 function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 {
-    $path = parse_url(trim($imageUrl), PHP_URL_PATH);
-    if (!is_string($path) || $path === '') {
+    $raw = trim($imageUrl);
+    if ($raw === '') {
         return null;
     }
 
-    if (!preg_match('#/images/([^/]+)$#', $path, $matches)) {
+    $parsedPath = (string) parse_url($raw, PHP_URL_PATH);
+    $candidate = $parsedPath !== '' ? $parsedPath : $raw;
+
+    if ($candidate === '') {
         return null;
     }
 
-    $fileName = basename((string) $matches[1]);
-    if ($fileName === '' || $fileName === '.' || $fileName === '..') {
+    $projectRoot = realpath(__DIR__ . '/..');
+    if ($projectRoot === false) {
         return null;
     }
 
-    $localPath = __DIR__ . '/../images/' . $fileName;
-    if (!is_file($localPath)) {
+    if ($candidate[0] === '/') {
+        $candidate = $projectRoot . $candidate;
+    } else {
+        $candidate = $projectRoot . '/' . $candidate;
+    }
+
+    $real = realpath($candidate);
+    if ($real === false || !is_file($real)) {
         return null;
     }
 
-    return $localPath;
+    if (strpos($real, $projectRoot . DIRECTORY_SEPARATOR) !== 0 && $real !== $projectRoot) {
+        return null;
+    }
+
+    return $real;
 }

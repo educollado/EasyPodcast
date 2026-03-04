@@ -29,11 +29,15 @@ function isHttpsRequest(): bool
  */
 function enforceCanonicalHostFromPodcastLink(string $dbPath): void
 {
+    // Las migraciones deben ejecutarse siempre en contexto web, independientemente
+    // de si las cabeceras ya se han enviado (headers_sent solo afecta al redirect).
+    if (PHP_SAPI !== 'cli') {
+        runMigrations($dbPath);
+    }
+
     if (PHP_SAPI === 'cli' || headers_sent()) {
         return;
     }
-
-    runMigrations($dbPath);
 
     $httpHost = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
     if ($httpHost === '') {

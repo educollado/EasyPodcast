@@ -17,8 +17,96 @@ function runMigrations(string $dbPath): void
     if ($version < 1) {
         migration_v1($pdo);
         $pdo->exec('PRAGMA user_version = 1');
+        $version = 1;
     }
-    // Futuras: if ($version < 2) { migration_v2($pdo); $pdo->exec('PRAGMA user_version = 2'); }
+
+    if ($version < 2) {
+        migration_v2($pdo);
+        $pdo->exec('PRAGMA user_version = 2');
+        $version = 2;
+    }
+
+    if ($version < 3) {
+        migration_v3($pdo);
+        $pdo->exec('PRAGMA user_version = 3');
+    }
+}
+
+/**
+ * Migración v3: hace pub_date nullable en episodes para que los borradores puedan
+ * no tener fecha de publicación. SQLite no soporta ALTER COLUMN, así que se
+ * recrea la tabla preservando todos los datos dentro de una transacción.
+ */
+function migration_v3(PDO $pdo): void
+{
+    // Si la tabla episodes no existe aún, se creará con el esquema correcto; nada que hacer.
+    $tableExists = (bool) $pdo
+        ->query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='episodes' LIMIT 1")
+        ->fetchColumn();
+    if (!$tableExists) {
+        return;
+    }
+
+    // Comprueba si pub_date ya es nullable (notnull = 0 → nullable).
+    $columns = $pdo->query('PRAGMA table_info(episodes)')->fetchAll();
+    foreach ($columns as $col) {
+        if ($col['name'] === 'pub_date' && (int) $col['notnull'] === 0) {
+            return; // Ya es nullable, nada que hacer.
+        }
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->exec(
+            "CREATE TABLE episodes_v3 (
+              id INTEGER PRIMARY KEY,
+              guid TEXT NOT NULL UNIQUE,
+              title TEXT NOT NULL,
+              description TEXT NOT NULL,
+              link TEXT,
+              pub_date TEXT,
+              audio_url TEXT NOT NULL,
+              audio_mime_type TEXT NOT NULL,
+              audio_size_bytes INTEGER NOT NULL,
+              duration TEXT,
+              explicit INTEGER,
+              season_number INTEGER,
+              episode_number INTEGER,
+              episode_type TEXT,
+              image_url TEXT,
+              author TEXT,
+              status TEXT NOT NULL DEFAULT 'draft',
+              created_at TEXT DEFAULT (datetime('now')),
+              updated_at TEXT DEFAULT (datetime('now'))
+            )"
+        );
+        $pdo->exec('INSERT INTO episodes_v3 SELECT * FROM episodes');
+        $pdo->exec('DROP TABLE episodes');
+        $pdo->exec('ALTER TABLE episodes_v3 RENAME TO episodes');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate ON episodes(status, pub_date)');
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
+}
+
+/**
+ * Migración v2: crea la tabla api_tokens para autenticación de la API REST.
+ */
+function migration_v2(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS api_tokens (
+          id INTEGER PRIMARY KEY,
+          token TEXT NOT NULL,
+          user_id INTEGER NOT NULL,
+          expires_at TEXT,
+          created_at TEXT DEFAULT (datetime('now'))
+        )"
+    );
 }
 
 /**

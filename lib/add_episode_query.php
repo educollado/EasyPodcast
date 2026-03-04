@@ -12,13 +12,12 @@ require_once __DIR__ . '/csrf.php';
  * - POST: guarda el episodio y devuelve el estado actualizado del formulario.
  * En error de BD no recuperable responde HTTP 500 y termina la ejecución.
  *
- * @return array{form:array, isEditing:bool, editingEpisodeId:?int, error:string, notice:string, id3Notice:string}
+ * @return array{form:array, isEditing:bool, editingEpisodeId:?int, error:string, notice:string}
  */
 function loadAddEpisodeData(string $dbPath): array
 {
     $error            = '';
     $notice           = '';
-    $id3Notice        = '';
     $editingEpisodeId = null;
     $isEditing        = false;
 
@@ -40,7 +39,7 @@ function loadAddEpisodeData(string $dbPath): array
               title TEXT NOT NULL,
               description TEXT NOT NULL,
               link TEXT,
-              pub_date TEXT NOT NULL,
+              pub_date TEXT,
               audio_url TEXT NOT NULL,
               audio_mime_type TEXT NOT NULL,
               audio_size_bytes INTEGER NOT NULL,
@@ -119,13 +118,12 @@ function loadAddEpisodeData(string $dbPath): array
             // rewrite_audio_metadata solo tiene sentido en edición; en creación se ignora.
             $rewriteAudioMetadata = $isEditing && ($_POST['rewrite_audio_metadata'] ?? '') === '1';
 
-            $result    = saveEpisode($pdo, $form, $isEditing, $editingEpisodeId, $podcastDefaults, $_FILES, $rewriteAudioMetadata);
-            $form      = $result['form'];
-            $error     = $result['error'];
-            $notice    = $result['notice'];
-            $id3Notice = $result['id3Notice'];
-            // pub_date ya no se muestra en el formulario; se limpia para no exponer la fecha interna.
-            $form['pub_date'] = '';
+            $result = saveEpisode($pdo, $form, $isEditing, $editingEpisodeId, $podcastDefaults, $_FILES, $rewriteAudioMetadata);
+            $form   = $result['form'];
+            $error  = $result['error'];
+            $notice = $result['notice'];
+            // Convierte pub_date al formato datetime-local para pre-rellenar el campo.
+            $form['pub_date'] = formatDateTimeLocal($form['pub_date']);
         }
     } catch (Throwable $e) {
         $message = $e->getMessage();
@@ -140,5 +138,5 @@ function loadAddEpisodeData(string $dbPath): array
         }
     }
 
-    return compact('form', 'isEditing', 'editingEpisodeId', 'error', 'notice', 'id3Notice');
+    return compact('form', 'isEditing', 'editingEpisodeId', 'error', 'notice');
 }

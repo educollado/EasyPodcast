@@ -51,7 +51,7 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
               title TEXT NOT NULL,
               description TEXT NOT NULL,
               link TEXT,
-              pub_date TEXT NOT NULL,
+              pub_date TEXT,
               audio_url TEXT NOT NULL,
               audio_mime_type TEXT NOT NULL,
               audio_size_bytes INTEGER NOT NULL,

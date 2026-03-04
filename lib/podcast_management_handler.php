@@ -6,6 +6,7 @@ require_once __DIR__ . '/../feed_builder.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/episode_helpers.php';
 
 // ---------------------------------------------------------------------------
 // Helpers de URL
@@ -23,48 +24,6 @@ function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
     }
 
     return resolveBaseUrl($pdo);
-}
-
-/**
- * Resuelve la ruta local de un fichero de imagen a partir de su URL relativa o absoluta.
- * Verifica que la ruta resuelta no escape de la raíz del proyecto (protección path traversal).
- * Devuelve null si la ruta no existe como fichero o queda fuera del proyecto.
- */
-function resolveLocalImagePathFromUrl(string $imageUrl): ?string
-{
-    $raw = trim($imageUrl);
-    if ($raw === '') {
-        return null;
-    }
-
-    $parsedPath = (string) parse_url($raw, PHP_URL_PATH);
-    $candidate = $parsedPath !== '' ? $parsedPath : $raw;
-
-    if ($candidate === '') {
-        return null;
-    }
-
-    $projectRoot = realpath(__DIR__ . '/..');
-    if ($projectRoot === false) {
-        return null;
-    }
-
-    if ($candidate[0] === '/') {
-        $candidate = $projectRoot . $candidate;
-    } else {
-        $candidate = $projectRoot . '/' . $candidate;
-    }
-
-    $real = realpath($candidate);
-    if ($real === false || !is_file($real)) {
-        return null;
-    }
-
-    if (strpos($real, $projectRoot . DIRECTORY_SEPARATOR) !== 0 && $real !== $projectRoot) {
-        return null;
-    }
-
-    return $real;
 }
 
 // ---------------------------------------------------------------------------

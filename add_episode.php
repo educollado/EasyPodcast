@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/public_episode_helpers.php';
 require_once __DIR__ . '/lib/add_episode_query.php';
 
 session_start();
@@ -24,7 +25,7 @@ enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadAddEpisodeData($dbPath);
-extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
+extract($data);  // form, isEditing, editingEpisodeId, error, notice
 ?>
 <!doctype html>
 <html lang="es">
@@ -63,10 +64,18 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
           </label>
           <label>
             Estado
-            <select name="status">
+            <select id="status_select" name="status">
               <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
               <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
             </select>
+          </label>
+        </div>
+
+        <div id="pub_date_row" class="grid two" style="margin-top:.8rem;<?= $form['status'] !== 'published' ? 'display:none;' : '' ?>">
+          <label>
+            Fecha de publicación
+            <input id="pub_date" type="datetime-local" name="pub_date" value="<?= esc($form['pub_date']) ?>">
+            <span class="help">Si se deja vacío se asigna la fecha actual al publicar.</span>
           </label>
         </div>
 
@@ -154,6 +163,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
         <div class="actions">
           <a class="btn back" href="episodes_management.php">Volver a capítulos</a>
           <?php if ($isEditing): ?>
+            <a class="btn" href="<?= esc(resolveEpisodeHref($form['link'], '', $form['title'])) ?>" target="_blank">Vista previa</a>
             <button class="btn" type="submit" name="rewrite_audio_metadata" value="1">Actualizar metadatos del MP3 actual</button>
           <?php endif; ?>
           <button class="btn" type="submit"><?= $isEditing ? 'Actualizar capítulo' : 'Guardar capítulo' ?></button>
@@ -266,6 +276,17 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice, id3Notice
       }
 
     })();
+  </script>
+  <script>
+    // Muestra el campo de fecha de publicación solo cuando el estado es "published".
+    (function () {
+      var statusSelect = document.getElementById('status_select');
+      var pubDateRow   = document.getElementById('pub_date_row');
+      if (!statusSelect || !pubDateRow) { return; }
+      statusSelect.addEventListener('change', function () {
+        pubDateRow.style.display = statusSelect.value === 'published' ? '' : 'none';
+      });
+    }());
   </script>
 </body>
 </html>

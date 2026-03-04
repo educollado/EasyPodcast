@@ -76,41 +76,40 @@ test('formatDateTimeLocal: fecha válida devuelve formato Y-m-d\\TH:i', function
     assert_eq('2024-03-15T10:30', formatDateTimeLocal('2024-03-15 10:30:00'));
 });
 
-test('formatDateTimeLocal: valor vacío devuelve fecha actual en formato correcto', function () {
-    $result = formatDateTimeLocal('');
-    assert_matches('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $result);
+test('formatDateTimeLocal: valor vacío devuelve cadena vacía', function () {
+    assert_eq('', formatDateTimeLocal(''));
 });
 
 // =============================================================================
-// slugifyForUrl
+// slugify
 // =============================================================================
 
-test('slugifyForUrl: convierte espacios a guiones', function () {
-    assert_eq('hola-mundo', slugifyForUrl('hola mundo'));
+test('slugify: convierte espacios a guiones', function () {
+    assert_eq('hola-mundo', slugify('hola mundo'));
 });
 
-test('slugifyForUrl: convierte a minúsculas', function () {
-    assert_eq('hola-mundo', slugifyForUrl('Hola Mundo'));
+test('slugify: convierte a minúsculas', function () {
+    assert_eq('hola-mundo', slugify('Hola Mundo'));
 });
 
-test('slugifyForUrl: cadena vacía → capitulo', function () {
-    assert_eq('capitulo', slugifyForUrl(''));
+test('slugify: cadena vacía → capitulo', function () {
+    assert_eq('capitulo', slugify(''));
 });
 
-test('slugifyForUrl: sólo espacios → capitulo', function () {
-    assert_eq('capitulo', slugifyForUrl('   '));
+test('slugify: sólo espacios → capitulo', function () {
+    assert_eq('capitulo', slugify('   '));
 });
 
-test('slugifyForUrl: guiones múltiples se normalizan', function () {
-    assert_eq('hola-mundo', slugifyForUrl('hola---mundo'));
+test('slugify: guiones múltiples se normalizan', function () {
+    assert_eq('hola-mundo', slugify('hola---mundo'));
 });
 
-test('slugifyForUrl: ya es slug válido → sin cambios', function () {
-    assert_eq('ya-es-slug', slugifyForUrl('ya-es-slug'));
+test('slugify: ya es slug válido → sin cambios', function () {
+    assert_eq('ya-es-slug', slugify('ya-es-slug'));
 });
 
-test('slugifyForUrl: caracteres especiales se eliminan', function () {
-    assert_eq('episodio-1', slugifyForUrl('¡Episodio #1!'));
+test('slugify: caracteres especiales se eliminan', function () {
+    assert_eq('episodio-1', slugify('¡Episodio #1!'));
 });
 
 // =============================================================================
