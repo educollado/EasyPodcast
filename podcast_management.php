@@ -242,7 +242,7 @@ extract($data);  // form, error, notice
               <input type="hidden" name="category" id="category-hidden" value="<?= esc($form['category']) ?>">
             </div>
           </div>
-          <label>
+          <label style="align-self: start">
             Explícito
             <select name="explicit">
               <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>>No</option>
@@ -257,7 +257,7 @@ extract($data);  // form, error, notice
             O subir imagen del podcast
             <input type="file" name="image_file" accept="image/*">
           </label>
-          <label>
+          <label style="align-self: start">
             Tipo iTunes
             <select name="itunes_type">
               <option value="episodic" <?= $form['itunes_type'] === 'episodic' ? 'selected' : '' ?>>episodic</option>

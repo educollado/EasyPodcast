@@ -80,7 +80,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         </div>
 
         <div class="grid two" style="margin-top: .8rem;">
-          <label>
+          <label style="align-self: start">
             Título *
             <input id="title" type="text" name="title" value="<?= esc($form['title']) ?>" required>
           </label>
@@ -136,7 +136,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             Número de episodio
             <input type="number" name="episode_number" min="0" step="1" value="<?= esc($form['episode_number']) ?>">
           </label>
-          <label>
+          <label style="align-self: start">
             Tipo de episodio
             <select name="episode_type">
               <option value="" <?= $form['episode_type'] === '' ? 'selected' : '' ?>>Sin definir</option>
