@@ -51,8 +51,8 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <link rel="apple-touch-icon" href="/favicon.ico">
   <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/index.css">
-  <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/dark.css">
 </head>
 <body>
@@ -73,22 +73,24 @@ header('X-Robots-Tag: noindex, follow, noarchive');
           <article class="episode">
             <?php $episodeImage = trim((string) ($episode['image_url'] ?? '')); ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
+            <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
+            <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
             <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
-              <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 180px, (max-width: 620px) 108px, 144px"<?php endif; ?> alt="Portada del capítulo">
+              <a href="<?= esc($episodeHref) ?>" tabindex="-1" aria-hidden="true">
+                <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 160px, (max-width: 620px) 88px, 112px"<?php endif; ?> alt="Portada del capítulo">
+              </a>
             <?php else: ?>
               <div class="cover" aria-hidden="true"></div>
             <?php endif; ?>
             <div class="episode-content">
-              <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
-              <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
               <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 240); ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
               <p class="excerpt">
                 <?= esc((string) $excerpt['text']) ?>
                 <?php if (!empty($excerpt['truncated'])): ?>
-                  <a class="read-more" href="<?= esc($episodeHref) ?>">[Leer más]</a>
+                  <a class="read-more" href="<?= esc($episodeHref) ?>">Leer más</a>
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>

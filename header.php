@@ -5,18 +5,31 @@ declare(strict_types=1);
 $podcastTitle = isset($podcastTitle) ? (string) $podcastTitle : 'Podcast';
 $podcastAuthor = isset($podcastAuthor) ? (string) $podcastAuthor : '';
 $podcastDescription = isset($podcastDescription) ? (string) $podcastDescription : '';
+$podcastImage = isset($podcastImage) ? (string) $podcastImage : '';
 $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
+// Variantes 80px (normal) y 144px (retina) para la miniatura de cabecera.
+$headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($podcastImage, [80, 144]) : ['src' => '', 'srcset' => ''];
 ?>
 <header class="card">
   <div class="podcast-header">
     <div class="podcast-header-left header-box">
-      <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
-      <?php if ($podcastAuthor !== ''): ?>
-        <p class="author"><?= esc($podcastAuthor) ?></p>
-      <?php endif; ?>
-      <?php if ($podcastDescription !== ''): ?>
-        <p class="desc"><?= renderTextWithLinks($podcastDescription) ?></p>
-      <?php endif; ?>
+      <div class="podcast-branding">
+        <?php if ($headerImgSources['src'] !== ''): ?>
+          <img class="podcast-cover-header"
+               src="<?= esc($headerImgSources['src']) ?>"
+               <?php if ($headerImgSources['srcset'] !== ''): ?>srcset="<?= esc($headerImgSources['srcset']) ?>" sizes="(max-width: 460px) 64px, 80px"<?php endif; ?>
+               width="80" height="80" alt="Portada del podcast">
+        <?php endif; ?>
+        <div class="podcast-info">
+          <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
+          <?php if ($podcastAuthor !== ''): ?>
+            <p class="author"><?= esc($podcastAuthor) ?></p>
+          <?php endif; ?>
+          <?php if ($podcastDescription !== ''): ?>
+            <p class="desc"><?= renderTextWithLinks($podcastDescription) ?></p>
+          <?php endif; ?>
+        </div>
+      </div>
     </div>
     <div class="podcast-header-right header-box">
       <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">

@@ -1,17 +1,36 @@
 /* =========================================================
-   Modo oscuro — cargado último para ganar en cascada.
-   Usa html[data-theme="dark"] (especificidad 0,1,1)
-   que supera a :root (0,1,0) de index.css / episode.css.
+   Modo oscuro — cargado último.
+   Especificidad html[data-theme="dark"] (0,1,1) supera :root (0,1,0).
    ========================================================= */
 html[data-theme="dark"] {
-  --bg:     #0f1923;
-  --card:   #1a2530;
-  --text:   #e8e0d0;
-  --muted:  #8a9aa5;
-  --accent: #38b2c8;
-  --border: #2a3a48;
+  --bg:          #161310;
+  --card:        #201c18;
+  --text:        #f4ede3;
+  --muted:       #9e9088;
+  --accent:      #e06c35;
+  --accent-dark: #c85a25;
+  --border:      #2e2a25;
+  --shadow:      0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.28);
 }
 
 html[data-theme="dark"] body {
-  background: radial-gradient(circle at top left, #0d1520 0%, var(--bg) 40%, #080f18 100%);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(224, 108, 53, .07) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(224, 108, 53, .04) 0%, transparent 50%);
+}
+
+html[data-theme="dark"] .search-form input[type="search"] {
+  background: #2a2420;
+  color: var(--text);
+}
+
+html[data-theme="dark"] .page-link {
+  background: var(--card);
+}
+
+html[data-theme="dark"] .page-link:hover {
+  background: #2a2420;
+  border-color: var(--accent);
+  color: var(--accent);
 }

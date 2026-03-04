@@ -1,266 +1,143 @@
 /* =========================================================
-   Tema base (variables)
+   Detalle de episodio — depende de common.css
    ========================================================= */
-    :root {
-      --bg: #f5f2eb;
-      --card: #fffefb;
-      --text: #1d2a33;
-      --muted: #5f6b73;
-      --accent: #0b7285;
-      --border: #d9d2c3;
-    }
-    /* Normalización mínima de cajas */
-    * { box-sizing: border-box; }
 
-    /* =========================================================
-       Estructura general
-       ========================================================= */
-    body {
-      margin: 0;
-      font-family: "Georgia", "Times New Roman", serif;
-      background: radial-gradient(circle at top left, #fff9ee 0%, var(--bg) 40%, #ece7dc 100%);
-      color: var(--text);
-      padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
-      line-height: 1.5;
-    }
-    .container {
-      max-width: 940px;
-      margin: 0 auto;
-      display: grid;
-      gap: 1rem;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.25rem;
-      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
-    }
-    /* =========================================================
-       Cabecera (título + icono RSS)
-       ========================================================= */
-    .podcast-header {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: start;
-      gap: .9rem;
-    }
-    .podcast-header-left {
-      min-width: 0;
-    }
-    .podcast-header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: end;
-      gap: .35rem;
-      justify-self: end;
-      min-width: 280px;
-    }
-    .header-box {
-      padding: 0;
-    }
-    .search-form {
-      display: flex;
-      gap: .5rem;
-      align-items: center;
-      width: min(540px, 100%);
-    }
-    .search-form input[type="search"] {
-      width: min(210px, 100%);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .45rem .6rem;
-      font: inherit;
-      color: var(--text);
-      background: #fff;
-    }
-    .search-form button {
-      border: 0;
-      border-radius: 8px;
-      padding: .55rem .7rem;
-      font: inherit;
-      font-size: .95rem;
-      color: #fff;
-      background: #0b7285;
-      cursor: pointer;
-    }
-    .search-form button:hover {
-      filter: brightness(0.95);
-    }
-    .rss-link img {
-      width: 28px;
-      height: 28px;
-      display: block;
-    }
-    .rss-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 40px;
-      min-height: 40px;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 4.2vw, 2rem);
-      line-height: 1.12;
-      overflow-wrap: anywhere;
-    }
-    h1 a {
-      color: inherit;
-      text-decoration: none;
-    }
-    h1 a:hover {
-      text-decoration: underline;
-    }
-    .author {
-      margin: .35rem 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-      font-weight: 700;
-    }
-    /* =========================================================
-       Detalle de episodio (imagen + contenido)
-       ========================================================= */
-    .back {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .detail {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: 220px 1fr;
-    }
-    .cover {
-      width: 220px;
-      height: 220px;
-      border-radius: 12px;
-      object-fit: cover;
-      border: 1px solid var(--border);
-      background: #ece7dc;
-    }
-    .meta {
-      color: var(--muted);
-      margin: .45rem 0 .75rem;
-      overflow-wrap: anywhere;
-    }
-    .desc {
-      margin: .8rem 0 0;
-      color: var(--muted);
-      overflow-wrap: anywhere;
-    }
-    .desc p {
-      margin: .4rem 0;
-      color: var(--muted);
-    }
-    .desc h2, .desc h3 {
-      color: var(--text);
-      margin: .85rem 0 .3rem;
-      font-size: 1.05rem;
-    }
-    .desc ul, .desc ol {
-      color: var(--muted);
-      padding-left: 1.5rem;
-      margin: .4rem 0;
-    }
-    .desc li {
-      margin: .2rem 0;
-    }
-    .desc a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .desc a:hover {
-      text-decoration: underline;
-    }
-    .player {
-      width: min(620px, 100%);
-      margin-top: .8rem;
-    }
-    /* =========================================================
-       Metadatos de audio y enlaces
-       ========================================================= */
-    .audio-meta {
-      color: var(--muted);
-      margin: .3rem 0 .2rem;
-      font-size: .95rem;
-      overflow-wrap: anywhere;
-    }
-    .download {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-      display: inline-block;
-      padding: .22rem 0;
-    }
-    .download:hover {
-      text-decoration: underline;
-    }
+.back {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  margin-bottom: 1.1rem;
+  transition: color .12s;
+}
 
-    /* =========================================================
-       Estados y pie
-       ========================================================= */
-    .error {
-      color: #b02a37;
-      margin: 0;
-    }
-    .site-footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: .92rem;
-      padding: .2rem 0 .8rem;
-    }
-    .site-footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .site-footer a:hover {
-      text-decoration: underline;
-    }
+.back:hover { color: var(--accent-dark); text-decoration: underline; }
 
-    /* =========================================================
-       Ajustes responsive
-       ========================================================= */
-    @media (max-width: 760px) {
-      .card {
-        padding: 1rem;
-      }
-      .podcast-header {
-        grid-template-columns: 1fr;
-        align-items: flex-start;
-      }
-      .podcast-header-right {
-        justify-self: stretch;
-        min-width: 0;
-        align-items: stretch;
-        width: 100%;
-      }
-      .detail {
-        grid-template-columns: 1fr;
-      }
-      .cover {
-        width: 160px;
-        height: 160px;
-        margin: 0 auto;
-      }
-      .player {
-        width: 100%;
-      }
-    }
+.detail {
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: 196px 1fr;
+}
 
-    @media (max-width: 460px) {
-      .cover {
-        width: min(100%, 220px);
-        height: auto;
-        aspect-ratio: 1 / 1;
-      }
-      .search-form {
-        width: 100%;
-        justify-content: stretch;
-      }
-      .search-form input[type="search"] {
-        width: 100%;
-      }
-    }
+.cover {
+  width: 196px;
+  height: 196px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #ede8e1;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+}
+
+/* El h1 del episodio es más contenido que el del podcast en cabecera */
+.detail h1 {
+  font-size: clamp(1.35rem, 3.8vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.meta {
+  color: var(--muted);
+  margin: .45rem 0 .9rem;
+  font-size: .74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   Descripción del episodio
+   ========================================================= */
+.detail .desc {
+  margin: 1rem 0 0;
+  font-size: .94rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.detail .desc p {
+  margin: .6rem 0;
+  color: var(--muted);
+}
+
+.detail .desc h2, .detail .desc h3 {
+  font-family: var(--font-display);
+  color: var(--text);
+  margin: 1.2rem 0 .4rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.detail .desc ul, .detail .desc ol {
+  color: var(--muted);
+  padding-left: 1.5rem;
+  margin: .5rem 0;
+}
+
+.detail .desc li { margin: .3rem 0; }
+
+.detail .desc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.detail .desc a:hover { text-decoration: underline; }
+
+/* =========================================================
+   Audio
+   ========================================================= */
+.player {
+  width: min(560px, 100%);
+  margin-top: .9rem;
+}
+
+.audio-meta {
+  color: var(--muted);
+  margin: .4rem 0 .3rem;
+  font-size: .87rem;
+  overflow-wrap: anywhere;
+}
+
+.download {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .15rem 0;
+  transition: color .12s;
+}
+
+.download:hover { color: var(--accent-dark); text-decoration: underline; }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media (max-width: 760px) {
+  .detail {
+    grid-template-columns: 1fr;
+    gap: .9rem;
+  }
+
+  .cover {
+    width: 156px;
+    height: 156px;
+    margin: 0 auto;
+  }
+
+  .player { width: 100%; }
+}
+
+@media (max-width: 460px) {
+  .cover {
+    width: min(100%, 200px);
+    height: auto;
+    aspect-ratio: 1/1;
+  }
+}

@@ -62,8 +62,8 @@ if ($error !== '') {
   <link rel="apple-touch-icon" href="/favicon.ico">
   <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/episode.css">
-  <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/dark.css">
   <script type="application/ld+json"><?= $episodeJsonLd ?></script>
 </head>
@@ -77,7 +77,7 @@ if ($error !== '') {
       <?php else: ?>
         <article class="detail">
           <?php if ($cover !== ''): ?>
-            <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 220px, (max-width: 760px) 160px, 220px"<?php endif; ?> alt="Portada del capítulo">
+            <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 200px, (max-width: 760px) 160px, 200px"<?php endif; ?> alt="Portada del capítulo">
           <?php else: ?>
             <div class="cover" aria-hidden="true"></div>
           <?php endif; ?>

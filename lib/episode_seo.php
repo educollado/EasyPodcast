@@ -22,6 +22,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
         $podcastAuthor  = trim((string) ($p['author'] ?? ''));
     }
     $podcastDescription = trim((string) ($p['description'] ?? ''));
+    $podcastImage       = trim((string) ($p['image_url'] ?? ''));
     $cover              = trim((string) ($e['image_url'] ?? ''));
     // Fallback de imagen del episodio a imagen del podcast.
     if ($cover === '') {
@@ -76,7 +77,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
 
     return compact(
         'podcastTitle', 'podcastAuthor', 'podcastDescription',
-        'cover', 'baseSeoUrl', 'canonicalUrl', 'robotsContent',
+        'podcastImage', 'cover', 'baseSeoUrl', 'canonicalUrl', 'robotsContent',
         'episodeTitle', 'pageTitle', 'metaDescription',
         'ogImage', 'rssUrl', 'episodeJsonLd'
     );

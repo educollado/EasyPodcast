@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Figtree:wght@400;500;600&display=swap');
+
+/* =========================================================
+   Variables de tema (claro)
+   ========================================================= */
+:root {
+  --bg:           #f6f2eb;
+  --card:         #fdfaf5;
+  --text:         #1c1814;
+  --muted:        #7a6f68;
+  --accent:       #b5470e;
+  --accent-dark:  #8c3509;
+  --border:       #e5dfd4;
+  --shadow:       0 1px 2px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.07);
+  --radius:       14px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Figtree', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* =========================================================
+   Estructura base
+   ========================================================= */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(181, 71, 14, .06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(181, 71, 14, .04) 0%, transparent 50%);
+  color: var(--text);
+  padding: max(1rem, env(safe-area-inset-top))
+           max(1rem, env(safe-area-inset-right))
+           max(1rem, env(safe-area-inset-bottom))
+           max(1rem, env(safe-area-inset-left));
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* --card-padding permite que los episodios extiendan el hover a los bordes */
+.card {
+  --card-padding: 1.75rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow);
+}
+
+/* =========================================================
+   Cabecera pública
+   ========================================================= */
+.podcast-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+}
+
+.podcast-branding {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+
+.podcast-cover-header {
+  width: 78px;
+  height: 78px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  transition: box-shadow .2s ease;
+}
+
+.podcast-cover-header:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+}
+
+.podcast-info,
+.podcast-header-left { min-width: 0; }
+
+.podcast-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .5rem;
+  justify-self: end;
+  min-width: 260px;
+}
+
+.header-box { padding: 0; }
+
+/* =========================================================
+   Buscador
+   ========================================================= */
+.search-form {
+  display: flex;
+  gap: .35rem;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.search-form input[type="search"] {
+  width: 195px;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: .42rem .9rem;
+  font-family: var(--font-body);
+  font-size: .88rem;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.search-form input[type="search"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(181, 71, 14, .12);
+}
+
+.search-form button {
+  border: 0;
+  border-radius: 20px;
+  padding: .42rem .85rem;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+
+.search-form button:hover { background: var(--accent-dark); }
+
+/* =========================================================
+   Botones de cabecera
+   ========================================================= */
+.rss-link {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .42rem .5rem;
+  cursor: pointer;
+  color: var(--muted);
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.rss-link:hover {
+  background: #fff1e6;
+  color: #c0390e;
+  border-color: #f0a882;
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .42rem .5rem;
+  cursor: pointer;
+  color: var(--muted);
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, border-color .12s;
+}
+
+.theme-toggle:hover {
+  background: #fff1e6;
+  border-color: var(--accent);
+}
+
+/* =========================================================
+   Tipografía de cabecera
+   ========================================================= */
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+h1 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color .12s;
+}
+
+h1 a:hover { color: var(--accent); }
+
+.author {
+  margin: .35rem 0 0;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.desc {
+  margin: .55rem 0 0;
+  color: var(--muted);
+  font-size: .91rem;
+  line-height: 1.6;
+}
+
+.desc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.desc a:hover { text-decoration: underline; }
+
+/* =========================================================
+   Pie de página
+   ========================================================= */
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: .84rem;
+  padding: .4rem 0 1.1rem;
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site-footer a:hover { text-decoration: underline; }
+
+/* =========================================================
+   Estados genéricos
+   ========================================================= */
+.error { color: #c0390e; margin: 0; }
+.empty { color: var(--muted); margin: 0; }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media (max-width: 760px) {
+  .podcast-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .podcast-header-right {
+    justify-self: end;
+    min-width: 260px;
+    align-items: flex-end;
+    width: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .card {
+    --card-padding: 1.25rem;
+  }
+
+  .podcast-header {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .podcast-header-right {
+    justify-self: stretch;
+    min-width: 0;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .search-form {
+    width: 100%;
+    justify-content: stretch;
+    align-self: auto;
+  }
+
+  .search-form input[type="search"] { width: 100%; }
+}
+
+@media (max-width: 460px) {
+  .podcast-cover-header { width: 62px; height: 62px; }
+}
