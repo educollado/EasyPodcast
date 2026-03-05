@@ -94,6 +94,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>Redes Sociales</h2>
             <p>Blog, LinkedIn, Mastodon, X y más</p>
           </a>
+          <a class="admin-card" href="stats.php">
+            <div class="admin-card-icon">📊</div>
+            <h2>Estadísticas</h2>
+            <p>Episodios, borradores y tamaño de audios</p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2>Ver podcast</h2>
