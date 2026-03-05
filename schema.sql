@@ -46,13 +46,16 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
 
-PRAGMA user_version = 3;
+PRAGMA user_version = 4;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (
   id INTEGER PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
+  totp_secret TEXT,
+  totp_enabled INTEGER NOT NULL DEFAULT 0,
+  totp_recovery_codes TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );

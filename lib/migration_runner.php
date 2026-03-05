@@ -29,6 +29,12 @@ function runMigrations(string $dbPath): void
     if ($version < 3) {
         migration_v3($pdo);
         $pdo->exec('PRAGMA user_version = 3');
+        $version = 3;
+    }
+
+    if ($version < 4) {
+        migration_v4($pdo);
+        $pdo->exec('PRAGMA user_version = 4');
     }
 }
 
@@ -90,6 +96,27 @@ function migration_v3(PDO $pdo): void
             $pdo->rollBack();
         }
         throw $e;
+    }
+}
+
+/**
+ * Migración v4: añade columnas TOTP a la tabla management para soporte de 2FA.
+ */
+function migration_v4(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(management)')->fetchAll(),
+        'name'
+    );
+    $pending = [
+        'totp_secret'         => 'ALTER TABLE management ADD COLUMN totp_secret TEXT',
+        'totp_enabled'        => 'ALTER TABLE management ADD COLUMN totp_enabled INTEGER NOT NULL DEFAULT 0',
+        'totp_recovery_codes' => 'ALTER TABLE management ADD COLUMN totp_recovery_codes TEXT',
+    ];
+    foreach ($pending as $col => $sql) {
+        if (!in_array($col, $existing, true)) {
+            $pdo->exec($sql);
+        }
     }
 }
 

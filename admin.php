@@ -17,7 +17,14 @@ $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
-$isLoggedIn = isset($_SESSION['admin_user']);
+$isLoggedIn    = isset($_SESSION['admin_user']);
+$isTotpPending = !$isLoggedIn && isset($_SESSION['totp_pending_user']);
+
+// Paso intermedio: verificación TOTP tras login correcto con 2FA activo.
+$totpError = '';
+if ($isTotpPending) {
+    $totpError = verifyTotpLogin($dbPath);
+}
 
 $data = loadAdminData($dbPath);
 extract($data); // adminCount, isSetupMode, error, notice
@@ -72,6 +79,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>Caché</h2>
             <p>Habilita la caché, bórrala o regenera imágenes</p>
           </a>
+          <a class="admin-card" href="twofa_management.php">
+            <div class="admin-card-icon">🔐</div>
+            <h2>2FA</h2>
+            <p>Autenticación en dos pasos con código TOTP</p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2>Ver podcast</h2>
@@ -84,6 +96,29 @@ extract($data); // adminCount, isSetupMode, error, notice
         </div>
       </main>
     </div>
+  <?php elseif ($isTotpPending): ?>
+    <main class="card">
+      <h1>Verificación en dos pasos</h1>
+      <p>Introduce el código de 6 dígitos de tu app de autenticación, o uno de tus códigos de recuperación.</p>
+
+      <?php if ($totpError !== ''): ?>
+        <div class="error"><?= esc($totpError) ?></div>
+      <?php endif; ?>
+
+      <form method="post" action="admin.php" autocomplete="off" style="display:grid;gap:.75rem;">
+        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+        <label>
+          Código
+          <input type="text" name="totp_code" inputmode="numeric" maxlength="9"
+                 autocomplete="one-time-code" autofocus placeholder="000000"
+                 style="letter-spacing:.15em; font-size:1.25rem;">
+        </label>
+        <button class="btn" type="submit">Verificar</button>
+      </form>
+      <div style="margin-top:.75rem; text-align:right;">
+        <a href="admin.php?logout=1" style="font-size:.85rem; color:var(--muted);">Cancelar y volver al login</a>
+      </div>
+    </main>
   <?php else: ?>
     <main class="card">
       <h1><?= $isSetupMode ? 'Configuración inicial' : 'Acceso administrador' ?></h1>
