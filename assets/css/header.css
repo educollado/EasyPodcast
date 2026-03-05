@@ -32,29 +32,6 @@
   border-color: #fdba74;
 }
 
-/* Iconos de redes sociales */
-.social-link {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .42rem .5rem;
-  cursor: pointer;
-  color: var(--muted);
-  min-width: 36px;
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: background .12s ease, color .12s ease, border-color .12s ease;
-}
-
-.social-link:hover {
-  background: var(--bg);
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
 /* Botón toggle claro/oscuro */
 .theme-toggle {
   background: none;

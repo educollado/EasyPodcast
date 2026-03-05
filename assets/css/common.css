@@ -194,6 +194,29 @@ body {
   border-color: var(--accent);
 }
 
+.social-link {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .42rem .5rem;
+  color: var(--muted);
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.social-link:visited { color: var(--muted); }
+
+.social-link:hover {
+  background: #fff1e6;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* =========================================================
    Tipografía de cabecera
    ========================================================= */
