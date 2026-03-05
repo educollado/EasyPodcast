@@ -124,8 +124,42 @@ function _epDownloadTar(string $url, string $dest): bool
 }
 
 /**
+ * Elimina recursivamente un directorio o fichero temporal.
+ */
+function _epDeleteRecursive(string $path): void
+{
+    if (is_link($path) || is_file($path)) {
+        @unlink($path);
+        return;
+    }
+    if (is_dir($path)) {
+        foreach (array_diff((array) scandir($path), ['.', '..']) as $child) {
+            _epDeleteRecursive($path . DIRECTORY_SEPARATOR . $child);
+        }
+        @rmdir($path);
+    }
+}
+
+/**
+ * Copia recursivamente un directorio sobre otro.
+ */
+function _epCopyDir(string $src, string $dst): void
+{
+    foreach (array_diff((array) scandir($src), ['.', '..']) as $item) {
+        $s = $src . DIRECTORY_SEPARATOR . $item;
+        $d = $dst . DIRECTORY_SEPARATOR . $item;
+        if (is_dir($s)) {
+            @mkdir($d, 0755, true);
+            _epCopyDir($s, $d);
+        } else {
+            copy($s, $d);
+        }
+    }
+}
+
+/**
  * Descarga el paquete desde GitHub, lo extrae sobre el directorio de la app
- * con --strip-components=1 y elimina el .tar.gz temporal.
+ * con strip-components=1 mediante PharData y elimina el .tar.gz temporal.
  *
  * @param string $tarUrl URL del .tar.gz (debe provenir de GitHub)
  * @param string $appDir Directorio raíz de la aplicación
@@ -151,8 +185,8 @@ function performUpdate(string $tarUrl, string $appDir): array
         return ['ok' => false, 'message' => 'URL de descarga no permitida.'];
     }
 
-    if (!function_exists('exec')) {
-        return ['ok' => false, 'message' => 'La función exec() está deshabilitada en este servidor. Actualiza manualmente.'];
+    if (!class_exists('PharData')) {
+        return ['ok' => false, 'message' => 'La extensión phar no está disponible en este servidor. Actualiza manualmente.'];
     }
 
     // Fichero temporal para el .tar.gz
@@ -168,18 +202,30 @@ function performUpdate(string $tarUrl, string $appDir): array
         return ['ok' => false, 'message' => 'No se pudo descargar el archivo de actualización.'];
     }
 
-    // Extraer sobre el directorio de la app, eliminando el nivel raíz del tar
-    $escapedTmp = escapeshellarg($tmpFile);
-    $escapedDir = escapeshellarg($appDir);
-    exec("tar -xzf {$escapedTmp} --strip-components=1 -C {$escapedDir} 2>&1", $output, $exitCode);
+    // Extraer en directorio temporal y copiar sobre $appDir (equivalente a --strip-components=1)
+    $tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ep_update_' . uniqid();
+    @mkdir($tempDir, 0755, true);
 
-    // Eliminar el tar temporal siempre
-    @unlink($tmpFile);
+    try {
+        $phar = new PharData($tmpFile);
+        $phar->extractTo($tempDir, null, true);
 
-    if ($exitCode !== 0) {
-        $detail = trim(implode(' ', $output));
-        return ['ok' => false, 'message' => 'Error al extraer el paquete: ' . $detail];
+        // Identificar el directorio raíz dentro del tar (strip-components=1)
+        $items  = array_values(array_diff((array) scandir($tempDir), ['.', '..']));
+        $srcDir = (count($items) === 1 && is_dir($tempDir . DIRECTORY_SEPARATOR . $items[0]))
+            ? $tempDir . DIRECTORY_SEPARATOR . $items[0]
+            : $tempDir;
+
+        _epCopyDir($srcDir, $appDir);
+    } catch (Throwable $ex) {
+        _epDeleteRecursive($tempDir);
+        @unlink($tmpFile);
+        return ['ok' => false, 'message' => 'Error al extraer el paquete: ' . $ex->getMessage()];
     }
+
+    // Limpiar temporales siempre
+    _epDeleteRecursive($tempDir);
+    @unlink($tmpFile);
 
     // Limpiar caché de opcodes para que el nuevo código entre en vigor de inmediato
     if (function_exists('opcache_reset')) {
