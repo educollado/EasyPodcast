@@ -4,14 +4,15 @@
 
 ## Versión
 
-**Versión actual: 0.8**
+**Versión actual: 0.9**
 
-## Novedades 0.8
+## Novedades 0.9
 
-- Rediseño visual completo del frontend público (`index.php`, `episode.php`, `search.php`, `header.php` y `footer.php`).
-- Rediseño visual del panel de administración con navegación compartida y estilos comunes.
-- `robots.txt` dinámico (servido por `robots.php`) con `Sitemap` calculado a partir del dominio configurado en BD.
-- El feed RSS limpia sintaxis Markdown en descripciones para publicar texto plano.
+- Autenticación en dos pasos (2FA) con TOTP compatible con Google Authenticator, QR de configuración y 8 códigos de recuperación.
+- Gestión de redes sociales desde el panel; los enlaces se muestran como iconos SVG en el footer público.
+- Página de gestión de caché separada (`cache_management.php`).
+- Cambio de contraseña desde el panel de administración.
+- Panel de estadísticas: episodios publicados, borradores, último publicado, tamaño de audios y estado de la caché.
 
 ## Sitio de referencia
 
@@ -100,7 +101,13 @@
 | `admin.php` | Login/logout y acceso al panel |
 | `podcast_management.php` | Metadatos del podcast (tabla `podcast`) |
 | `episodes_management.php` | CRUD de episodios (tabla `episodes`) |
+| `add_episode.php` | Alta/edición de episodios |
 | `backups.php` | Exportar/importar base de datos y ficheros (`images/`, `audios/`) |
+| `cache_management.php` | Habilitar/deshabilitar caché, borrar y regenerar imágenes |
+| `twofa_management.php` | Activar/desactivar 2FA TOTP y gestionar códigos de recuperación |
+| `social_management.php` | Gestión de enlaces a redes sociales |
+| `change_password.php` | Cambio de contraseña del administrador |
+| `stats.php` | Estadísticas de episodios y caché |
 
 ## Estructura del proyecto
 

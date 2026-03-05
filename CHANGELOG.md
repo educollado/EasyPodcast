@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9
+
+- Autenticación en dos pasos (2FA) con TOTP compatible con Google Authenticator y cualquier app TOTP. Incluye generación de QR, códigos de recuperación (8 por activación) y verificación en el flujo de login.
+- Nueva página de gestión de redes sociales (`social_management.php`): blog, LinkedIn, Mastodon, X, Pixelfed, Instagram, YouTube, GitHub y Bluesky. Los enlaces configurados aparecen como iconos SVG en el pie de página público.
+- Enlace Mastodon en el footer con `rel="me"` tomado de la BD en lugar de ser estático.
+- Nueva página de gestión de caché (`cache_management.php`) con habilitación/deshabilitación, borrado y regeneración de imágenes; estos controles se han extraído de `podcast_management.php`.
+- Nueva página de cambio de contraseña (`change_password.php`) accesible desde el panel de administración.
+- Nueva página de estadísticas (`stats.php`): episodios publicados, borradores, último publicado, tamaño total de audios y estado detallado de la caché (activa/inactiva, número de páginas cacheadas y tamaño).
+- Migraciones de BD v4 (columnas TOTP en `management`) y v5 (tabla `social`).
+
 ## 0.8
 
 - Rediseño visual completo del frontend público (`index.php`, `episode.php`, `search.php`, `header.php` y CSS asociados).
