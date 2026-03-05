@@ -165,13 +165,14 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background .12s, color .12s, border-color .12s;
+  transition: background .12s, border-color .12s;
 }
+
+.rss-link:visited { color: var(--muted); }
 
 .rss-link:hover {
   background: #fff1e6;
-  color: #c0390e;
-  border-color: #f0a882;
+  border-color: var(--accent);
 }
 
 .theme-toggle {
