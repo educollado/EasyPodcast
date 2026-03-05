@@ -78,14 +78,7 @@ $_socialIcons = [
       </div>
     </div>
     <div class="podcast-header-right header-box">
-      <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
-        <?php foreach ($_socialIcons as $_sKey => $_sData): ?>
-          <?php $_sUrl = (string) ($_socialLinks[$_sKey] ?? ''); ?>
-          <?php if ($_sUrl !== ''): ?>
-            <a class="social-link" href="<?= esc($_sUrl) ?>" target="_blank" rel="noopener noreferrer me"
-               aria-label="<?= esc($_sData['label']) ?>"><?= $_sData['svg'] ?></a>
-          <?php endif; ?>
-        <?php endforeach; ?>
+      <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro"></button>
         <a class="rss-link" href="/feed.xml" aria-label="Feed RSS">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
@@ -99,6 +92,23 @@ $_socialIcons = [
         <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">
         <button type="submit">Buscar</button>
       </form>
+      <?php
+        $_hasSocial = false;
+        foreach ($_socialIcons as $_sKey => $_sData) {
+            if ((string) ($_socialLinks[$_sKey] ?? '') !== '') { $_hasSocial = true; break; }
+        }
+      ?>
+      <?php if ($_hasSocial): ?>
+        <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+          <?php foreach ($_socialIcons as $_sKey => $_sData): ?>
+            <?php $_sUrl = (string) ($_socialLinks[$_sKey] ?? ''); ?>
+            <?php if ($_sUrl !== ''): ?>
+              <a class="social-link" href="<?= esc($_sUrl) ?>" target="_blank" rel="noopener noreferrer me"
+                 aria-label="<?= esc($_sData['label']) ?>"><?= $_sData['svg'] ?></a>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 </header>
