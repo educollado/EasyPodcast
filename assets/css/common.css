@@ -281,6 +281,35 @@ h1 a:hover { color: var(--accent); }
 
 .site-footer a:hover { text-decoration: underline; }
 
+.site-footer p { margin: 0; }
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin-bottom: .75rem;
+}
+
+.footer-social-link {
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: color .12s, background .12s;
+}
+
+.footer-social-link:visited { color: var(--muted); }
+
+.footer-social-link:hover {
+  color: var(--accent);
+  background: rgba(181, 71, 14, .07);
+}
+
 /* =========================================================
    Estados genéricos
    ========================================================= */
