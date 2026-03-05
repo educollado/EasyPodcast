@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0
+
+- Páginas estáticas gestionables desde el panel de administración (`pages_management.php`, `add_page.php`): jerarquía padre/hijo, rutas amigables `/slug` y `/padre/hijo`, contenido en Markdown con soporte de imágenes inline y flotadas.
+- Barra de navegación pública con submenús CSS puro en `header.php` para mostrar las páginas publicadas.
+- Migración de BD v6: nueva tabla `pages` con índice `idx_pages_status`.
+- Actualizador integrado (`update.php`): comprueba e instala actualizaciones desde GitHub Releases directamente desde el panel de administración.
+- Soporte de imágenes en Markdown (inline, flotadas izquierda/derecha) en `renderMarkdown()` de `lib/view_helpers.php`.
+
 ## 0.9
 
 - Autenticación en dos pasos (2FA) con TOTP compatible con Google Authenticator y cualquier app TOTP. Incluye generación de QR, códigos de recuperación (8 por activación) y verificación en el flujo de login.

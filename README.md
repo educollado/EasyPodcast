@@ -4,15 +4,13 @@
 
 ## Versión
 
-**Versión actual: 0.9**
+**Versión actual: 1.0**
 
-## Novedades 0.9
+## Novedades 1.0
 
-- Autenticación en dos pasos (2FA) con TOTP compatible con Google Authenticator, QR de configuración y 8 códigos de recuperación.
-- Gestión de redes sociales desde el panel; los enlaces se muestran como iconos SVG en el footer público.
-- Página de gestión de caché separada (`cache_management.php`).
-- Cambio de contraseña desde el panel de administración.
-- Panel de estadísticas: episodios publicados, borradores, último publicado, tamaño de audios y estado de la caché.
+- Páginas estáticas con jerarquía padre/hijo, rutas amigables y contenido Markdown (imágenes inline y flotadas).
+- Barra de navegación pública con submenús CSS puro para mostrar las páginas publicadas.
+- Actualizador integrado: comprueba e instala actualizaciones desde GitHub Releases directamente desde el panel.
 
 ## Sitio de referencia
 
@@ -108,6 +106,9 @@
 | `social_management.php` | Gestión de enlaces a redes sociales |
 | `change_password.php` | Cambio de contraseña del administrador |
 | `stats.php` | Estadísticas de episodios y caché |
+| `pages_management.php` | Gestión de páginas estáticas |
+| `add_page.php` | Alta/edición de páginas estáticas |
+| `update.php` | Comprobación e instalación de actualizaciones desde GitHub Releases |
 
 ## Estructura del proyecto
 
@@ -232,6 +233,7 @@ chmod 664 podcast.sqlite feed.xml favicon.ico
 | `episodes` | Episodios y estado de publicación |
 | `management` | Credenciales de administración y configuración 2FA (TOTP) |
 | `social` | Enlaces a redes sociales del autor (una sola fila) |
+| `pages` | Páginas estáticas con jerarquía padre/hijo |
 
 Ver detalle en `schema.sql`.
 
@@ -294,6 +296,7 @@ PRAGMA user_version = 2;
 | 3 | Hace `pub_date` nullable en `episodes` (permite borradores sin fecha) |
 | 4 | Añade columnas `totp_secret`, `totp_enabled`, `totp_recovery_codes` a `management` |
 | 5 | Crea tabla `social` |
+| 6 | Crea tabla `pages` con índice `idx_pages_status` |
 
 ## Flujo de publicación
 
