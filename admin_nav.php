@@ -14,6 +14,7 @@ $_navPage = $currentAdminPage ?? '';
     <a class="admin-nav-link <?= $_navPage === 'episodes'  ? 'active' : '' ?>" href="episodes_management.php">Capítulos</a>
     <a class="admin-nav-link <?= $_navPage === 'add'       ? 'active' : '' ?>" href="add_episode.php">Añadir</a>
     <a class="admin-nav-link <?= $_navPage === 'backups'   ? 'active' : '' ?>" href="backups.php">Backups</a>
+    <a class="admin-nav-link <?= $_navPage === 'cache'     ? 'active' : '' ?>" href="cache_management.php">Caché</a>
     <a class="admin-nav-link" href="/" target="_blank" rel="noopener">Ver web ↗</a>
   </div>
   <a class="admin-nav-logout" href="admin.php?logout=1">Salir</a>

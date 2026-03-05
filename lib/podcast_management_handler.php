@@ -219,16 +219,7 @@ function loadPodcastManagementData(string $dbPath): array
             }
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['cache_action'] ?? '') === 'clear_cache') {
-            csrf_verify();
-            $webOk   = clearWebCache();
-            $imageOk = clearImageCache();
-            if ($webOk && $imageOk) {
-                $notice = 'Caché borrada correctamente.';
-            } else {
-                $error = 'No se pudo borrar completamente la caché.';
-            }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             csrf_verify();
             // Hidrata el formulario con POST para preservar datos si hay errores de validación.
             foreach ($form as $key => $value) {
@@ -249,7 +240,7 @@ function loadPodcastManagementData(string $dbPath): array
                     continue;
                 }
                 if ($key === 'cache_enabled') {
-                    $form[$key] = isset($_POST[$key]) ? '1' : '0';
+                    // Gestionado desde cache_management.php; preservar valor de BD.
                     continue;
                 }
                 $form[$key] = trim((string) ($_POST[$key] ?? ''));

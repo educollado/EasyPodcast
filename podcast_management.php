@@ -279,11 +279,6 @@ extract($data);  // form, error, notice
             <span>Escribir metadatos ID3 en MP3 al subir episodio</span>
             <small>Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista.</small>
           </label>
-          <label class="inline-checkbox">
-            <input type="checkbox" name="cache_enabled" value="1" <?= $form['cache_enabled'] === '1' ? 'checked' : '' ?>>
-            <span>Habilitar caché pública en /cache</span>
-            <small>Aplica a portada, episodio, feed y sitemap.</small>
-          </label>
         </div>
 
         <div class="grid" style="margin-top: .8rem;">
@@ -294,14 +289,8 @@ extract($data);  // form, error, notice
         </div>
 
         <div class="actions">
-          <button class="btn back" type="submit" form="cache-form">Borrar caché</button>
           <button class="btn" type="submit">Guardar podcast</button>
         </div>
-      </form>
-      <!-- Formulario separado para borrar caché (fuera del form principal para evitar anidamiento inválido) -->
-      <form id="cache-form" method="post" action="podcast_management.php" style="display:none;">
-        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
-        <input type="hidden" name="cache_action" value="clear_cache">
       </form>
     </main>
   </div>

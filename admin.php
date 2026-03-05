@@ -67,6 +67,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>Backups</h2>
             <p>Exporta e importa la base de datos</p>
           </a>
+          <a class="admin-card" href="cache_management.php">
+            <div class="admin-card-icon">⚡</div>
+            <h2>Caché</h2>
+            <p>Habilita la caché, bórrala o regenera imágenes</p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2>Ver podcast</h2>
