@@ -2,16 +2,21 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/cache_service.php';
+
 /**
- * Devuelve las estadísticas básicas del podcast a partir de la BD.
+ * Devuelve las estadísticas básicas del podcast a partir de la BD y del sistema de caché.
  *
  * @return array{
  *   published: int,
  *   drafts: int,
  *   total: int,
- *   last_title: string,
- *   last_pub_date: string,
- *   audio_size_bytes: int,
+ *   lastTitle: string,
+ *   lastPubDate: string,
+ *   audioSizeBytes: int,
+ *   cacheEnabled: bool,
+ *   cacheFiles: int,
+ *   cacheSizeBytes: int,
  *   error: string
  * }
  */
@@ -23,6 +28,9 @@ function loadStatsData(string $dbPath): array
     $lastTitle       = '';
     $lastPubDate     = '';
     $audioSizeBytes  = 0;
+    $cacheEnabled    = false;
+    $cacheFiles      = 0;
+    $cacheSizeBytes  = 0;
     $error           = '';
 
     try {
@@ -64,17 +72,36 @@ function loadStatsData(string $dbPath): array
         $error = 'Error al cargar estadísticas: ' . $e->getMessage();
     }
 
+    // Estado de la caché web.
+    $cacheEnabled = isWebCacheEnabled($dbPath);
+    $cacheDir = cacheDirectoryPath();
+    if (is_dir($cacheDir)) {
+        $entries = @scandir($cacheDir) ?: [];
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $cacheDir . '/' . $entry;
+            if (is_file($path)) {
+                $cacheFiles++;
+                $cacheSizeBytes += (int) @filesize($path);
+            }
+        }
+    }
+
     return compact(
         'published', 'drafts', 'total',
         'lastTitle', 'lastPubDate',
-        'audioSizeBytes', 'error'
+        'audioSizeBytes',
+        'cacheEnabled', 'cacheFiles', 'cacheSizeBytes',
+        'error'
     );
 }
 
 /**
  * Formatea bytes en una cadena legible (KB, MB, GB).
  */
-function formatBytes(int $bytes): string
+function statsFormatBytes(int $bytes): string
 {
     if ($bytes <= 0) {
         return '0 B';

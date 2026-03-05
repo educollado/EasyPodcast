@@ -19,7 +19,7 @@ enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadStatsData($dbPath);
-extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBytes, error
+extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBytes, cacheEnabled, cacheFiles, cacheSizeBytes, error
 ?>
 <!doctype html>
 <html lang="es">
@@ -99,7 +99,7 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
 
         <div class="stat-card">
           <span class="stat-label">Tamaño de audios</span>
-          <span class="stat-value"><?= esc(formatBytes($audioSizeBytes)) ?></span>
+          <span class="stat-value"><?= esc(statsFormatBytes($audioSizeBytes)) ?></span>
           <span class="stat-sub">según metadatos de BD</span>
         </div>
 
@@ -112,6 +112,35 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
           <?php endif; ?>
         </div>
         <?php endif; ?>
+
+      </div>
+
+      <h2 style="margin-top:2rem; font-size:1.05rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;">Caché</h2>
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span class="stat-label">Estado</span>
+          <span class="stat-value" style="font-size:1.2rem;">
+            <?php if ($cacheEnabled): ?>
+              <span style="color:#059669;">Activa</span>
+            <?php else: ?>
+              <span style="color:var(--muted);">Inactiva</span>
+            <?php endif; ?>
+          </span>
+          <span class="stat-sub"><a href="cache_management.php" style="color:var(--accent);">Gestionar caché</a></span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Páginas en caché</span>
+          <span class="stat-value"><?= $cacheFiles ?></span>
+          <span class="stat-sub">ficheros .cache</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Tamaño de caché</span>
+          <span class="stat-value"><?= esc(statsFormatBytes($cacheSizeBytes)) ?></span>
+          <span class="stat-sub">HTML cacheado</span>
+        </div>
 
       </div>
     </main>
