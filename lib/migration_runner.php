@@ -35,6 +35,12 @@ function runMigrations(string $dbPath): void
     if ($version < 4) {
         migration_v4($pdo);
         $pdo->exec('PRAGMA user_version = 4');
+        $version = 4;
+    }
+
+    if ($version < 5) {
+        migration_v5($pdo);
+        $pdo->exec('PRAGMA user_version = 5');
     }
 }
 
@@ -97,6 +103,27 @@ function migration_v3(PDO $pdo): void
         }
         throw $e;
     }
+}
+
+/**
+ * Migración v5: crea la tabla social para los enlaces a redes sociales del autor.
+ */
+function migration_v5(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS social (
+          id INTEGER PRIMARY KEY,
+          blog      TEXT NOT NULL DEFAULT '',
+          linkedin  TEXT NOT NULL DEFAULT '',
+          mastodon  TEXT NOT NULL DEFAULT '',
+          x         TEXT NOT NULL DEFAULT '',
+          pixelfed  TEXT NOT NULL DEFAULT '',
+          instagram TEXT NOT NULL DEFAULT '',
+          youtube   TEXT NOT NULL DEFAULT '',
+          github    TEXT NOT NULL DEFAULT '',
+          bluesky   TEXT NOT NULL DEFAULT ''
+        )"
+    );
 }
 
 /**

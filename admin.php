@@ -84,6 +84,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>2FA</h2>
             <p>Autenticación en dos pasos con código TOTP</p>
           </a>
+          <a class="admin-card" href="social_management.php">
+            <div class="admin-card-icon">🔗</div>
+            <h2>Redes Sociales</h2>
+            <p>Blog, LinkedIn, Mastodon, X y más</p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2>Ver podcast</h2>

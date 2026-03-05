@@ -46,7 +46,21 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
 
-PRAGMA user_version = 4;
+PRAGMA user_version = 5;
+
+-- social: enlaces a redes sociales del autor (fila única).
+CREATE TABLE IF NOT EXISTS social (
+  id INTEGER PRIMARY KEY,
+  blog      TEXT NOT NULL DEFAULT '',
+  linkedin  TEXT NOT NULL DEFAULT '',
+  mastodon  TEXT NOT NULL DEFAULT '',
+  x         TEXT NOT NULL DEFAULT '',
+  pixelfed  TEXT NOT NULL DEFAULT '',
+  instagram TEXT NOT NULL DEFAULT '',
+  youtube   TEXT NOT NULL DEFAULT '',
+  github    TEXT NOT NULL DEFAULT '',
+  bluesky   TEXT NOT NULL DEFAULT ''
+);
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (
