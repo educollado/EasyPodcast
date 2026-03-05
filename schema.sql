@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
 
-PRAGMA user_version = 5;
+PRAGMA user_version = 6;
 
 -- social: enlaces a redes sociales del autor (fila única).
 CREATE TABLE IF NOT EXISTS social (
@@ -61,6 +61,23 @@ CREATE TABLE IF NOT EXISTS social (
   github    TEXT NOT NULL DEFAULT '',
   bluesky   TEXT NOT NULL DEFAULT ''
 );
+
+-- pages: páginas estáticas con jerarquía de hasta 2 niveles (padre → hijo).
+CREATE TABLE IF NOT EXISTS pages (
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,           -- segmento propio de la URL
+  full_path TEXT NOT NULL UNIQUE, -- ruta completa: 'sobre' o 'sobre/equipo'
+  content TEXT NOT NULL DEFAULT '',
+  parent_id INTEGER,            -- NULL = página de primer nivel
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'draft',
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY(parent_id) REFERENCES pages(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS idx_pages_status ON pages(status, parent_id, sort_order);
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

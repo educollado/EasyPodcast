@@ -95,3 +95,238 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   Barra de navegación de páginas estáticas
+   ========================================================= */
+
+.pages-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .15rem;
+  padding: .45rem .65rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.pages-nav-item {
+  position: relative;
+}
+
+.pages-nav-item > a {
+  display: inline-block;
+  padding: .35rem .85rem;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: .875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+
+.pages-nav-item > a:hover {
+  background: rgba(181, 71, 14, .08);
+  color: var(--accent);
+}
+
+/* Submenu desplegable CSS puro */
+.pages-submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  list-style: none;
+  padding: .3rem 0;
+  margin: 0;
+  z-index: 100;
+}
+
+.pages-nav-item.has-submenu:hover .pages-submenu,
+.pages-nav-item.has-submenu:focus-within .pages-submenu {
+  display: block;
+}
+
+.pages-submenu li a {
+  display: block;
+  padding: .4rem .85rem;
+  color: var(--muted);
+  font-size: .875rem;
+  text-decoration: none;
+  transition: background .1s, color .1s;
+}
+
+.pages-submenu li a:hover {
+  background: var(--bg);
+  color: var(--accent);
+}
+
+/* =========================================================
+   Contenido de página estática (page.php)
+   ========================================================= */
+
+/* Ocupa todo el ancho del .card, sin el grid de dos columnas de .detail */
+.page-article .desc {
+  margin-top: .75rem;
+  font-size: .95rem;
+  line-height: 1.75;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.page-article .desc p {
+  margin: .65rem 0;
+  color: var(--muted);
+}
+
+.page-article .desc h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 1.5rem 0 .4rem;
+  letter-spacing: -0.01em;
+}
+
+.page-article .desc h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 1.1rem 0 .35rem;
+}
+
+.page-article .desc ul,
+.page-article .desc ol {
+  padding-left: 1.5rem;
+  margin: .5rem 0;
+  color: var(--muted);
+}
+
+.page-article .desc li { margin: .3rem 0; }
+
+.page-article .desc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.page-article .desc a:hover { text-decoration: underline; }
+
+.page-article .desc img {
+  max-width: 100%;
+  border-radius: 8px;
+  display: block;
+  margin: 1rem 0;
+}
+
+/* =========================================================
+   Imágenes en contenido Markdown
+   ========================================================= */
+
+/* Imagen en bloque centrada: ![alt](url) */
+figure.md-img {
+  margin: 1.25rem 0;
+}
+
+/* Imagen flotada a la izquierda: ![alt](url){left} */
+figure.img-float-left {
+  float: left;
+  margin: .25rem 1.5rem 1rem 0;
+  max-width: 45%;
+}
+
+/* Imagen flotada a la derecha: ![alt](url){right} */
+figure.img-float-right {
+  float: right;
+  margin: .25rem 0 1rem 1.5rem;
+  max-width: 45%;
+}
+
+figure.md-img img,
+figure.img-float-left img,
+figure.img-float-right img {
+  max-width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Imagen inline dentro de un párrafo */
+.md-img-inline {
+  max-width: 100%;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+/* Clearfix: evita que el contenedor colapse cuando hay imágenes flotadas */
+.page-article .desc::after,
+.detail .desc::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+/* En móvil las imágenes flotadas ocupan ancho completo */
+@media (max-width: 540px) {
+  figure.img-float-left,
+  figure.img-float-right {
+    float: none;
+    max-width: 100%;
+    margin: 1rem 0;
+  }
+}
+
+/* Breadcrumb en page.php */
+.breadcrumb {
+  font-size: .85rem;
+  color: var(--muted);
+  margin-bottom: .75rem;
+}
+
+.breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+
+/* Lista de subpáginas al final del contenido */
+.page-children {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.page-children ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.page-children li a {
+  display: inline-block;
+  padding: .35rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: .875rem;
+  text-decoration: none;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.page-children li a:hover {
+  background: var(--bg);
+  color: var(--accent);
+  border-color: var(--accent);
+}

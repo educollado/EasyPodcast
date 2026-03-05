@@ -52,15 +52,16 @@ function renderTextWithLinks(string $value): string
 }
 
 /**
- * Aplica formato Markdown inline (negrita, cursiva, enlaces) a una línea de texto.
+ * Aplica formato Markdown inline (negrita, cursiva, imágenes, enlaces) a una línea de texto.
  * Las partes sin formato se escapan con esc(); el HTML generado es seguro.
  */
 function renderMarkdownInline(string $text): string
 {
     // preg_split con PREG_SPLIT_DELIM_CAPTURE divide el texto en fragmentos alternos:
     // índices pares → texto plano (se escapa con esc()), índices impares → token Markdown capturado.
+    // Nota: ![...] debe ir antes de [...] en la alternancia para que el ! no quede huérfano.
     $parts = preg_split(
-        '/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/u',
+        '/(\*\*[^*]+\*\*|\*[^*]+\*|!\[[^\]]*\]\([^\s)]+\)|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/u',
         $text,
         -1,
         PREG_SPLIT_DELIM_CAPTURE
@@ -79,6 +80,18 @@ function renderMarkdownInline(string $text): string
             $html .= '<strong>' . esc(substr($part, 2, -2)) . '</strong>';
         } elseif (str_starts_with($part, '*')) {
             $html .= '<em>' . esc(substr($part, 1, -1)) . '</em>';
+        } elseif (str_starts_with($part, '![')) {
+            // Imagen inline: ![alt](url) → <img> sin flotado.
+            if (preg_match('/^!\[([^\]]*)\]\(([^\s)]+)\)$/', $part, $m)) {
+                $src = trim($m[2]);
+                if (preg_match('/^https?:\/\//i', $src) || str_starts_with($src, '/')) {
+                    $html .= '<img src="' . esc($src) . '" alt="' . esc(trim($m[1])) . '" class="md-img-inline">';
+                } else {
+                    $html .= esc($part);
+                }
+            } else {
+                $html .= esc($part);
+            }
         } elseif (str_starts_with($part, '[')) {
             if (preg_match('/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/', $part, $m)
                 && filter_var($m[2], FILTER_VALIDATE_URL) !== false) {
@@ -100,6 +113,8 @@ function renderMarkdownInline(string $text): string
  */
 function stripMarkdown(string $text): string
 {
+    // Imágenes: ![alt](url) o ![alt](url){left|right} → '' (se eliminan por completo)
+    $text = (string) preg_replace('/!\[[^\]]*\]\([^\s)]+\)(?:\{[^}]*\})?/u', '', $text);
     // Negrita e itálica: **texto** y *texto* → texto
     $text = (string) preg_replace('/\*\*([^*]+)\*\*/u', '$1', $text);
     $text = (string) preg_replace('/\*([^*]+)\*/u', '$1', $text);
@@ -115,7 +130,8 @@ function stripMarkdown(string $text): string
 
 /**
  * Convierte texto Markdown sencillo a HTML seguro.
- * Soporta: encabezados (#/##/###), listas (-/* y 1.), negrita, cursiva, enlaces y párrafos.
+ * Soporta: encabezados (#/##/###), listas (-/* y 1.), negrita, cursiva, imágenes, enlaces y párrafos.
+ * Imágenes en bloque: ![alt](url) → imagen centrada; ![alt](url){left|right} → imagen flotada.
  * No se permite HTML arbitrario; todo el texto libre se escapa con esc().
  */
 function renderMarkdown(string $value): string
@@ -136,6 +152,24 @@ function renderMarkdown(string $value): string
         }
 
         $lines = explode("\n", $block);
+
+        // Imagen en bloque: ![alt](url) o ![alt](url){left|right}
+        // Debe ir antes del check de encabezado para que ![...] no caiga en el párrafo genérico.
+        if (count($lines) === 1 && preg_match('/^!\[([^\]]*)\]\(([^\s)]+)\)(?:\{(left|right)\})?$/', $lines[0], $m)) {
+            $src   = trim($m[2]);
+            $alt   = trim($m[1]);
+            $float = $m[3] ?? '';
+            // Solo se permiten URLs http/https o rutas absolutas del servidor.
+            if (preg_match('/^https?:\/\//i', $src) || str_starts_with($src, '/')) {
+                $class = match ($float) {
+                    'left'  => 'img-float-left',
+                    'right' => 'img-float-right',
+                    default => 'md-img',
+                };
+                $html .= '<figure class="' . $class . '"><img src="' . esc($src) . '" alt="' . esc($alt) . '"></figure>' . "\n";
+                continue;
+            }
+        }
 
         // Encabezado (bloque de una sola línea que empieza por #)
         if (count($lines) === 1 && preg_match('/^(#{1,3})\s+(.+)$/', $lines[0], $m)) {

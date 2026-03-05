@@ -71,6 +71,7 @@ if ($error !== '') {
   <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/episode.css">
   <link rel="stylesheet" href="/assets/css/dark.css">
   <script type="application/ld+json"><?= $episodeJsonLd ?></script>

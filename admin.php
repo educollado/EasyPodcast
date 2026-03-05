@@ -94,10 +94,20 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>Redes Sociales</h2>
             <p>Blog, LinkedIn, Mastodon, X y más</p>
           </a>
+          <a class="admin-card" href="pages_management.php">
+            <div class="admin-card-icon">📄</div>
+            <h2>Páginas</h2>
+            <p>Crea páginas estáticas tipo "Acerca de"</p>
+          </a>
           <a class="admin-card" href="stats.php">
             <div class="admin-card-icon">📊</div>
             <h2>Estadísticas</h2>
             <p>Episodios, borradores y tamaño de audios</p>
+          </a>
+          <a class="admin-card" href="update.php">
+            <div class="admin-card-icon">⬆️</div>
+            <h2>Actualizar</h2>
+            <p>Comprueba e instala nuevas versiones</p>
           </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>

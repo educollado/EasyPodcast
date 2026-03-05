@@ -33,6 +33,7 @@ $searchQuery        = '';
   <link rel="apple-touch-icon" href="/favicon.ico">
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/dark.css">
 </head>
 <body>

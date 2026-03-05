@@ -41,7 +41,38 @@ function runMigrations(string $dbPath): void
     if ($version < 5) {
         migration_v5($pdo);
         $pdo->exec('PRAGMA user_version = 5');
+        $version = 5;
     }
+
+    if ($version < 6) {
+        migration_v6($pdo);
+        $pdo->exec('PRAGMA user_version = 6');
+    }
+}
+
+/**
+ * Migración v6: crea la tabla pages para páginas estáticas con jerarquía (padre/hijo).
+ */
+function migration_v6(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS pages (
+          id INTEGER PRIMARY KEY,
+          title TEXT NOT NULL,
+          slug TEXT NOT NULL,
+          full_path TEXT NOT NULL UNIQUE,
+          content TEXT NOT NULL DEFAULT '',
+          parent_id INTEGER,
+          sort_order INTEGER NOT NULL DEFAULT 0,
+          status TEXT NOT NULL DEFAULT 'draft',
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(parent_id) REFERENCES pages(id) ON DELETE RESTRICT
+        )"
+    );
+    $pdo->exec(
+        "CREATE INDEX IF NOT EXISTS idx_pages_status ON pages(status, parent_id, sort_order)"
+    );
 }
 
 /**

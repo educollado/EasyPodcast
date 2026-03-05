@@ -18,7 +18,9 @@ $_navPage = $currentAdminPage ?? '';
     <a class="admin-nav-link <?= $_navPage === 'twofa'    ? 'active' : '' ?>" href="twofa_management.php">2FA</a>
     <a class="admin-nav-link <?= $_navPage === 'social'    ? 'active' : '' ?>" href="social_management.php">Redes</a>
     <a class="admin-nav-link <?= $_navPage === 'password'  ? 'active' : '' ?>" href="change_password.php">Contraseña</a>
+    <a class="admin-nav-link <?= $_navPage === 'pages'     ? 'active' : '' ?>" href="pages_management.php">Páginas</a>
     <a class="admin-nav-link <?= $_navPage === 'stats'     ? 'active' : '' ?>" href="stats.php">Stats</a>
+    <a class="admin-nav-link <?= $_navPage === 'update'    ? 'active' : '' ?>" href="update.php">Actualizar</a>
     <a class="admin-nav-link" href="/" target="_blank" rel="noopener">Ver web ↗</a>
   </div>
   <a class="admin-nav-logout" href="admin.php?logout=1">Salir</a>

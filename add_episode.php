@@ -183,7 +183,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
           toolbar: [
             'bold', 'italic', 'heading', '|',
             'unordered-list', 'ordered-list', '|',
-            'link', '|',
+            'link', 'image', '|',
             'preview'
           ],
           spellChecker: false,

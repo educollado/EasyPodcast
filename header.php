@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/lib/page_helpers.php';
+
 $podcastTitle = isset($podcastTitle) ? (string) $podcastTitle : 'Podcast';
 $podcastAuthor = isset($podcastAuthor) ? (string) $podcastAuthor : '';
 $podcastDescription = isset($podcastDescription) ? (string) $podcastDescription : '';
@@ -49,6 +51,31 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     </div>
   </div>
 </header>
+<?php
+// Barra de navegación: siempre incluye "Inicio" seguido de las páginas publicadas.
+$_navPages = isset($dbPath) ? getPublishedPagesForNav($dbPath) : [];
+?>
+<nav class="pages-nav" aria-label="Navegación principal">
+  <div class="pages-nav-item">
+    <a href="/">Inicio</a>
+  </div>
+  <?php foreach ($_navPages as $_navPage): ?>
+    <?php if ($_navPage['children']): ?>
+      <div class="pages-nav-item has-submenu">
+        <a href="/<?= esc((string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
+        <ul class="pages-submenu">
+          <?php foreach ($_navPage['children'] as $_navChild): ?>
+            <li><a href="/<?= esc((string) $_navChild['full_path']) ?>"><?= esc((string) $_navChild['title']) ?></a></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    <?php else: ?>
+      <div class="pages-nav-item">
+        <a href="/<?= esc((string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
+      </div>
+    <?php endif; ?>
+  <?php endforeach; ?>
+</nav>
 <script>
 // Toggle de modo oscuro.
 // El script vive aquí (justo tras el botón en el DOM) para poder adjuntar
