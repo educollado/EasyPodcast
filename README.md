@@ -1,6 +1,6 @@
 # EasyPodcast
 
-> Aplicación ligera en **PHP + SQLite** para publicar un podcast con web pública, páginas de episodio y feed RSS.
+> Aplicación en **PHP + SQLite** para publicar un podcast con web pública, páginas de episodio y feed RSS.
 
 ## Versión
 
