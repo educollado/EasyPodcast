@@ -47,6 +47,13 @@ function loadTwofaData(string $dbPath): array
         $totpSecret    = (string) ($row['totp_secret'] ?? '');
         $recoveryCodes = (string) ($row['totp_recovery_codes'] ?? '[]');
 
+        // Issuer: dominio del podcast (podcast.link) o host actual como fallback.
+        $podcastRow = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        $podcastLink = (string) ($podcastRow['link'] ?? '');
+        $issuer = ($podcastLink !== '')
+            ? (parse_url($podcastLink, PHP_URL_HOST) ?: $podcastLink)
+            : (string) ($_SERVER['HTTP_HOST'] ?? 'EasyPodcast');
+
         // Determinar estado base.
         if ($totpEnabled && $totpSecret !== '') {
             $state = 'enabled';
@@ -55,7 +62,6 @@ function loadTwofaData(string $dbPath): array
         } elseif (isset($_SESSION['totp_setup_secret'])) {
             $state         = 'setup_pending';
             $pendingSecret = (string) $_SESSION['totp_setup_secret'];
-            $issuer        = 'EasyPodcast';
             $qrUri         = totpQrUri($pendingSecret, $username, $issuer);
         }
 
@@ -70,7 +76,6 @@ function loadTwofaData(string $dbPath): array
                 $_SESSION['totp_setup_secret'] = $secret;
                 $state         = 'setup_pending';
                 $pendingSecret = $secret;
-                $issuer        = 'EasyPodcast';
                 $qrUri         = totpQrUri($pendingSecret, $username, $issuer);
 
             } elseif ($action === 'confirm_setup') {
@@ -84,7 +89,7 @@ function loadTwofaData(string $dbPath): array
                     if (!totpVerify($pendingSecret, $code)) {
                         $error = 'Código incorrecto. Asegúrate de que tu app está sincronizada y vuelve a intentarlo.';
                         $state         = 'setup_pending';
-                        $qrUri         = totpQrUri($pendingSecret, $username, 'EasyPodcast');
+                        $qrUri         = totpQrUri($pendingSecret, $username, $issuer);
                     } else {
                         // Código correcto: activar 2FA y generar códigos de recuperación.
                         $codes = totpGenerateRecoveryCodes(8);
