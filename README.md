@@ -230,7 +230,9 @@ chmod 664 podcast.sqlite feed.xml favicon.ico
 |---|---|
 | `podcast` | Metadatos del canal (una sola fila) |
 | `episodes` | Episodios y estado de publicación |
-| `management` | Credenciales de administración |
+| `management` | Credenciales de administración y configuración 2FA (TOTP) |
+| `social` | Enlaces a redes sociales del autor (una sola fila) |
+| `api_tokens` | Tokens de acceso a la API REST |
 
 Ver detalle en `schema.sql`.
 
@@ -290,6 +292,10 @@ PRAGMA user_version = 2;
 | Versión | Cambios |
 |---|---|
 | 1 | Añade `rss_item_limit`, `home_items_per_page`, `write_audio_metadata`, `cache_enabled` a `podcast` |
+| 2 | Crea tabla `api_tokens` |
+| 3 | Hace `pub_date` nullable en `episodes` (permite borradores sin fecha) |
+| 4 | Añade columnas `totp_secret`, `totp_enabled`, `totp_recovery_codes` a `management` |
+| 5 | Crea tabla `social` |
 
 ## Flujo de publicación
 
