@@ -110,15 +110,8 @@ function loadTwofaData(string $dbPath): array
                 }
 
             } elseif ($action === 'disable') {
-                // Requiere código TOTP para desactivar (evita desactivación por secuestro de sesión).
-                $code = trim((string) ($_POST['totp_code'] ?? ''));
                 if (!$totpEnabled || $totpSecret === '') {
                     $error = '2FA ya está desactivado.';
-                } elseif (!totpVerify($totpSecret, $code)) {
-                    $error = 'Código incorrecto. No se ha desactivado el 2FA.';
-                    $state = 'enabled';
-                    $storedHashes = json_decode($recoveryCodes, true);
-                    $recoveryCount = is_array($storedHashes) ? count($storedHashes) : 0;
                 } else {
                     $upd = $pdo->prepare(
                         'UPDATE management SET totp_secret = NULL, totp_enabled = 0, totp_recovery_codes = NULL WHERE id = :id'

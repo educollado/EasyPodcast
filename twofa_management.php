@@ -158,16 +158,11 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
         <!-- Desactivar 2FA -->
         <div class="danger-zone">
           <h3>Desactivar 2FA</h3>
-          <p>Introduce tu código TOTP actual para desactivar la autenticación en dos pasos:</p>
-          <form method="post" action="twofa_management.php" autocomplete="off">
+          <p>Se eliminará el secreto y los códigos de recuperación.</p>
+          <form method="post" action="twofa_management.php">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="twofa_action" value="disable">
-            <label>
-              Código de verificación
-              <input class="totp-input" type="text" name="totp_code" inputmode="numeric"
-                     maxlength="6" required placeholder="000000" autocomplete="one-time-code">
-            </label>
-            <div class="actions" style="margin-top:.6rem;">
+            <div class="actions">
               <button class="btn" type="submit" style="background:var(--danger);">Desactivar 2FA</button>
             </div>
           </form>
