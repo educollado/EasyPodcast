@@ -139,16 +139,11 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
         <details style="margin-top:1rem;">
           <summary style="cursor:pointer; color:var(--accent); font-weight:600;">Regenerar códigos de recuperación</summary>
           <div style="margin-top:.8rem;">
-            <p>Los códigos actuales quedarán anulados. Introduce tu código TOTP para confirmar:</p>
-            <form method="post" action="twofa_management.php" autocomplete="off">
+            <p>Los códigos actuales quedarán anulados.</p>
+            <form method="post" action="twofa_management.php">
               <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
               <input type="hidden" name="twofa_action" value="regenerate_codes">
-              <label>
-                Código de verificación
-                <input class="totp-input" type="text" name="totp_code" inputmode="numeric"
-                       maxlength="6" required placeholder="000000" autocomplete="one-time-code">
-              </label>
-              <div class="actions" style="margin-top:.6rem;">
+              <div class="actions">
                 <button class="btn" type="submit">Regenerar códigos</button>
               </div>
             </form>

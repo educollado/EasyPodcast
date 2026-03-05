@@ -122,15 +122,8 @@ function loadTwofaData(string $dbPath): array
                 }
 
             } elseif ($action === 'regenerate_codes') {
-                // Requiere código TOTP para regenerar los códigos de recuperación.
-                $code = trim((string) ($_POST['totp_code'] ?? ''));
                 if (!$totpEnabled || $totpSecret === '') {
                     $error = '2FA no está activo.';
-                } elseif (!totpVerify($totpSecret, $code)) {
-                    $error = 'Código incorrecto. No se han regenerado los códigos.';
-                    $state = 'enabled';
-                    $storedHashes = json_decode($recoveryCodes, true);
-                    $recoveryCount = is_array($storedHashes) ? count($storedHashes) : 0;
                 } else {
                     $codes = totpGenerateRecoveryCodes(8);
                     $upd = $pdo->prepare('UPDATE management SET totp_recovery_codes = :rc WHERE id = :id');
