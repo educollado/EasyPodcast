@@ -84,6 +84,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>2FA</h2>
             <p>Autenticación en dos pasos con código TOTP</p>
           </a>
+          <a class="admin-card" href="change_password.php">
+            <div class="admin-card-icon">🔑</div>
+            <h2>Contraseña</h2>
+            <p>Cambia la contraseña de acceso al panel</p>
+          </a>
           <a class="admin-card" href="social_management.php">
             <div class="admin-card-icon">🔗</div>
             <h2>Redes Sociales</h2>
