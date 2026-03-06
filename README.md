@@ -4,7 +4,13 @@
 
 ## Versión
 
-**Versión actual: 1.1**
+**Versión actual: 1.2**
+
+## Novedades 1.2
+
+- Imagen Docker oficial publicada en `ghcr.io/educollado/easypodcast` con GitHub Actions.
+- Instalación con Docker en un solo comando usando `docker-compose.yml`.
+- Inicialización automática de la base de datos en primera instalación.
 
 ## Novedades 1.1
 
@@ -171,6 +177,32 @@
 | Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/`, `cache/`, `favicon.ico` |
 
 ## Instalación
+
+### Con Docker (recomendado)
+
+```bash
+# 1. Crear directorios de datos
+mkdir -p data/db data/audios data/images data/cache
+
+# 2. Levantar el contenedor
+docker run -d \
+  --name easypodcast \
+  -p 8080:80 \
+  -e PODCAST_DB_PATH=/var/www/html/data/podcast.sqlite \
+  -v $(pwd)/data/db:/var/www/html/data \
+  -v $(pwd)/data/audios:/var/www/html/audios \
+  -v $(pwd)/data/images:/var/www/html/images \
+  -v $(pwd)/data/cache:/var/www/html/cache \
+  ghcr.io/educollado/easypodcast:latest
+```
+
+O con `docker compose up -d` usando el `docker-compose.yml` del repositorio.
+
+La base de datos se inicializa automáticamente en el primer arranque.
+
+---
+
+### Con Apache (instalación manual)
 
 ### 1) Copiar el proyecto al servidor web
 
