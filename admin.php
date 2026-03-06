@@ -109,6 +109,11 @@ extract($data); // adminCount, isSetupMode, error, notice
             <h2>Actualizar</h2>
             <p>Comprueba e instala nuevas versiones</p>
           </a>
+          <a class="admin-card" href="import_feed.php">
+            <div class="admin-card-icon">📥</div>
+            <h2>Importar feed</h2>
+            <p>Importa episodios desde una URL de feed RSS externo</p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2>Ver podcast</h2>

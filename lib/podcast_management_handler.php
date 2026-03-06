@@ -218,6 +218,10 @@ function loadPodcastManagementData(string $dbPath): array
                 $form[$key] = (string) ($existing[$key] ?? $value);
             }
         }
+        // Si el link está vacío (instalación nueva o campo no guardado), sugerir el host actual.
+        if ($form['link'] === '') {
+            $form['link'] = runtimeBaseUrl();
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             csrf_verify();
