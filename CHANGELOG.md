@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Corrección de versión: `APP_VERSION` actualizado a `1.2.1`.
+
 ## 1.2
 
 - Imagen Docker oficial publicada en `ghcr.io/educollado/easypodcast`.

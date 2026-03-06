@@ -4,7 +4,11 @@
 
 ## Versión
 
-**Versión actual: 1.2**
+**Versión actual: 1.2.1**
+
+## Novedades 1.2.1
+
+- Corrección de versión: `APP_VERSION` actualizado a `1.2.1`.
 
 ## Novedades 1.2
 
