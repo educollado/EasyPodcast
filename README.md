@@ -126,6 +126,7 @@
 | `pages_management.php` | Gestión de páginas estáticas |
 | `add_page.php` | Alta/edición de páginas estáticas |
 | `update.php` | Comprobación e instalación de actualizaciones desde GitHub Releases |
+| `import_feed.php` | Importación de episodios desde un feed RSS externo (previsualización, selección y descarga de audio e imágenes) |
 
 ## Estructura del proyecto
 
@@ -162,6 +163,8 @@
 | `lib/search_seo.php` | Metadatos SEO de la página de búsqueda |
 | `lib/episodes_management_query.php` | Consultas SQL y acciones CRUD de gestión de episodios |
 | `lib/add_episode_query.php` | Orquestación del formulario de alta/edición de episodio |
+| `import_feed.php` | Importación de feed RSS externo |
+| `lib/import_feed_handler.php` | Parser de feed, descarga de audios/imágenes y lógica de importación con streaming de progreso |
 | `lib/podcast_management_handler.php` | Acciones POST de gestión del canal (metadatos, caché, favicon) |
 | `lib/admin_query.php` | Autenticación: login, setup inicial y logout |
 | `lib/backup_handler.php` | Exportación/importación de base de datos y ficheros multimedia |
@@ -179,7 +182,7 @@
 | Componente | Requisito |
 |---|---|
 | PHP | 8+ recomendado |
-| Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd` |
+| Extensiones | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd`, `curl` |
 | Servidor | Apache con `mod_rewrite` |
 | Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/`, `cache/`, `favicon.ico` |
 
