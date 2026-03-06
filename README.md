@@ -4,7 +4,11 @@
 
 ## Versión
 
-**Versión actual: 1.0**
+**Versión actual: 1.1**
+
+## Novedades 1.1
+
+- Enlace de EasyPodcast en el pie de página apunta ahora a [easypodcast.eu](https://www.easypodcast.eu) en lugar del repositorio de GitHub.
 
 ## Novedades 1.0
 

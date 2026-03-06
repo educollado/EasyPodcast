@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1
+
+- Enlace de EasyPodcast en el pie de página apunta ahora a [easypodcast.eu](https://www.easypodcast.eu) en lugar del repositorio de GitHub.
+
 ## 1.0
 
 - Páginas estáticas gestionables desde el panel de administración (`pages_management.php`, `add_page.php`): jerarquía padre/hijo, rutas amigables `/slug` y `/padre/hijo`, contenido en Markdown con soporte de imágenes inline y flotadas.
