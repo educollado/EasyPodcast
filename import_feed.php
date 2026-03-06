@@ -69,6 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
       <h1>Importar feed RSS</h1>
       <p>Importa episodios desde una URL de feed RSS externo. Los archivos MP3 e imágenes se descargarán localmente.</p>
 
+      <?php if (!function_exists('curl_init')): ?>
+        <div class="error">
+          <strong>La extensión cURL no está disponible.</strong><br>
+          La importación de feeds requiere cURL para descargar el feed, los audios y las imágenes.
+          Habilita la extensión <code>curl</code> en tu instalación de PHP y recarga esta página para poder importar.
+        </div>
+      <?php else: ?>
+
       <?php if ($previewError !== ''): ?>
         <div class="error"><?= esc($previewError) ?></div>
       <?php endif; ?>
@@ -277,6 +285,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           }());
         </script>
       <?php endif; ?>
+
+      <?php endif; // curl disponible ?>
 
     </main>
   </div>
