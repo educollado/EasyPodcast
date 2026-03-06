@@ -39,6 +39,11 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
         return;
     }
 
+    // Permite deshabilitar la redirección canónica en entornos locales/Docker sin HTTPS.
+    if (getenv('DISABLE_HTTPS_REDIRECT') === 'true') {
+        return;
+    }
+
     $httpHost = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
     if ($httpHost === '') {
         return;

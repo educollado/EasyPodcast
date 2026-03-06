@@ -7,7 +7,7 @@ services:
       # La BD se guarda en data/ para que persista independiente del código
       PODCAST_DB_PATH: /var/www/html/data/podcast.sqlite
       # Descomentar en desarrollo local (sin HTTPS ni reverse proxy):
-      # DISABLE_HTTPS_REDIRECT: "true"
+      DISABLE_HTTPS_REDIRECT: "true"
     volumes:
       # Base de datos SQLite — persiste entre actualizaciones de imagen
       - ./data/db:/var/www/html/data
