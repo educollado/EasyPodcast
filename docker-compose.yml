@@ -1,0 +1,20 @@
+services:
+  app:
+    image: ghcr.io/educollado/easypodcast:latest
+    ports:
+      - "8080:80"
+    environment:
+      # La BD se guarda en data/ para que persista independiente del código
+      PODCAST_DB_PATH: /var/www/html/data/podcast.sqlite
+      # Descomentar en desarrollo local (sin HTTPS ni reverse proxy):
+      # DISABLE_HTTPS_REDIRECT: "true"
+    volumes:
+      # Base de datos SQLite — persiste entre actualizaciones de imagen
+      - ./data/db:/var/www/html/data
+      # Archivos de audio subidos
+      - ./data/audios:/var/www/html/audios
+      # Imágenes de portada y episodios
+      - ./data/images:/var/www/html/images
+      # Caché de páginas HTML generadas
+      - ./data/cache:/var/www/html/cache
+    restart: unless-stopped

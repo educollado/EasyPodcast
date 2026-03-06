@@ -1,0 +1,16 @@
+.git/
+.claude/
+tests/
+deploy.sh
+audios/
+images/
+cache/
+data/
+podcast.sqlite
+*.sqlite
+*.zip
+tools/
+.gitignore
+CLAUDE.md
+AGENTS.md
+.insyncdl

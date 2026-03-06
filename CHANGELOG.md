@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2
+
+- Imagen Docker oficial publicada en `ghcr.io/educollado/easypodcast`.
+- `Dockerfile`: corregidas dependencias del sistema para compilar `pdo_sqlite` y `gd` en Debian Bookworm (`libsqlite3-dev`, `pkg-config`, `libjpeg-dev`).
+- `docker/entrypoint.sh`: inicialización automática de la base de datos desde `schema.sql` en primera instalación.
+- `docker/init_db.php`: script de inicialización de BD para contenedores nuevos.
+- GitHub Actions (`docker-publish.yml`): publicación automática de imagen en cada release.
+
 ## 1.1
 
 - Enlace de EasyPodcast en el pie de página apunta ahora a [easypodcast.eu](https://www.easypodcast.eu) en lugar del repositorio de GitHub.
