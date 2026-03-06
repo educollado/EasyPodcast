@@ -34,3 +34,25 @@ html[data-theme="dark"] .page-link:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* Badge de fecha en modo oscuro */
+html[data-theme="dark"] .episode .meta,
+html[data-theme="dark"] .detail .meta {
+  background: rgba(224, 108, 53, .09);
+}
+
+/* Botón descargar en modo oscuro */
+html[data-theme="dark"] .download {
+  background: rgba(224, 108, 53, .08);
+  border-color: rgba(224, 108, 53, .2);
+}
+
+/* Sombra hover de tarjeta episodio en modo oscuro */
+html[data-theme="dark"] .episode:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
+}
+
+/* Paginación en modo oscuro */
+html[data-theme="dark"] .pagination {
+  background: var(--card);
+}

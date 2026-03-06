@@ -17,10 +17,12 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     <div class="podcast-header-left header-box">
       <div class="podcast-branding">
         <?php if ($headerImgSources['src'] !== ''): ?>
-          <img class="podcast-cover-header"
-               src="<?= esc($headerImgSources['src']) ?>"
-               <?php if ($headerImgSources['srcset'] !== ''): ?>srcset="<?= esc($headerImgSources['srcset']) ?>" sizes="(max-width: 460px) 64px, 80px"<?php endif; ?>
-               width="80" height="80" alt="Portada del podcast">
+          <a href="/" aria-label="Ir a la página de inicio">
+            <img class="podcast-cover-header"
+                 src="<?= esc($headerImgSources['src']) ?>"
+                 <?php if ($headerImgSources['srcset'] !== ''): ?>srcset="<?= esc($headerImgSources['srcset']) ?>" sizes="(max-width: 460px) 64px, 80px"<?php endif; ?>
+                 width="80" height="80" alt="Portada del podcast">
+          </a>
         <?php endif; ?>
         <div class="podcast-info">
           <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>

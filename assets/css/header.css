@@ -23,13 +23,14 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background .12s ease, color .12s ease, border-color .12s ease;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .15s ease;
 }
 
 .rss-link:hover {
   background: #fff7ed;
   color: #ea580c;
   border-color: #fdba74;
+  transform: translateY(-1px);
 }
 
 /* Botón toggle claro/oscuro */
@@ -45,12 +46,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background .12s ease, border-color .12s ease;
+  transition: background .12s ease, border-color .12s ease, transform .15s ease;
 }
 
 .theme-toggle:hover {
   background: #fef3c7;
   border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 /* En episode.php el breakpoint 760px solo afecta al .detail,

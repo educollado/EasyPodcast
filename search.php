@@ -49,6 +49,8 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <meta property="og:image" content="<?= esc($ogImage) ?>">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
   <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/common.css">
@@ -71,7 +73,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
       <?php else: ?>
         <p class="meta">Resultados para "<?= esc($query) ?>": <?= (int) $totalEpisodes ?></p>
         <?php foreach ($episodes as $episode): ?>
-          <article class="episode">
+          <article class="episode reveal">
             <?php $episodeImage = trim((string) ($episode['image_url'] ?? '')); ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
             <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
@@ -125,5 +127,25 @@ header('X-Robots-Tag: noindex, follow, noarchive');
     </main>
     <?php require __DIR__ . '/footer.php'; ?>
   </div>
+  <script>
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.06 });
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      el.style.transition = 'opacity .55s ease, transform .55s ease';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      obs.observe(el);
+    });
+  }());
+  </script>
 </body>
 </html>

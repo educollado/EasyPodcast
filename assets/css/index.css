@@ -2,26 +2,38 @@
    Lista de episodios — depende de common.css
    ========================================================= */
 
+/* El contenedor principal pasa a ser un flex column transparente:
+   cada episodio es su propia tarjeta flotante. */
+main.card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+
+/* =========================================================
+   Tarjeta de episodio
+   ========================================================= */
 .episode {
-  border-top: 1px solid var(--border);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
   display: grid;
   grid-template-columns: 108px 1fr;
   gap: 1.1rem;
   align-items: start;
-  /* Extiende el hover a los bordes de la card */
-  margin: 0 calc(-1 * var(--card-padding));
-  padding: 1.25rem var(--card-padding) .6rem;
-  border-left: 3px solid transparent;
-  transition: background .2s ease, border-color .2s ease;
-}
-
-.episode:first-child {
-  border-top: 0;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
 .episode:hover {
-  background: rgba(181, 71, 14, .03);
-  border-left-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 16px 40px rgba(0,0,0,.12);
+  border-color: var(--accent);
 }
 
 .episode > a {
@@ -31,7 +43,7 @@
 .cover {
   width: 108px;
   height: 108px;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
   border: 1px solid var(--border);
   background: #ede8e1;
@@ -41,7 +53,7 @@
 
 .episode:hover .cover {
   box-shadow: 0 4px 18px rgba(0,0,0,0.16);
-  transform: scale(1.03) rotate(-0.5deg);
+  transform: scale(1.04) rotate(-0.5deg);
 }
 
 .episode-content { min-width: 0; }
@@ -49,8 +61,8 @@
 h2 {
   margin: 0 0 .3rem;
   font-family: var(--font-display);
-  font-size: clamp(1rem, 2.6vw, 1.15rem);
-  font-weight: 600;
+  font-size: clamp(1.05rem, 2.8vw, 1.2rem);
+  font-weight: 700;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
@@ -63,20 +75,23 @@ h2 a {
 
 h2 a:hover { color: var(--accent); }
 
-.meta {
-  margin: 0 0 .45rem;
-  color: var(--muted);
-  font-size: .74rem;
+/* Badge de fecha */
+.episode .meta {
+  display: inline-block;
+  margin: 0 0 .5rem;
+  border-radius: 999px;
+  background: rgba(181, 71, 14, .09);
+  color: var(--accent);
+  padding: .2em .75em;
+  font-size: .78rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .09em;
 }
 
 .excerpt {
   margin: 0;
-  font-size: .91rem;
+  font-size: .93rem;
   color: var(--muted);
-  line-height: 1.58;
+  line-height: 1.65;
   overflow-wrap: anywhere;
 }
 
@@ -89,9 +104,14 @@ h2 a:hover { color: var(--accent); }
   white-space: nowrap;
 }
 
-.read-more::after { content: ' →'; }
+.read-more::after {
+  content: ' →';
+  display: inline-block;
+  transition: transform .15s ease;
+}
 
 .read-more:hover { text-decoration: underline; }
+.read-more:hover::after { transform: translateX(2px); }
 
 .player {
   margin-top: .75rem;
@@ -102,9 +122,12 @@ h2 a:hover { color: var(--accent); }
    Paginación
    ========================================================= */
 .pagination {
-  margin-top: 1.5rem;
-  padding-top: 1.1rem;
-  border-top: 1px solid var(--border);
+  margin-top: .15rem;
+  padding: 1.1rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
   display: flex;
   gap: .5rem;
   flex-wrap: wrap;
@@ -120,7 +143,7 @@ h2 a:hover { color: var(--accent); }
 
 .page-link {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: .4rem .75rem;
   text-decoration: none;
   color: var(--text);
@@ -130,13 +153,14 @@ h2 a:hover { color: var(--accent); }
   min-height: 36px;
   display: inline-flex;
   align-items: center;
-  transition: background .12s, border-color .12s, color .12s;
+  transition: background .12s, border-color .12s, color .12s, transform .15s ease;
 }
 
 .page-link:hover {
   background: #ffeee6;
   border-color: var(--accent);
   color: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
 .page-link.active {
@@ -147,11 +171,20 @@ h2 a:hover { color: var(--accent); }
 }
 
 /* =========================================================
+   Animación de entrada
+   ========================================================= */
+.reveal.visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 @media (max-width: 620px) {
   .episode {
     grid-template-columns: 84px 1fr;
+    padding: 1.1rem;
   }
 
   .cover { width: 84px; height: 84px; }
