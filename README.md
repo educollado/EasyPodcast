@@ -4,11 +4,14 @@
 
 ## Versión
 
-**Versión actual: 1.2.1**
+**Versión actual: 1.2.2**
 
-## Novedades 1.2.1
+## Novedades 1.2.2
 
-- Corrección de versión: `APP_VERSION` actualizado a `1.2.1`.
+- Importación de feed RSS externo: descarga episodios (audio e imágenes) desde cualquier URL de feed con previsualización y selección individual.
+- Primera importación: crea automáticamente la fila del podcast si la BD está vacía.
+- La URL principal nunca se sobreescribe con el valor del feed; usa siempre el host de la instalación.
+- `podcast_management.php`: el campo "URL principal" se rellena automáticamente con el host actual cuando está vacío.
 
 ## Novedades 1.2
 

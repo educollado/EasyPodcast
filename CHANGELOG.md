@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2
+
+- Importación de feed RSS externo (`import_feed.php`): descarga episodios (audio e imágenes) desde cualquier URL de feed, con previsualización y selección individual de episodios y metadatos del podcast.
+- Primera importación: si la tabla `podcast` está vacía, se crea la fila de canal automáticamente desde el feed.
+- La URL principal (`podcast.link`) nunca se sobrescribe con el valor del feed; se usa siempre el host actual de la instalación.
+- `podcast_management.php`: el campo "URL principal" se rellena automáticamente con el host actual cuando está vacío.
+- Enlace a "Importar feed" añadido en el panel de administración y en la barra de navegación admin.
+
 ## 1.2.1
 
 - Corrección de versión: `APP_VERSION` actualizado a `1.2.1`.
