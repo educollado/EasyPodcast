@@ -93,27 +93,38 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
 
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 
-        // Recupera episodios según estado y resuelve el episodio exacto por la ruta solicitada.
-        // Con $allowDraft también se incluyen borradores (solo para previsualización de admin).
-        // No se filtra por pub_date en SQL para no romper URLs cuando el link guardado
-        // se conserva aunque cambie la fecha de publicación.
         $statusClause = $allowDraft
             ? "status IN ('published', 'draft')"
             : "status = 'published'";
-        $stmt = $pdo->prepare(
-            "SELECT *
-             FROM episodes
-             WHERE $statusClause
-             ORDER BY datetime(pub_date) DESC, id DESC"
-        );
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
 
-        // Varios episodios pueden compartir ruta parcial. Resolvemos el definitivo por URL completa.
-        foreach ($rows as $row) {
-            if (episodeMatchesRoute($row, $year, $month, $slug)) {
-                $episode = $row;
-                break;
+        // Fast path: búsqueda exacta por link indexado (O(log n)).
+        // Cubre todos los episodios creados o editados en EasyPodcast, donde link
+        // siempre se guarda como ruta relativa /YYYY/MM/slug.
+        $linkPath = "/$year/$month/$slug";
+        $fastStmt = $pdo->prepare(
+            "SELECT * FROM episodes WHERE link = :link AND $statusClause LIMIT 1"
+        );
+        $fastStmt->execute([':link' => $linkPath]);
+        $episode = $fastStmt->fetch() ?: null;
+
+        // Fallback legacy: episodios sin link (importados antes de que se guardara la ruta).
+        // Se filtra por pub_date en SQL y se resuelve el slug exacto en PHP.
+        if ($episode === null) {
+            $fallbackStmt = $pdo->prepare(
+                "SELECT *
+                 FROM episodes
+                 WHERE $statusClause
+                   AND (link IS NULL OR TRIM(link) = '')
+                   AND strftime('%Y', pub_date) = :year
+                   AND strftime('%m', pub_date) = :month
+                 ORDER BY datetime(pub_date) DESC, id DESC"
+            );
+            $fallbackStmt->execute([':year' => $year, ':month' => $month]);
+            foreach ($fallbackStmt->fetchAll() as $row) {
+                if (episodeMatchesRoute($row, $year, $month, $slug)) {
+                    $episode = $row;
+                    break;
+                }
             }
         }
 

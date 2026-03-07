@@ -46,7 +46,10 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_status_pubdate
 ON episodes(status, pub_date);
 
-PRAGMA user_version = 6;
+-- Permite resolución O(log n) de URLs por link guardado (/YYYY/MM/slug).
+CREATE INDEX IF NOT EXISTS idx_episodes_link ON episodes(link);
+
+PRAGMA user_version = 7;
 
 -- social: enlaces a redes sociales del autor (fila única).
 CREATE TABLE IF NOT EXISTS social (

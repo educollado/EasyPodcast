@@ -47,7 +47,23 @@ function runMigrations(string $dbPath): void
     if ($version < 6) {
         migration_v6($pdo);
         $pdo->exec('PRAGMA user_version = 6');
+        $version = 6;
     }
+
+    if ($version < 7) {
+        migration_v7($pdo);
+        $pdo->exec('PRAGMA user_version = 7');
+    }
+}
+
+/**
+ * Migración v7: añade índice sobre episodes(link) para resolución O(log n) de URLs.
+ */
+function migration_v7(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE INDEX IF NOT EXISTS idx_episodes_link ON episodes(link)'
+    );
 }
 
 /**
