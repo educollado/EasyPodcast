@@ -50,6 +50,9 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
       <form method="post" action="add_page.php<?= $isEditing && $editingPageId !== null ? '?page_id=' . (int) $editingPageId : '' ?>" autocomplete="off">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+        <?php if ($isEditing && !empty($form['full_path'])): ?>
+          <input type="hidden" name="current_full_path" value="<?= esc((string) $form['full_path']) ?>">
+        <?php endif; ?>
         <?php if ($isEditing && $editingPageId !== null): ?>
           <input type="hidden" name="page_id" value="<?= (int) $editingPageId ?>">
         <?php endif; ?>
@@ -111,7 +114,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="actions" style="margin-top:1rem;">
           <?php if ($isEditing): ?>
-            <a class="btn" href="/<?= esc((string) ($form['slug'] ?? '')) ?>" target="_blank" rel="noopener">Vista previa</a>
+            <a class="btn" href="<?= esc(buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener">Vista previa</a>
           <?php endif; ?>
           <a class="btn" href="pages_management.php">Volver a la lista</a>
           <button class="btn" type="submit"><?= $isEditing ? 'Actualizar página' : 'Guardar página' ?></button>

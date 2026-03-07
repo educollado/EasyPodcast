@@ -8,6 +8,36 @@ require_once __DIR__ . '/cache_service.php';
 const PAGE_RESERVED_SLUGS = ['admin', 'feed', 'search', 'cache', 'audios', 'images', 'assets', 'backups', 'robots'];
 
 /**
+ * Valida que una página en edición no se asigne a sí misma como padre.
+ * Lanza RuntimeException si la selección es inválida.
+ */
+function ensurePageParentIsValid(?int $parentId, ?int $editId): void
+{
+    if ($editId !== null && $parentId !== null && $parentId === $editId) {
+        throw new RuntimeException('Una página no puede ser su propia página padre.');
+    }
+}
+
+/**
+ * Devuelve la ruta de preview para el formulario de páginas.
+ * Prioriza full_path persistido (útil en páginas hijas) y, si no existe, usa slug.
+ */
+function buildPagePreviewPath(array $form): string
+{
+    $fullPath = trim((string) ($form['full_path'] ?? ''));
+    if ($fullPath !== '') {
+        return '/' . ltrim($fullPath, '/');
+    }
+
+    $slug = trim((string) ($form['slug'] ?? ''));
+    if ($slug !== '') {
+        return '/' . ltrim($slug, '/');
+    }
+
+    return '/';
+}
+
+/**
  * Valida el formulario de página.
  * Devuelve ['errors' => string[], 'form' => array].
  */
@@ -19,6 +49,7 @@ function validatePageForm(array $post): array
         'slug'       => trim(strtolower((string) ($post['slug'] ?? ''))),
         'content'    => (string) ($post['content'] ?? ''),
         'parent_id'  => $parentIdRaw !== '' ? (int) $parentIdRaw : null,
+        'full_path'  => trim((string) ($post['current_full_path'] ?? '')),
         'sort_order' => (int) ($post['sort_order'] ?? 0),
         'status'     => in_array($post['status'] ?? '', ['draft', 'published'], true)
                             ? (string) $post['status']
@@ -46,6 +77,8 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
 {
     $slug     = $form['slug'];
     $parentId = $form['parent_id'];
+
+    ensurePageParentIsValid($parentId, $editId);
 
     // Calcular full_path según si es hija o de primer nivel.
     if ($parentId !== null) {
@@ -318,6 +351,7 @@ function defaultPageForm(): array
         'slug'       => '',
         'content'    => '',
         'parent_id'  => null,
+        'full_path'  => '',
         'sort_order' => 0,
         'status'     => 'draft',
     ];
@@ -331,6 +365,7 @@ function formFromPageRow(array $row): array
         'slug'       => (string) ($row['slug'] ?? ''),
         'content'    => (string) ($row['content'] ?? ''),
         'parent_id'  => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
+        'full_path'  => (string) ($row['full_path'] ?? ''),
         'sort_order' => (int) ($row['sort_order'] ?? 0),
         'status'     => (string) ($row['status'] ?? 'draft'),
     ];
