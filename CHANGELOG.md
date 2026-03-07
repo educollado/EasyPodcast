@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3
+
+- `import_feed.php`: aviso visible si cURL no está disponible en el servidor en lugar de fallo silencioso.
+- `README.md`: documentación de los requisitos de cURL para la importación de feeds.
+
 ## 1.2.2
 
 - Importación de feed RSS externo (`import_feed.php`): descarga episodios (audio e imágenes) desde cualquier URL de feed, con previsualización y selección individual de episodios y metadatos del podcast.

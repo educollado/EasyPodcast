@@ -4,7 +4,11 @@
 
 ## Versión
 
-**Versión actual: 1.2.2**
+**Versión actual: 1.2.3**
+
+## Novedades 1.2.3
+
+- `import_feed.php`: aviso visible si cURL no está disponible en el servidor en lugar de fallo silencioso.
 
 ## Novedades 1.2.2
 
