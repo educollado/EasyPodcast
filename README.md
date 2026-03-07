@@ -18,7 +18,7 @@ curl -O https://github.com/educollado/EasyPodcast/releases/latest/download/docke
 docker compose up -d
 ```
 
-Abre `http://localhost:8080` y crea el primer administrador. La base de datos se inicializa automáticamente.
+Abre `http://localhost:8080/admin.php` y crea el primer administrador. La base de datos se inicializa automáticamente.
 
 O con `docker run`:
 
