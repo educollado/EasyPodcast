@@ -9,6 +9,8 @@ require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/page_helpers.php';
+require_once __DIR__ . '/lib/social_handler.php';
+require_once __DIR__ . '/lib/seo_helpers.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
@@ -43,7 +45,10 @@ if ($httpStatus !== 200) {
 
 $podcast    = $podcast ?? [];
 $seo        = buildPageSeoData($podcast, $page, $error);
-extract($seo);  // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
+extract($seo);
+
+$_social = getSocialLinks($dbPath);
+$_fediverseCreator = mastodonUrlToFediverseHandle((string) ($_social['mastodon'] ?? ''));  // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
                 // baseSeoUrl, canonicalUrl, robotsContent, pageTitle,
                 // metaDescription, ogImage, rssUrl
 
@@ -59,6 +64,9 @@ if ($error !== '') {
   <title><?= esc($pageTitle) ?></title>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
+  <?php if ($_fediverseCreator !== ''): ?>
+  <meta name="fediverse:creator" content="<?= esc($_fediverseCreator) ?>">
+  <?php endif; ?>
   <link rel="canonical" href="<?= esc($canonicalUrl) ?>">
   <link rel="alternate" type="application/rss+xml" title="<?= esc($podcastTitle) ?> RSS" href="<?= esc($rssUrl) ?>">
   <meta property="og:type" content="article">

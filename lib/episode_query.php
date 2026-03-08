@@ -97,14 +97,14 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
             ? "status IN ('published', 'draft')"
             : "status = 'published'";
 
-        // Fast path: búsqueda exacta por link indexado (O(log n)).
-        // Cubre todos los episodios creados o editados en EasyPodcast, donde link
-        // siempre se guarda como ruta relativa /YYYY/MM/slug.
+        // Fast path: búsqueda por link indexado (O(log n)).
+        // Cubre rutas relativas (/YYYY/MM/slug) y URLs absolutas (...host.../YYYY/MM/slug),
+        // ya que buildEpisodePublicLink guarda el link con dominio completo.
         $linkPath = "/$year/$month/$slug";
         $fastStmt = $pdo->prepare(
-            "SELECT * FROM episodes WHERE link = :link AND $statusClause LIMIT 1"
+            "SELECT * FROM episodes WHERE (link = :link OR link LIKE :suffix) AND $statusClause LIMIT 1"
         );
-        $fastStmt->execute([':link' => $linkPath]);
+        $fastStmt->execute([':link' => $linkPath, ':suffix' => '%' . $linkPath]);
         $episode = $fastStmt->fetch() ?: null;
 
         // Fallback legacy: episodios sin link (importados antes de que se guardara la ruta).

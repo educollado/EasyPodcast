@@ -8,6 +8,7 @@ require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
 require_once __DIR__ . '/lib/search_query.php';
 require_once __DIR__ . '/lib/search_seo.php';
+require_once __DIR__ . '/lib/social_handler.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
@@ -19,7 +20,10 @@ $data = loadSearchData($dbPath, $query, $requestedPage);
 extract($data);  // podcast, episodes, query, page, perPage, totalEpisodes, totalPages, error
 
 $seo = buildSearchSeoData($podcast, $query, $page, $totalPages);
-extract($seo);   // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
+extract($seo);
+
+$_social = getSocialLinks($dbPath);
+$_fediverseCreator = mastodonUrlToFediverseHandle((string) ($_social['mastodon'] ?? ''));   // podcastTitle, podcastAuthor, podcastDescription, podcastImage,
                  // baseSeoUrl, canonicalUrl, robotsContent, prevUrl, nextUrl,
                  // metaDescription, ogImage, rssUrl
 
@@ -33,6 +37,9 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <title>Buscar | <?= esc($podcastTitle) ?></title>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
+  <?php if ($_fediverseCreator !== ''): ?>
+  <meta name="fediverse:creator" content="<?= esc($_fediverseCreator) ?>">
+  <?php endif; ?>
   <link rel="canonical" href="<?= esc($canonicalUrl) ?>">
   <?php if ($prevUrl !== null): ?>
   <link rel="prev" href="<?= esc($prevUrl) ?>">

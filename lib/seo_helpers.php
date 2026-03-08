@@ -46,6 +46,31 @@ function toAbsoluteSeoUrl(string $value, string $baseUrl): string
 }
 
 /**
+ * Convierte una URL de perfil de Mastodon al formato fediverse:creator.
+ * Ejemplo: https://mastodon.social/@ecollado → @ecollado@mastodon.social
+ * Devuelve cadena vacía si la URL no es un perfil Mastodon válido.
+ */
+function mastodonUrlToFediverseHandle(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    $parts = parse_url($url);
+    if (!is_array($parts) || empty($parts['host']) || empty($parts['path'])) {
+        return '';
+    }
+    $path = ltrim((string) $parts['path'], '/');
+    // El path debe comenzar con '@' (perfil de usuario).
+    if (!str_starts_with($path, '@')) {
+        return '';
+    }
+    // Toma solo el primer segmento del path (@usuario), ignorando sub-rutas.
+    $user = explode('/', $path)[0];
+    return $user . '@' . (string) $parts['host'];
+}
+
+/**
  * Limpia y recorta texto para meta description.
  * Usa mb_* cuando está disponible para respetar caracteres multibyte.
  */
