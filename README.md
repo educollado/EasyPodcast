@@ -10,7 +10,39 @@ Aplicación en **PHP + SQLite** para publicar un podcast con web pública, feed 
 
 ---
 
-## Instalación con Apache (Opción recomendada)
+## Instalación con instalador automático (Opción recomendada)
+
+La forma más sencilla de instalar EasyPodcast: un único archivo PHP que descarga la última release desde GitHub, la extrae en el servidor y crea la base de datos SQLite, todo desde el navegador sin acceso SSH.
+
+**Requisitos**
+
+| Componente | Mínimo |
+|---|---|
+| PHP | 8.0+ |
+| Extensiones PHP | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd` |
+| Directorio de instalación | Escribible por el servidor web |
+
+**Pasos**
+
+1. Descarga `instalar.php` del repositorio [EasyPodcast-Installer](https://github.com/educollado/EasyPodcast-Installer) y súbelo al directorio raíz de tu servidor web (debe estar vacío o ser el único archivo).
+
+2. Abre el instalador en tu navegador:
+   ```
+   https://tu-dominio.com/instalar.php
+   ```
+
+3. Sigue los tres pasos del asistente:
+   - **Compatibilidad** — verifica que el servidor cumple todos los requisitos.
+   - **Directorio** — comprueba si el directorio está limpio.
+   - **Instalación** — descarga y extrae la última release de EasyPodcast y crea la base de datos.
+
+4. Al finalizar serás redirigido al panel de administración (`/admin.php`).
+
+> **Seguridad:** el instalador intenta borrarse a sí mismo al completarse. Si no pudo eliminarse, **borra `instalar.php` manualmente** antes de usar la aplicación.
+
+---
+
+## Instalación con Apache (Opción 2)
 
 **1. Crear la base de datos**
 
@@ -45,7 +77,7 @@ Abre `/admin.php`, crea el administrador y configura el canal en `Gestión del P
 
 ---
 
-## Instalación rápida con Docker (Opción 2)
+## Instalación rápida con Docker (Opción 3)
 
 ```bash
 # Descargar el compose y levantar
