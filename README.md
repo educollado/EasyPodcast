@@ -31,7 +31,7 @@ chmod 664 podcast.sqlite feed.xml favicon.ico
 
 **4. Primer acceso**
 
-Abre `/admin.php`, crea el administrador y configura el canal en `podcast_management.php`.
+Abre `/admin.php`, crea el administrador y configura el canal en `Gestión del Podcast`.
 
 **5. Comprobaciones**
 
