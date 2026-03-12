@@ -10,6 +10,41 @@ Aplicación en **PHP + SQLite** para publicar un podcast con web pública, feed 
 
 ---
 
+## Instalación con Apache
+
+**1. Crear la base de datos**
+
+```bash
+sqlite3 podcast.sqlite < schema.sql
+mkdir -p audios images cache
+```
+
+**2. Dar permisos de escritura al usuario del servidor web**
+
+```bash
+chown -R www-data:www-data podcast.sqlite feed.xml audios images cache favicon.ico
+chmod 775 audios images cache
+chmod 664 podcast.sqlite feed.xml favicon.ico
+```
+
+**3. Activar `mod_rewrite`** con `AllowOverride All` en el virtual host.
+
+**4. Primer acceso**
+
+Abre `/admin.php`, crea el administrador y configura el canal en `podcast_management.php`.
+
+**5. Comprobaciones**
+
+```
+/          → Portada pública
+/feed.php  → Feed RSS dinámico
+/feed.xml  → Feed generado
+/sitemap.xml
+/robots.txt
+```
+
+---
+
 ## Instalación rápida con Docker
 
 ```bash
@@ -95,40 +130,6 @@ docker run -d \
 | Servidor | Apache con `mod_rewrite` |
 | Permisos de escritura | `podcast.sqlite`, `feed.xml`, `audios/`, `images/`, `cache/`, `favicon.ico` |
 
----
-
-## Instalación con Apache
-
-**1. Crear la base de datos**
-
-```bash
-sqlite3 podcast.sqlite < schema.sql
-mkdir -p audios images cache
-```
-
-**2. Dar permisos de escritura al usuario del servidor web**
-
-```bash
-chown -R www-data:www-data podcast.sqlite feed.xml audios images cache favicon.ico
-chmod 775 audios images cache
-chmod 664 podcast.sqlite feed.xml favicon.ico
-```
-
-**3. Activar `mod_rewrite`** con `AllowOverride All` en el virtual host.
-
-**4. Primer acceso**
-
-Abre `/admin.php`, crea el administrador y configura el canal en `podcast_management.php`.
-
-**5. Comprobaciones**
-
-```
-/          → Portada pública
-/feed.php  → Feed RSS dinámico
-/feed.xml  → Feed generado
-/sitemap.xml
-/robots.txt
-```
 
 ---
 
