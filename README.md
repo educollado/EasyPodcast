@@ -10,7 +10,7 @@ Aplicación en **PHP + SQLite** para publicar un podcast con web pública, feed 
 
 ---
 
-## Instalación con Apache
+## Instalación con Apache (Opción recomendada)
 
 **1. Crear la base de datos**
 
@@ -45,7 +45,7 @@ Abre `/admin.php`, crea el administrador y configura el canal en `podcast_manage
 
 ---
 
-## Instalación rápida con Docker
+## Instalación rápida con Docker (Opción 2)
 
 ```bash
 # Descargar el compose y levantar
