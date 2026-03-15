@@ -102,9 +102,12 @@ docker run -d \
 
 ---
 
-## Novedades 1.2.3
+## Novedades 1.5.0
 
-- `import_feed.php`: aviso visible si cURL no está disponible en el servidor en lugar de fallo silencioso.
+- Internacionalización (i18n) del panel de administración: todos los textos pasan por `__()` para soporte multiidioma.
+- Selector de idioma en el panel y en `podcast_management.php`.
+- Mejora de rendimiento: resolución de episodios por `link` indexado con fast path O(log n).
+- Corrección de rutas de episodio/páginas y validación de padre propio.
 
 ---
 
