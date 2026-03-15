@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/lib/migration_runner.php';
+require_once __DIR__ . '/lib/i18n.php';
+i18n_load('es_ES');
 
 /**
  * Determina si la petición actual llega por HTTPS.
@@ -23,6 +25,24 @@ function isHttpsRequest(): bool
 }
 
 /**
+ * Carga el idioma de la aplicación desde BD y lo aplica a i18n.
+ * Llamada una vez tras runMigrations() para que app_language exista.
+ * Silenciosa en caso de error: mantiene el idioma por defecto ya cargado.
+ */
+function loadAppLocale(string $dbPath): void
+{
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $appLang = $pdo->query('SELECT app_language FROM podcast LIMIT 1')->fetchColumn();
+        if (is_string($appLang) && $appLang !== '') {
+            i18n_load($appLang);
+        }
+    } catch (Throwable $e) {
+        // Silencioso: mantiene el idioma por defecto.
+    }
+}
+
+/**
  * Aplica redirección 301 al host/esquema canónico definido en podcast.link.
  * No actúa en CLI ni si las cabeceras ya han sido enviadas.
  * Si hay error de lectura en BD, no bloquea la request y retorna silenciosamente.
@@ -33,6 +53,7 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
     // de si las cabeceras ya se han enviado (headers_sent solo afecta al redirect).
     if (PHP_SAPI !== 'cli') {
         runMigrations($dbPath);
+        loadAppLocale($dbPath);
     }
 
     if (PHP_SAPI === 'cli' || headers_sent()) {

@@ -28,15 +28,15 @@ extract($data);  // form, error, notice
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestión Podcast</title>
+  <title><?= __('Gestión Podcast') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'podcast'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Gestión Podcast</h1>
-      <p>Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>.</p>
+      <h1><?= __('Gestión Podcast') ?></h1>
+      <p><?= __('Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>.') ?></p>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -54,33 +54,60 @@ extract($data);  // form, error, notice
             <input type="text" name="title" value="<?= esc($form['title']) ?>" required>
           </label>
           <label>
-            URL principal *
+            <?= __('URL principal *') ?>
             <input type="url" name="link" value="<?= esc($form['link']) ?>" required>
           </label>
         </div>
 
         <div class="grid" style="margin-top: .8rem;">
           <label>
-            Descripción *
+            <?= __('Descripción *') ?>
             <textarea name="description" required><?= esc($form['description']) ?></textarea>
           </label>
         </div>
 
         <div class="grid two" style="margin-top: .8rem;">
           <label>
-            Idioma
+            <?= __('Idioma') ?>
             <input type="text" name="language" value="<?= esc($form['language']) ?>" placeholder="es-ES">
           </label>
+          <?php
+            $localeDir   = __DIR__ . '/locale';
+            $localeFiles = glob($localeDir . '/*.po') ?: [];
+            $localeLabels = [
+                'ca_ES' => 'Català',
+                'en_US' => 'English (US)',
+                'es_ES' => 'Español (España)',
+                'fr_FR' => 'Français',
+                'gl_ES' => 'Galego',
+                'pt_PT' => 'Português (Portugal)',
+            ];
+            sort($localeFiles);
+          ?>
           <label>
-            Autor (itunes:author)
+            <?= __('Idioma del panel') ?>
+            <select name="app_language">
+              <?php foreach ($localeFiles as $f):
+                $lc = basename($f, '.po');
+                $label = $localeLabels[$lc] ?? $lc;
+              ?>
+                <option value="<?= esc($lc) ?>" <?= $form['app_language'] === $lc ? 'selected' : '' ?>>
+                  <?= esc($label) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+            <small><?= __('Idioma de la interfaz de administración y de las páginas públicas.') ?></small>
+          </label>
+          <label>
+            <?= __('Autor (itunes:author)') ?>
             <input type="text" name="author" value="<?= esc($form['author']) ?>">
           </label>
           <label>
-            Owner name
+            <?= __('Owner name') ?>
             <input type="text" name="owner_name" value="<?= esc($form['owner_name']) ?>">
           </label>
           <label>
-            Owner email
+            <?= __('Owner email') ?>
             <input type="email" name="owner_email" value="<?= esc($form['owner_email']) ?>">
           </label>
           <div class="label-block">
@@ -250,46 +277,46 @@ extract($data);  // form, error, notice
             </select>
           </label>
           <label>
-            Imagen del podcast (URL)
+            <?= __('Imagen del podcast (URL)') ?>
             <input type="url" name="image_url" value="<?= esc($form['image_url']) ?>">
           </label>
           <label>
-            O subir imagen del podcast
+            <?= __('O subir imagen del podcast') ?>
             <input type="file" name="image_file" accept="image/*">
           </label>
           <label style="align-self: start">
-            Tipo iTunes
+            <?= __('Tipo iTunes') ?>
             <select name="itunes_type">
               <option value="episodic" <?= $form['itunes_type'] === 'episodic' ? 'selected' : '' ?>>episodic</option>
               <option value="serial" <?= $form['itunes_type'] === 'serial' ? 'selected' : '' ?>>serial</option>
             </select>
           </label>
           <label>
-            Cantidad de elementos del Feed RSS
+            <?= __('Cantidad de elementos del Feed RSS') ?>
             <input type="number" min="0" step="1" name="rss_item_limit" value="<?= esc($form['rss_item_limit']) ?>">
-            <small>Nota: 0 significa infinitos (sin límite).</small>
+            <small><?= __('Nota: 0 significa infinitos (sin límite).') ?></small>
           </label>
           <label>
-            Cantidad de elementos de la portada
+            <?= __('Cantidad de elementos de la portada') ?>
             <input type="number" min="1" step="1" name="home_items_per_page" value="<?= esc($form['home_items_per_page']) ?>">
-            <small>Controla cuántos episodios se muestran por página en la portada.</small>
+            <small><?= __('Controla cuántos episodios se muestran por página en la portada.') ?></small>
           </label>
           <label class="inline-checkbox">
             <input type="checkbox" name="write_audio_metadata" value="1" <?= $form['write_audio_metadata'] === '1' ? 'checked' : '' ?>>
-            <span>Escribir metadatos ID3 en MP3 al subir episodio</span>
-            <small>Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista.</small>
+            <span><?= __('Escribir metadatos ID3 en MP3 al subir episodio') ?></span>
+            <small><?= __('Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista.') ?></small>
           </label>
         </div>
 
         <div class="grid" style="margin-top: .8rem;">
           <label>
-            Copyright
+            <?= __('Copyright') ?>
             <input type="text" name="copyright" value="<?= esc($form['copyright']) ?>">
           </label>
         </div>
 
         <div class="actions">
-          <button class="btn" type="submit">Guardar podcast</button>
+          <button class="btn" type="submit"><?= __('Guardar podcast') ?></button>
         </div>
       </form>
     </main>

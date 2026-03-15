@@ -1,0 +1,1235 @@
+# EasyPodcast — Español (España)
+# Idioma base: el msgid ES el texto en español.
+# msgstr vacío → la función __() devuelve el propio msgid sin cambio de comportamiento.
+# Para añadir otro idioma (p.ej. en_US.po): copiar este fichero,
+# cambiar la cabecera y rellenar los msgstr con las traducciones.
+msgid ""
+msgstr ""
+"Language: es_ES\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ---------------------------------------------------------------------------
+# lib/episode_save_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "El valor de explícito no es válido."
+msgstr ""
+
+msgid "El estado debe ser draft o published."
+msgstr ""
+
+msgid "El tipo de episodio debe ser full, trailer o bonus."
+msgstr ""
+
+msgid "Título y descripción son obligatorios."
+msgstr ""
+
+msgid "La fecha de publicación no es válida."
+msgstr ""
+
+msgid "Revisa los campos numéricos: deben ser enteros positivos."
+msgstr ""
+
+msgid "Debes indicar la URL de audio o subir un fichero de audio."
+msgstr ""
+
+msgid "El MIME del audio es obligatorio."
+msgstr ""
+
+msgid "El tamaño del audio debe ser un entero mayor que 0."
+msgstr ""
+
+msgid "Capítulo actualizado correctamente."
+msgstr ""
+
+msgid "Capítulo guardado correctamente."
+msgstr ""
+
+msgid "(Aviso: no se pudo regenerar feed.xml/sitemap.xml)"
+msgstr ""
+
+msgid "(Aviso: no se pudo limpiar completamente la caché)"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/page_save_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Una página no puede ser su propia página padre."
+msgstr ""
+
+msgid "El título es obligatorio."
+msgstr ""
+
+msgid "El slug es obligatorio."
+msgstr ""
+
+msgid "El slug solo puede contener letras minúsculas, números y guiones."
+msgstr ""
+
+msgid "La página padre seleccionada no existe."
+msgstr ""
+
+msgid "El slug \"%s\" es una ruta reservada del sistema."
+msgstr ""
+
+msgid "Ya existe una página con la ruta \"%s\"."
+msgstr ""
+
+msgid "No se puede borrar una página que tiene subpáginas. Borra primero las subpáginas."
+msgstr ""
+
+msgid "Página borrada correctamente."
+msgstr ""
+
+msgid "Error al cargar las páginas: %s"
+msgstr ""
+
+msgid "Página actualizada correctamente."
+msgstr ""
+
+msgid "Página creada correctamente."
+msgstr ""
+
+msgid "Página no encontrada."
+msgstr ""
+
+msgid "Error interno: %s"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/change_password_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Completa todos los campos."
+msgstr ""
+
+msgid "La nueva contraseña y su confirmación no coinciden."
+msgstr ""
+
+msgid "La nueva contraseña debe tener al menos 8 caracteres."
+msgstr ""
+
+msgid "Usuario no encontrado."
+msgstr ""
+
+msgid "La contraseña actual no es correcta."
+msgstr ""
+
+msgid "Contraseña actualizada correctamente."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/cache_management_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Configuración de caché guardada."
+msgstr ""
+
+msgid "Caché borrada correctamente."
+msgstr ""
+
+msgid "No se pudo borrar completamente la caché."
+msgstr ""
+
+msgid "No se pudo limpiar la caché de imágenes antes de regenerar."
+msgstr ""
+
+msgid "Imágenes regeneradas: %d fuente(s) procesada(s)."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/twofa_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "No hay configuración de 2FA en curso. Vuelve a empezar."
+msgstr ""
+
+msgid "Código incorrecto. Asegúrate de que tu app está sincronizada y vuelve a intentarlo."
+msgstr ""
+
+msgid "2FA activado correctamente. Guarda los códigos de recuperación en un lugar seguro."
+msgstr ""
+
+msgid "2FA ya está desactivado."
+msgstr ""
+
+msgid "2FA desactivado."
+msgstr ""
+
+msgid "2FA no está activo."
+msgstr ""
+
+msgid "Nuevos códigos de recuperación generados. Los anteriores ya no son válidos."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/stats_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Error al cargar estadísticas: %s"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/social_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "El valor de \"%s\" no es una URL válida."
+msgstr ""
+
+msgid "Redes sociales guardadas correctamente."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/podcast_management_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Título, descripción y enlace son obligatorios."
+msgstr ""
+
+msgid "No se pueden seleccionar más de 3 categorías."
+msgstr ""
+
+msgid "La cantidad de elementos del feed debe ser un entero igual o mayor que 0."
+msgstr ""
+
+msgid "La cantidad de elementos de la portada debe ser un entero mayor o igual que 1."
+msgstr ""
+
+msgid "El tipo de podcast debe ser episodic o serial."
+msgstr ""
+
+msgid "El email del propietario no es válido."
+msgstr ""
+
+msgid "No se pudo subir la imagen del podcast."
+msgstr ""
+
+msgid "El fichero debe ser una imagen válida (jpg, png, gif o webp)."
+msgstr ""
+
+msgid "No se pudo crear la carpeta de imágenes."
+msgstr ""
+
+msgid "No se pudo guardar la imagen subida."
+msgstr ""
+
+msgid "Podcast actualizado correctamente."
+msgstr ""
+
+msgid "Podcast guardado correctamente."
+msgstr ""
+
+msgid "No se pudo generar favicon.ico (falta extension GD)."
+msgstr ""
+
+msgid "No se pudo generar favicon.ico (imagen del podcast no localizada en servidor)."
+msgstr ""
+
+msgid "No se pudo generar favicon.ico (fallo al convertir imagen)."
+msgstr ""
+
+msgid "No se pudo escribir favicon.ico en disco."
+msgstr ""
+
+msgid "Aviso: %s"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/admin_query.php
+# ---------------------------------------------------------------------------
+
+msgid "Completa usuario, contraseña y confirmación."
+msgstr ""
+
+msgid "Las contraseñas no coinciden."
+msgstr ""
+
+msgid "La contraseña debe tener al menos 8 caracteres."
+msgstr ""
+
+msgid "Usuario administrador creado correctamente."
+msgstr ""
+
+msgid "Introduce usuario y contraseña."
+msgstr ""
+
+msgid "Credenciales inválidas."
+msgstr ""
+
+msgid "Introduce el código de verificación."
+msgstr ""
+
+msgid "Código incorrecto. Inténtalo de nuevo."
+msgstr ""
+
+msgid "Error interno al verificar el código."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/import_feed_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "La URL debe usar http o https."
+msgstr ""
+
+msgid "Error al descargar el feed: %s"
+msgstr ""
+
+msgid "El servidor devolvió HTTP %d."
+msgstr ""
+
+msgid "El feed está vacío."
+msgstr ""
+
+msgid "La URL del feed no es válida."
+msgstr ""
+
+msgid "No se pudo parsear el XML del feed."
+msgstr ""
+
+msgid "El feed no contiene un elemento <channel>."
+msgstr ""
+
+msgid "URL no válida (debe ser http/https)."
+msgstr ""
+
+msgid "No se pudo crear el fichero destino."
+msgstr ""
+
+msgid "Error cURL: %s"
+msgstr ""
+
+msgid "El fichero descargado está vacío."
+msgstr ""
+
+msgid "MIME de imagen no válido: %s"
+msgstr ""
+
+msgid "MIME de audio no válido: %s"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/backup_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "No se pudo preparar el archivo temporal para exportar."
+msgstr ""
+
+msgid "No se pudo crear el archivo ZIP de exportación."
+msgstr ""
+
+msgid "No hay archivos para exportar en esta parte."
+msgstr ""
+
+msgid "No se encontró la base de datos para exportar."
+msgstr ""
+
+msgid "La extensión ZipArchive no está disponible en este servidor."
+msgstr ""
+
+msgid "Tipo de exportación inválido."
+msgstr ""
+
+msgid "No hay archivos para exportar en %s/."
+msgstr ""
+
+msgid "No hay ficheros exportables en ZIP para %s/. Descarga manualmente los que superan 127 MB desde la lista inferior."
+msgstr ""
+
+msgid "La parte solicitada no existe para %s."
+msgstr ""
+
+msgid "Selecciona un archivo de base de datos."
+msgstr ""
+
+msgid "No se pudo subir el archivo."
+msgstr ""
+
+msgid "El archivo debe tener extensión .sqlite o .db."
+msgstr ""
+
+msgid "La base de datos importada no parece válida para EasyPodcast."
+msgstr ""
+
+msgid "La extensión SQLite3 no está disponible en este servidor."
+msgstr ""
+
+msgid "No se pudo crear el directorio de backups."
+msgstr ""
+
+msgid "No se pudo crear el backup previo de seguridad."
+msgstr ""
+
+msgid "Falló la importación de la base de datos."
+msgstr ""
+
+msgid "Base de datos importada correctamente y feed.xml/sitemap.xml regenerados."
+msgstr ""
+
+msgid "Base de datos importada correctamente, pero no se pudo regenerar feed.xml/sitemap.xml."
+msgstr ""
+
+msgid "(Aviso: no se pudo borrar el backup temporal en /backups)"
+msgstr ""
+
+msgid "No se pudo validar/importar el archivo: %s"
+msgstr ""
+
+msgid "Todos los ficheros ZIP deben tener extensión .zip."
+msgstr ""
+
+msgid "No se pudo subir uno de los ZIP de ficheros."
+msgstr ""
+
+msgid "No se pudo crear el directorio audios/."
+msgstr ""
+
+msgid "No se pudo subir uno de los audios MP3."
+msgstr ""
+
+msgid "Todos los audios sueltos deben tener extensión .mp3."
+msgstr ""
+
+msgid "No se pudo guardar uno de los audios MP3 en audios/."
+msgstr ""
+
+msgid "Selecciona al menos un ZIP o un audio MP3."
+msgstr ""
+
+msgid "Importacion completada. ZIP procesados: %d. Archivos escritos desde ZIP: %d. Directorios creados: %d. Audios MP3 subidos: %d."
+msgstr ""
+
+msgid "(Aviso: no se pudo regenerar sitemap.xml)"
+msgstr ""
+
+msgid "No se pudo abrir el ZIP para importar ficheros."
+msgstr ""
+
+msgid "El ZIP contiene rutas no permitidas."
+msgstr ""
+
+msgid "No se pudo crear un directorio durante la importación."
+msgstr ""
+
+msgid "No se pudo preparar directorios para extraer ficheros."
+msgstr ""
+
+msgid "No se pudo leer un fichero dentro del ZIP."
+msgstr ""
+
+msgid "No se pudo escribir un fichero en destino."
+msgstr ""
+
+msgid "Error al leer datos del ZIP."
+msgstr ""
+
+msgid "Error al guardar un fichero importado."
+msgstr ""
+
+msgid "El ZIP no contiene rutas válidas de images/ o audios/."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/update_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "No se pudo conectar con GitHub (HTTP %d)."
+msgstr ""
+
+msgid "No se pudo conectar con GitHub."
+msgstr ""
+
+msgid "Respuesta inesperada de GitHub."
+msgstr ""
+
+msgid "Versión no reconocida: %s."
+msgstr ""
+
+msgid "No se encontró el archivo .tar.gz en la release."
+msgstr ""
+
+msgid "URL de descarga no permitida."
+msgstr ""
+
+msgid "La extensión phar no está disponible en este servidor. Actualiza manualmente."
+msgstr ""
+
+msgid "No se pudo crear el archivo temporal."
+msgstr ""
+
+msgid "No se pudo descargar el archivo de actualización."
+msgstr ""
+
+msgid "Error al extraer el paquete: %s"
+msgstr ""
+
+msgid "Actualización completada."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# lib/episode_query.php
+# ---------------------------------------------------------------------------
+
+msgid "Capítulo no encontrado."
+msgstr ""
+
+msgid "No se pudo cargar el capítulo: %s"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — admin.php
+# ---------------------------------------------------------------------------
+
+msgid "Administración"
+msgstr ""
+
+msgid "Panel de administración"
+msgstr ""
+
+msgid "Sesión iniciada como"
+msgstr ""
+
+msgid "Verificación en dos pasos"
+msgstr ""
+
+msgid "Introduce el código de 6 dígitos de tu app de autenticación, o uno de tus códigos de recuperación."
+msgstr ""
+
+msgid "Código"
+msgstr ""
+
+msgid "Verificar"
+msgstr ""
+
+msgid "Cancelar y volver al login"
+msgstr ""
+
+msgid "Configuración inicial"
+msgstr ""
+
+msgid "Acceso administrador"
+msgstr ""
+
+msgid "No hay usuario administrador. Crea el primero para proteger el panel."
+msgstr ""
+
+msgid "Introduce tus credenciales para entrar al panel de administración."
+msgstr ""
+
+msgid "Usuario"
+msgstr ""
+
+msgid "Contraseña"
+msgstr ""
+
+msgid "Repite la contraseña"
+msgstr ""
+
+msgid "Crear usuario y entrar"
+msgstr ""
+
+msgid "Entrar"
+msgstr ""
+
+msgid "Cerrar sesión"
+msgstr ""
+
+msgid "Metadatos del canal, imagen y categorías"
+msgstr ""
+
+msgid "Lista, edita y borra episodios"
+msgstr ""
+
+msgid "Añadir capítulo"
+msgstr ""
+
+msgid "Sube un nuevo episodio al podcast"
+msgstr ""
+
+msgid "Exporta e importa la base de datos"
+msgstr ""
+
+msgid "Habilita la caché, bórrala o regenera imágenes"
+msgstr ""
+
+msgid "Autenticación en dos pasos con código TOTP"
+msgstr ""
+
+msgid "Cambia la contraseña de acceso al panel"
+msgstr ""
+
+msgid "Blog, LinkedIn, Mastodon, X y más"
+msgstr ""
+
+msgid "Crea páginas estáticas tipo \"Acerca de\""
+msgstr ""
+
+msgid "Episodios, borradores y tamaño de audios"
+msgstr ""
+
+msgid "Comprueba e instala nuevas versiones"
+msgstr ""
+
+msgid "Importa episodios desde una URL de feed RSS externo"
+msgstr ""
+
+msgid "Ver podcast"
+msgstr ""
+
+msgid "Abre la web pública en una pestaña nueva"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — add_episode.php
+# ---------------------------------------------------------------------------
+
+msgid "Editar Capítulo"
+msgstr ""
+
+msgid "Añadir Capítulo"
+msgstr ""
+
+msgid "Edita el capítulo seleccionado."
+msgstr ""
+
+msgid "Completa los datos para insertar un episodio en la tabla <strong>episodes</strong>."
+msgstr ""
+
+msgid "GUID (opcional)"
+msgstr ""
+
+msgid "Estado"
+msgstr ""
+
+msgid "Fecha de publicación"
+msgstr ""
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar."
+msgstr ""
+
+msgid "Título *"
+msgstr ""
+
+msgid "URL del capítulo (opcional)"
+msgstr ""
+
+msgid "Generar URL"
+msgstr ""
+
+msgid "Audio (URL)"
+msgstr ""
+
+msgid "Si subes audio, esta URL se rellena automáticamente con /audios/fichero."
+msgstr ""
+
+msgid "O subir audio del capítulo"
+msgstr ""
+
+msgid "MIME audio *"
+msgstr ""
+
+msgid "Tamaño audio en bytes *"
+msgstr ""
+
+msgid "Duración (HH:MM:SS)"
+msgstr ""
+
+msgid "Explícito"
+msgstr ""
+
+msgid "Heredar del podcast"
+msgstr ""
+
+msgid "Temporada"
+msgstr ""
+
+msgid "Número de episodio"
+msgstr ""
+
+msgid "Imagen del capítulo (URL)"
+msgstr ""
+
+msgid "Si subes imagen, esta URL se rellena automáticamente con /images/fichero."
+msgstr ""
+
+msgid "O subir imagen del capítulo"
+msgstr ""
+
+msgid "Tipo de episodio"
+msgstr ""
+
+msgid "Sin definir"
+msgstr ""
+
+msgid "Autor"
+msgstr ""
+
+msgid "Vista previa"
+msgstr ""
+
+msgid "Actualizar metadatos del MP3 actual"
+msgstr ""
+
+msgid "Actualizar capítulo"
+msgstr ""
+
+msgid "Guardar capítulo"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — episodes_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Capítulos Existentes"
+msgstr ""
+
+msgid "Todavía no hay capítulos guardados."
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Título"
+msgstr ""
+
+msgid "Publicación"
+msgstr ""
+
+msgid "Acción"
+msgstr ""
+
+msgid "Editar"
+msgstr ""
+
+msgid "Borrar"
+msgstr ""
+
+msgid "Anterior"
+msgstr ""
+
+msgid "Página %d de %d (%d capítulos)"
+msgstr ""
+
+msgid "Siguiente"
+msgstr ""
+
+msgid "Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — podcast_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Gestión Podcast"
+msgstr ""
+
+msgid "Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>."
+msgstr ""
+
+msgid "URL principal *"
+msgstr ""
+
+msgid "Descripción *"
+msgstr ""
+
+msgid "Idioma"
+msgstr ""
+
+msgid "Idioma del panel"
+msgstr ""
+
+msgid "Idioma de la interfaz de administración y de las páginas públicas."
+msgstr ""
+
+msgid "Autor (itunes:author)"
+msgstr ""
+
+msgid "Owner name"
+msgstr ""
+
+msgid "Owner email"
+msgstr ""
+
+msgid "Tipo iTunes"
+msgstr ""
+
+msgid "Cantidad de elementos del Feed RSS"
+msgstr ""
+
+msgid "Nota: 0 significa infinitos (sin límite)."
+msgstr ""
+
+msgid "Cantidad de elementos de la portada"
+msgstr ""
+
+msgid "Controla cuántos episodios se muestran por página en la portada."
+msgstr ""
+
+msgid "Escribir metadatos ID3 en MP3 al subir episodio"
+msgstr ""
+
+msgid "Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista."
+msgstr ""
+
+msgid "Copyright"
+msgstr ""
+
+msgid "Guardar podcast"
+msgstr ""
+
+msgid "O subir imagen del podcast"
+msgstr ""
+
+msgid "Imagen del podcast (URL)"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — backups.php
+# ---------------------------------------------------------------------------
+
+msgid "Copias de seguridad"
+msgstr ""
+
+msgid "Gestiona por separado la base de datos y los ficheros multimedia."
+msgstr ""
+
+msgid "Base de Datos"
+msgstr ""
+
+msgid "Exporta o importa el archivo SQLite del podcast."
+msgstr ""
+
+msgid "Exportar base de datos"
+msgstr ""
+
+msgid "Importar base de datos"
+msgstr ""
+
+msgid "Ficheros"
+msgstr ""
+
+msgid "Exportar imágenes"
+msgstr ""
+
+msgid "No hay ficheros en <code>images/</code>."
+msgstr ""
+
+msgid "Exportar audios"
+msgstr ""
+
+msgid "No hay ficheros en <code>audios/</code>."
+msgstr ""
+
+msgid "Audios MP3 sueltos (opcional)"
+msgstr ""
+
+msgid "Importar ZIP(s) y/o audios"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — change_password.php
+# ---------------------------------------------------------------------------
+
+msgid "Cambiar contraseña"
+msgstr ""
+
+msgid "Contraseña actual"
+msgstr ""
+
+msgid "Nueva contraseña"
+msgstr ""
+
+msgid "Repite la nueva contraseña"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — cache_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Gestión de Caché"
+msgstr ""
+
+msgid "Caché web"
+msgstr ""
+
+msgid "Almacena la salida HTML de portada, episodios, feed y sitemap para servir respuestas más rápido."
+msgstr ""
+
+msgid "Habilitar caché pública en /cache"
+msgstr ""
+
+msgid "Aplica a portada, episodio, feed y sitemap."
+msgstr ""
+
+msgid "Guardar"
+msgstr ""
+
+msgid "Borrar caché"
+msgstr ""
+
+msgid "Imágenes generadas"
+msgstr ""
+
+msgid "Regenerar imágenes"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — twofa_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Autenticación en dos pasos (2FA)"
+msgstr ""
+
+msgid "Desactivado"
+msgstr ""
+
+msgid "Activa la autenticación en dos pasos para proteger tu cuenta con Google Authenticator u otra app compatible con TOTP."
+msgstr ""
+
+msgid "Activar 2FA"
+msgstr ""
+
+msgid "Configurando…"
+msgstr ""
+
+msgid "¿No puedes escanear? Introduce esta clave manualmente en tu app:"
+msgstr ""
+
+msgid "Código de verificación"
+msgstr ""
+
+msgid "Cancelar"
+msgstr ""
+
+msgid "Confirmar y activar"
+msgstr ""
+
+msgid "Activo"
+msgstr ""
+
+msgid "Guarda estos códigos de recuperación ahora."
+msgstr ""
+
+msgid "No volverán a mostrarse. Úsalos si pierdes acceso a tu app de autenticación."
+msgstr ""
+
+msgid "Códigos de recuperación disponibles: <strong>%d</strong> de 8"
+msgstr ""
+
+msgid "Regenerar códigos de recuperación"
+msgstr ""
+
+msgid "Los códigos actuales quedarán anulados."
+msgstr ""
+
+msgid "Regenerar códigos"
+msgstr ""
+
+msgid "Desactivar 2FA"
+msgstr ""
+
+msgid "Se eliminará el secreto y los códigos de recuperación."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — stats.php
+# ---------------------------------------------------------------------------
+
+msgid "Estadísticas"
+msgstr ""
+
+msgid "Publicados"
+msgstr ""
+
+msgid "episodios en el feed"
+msgstr ""
+
+msgid "Borradores"
+msgstr ""
+
+msgid "sin publicar"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "episodios en la BD"
+msgstr ""
+
+msgid "Tamaño de audios"
+msgstr ""
+
+msgid "según metadatos de BD"
+msgstr ""
+
+msgid "Último publicado"
+msgstr ""
+
+msgid "Estado"
+msgstr ""
+
+msgid "Páginas en caché"
+msgstr ""
+
+msgid "ficheros .cache"
+msgstr ""
+
+msgid "Tamaño de caché"
+msgstr ""
+
+msgid "HTML cacheado"
+msgstr ""
+
+msgid "Activa"
+msgstr ""
+
+msgid "Inactiva"
+msgstr ""
+
+msgid "Gestionar caché"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — pages_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Páginas"
+msgstr ""
+
+msgid "Todavía no hay páginas creadas."
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Orden"
+msgstr ""
+
+msgid "Añadir Página"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — add_page.php
+# ---------------------------------------------------------------------------
+
+msgid "Editar Página"
+msgstr ""
+
+msgid "Edita la página seleccionada."
+msgstr ""
+
+msgid "Crea una nueva página estática."
+msgstr ""
+
+msgid "Slug *"
+msgstr ""
+
+msgid "Solo letras minúsculas, números y guiones. Se genera desde el título."
+msgstr ""
+
+msgid "Página padre"
+msgstr ""
+
+msgid "— Sin padre (primer nivel) —"
+msgstr ""
+
+msgid "Orden (numérico, menor = antes)"
+msgstr ""
+
+msgid "Contenido"
+msgstr ""
+
+msgid "Volver a la lista"
+msgstr ""
+
+msgid "Actualizar página"
+msgstr ""
+
+msgid "Guardar página"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — social_management.php
+# ---------------------------------------------------------------------------
+
+msgid "Redes Sociales"
+msgstr ""
+
+msgid "Los enlaces configurados aparecerán como iconos en la cabecera de la web pública."
+msgstr ""
+
+msgid "Guardar redes sociales"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — update.php
+# ---------------------------------------------------------------------------
+
+msgid "Actualizar EasyPodcast"
+msgstr ""
+
+msgid "Comprueba si hay una nueva versión disponible y aplícala sin perder datos."
+msgstr ""
+
+msgid "EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado."
+msgstr ""
+
+msgid "Instalada"
+msgstr ""
+
+msgid "Última disponible"
+msgstr ""
+
+msgid "Ya tienes la última versión instalada."
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — import_feed.php
+# ---------------------------------------------------------------------------
+
+msgid "Importar feed RSS"
+msgstr ""
+
+msgid "Importa episodios desde una URL de feed RSS externo. Los archivos MP3 e imágenes se descargarán localmente."
+msgstr ""
+
+msgid "La extensión cURL no está disponible."
+msgstr ""
+
+msgid "La importación de feeds requiere cURL para descargar el feed, los audios y las imágenes. Habilita la extensión <code>curl</code> en tu instalación de PHP y recarga esta página para poder importar."
+msgstr ""
+
+msgid "URL del feed RSS"
+msgstr ""
+
+msgid "Importar episodios aunque su GUID ya exista en la base de datos"
+msgstr ""
+
+msgid "⚠ La importación puede tardar varios minutos dependiendo del número de episodios y el tamaño de los audios. No cierres esta página hasta que finalice."
+msgstr ""
+
+msgid "Iniciar importación"
+msgstr ""
+
+msgid "(sin título)"
+msgstr ""
+
+msgid "Sin imagen"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — index.php / search.php / episode.php (públicas)
+# ---------------------------------------------------------------------------
+
+msgid "Todavía no hay capítulos publicados."
+msgstr ""
+
+msgid "Leer más"
+msgstr ""
+
+msgid "Tu navegador no soporta audio HTML5."
+msgstr ""
+
+msgid "Portada del capítulo"
+msgstr ""
+
+msgid "Escribe un término para buscar episodios."
+msgstr ""
+
+msgid "No hay resultados para \"%s\"."
+msgstr ""
+
+msgid "Resultados para \"%s\": %d"
+msgstr ""
+
+msgid "Buscar"
+msgstr ""
+
+msgid "Buscar episodios"
+msgstr ""
+
+msgid "Ir a la página de inicio"
+msgstr ""
+
+msgid "Portada del podcast"
+msgstr ""
+
+msgid "Inicio"
+msgstr ""
+
+msgid "Descargar"
+msgstr ""
+
+msgid "Duración: %s"
+msgstr ""
+
+msgid "Borrador — Esta página no está publicada y solo es visible para administradores."
+msgstr ""
+
+msgid "Sin título"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — header.php
+# ---------------------------------------------------------------------------
+
+msgid "Cambiar modo claro/oscuro"
+msgstr ""
+
+msgid "Feed RSS"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — admin_nav.php
+# ---------------------------------------------------------------------------
+
+msgid "Panel"
+msgstr ""
+
+msgid "Podcast"
+msgstr ""
+
+msgid "Capítulos"
+msgstr ""
+
+msgid "Añadir"
+msgstr ""
+
+msgid "Backups"
+msgstr ""
+
+msgid "Caché"
+msgstr ""
+
+msgid "2FA"
+msgstr ""
+
+msgid "Redes"
+msgstr ""
+
+msgid "Páginas"
+msgstr ""
+
+msgid "Stats"
+msgstr ""
+
+msgid "Actualizar"
+msgstr ""
+
+msgid "Importar"
+msgstr ""
+
+msgid "Ver web ↗"
+msgstr ""
+
+msgid "Salir"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Vistas — footer.php
+# ---------------------------------------------------------------------------
+
+msgid "Podcast creado con %s, hecho en %s con ❤️ por %s"
+msgstr ""

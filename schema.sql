@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS podcast (
   rss_item_limit INTEGER NOT NULL DEFAULT 0,
   home_items_per_page INTEGER NOT NULL DEFAULT 20,
   write_audio_metadata INTEGER NOT NULL DEFAULT 0,
-  cache_enabled INTEGER NOT NULL DEFAULT 0
+  cache_enabled INTEGER NOT NULL DEFAULT 0,
+  app_language TEXT NOT NULL DEFAULT 'es_ES'
 );
 
 -- episodes: una fila por episodio.
@@ -49,7 +50,7 @@ ON episodes(status, pub_date);
 -- Permite resolución O(log n) de URLs por link guardado (/YYYY/MM/slug).
 CREATE INDEX IF NOT EXISTS idx_episodes_link ON episodes(link);
 
-PRAGMA user_version = 7;
+PRAGMA user_version = 8;
 
 -- social: enlaces a redes sociales del autor (fila única).
 CREATE TABLE IF NOT EXISTS social (

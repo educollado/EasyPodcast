@@ -53,6 +53,26 @@ function runMigrations(string $dbPath): void
     if ($version < 7) {
         migration_v7($pdo);
         $pdo->exec('PRAGMA user_version = 7');
+        $version = 7;
+    }
+
+    if ($version < 8) {
+        migration_v8($pdo);
+        $pdo->exec('PRAGMA user_version = 8');
+    }
+}
+
+/**
+ * Migración v8: añade columna app_language a podcast para el idioma de la interfaz.
+ */
+function migration_v8(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('app_language', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN app_language TEXT NOT NULL DEFAULT 'es_ES'");
     }
 }
 

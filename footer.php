@@ -23,5 +23,9 @@ $_footerIcons  = getSocialIcons();
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
-  <p><a href="https://www.easypodcast.eu" target="_blank" rel="noopener noreferrer">EasyPodcast</a>, hecho en <strong>Europa</strong> con ❤️ por <a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a></p>
+  <p><?= __('Podcast creado con %s, hecho en %s con ❤️ por %s',
+    '<a href="https://www.easypodcast.eu" target="_blank" rel="noopener noreferrer">EasyPodcast</a>',
+    '<strong>Europa</strong>',
+    '<a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>'
+  ) ?></p>
 </footer>

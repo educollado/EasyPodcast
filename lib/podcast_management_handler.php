@@ -7,6 +7,7 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/episode_helpers.php';
+require_once __DIR__ . '/i18n.php';
 
 // ---------------------------------------------------------------------------
 // Helpers de URL
@@ -117,13 +118,13 @@ function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
         return true;
     }
     if (!function_exists('imagecreatefromstring')) {
-        $warning = 'No se pudo generar favicon.ico (falta extension GD).';
+        $warning = __('No se pudo generar favicon.ico (falta extension GD).');
         return false;
     }
 
     $sourcePath = resolveLocalImagePathFromUrl($imageUrl);
     if ($sourcePath === null) {
-        $warning = 'No se pudo generar favicon.ico (imagen del podcast no localizada en servidor).';
+        $warning = __('No se pudo generar favicon.ico (imagen del podcast no localizada en servidor).');
         return false;
     }
 
@@ -132,7 +133,7 @@ function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
     foreach ($sizes as $size) {
         $blob = createPngBlobForIco($sourcePath, $size);
         if ($blob === null) {
-            $warning = 'No se pudo generar favicon.ico (fallo al convertir imagen).';
+            $warning = __('No se pudo generar favicon.ico (fallo al convertir imagen).');
             return false;
         }
         $blobs[$size] = $blob;
@@ -141,7 +142,7 @@ function regeneratePodcastFavicon(string $imageUrl, string &$warning): bool
     $icoBinary = buildIcoBinaryFromPngBlobs($blobs);
     $targetPath = __DIR__ . '/../favicon.ico';
     if (@file_put_contents($targetPath, $icoBinary) === false) {
-        $warning = 'No se pudo escribir favicon.ico en disco.';
+        $warning = __('No se pudo escribir favicon.ico en disco.');
         return false;
     }
 
@@ -181,6 +182,7 @@ function loadPodcastManagementData(string $dbPath): array
         'home_items_per_page' => '20',
         'write_audio_metadata' => '0',
         'cache_enabled'       => '0',
+        'app_language'        => 'es_ES',
     ];
 
     try {
@@ -247,6 +249,12 @@ function loadPodcastManagementData(string $dbPath): array
                     // Gestionado desde cache_management.php; preservar valor de BD.
                     continue;
                 }
+                if ($key === 'app_language') {
+                    $val = trim((string) ($_POST[$key] ?? 'es_ES'));
+                    // Valida que exista el fichero .po; si no, usa el fallback.
+                    $form[$key] = file_exists(__DIR__ . '/../locale/' . $val . '.po') ? $val : 'es_ES';
+                    continue;
+                }
                 $form[$key] = trim((string) ($_POST[$key] ?? ''));
             }
 
@@ -256,32 +264,32 @@ function loadPodcastManagementData(string $dbPath): array
                 : 0;
 
             if ($form['title'] === '' || $form['description'] === '' || $form['link'] === '') {
-                $error = 'Título, descripción y enlace son obligatorios.';
+                $error = __('Título, descripción y enlace son obligatorios.');
             } elseif ($catCount > 3) {
-                $error = 'No se pueden seleccionar más de 3 categorías.';
+                $error = __('No se pueden seleccionar más de 3 categorías.');
             } elseif (
                 $form['rss_item_limit'] === ''
                 || filter_var($form['rss_item_limit'], FILTER_VALIDATE_INT) === false
                 || (int) $form['rss_item_limit'] < 0
             ) {
-                $error = 'La cantidad de elementos del feed debe ser un entero igual o mayor que 0.';
+                $error = __('La cantidad de elementos del feed debe ser un entero igual o mayor que 0.');
             } elseif (
                 $form['home_items_per_page'] === ''
                 || filter_var($form['home_items_per_page'], FILTER_VALIDATE_INT) === false
                 || (int) $form['home_items_per_page'] < 1
             ) {
-                $error = 'La cantidad de elementos de la portada debe ser un entero mayor o igual que 1.';
+                $error = __('La cantidad de elementos de la portada debe ser un entero mayor o igual que 1.');
             } elseif (!in_array($form['itunes_type'], ['episodic', 'serial'], true)) {
-                $error = 'El tipo de podcast debe ser episodic o serial.';
+                $error = __('El tipo de podcast debe ser episodic o serial.');
             } elseif ($form['owner_email'] !== '' && !filter_var($form['owner_email'], FILTER_VALIDATE_EMAIL)) {
-                $error = 'El email del propietario no es válido.';
+                $error = __('El email del propietario no es válido.');
             } else {
                 // Subida opcional de imagen con whitelist MIME y sufijo aleatorio en nombre.
                 $uploadedImage = $_FILES['image_file'] ?? null;
                 if (is_array($uploadedImage) && (int) ($uploadedImage['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
                     $uploadError = (int) ($uploadedImage['error'] ?? UPLOAD_ERR_OK);
                     if ($uploadError !== UPLOAD_ERR_OK) {
-                        $error = 'No se pudo subir la imagen del podcast.';
+                        $error = __('No se pudo subir la imagen del podcast.');
                     } else {
                         $tmpPath = (string) ($uploadedImage['tmp_name'] ?? '');
                         $originalName = (string) ($uploadedImage['name'] ?? '');
@@ -295,7 +303,7 @@ function loadPodcastManagementData(string $dbPath): array
                         ];
 
                         if (!isset($allowedTypes[$mimeType])) {
-                            $error = 'El fichero debe ser una imagen válida (jpg, png, gif o webp).';
+                            $error = __('El fichero debe ser una imagen válida (jpg, png, gif o webp).');
                         } else {
                             $safeBaseName = strtolower((string) preg_replace('/[^a-zA-Z0-9_-]+/', '-', pathinfo($originalName, PATHINFO_FILENAME)));
                             $safeBaseName = trim($safeBaseName, '-');
@@ -308,9 +316,9 @@ function loadPodcastManagementData(string $dbPath): array
                             $imagesDir = __DIR__ . '/../images';
 
                             if (!is_dir($imagesDir) && !mkdir($imagesDir, 0755, true) && !is_dir($imagesDir)) {
-                                $error = 'No se pudo crear la carpeta de imágenes.';
+                                $error = __('No se pudo crear la carpeta de imágenes.');
                             } elseif (!move_uploaded_file($tmpPath, $imagesDir . '/' . $fileName)) {
-                                $error = 'No se pudo guardar la imagen subida.';
+                                $error = __('No se pudo guardar la imagen subida.');
                             } else {
                                 $form['image_url'] = rtrim(resolvePodcastFormBaseUrl($form, $pdo), '/') . '/images/' . $fileName;
                             }
@@ -336,6 +344,7 @@ function loadPodcastManagementData(string $dbPath): array
                         ':home_items_per_page'  => (int) $form['home_items_per_page'],
                         ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                         ':cache_enabled'        => (int) $form['cache_enabled'],
+                        ':app_language'         => $form['app_language'],
                     ];
 
                     if ($existing) {
@@ -357,22 +366,23 @@ function loadPodcastManagementData(string $dbPath): array
                                  rss_item_limit = :rss_item_limit,
                                  home_items_per_page = :home_items_per_page,
                                  write_audio_metadata = :write_audio_metadata,
-                                 cache_enabled = :cache_enabled
+                                 cache_enabled = :cache_enabled,
+                                 app_language = :app_language
                              WHERE id = :id'
                         );
                         $params[':id'] = (int) $existing['id'];
                         $stmt->execute($params);
-                        $notice = 'Podcast actualizado correctamente.';
+                        $notice = __('Podcast actualizado correctamente.');
                     } else {
                         // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                         $stmt = $pdo->prepare(
                             'INSERT INTO podcast
-                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled)
+                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language)
                              VALUES
-                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled)'
+                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language)'
                         );
                         $stmt->execute($params);
-                        $notice = 'Podcast guardado correctamente.';
+                        $notice = __('Podcast guardado correctamente.');
                     }
 
                     try {
@@ -380,15 +390,15 @@ function loadPodcastManagementData(string $dbPath): array
                         writePodcastFeedFile($pdo, __DIR__ . '/../feed.xml', resolveFeedSelfHref($pdo));
                         writePodcastSitemapFile($pdo, __DIR__ . '/../sitemap.xml');
                     } catch (Throwable $feedError) {
-                        $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
+                        $notice .= ' ' . __('(Aviso: no se pudo regenerar feed.xml/sitemap.xml)');
                     }
 
                     $faviconWarning = '';
                     if (!regeneratePodcastFavicon((string) $form['image_url'], $faviconWarning) && $faviconWarning !== '') {
-                        $notice .= ' (Aviso: ' . $faviconWarning . ')';
+                        $notice .= ' (' . __('Aviso: %s', $faviconWarning) . ')';
                     }
                     if (!clearWebCache()) {
-                        $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                        $notice .= ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
                     }
 
                     // Recarga el formulario con los datos persistidos.
