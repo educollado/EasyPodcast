@@ -33,7 +33,7 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Capítulos Existentes</title>
+  <title><?= __('Capítulos Existentes') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
@@ -41,8 +41,8 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
   <div class="admin-wrap">
     <section class="card list-card">
       <div class="title-row">
-        <h1>Capítulos Existentes</h1>
-        <a class="btn add-link" href="add_episode.php">Añadir Capítulo</a>
+        <h1><?= __('Capítulos Existentes') ?></h1>
+        <a class="btn add-link" href="add_episode.php"><?= __('Añadir Capítulo') ?></a>
       </div>
 
       <?php if ($error !== ''): ?>
@@ -54,17 +54,17 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
       <?php endif; ?>
 
       <?php if (!$episodesList): ?>
-        <p class="muted">Todavía no hay capítulos guardados.</p>
+        <p class="muted"><?= __('Todavía no hay capítulos guardados.') ?></p>
       <?php else: ?>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Título</th>
-                <th>Estado</th>
-                <th>Publicación</th>
-                <th>Acción</th>
+                <th><?= __('ID') ?></th>
+                <th><?= __('Título') ?></th>
+                <th><?= __('Estado') ?></th>
+                <th><?= __('Publicación') ?></th>
+                <th><?= __('Acción') ?></th>
               </tr>
             </thead>
             <tbody>
@@ -79,13 +79,13 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
                   <td><?= esc((string) ($episode['pub_date'] ?? '')) ?></td>
                   <td>
                     <div class="row-actions">
-                      <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>">Editar</a>
-                      <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank">Vista previa</a>
-                      <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?');">
+                      <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
+                      <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
+                      <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
                         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                         <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                         <input type="hidden" name="return_page" value="<?= $currentPage ?>">
-                        <button class="delete-text" type="submit">Borrar</button>
+                        <button class="delete-text" type="submit"><?= __('Borrar') ?></button>
                       </form>
                     </div>
                   </td>
@@ -97,11 +97,11 @@ extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error,
 
         <nav class="pagination" aria-label="Paginación de capítulos">
           <?php if ($currentPage > 1): ?>
-            <a class="page-link" href="episodes_management.php?page=<?= $currentPage - 1 ?>">Anterior</a>
+            <a class="page-link" href="episodes_management.php?page=<?= $currentPage - 1 ?>"><?= __('Anterior') ?></a>
           <?php endif; ?>
-          <span class="page-status">Página <?= $currentPage ?> de <?= $totalPages ?> (<?= $totalEpisodes ?> capítulos)</span>
+          <span class="page-status"><?= esc(__('Página %d de %d (%d capítulos)', $currentPage, $totalPages, $totalEpisodes)) ?></span>
           <?php if ($currentPage < $totalPages): ?>
-            <a class="page-link" href="episodes_management.php?page=<?= $currentPage + 1 ?>">Siguiente</a>
+            <a class="page-link" href="episodes_management.php?page=<?= $currentPage + 1 ?>"><?= __('Siguiente') ?></a>
           <?php endif; ?>
         </nav>
       <?php endif; ?>

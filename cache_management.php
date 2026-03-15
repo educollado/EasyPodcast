@@ -26,14 +26,14 @@ extract($data); // cacheEnabled, error, notice
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestión de Caché</title>
+  <title><?= __('Gestión de Caché') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'cache'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Gestión de Caché</h1>
+      <h1><?= __('Gestión de Caché') ?></h1>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -44,19 +44,19 @@ extract($data); // cacheEnabled, error, notice
       <?php endif; ?>
 
       <section>
-        <h2>Caché web</h2>
-        <p>Almacena la salida HTML de portada, episodios, feed y sitemap para servir respuestas más rápido.</p>
+        <h2><?= __('Caché web') ?></h2>
+        <p><?= __('Almacena la salida HTML de portada, episodios, feed y sitemap para servir respuestas más rápido.') ?></p>
 
         <form method="post" action="cache_management.php">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="cache_action" value="save_settings">
           <label class="inline-checkbox">
             <input type="checkbox" name="cache_enabled" value="1" <?= $cacheEnabled === '1' ? 'checked' : '' ?>>
-            <span>Habilitar caché pública en /cache</span>
-            <small>Aplica a portada, episodio, feed y sitemap.</small>
+            <span><?= __('Habilitar caché pública en /cache') ?></span>
+            <small><?= __('Aplica a portada, episodio, feed y sitemap.') ?></small>
           </label>
           <div class="actions" style="margin-top:.8rem;">
-            <button class="btn" type="submit">Guardar</button>
+            <button class="btn" type="submit"><?= __('Guardar') ?></button>
           </div>
         </form>
 
@@ -64,13 +64,13 @@ extract($data); // cacheEnabled, error, notice
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="cache_action" value="clear_cache">
           <div class="actions">
-            <button class="btn back" type="submit">Borrar caché</button>
+            <button class="btn back" type="submit"><?= __('Borrar caché') ?></button>
           </div>
         </form>
       </section>
 
       <section style="margin-top:1.5rem;">
-        <h2>Imágenes generadas</h2>
+        <h2><?= __('Imágenes generadas') ?></h2>
         <p>Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en <code>/images/generated/</code>.
            Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px.</p>
 
@@ -78,7 +78,7 @@ extract($data); // cacheEnabled, error, notice
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="cache_action" value="regenerate_images">
           <div class="actions">
-            <button class="btn" type="submit">Regenerar imágenes</button>
+            <button class="btn" type="submit"><?= __('Regenerar imágenes') ?></button>
           </div>
         </form>
       </section>

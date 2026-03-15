@@ -59,21 +59,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Importar feed RSS</title>
+  <title><?= __('Importar feed RSS') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'import'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Importar feed RSS</h1>
-      <p>Importa episodios desde una URL de feed RSS externo. Los archivos MP3 e imágenes se descargarán localmente.</p>
+      <h1><?= __('Importar feed RSS') ?></h1>
+      <p><?= __('Importa episodios desde una URL de feed RSS externo. Los archivos MP3 e imágenes se descargarán localmente.') ?></p>
 
       <?php if (!function_exists('curl_init')): ?>
         <div class="error">
-          <strong>La extensión cURL no está disponible.</strong><br>
-          La importación de feeds requiere cURL para descargar el feed, los audios y las imágenes.
-          Habilita la extensión <code>curl</code> en tu instalación de PHP y recarga esta página para poder importar.
+          <strong><?= __('La extensión cURL no está disponible.') ?></strong><br>
+          <?= __('La importación de feeds requiere cURL para descargar el feed, los audios y las imágenes. Habilita la extensión <code>curl</code> en tu instalación de PHP y recarga esta página para poder importar.') ?>
         </div>
       <?php else: ?>
 
@@ -87,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="action" value="preview">
           <label>
-            URL del feed RSS
+            <?= __('URL del feed RSS') ?>
             <input type="url" name="feed_url" value="<?= esc($feedUrl) ?>"
                    placeholder="https://ejemplo.com/feed.xml" required autofocus>
           </label>
@@ -203,10 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
                       <input type="checkbox" name="selected_guids[]" value="<?= esc($ep['guid']) ?>" checked>
                     </td>
                     <td style="padding:.3rem .5rem"><?= $i + 1 ?></td>
-                    <td style="padding:.3rem .5rem"><?= esc($ep['title'] !== '' ? $ep['title'] : '(sin título)') ?></td>
+                    <td style="padding:.3rem .5rem"><?= esc($ep['title'] !== '' ? $ep['title'] : __('(sin título)')) ?></td>
                     <td style="padding:.3rem .5rem"><?= esc($ep['pub_date'] ?? '') ?></td>
                     <td style="padding:.3rem .5rem"><?= esc($ep['duration']) ?></td>
-                    <td style="padding:.3rem .5rem;text-align:center" title="<?= $ep['image_url'] !== '' ? esc($ep['image_url']) : 'Sin imagen' ?>">
+                    <td style="padding:.3rem .5rem;text-align:center" title="<?= $ep['image_url'] !== '' ? esc($ep['image_url']) : esc(__('Sin imagen')) ?>">
                       <?= $ep['image_url'] !== '' ? '✓' : '<span style="color:var(--muted,#999)">—</span>' ?>
                     </td>
                     <td style="padding:.3rem .5rem"><?= esc($ep['status']) ?></td>
@@ -220,18 +219,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
             <legend style="padding:0 .5rem;font-weight:600">Opciones de importación</legend>
             <label style="display:flex;align-items:center;gap:.5rem;font-weight:400">
               <input type="checkbox" name="import_duplicates">
-              Importar episodios aunque su GUID ya exista en la base de datos
+              <?= __('Importar episodios aunque su GUID ya exista en la base de datos') ?>
             </label>
           </fieldset>
 
           <div class="notice" style="margin-bottom:1rem">
-            ⚠ La importación puede tardar varios minutos dependiendo del número de episodios y el tamaño de los audios.
-            No cierres esta página hasta que finalice.
+            <?= __('⚠ La importación puede tardar varios minutos dependiendo del número de episodios y el tamaño de los audios. No cierres esta página hasta que finalice.') ?>
           </div>
 
           <div class="actions">
             <a class="btn" href="import_feed.php">Cancelar</a>
-            <button class="btn" type="submit" id="import-btn">Iniciar importación</button>
+            <button class="btn" type="submit" id="import-btn"><?= __('Iniciar importación') ?></button>
           </div>
         </form>
 

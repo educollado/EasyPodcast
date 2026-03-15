@@ -91,7 +91,7 @@ if ($error !== '') {
 
     <?php if ($isDraft): ?>
     <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600;color:#664d03;">
-      <span aria-hidden="true">✏️</span> Borrador — Esta página no está publicada y solo es visible para administradores.
+      <span aria-hidden="true">✏️</span> <?= __('Borrador — Esta página no está publicada y solo es visible para administradores.') ?>
     </div>
     <?php endif; ?>
 
@@ -101,16 +101,16 @@ if ($error !== '') {
       <?php else: ?>
         <article class="detail">
           <?php if ($cover !== ''): ?>
-            <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 200px, (max-width: 760px) 160px, 200px"<?php endif; ?> alt="Portada del capítulo">
+            <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 200px, (max-width: 760px) 160px, 200px"<?php endif; ?> alt="<?= esc(__('Portada del capítulo')) ?>">
           <?php else: ?>
             <div class="cover" aria-hidden="true"></div>
           <?php endif; ?>
           <div>
-            <h1><?= esc((string) ($episode['title'] ?? 'Sin título')) ?></h1>
+            <h1><?= esc(($episode['title'] ?? '') !== '' ? (string) $episode['title'] : __('Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['audio_url'])): ?>
               <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
-                Tu navegador no soporta audio HTML5.
+                <?= __('Tu navegador no soporta audio HTML5.') ?>
               </audio>
               <?php // Metadatos de audio: enlace de descarga con duración y tamaño entre paréntesis. ?>
               <?php
@@ -118,12 +118,12 @@ if ($error !== '') {
                 $readableSize = formatBytes($episode['audio_size_bytes'] ?? 0);
                 // Construye la parte entre paréntesis solo con los datos disponibles.
                 $metaParts = [];
-                if ($duration !== '')    $metaParts[] = 'Duración: ' . $duration;
+                if ($duration !== '')    $metaParts[] = __('Duración: %s', $duration);
                 if ($readableSize !== '') $metaParts[] = $readableSize;
                 $metaParens = $metaParts ? ' (' . implode(' — ', $metaParts) . ')' : '';
               ?>
               <p class="audio-meta">
-                <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download>Descargar</a><?= esc($metaParens) ?>
+                <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['description'])): ?>

@@ -7,6 +7,7 @@ require_once __DIR__ . '/view_helpers.php';       // esc()
 require_once __DIR__ . '/cache_service.php';      // clearWebCache()
 require_once __DIR__ . '/sitemap_builder.php';    // writePodcastSitemapFile()
 require_once __DIR__ . '/../feed_builder.php';    // writePodcastFeedFile(), resolveBaseUrl(), resolveFeedSelfHref()
+require_once __DIR__ . '/i18n.php';
 
 // ---------------------------------------------------------------------------
 // Descarga del XML del feed
@@ -20,7 +21,7 @@ function fetchFeedXml(string $url): array
 {
     $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
     if (!in_array($scheme, ['http', 'https'], true)) {
-        return ['xml' => null, 'error' => 'La URL debe usar http o https.'];
+        return ['xml' => null, 'error' => __('La URL debe usar http o https.')];
     }
 
     $ch = curl_init();
@@ -40,15 +41,15 @@ function fetchFeedXml(string $url): array
     curl_close($ch);
 
     if ($body === false || $curlError !== '') {
-        return ['xml' => null, 'error' => 'Error al descargar el feed: ' . $curlError];
+        return ['xml' => null, 'error' => __('Error al descargar el feed: %s', $curlError)];
     }
 
     if ($httpCode >= 400) {
-        return ['xml' => null, 'error' => 'El servidor devolvió HTTP ' . $httpCode . '.'];
+        return ['xml' => null, 'error' => __('El servidor devolvió HTTP %d.', $httpCode)];
     }
 
     if (!is_string($body) || trim($body) === '') {
-        return ['xml' => null, 'error' => 'El feed está vacío.'];
+        return ['xml' => null, 'error' => __('El feed está vacío.')];
     }
 
     return ['xml' => $body, 'error' => ''];
@@ -241,7 +242,7 @@ function loadFeedPreview(string $feedUrl): array
     $empty = ['preview' => null, 'error' => ''];
 
     if (!filter_var($feedUrl, FILTER_VALIDATE_URL)) {
-        return array_merge($empty, ['error' => 'La URL del feed no es válida.']);
+        return array_merge($empty, ['error' => __('La URL del feed no es válida.')]);
     }
 
     $fetchResult = fetchFeedXml($feedUrl);
@@ -254,11 +255,11 @@ function loadFeedPreview(string $feedUrl): array
     libxml_clear_errors();
 
     if ($xml === false) {
-        return array_merge($empty, ['error' => 'No se pudo parsear el XML del feed.']);
+        return array_merge($empty, ['error' => __('No se pudo parsear el XML del feed.')]);
     }
 
     if (!isset($xml->channel)) {
-        return array_merge($empty, ['error' => 'El feed no contiene un elemento <channel>.']);
+        return array_merge($empty, ['error' => __('El feed no contiene un elemento <channel>.')]);
     }
 
     $channel  = $xml->channel;
@@ -288,7 +289,7 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
 
     $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
     if (!in_array($scheme, ['http', 'https'], true)) {
-        $errorResult['error'] = 'URL no válida (debe ser http/https).';
+        $errorResult['error'] = __('URL no válida (debe ser http/https).');
         return $errorResult;
     }
 
@@ -305,7 +306,7 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
 
     $fh = @fopen($localPath, 'wb');
     if ($fh === false) {
-        $errorResult['error'] = 'No se pudo crear el fichero destino.';
+        $errorResult['error'] = __('No se pudo crear el fichero destino.');
         return $errorResult;
     }
 
@@ -328,19 +329,19 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
 
     if ($ok === false || $curlError !== '') {
         @unlink($localPath);
-        $errorResult['error'] = 'Error cURL: ' . $curlError;
+        $errorResult['error'] = __('Error cURL: %s', $curlError);
         return $errorResult;
     }
 
     if ($httpCode >= 400) {
         @unlink($localPath);
-        $errorResult['error'] = 'El servidor devolvió HTTP ' . $httpCode . '.';
+        $errorResult['error'] = __('El servidor devolvió HTTP %d.', $httpCode);
         return $errorResult;
     }
 
     if (!is_file($localPath) || filesize($localPath) === 0) {
         @unlink($localPath);
-        $errorResult['error'] = 'El fichero descargado está vacío.';
+        $errorResult['error'] = __('El fichero descargado está vacío.');
         return $errorResult;
     }
 
@@ -377,7 +378,7 @@ function downloadImage(string $url, string $imagesDir, string $baseUrl, string $
     $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!in_array($result['mime'], $allowedMimes, true)) {
         @unlink($result['localPath']);
-        $result['error'] = 'MIME de imagen no válido: ' . $result['mime'];
+        $result['error'] = __('MIME de imagen no válido: %s', $result['mime']);
         return $result;
     }
 
@@ -400,7 +401,7 @@ function downloadAudio(string $url, string $audiosDir, string $baseUrl, string $
     $ext      = resolveAudioExtension($result['mime'], $origName);
     if ($ext === null) {
         @unlink($result['localPath']);
-        $result['error'] = 'MIME de audio no válido: ' . $result['mime'];
+        $result['error'] = __('MIME de audio no válido: %s', $result['mime']);
         return $result;
     }
 

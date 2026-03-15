@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/view_helpers.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Regenera las variantes de imagen para todos los episodios y el podcast.
@@ -77,23 +78,23 @@ function loadCacheManagementData(string $dbPath): array
                 if (!$newEnabled) {
                     clearWebCache();
                 }
-                $notice = 'Configuración de caché guardada.';
+                $notice = __('Configuración de caché guardada.');
 
             } elseif ($action === 'clear_cache') {
                 $webOk   = clearWebCache();
                 $imageOk = clearImageCache();
                 if ($webOk && $imageOk) {
-                    $notice = 'Caché borrada correctamente.';
+                    $notice = __('Caché borrada correctamente.');
                 } else {
-                    $error = 'No se pudo borrar completamente la caché.';
+                    $error = __('No se pudo borrar completamente la caché.');
                 }
 
             } elseif ($action === 'regenerate_images') {
                 if (!clearImageCache()) {
-                    $error = 'No se pudo limpiar la caché de imágenes antes de regenerar.';
+                    $error = __('No se pudo limpiar la caché de imágenes antes de regenerar.');
                 } else {
                     $count  = regenerateAllImages($pdo);
-                    $notice = 'Imágenes regeneradas: ' . $count . ' fuente(s) procesada(s).';
+                    $notice = __('Imágenes regeneradas: %d fuente(s) procesada(s).', $count);
                 }
             }
         }

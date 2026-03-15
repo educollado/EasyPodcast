@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Procesa el cambio de contraseña del usuario en sesión.
@@ -26,17 +27,17 @@ function loadChangePasswordData(string $dbPath): array
     $confirm     = (string) ($_POST['new_password_confirm'] ?? '');
 
     if ($current === '' || $new === '' || $confirm === '') {
-        $error = 'Completa todos los campos.';
+        $error = __('Completa todos los campos.');
         return compact('error', 'notice');
     }
 
     if ($new !== $confirm) {
-        $error = 'La nueva contraseña y su confirmación no coinciden.';
+        $error = __('La nueva contraseña y su confirmación no coinciden.');
         return compact('error', 'notice');
     }
 
     if (strlen($new) < 8) {
-        $error = 'La nueva contraseña debe tener al menos 8 caracteres.';
+        $error = __('La nueva contraseña debe tener al menos 8 caracteres.');
         return compact('error', 'notice');
     }
 
@@ -50,13 +51,13 @@ function loadChangePasswordData(string $dbPath): array
         $row = $stmt->fetch();
 
         if (!$row) {
-            $error = 'Usuario no encontrado.';
+            $error = __('Usuario no encontrado.');
             return compact('error', 'notice');
         }
 
         $stored = (string) $row['password'];
         if (!password_verify($current, $stored) && !hash_equals($stored, $current)) {
-            $error = 'La contraseña actual no es correcta.';
+            $error = __('La contraseña actual no es correcta.');
             return compact('error', 'notice');
         }
 
@@ -65,7 +66,7 @@ function loadChangePasswordData(string $dbPath): array
         );
         $upd->execute([':p' => password_hash($new, PASSWORD_DEFAULT), ':id' => (int) $row['id']]);
 
-        $notice = 'Contraseña actualizada correctamente.';
+        $notice = __('Contraseña actualizada correctamente.');
     } catch (Throwable $e) {
         http_response_code(500);
         header('Content-Type: text/plain; charset=UTF-8');

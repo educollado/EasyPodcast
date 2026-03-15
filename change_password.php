@@ -26,14 +26,14 @@ extract($data); // error, notice
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cambiar contraseña</title>
+  <title><?= __('Cambiar contraseña') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'password'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Cambiar contraseña</h1>
+      <h1><?= __('Cambiar contraseña') ?></h1>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -46,19 +46,19 @@ extract($data); // error, notice
       <form method="post" action="change_password.php" autocomplete="off" style="display:grid;gap:.75rem;max-width:420px;">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
-          Contraseña actual
+          <?= __('Contraseña actual') ?>
           <input type="password" name="current_password" required autofocus>
         </label>
         <label>
-          Nueva contraseña
+          <?= __('Nueva contraseña') ?>
           <input type="password" name="new_password" required minlength="8">
         </label>
         <label>
-          Repite la nueva contraseña
+          <?= __('Repite la nueva contraseña') ?>
           <input type="password" name="new_password_confirm" required minlength="8">
         </label>
         <div class="actions">
-          <button class="btn" type="submit">Cambiar contraseña</button>
+          <button class="btn" type="submit"><?= __('Cambiar contraseña') ?></button>
         </div>
       </form>
     </main>

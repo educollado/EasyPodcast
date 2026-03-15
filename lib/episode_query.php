@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/view_helpers.php';
 require_once __DIR__ . '/public_episode_helpers.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Intenta extraer {year, month, slug} de un enlace en formato /YYYY/MM/slug.
@@ -83,7 +84,7 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
 
     // Valida parámetros de ruta al inicio para devolver 404 consistente.
     if (!preg_match('/^\d{4}$/', $year) || !preg_match('/^\d{2}$/', $month) || !preg_match('/^[a-z0-9-]+$/', $slug)) {
-        return ['podcast' => null, 'episode' => null, 'error' => 'Capítulo no encontrado.', 'httpStatus' => 404];
+        return ['podcast' => null, 'episode' => null, 'error' => __('Capítulo no encontrado.'), 'httpStatus' => 404];
     }
 
     try {
@@ -129,11 +130,11 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
         }
 
         if (!$episode) {
-            $error = 'Capítulo no encontrado.';
+            $error = __('Capítulo no encontrado.');
             $httpStatus = 404;
         }
     } catch (Throwable $e) {
-        $error = 'No se pudo cargar el capítulo: ' . $e->getMessage();
+        $error = __('No se pudo cargar el capítulo: %s', $e->getMessage());
         $httpStatus = 500;
     }
 

@@ -17,11 +17,11 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     <div class="podcast-header-left header-box">
       <div class="podcast-branding">
         <?php if ($headerImgSources['src'] !== ''): ?>
-          <a href="/" aria-label="Ir a la página de inicio">
+          <a href="/" aria-label="<?= esc(__('Ir a la página de inicio')) ?>">
             <img class="podcast-cover-header"
                  src="<?= esc($headerImgSources['src']) ?>"
                  <?php if ($headerImgSources['srcset'] !== ''): ?>srcset="<?= esc($headerImgSources['srcset']) ?>" sizes="(max-width: 460px) 64px, 80px"<?php endif; ?>
-                 width="80" height="80" alt="Portada del podcast">
+                 width="80" height="80" alt="<?= esc(__('Portada del podcast')) ?>">
           </a>
         <?php endif; ?>
         <div class="podcast-info">
@@ -37,8 +37,8 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     </div>
     <div class="podcast-header-right header-box">
       <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
-        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar modo claro/oscuro"></button>
-        <a class="rss-link" href="/feed.xml" aria-label="Feed RSS">
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="<?= esc(__('Cambiar modo claro/oscuro')) ?>"></button>
+        <a class="rss-link" href="/feed.xml" aria-label="<?= esc(__('Feed RSS')) ?>">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             <circle cx="5" cy="19" r="3"/>
             <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z"/>
@@ -47,8 +47,8 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
         </a>
       </div>
       <form class="search-form" method="get" action="/search.php" role="search">
-        <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="Buscar episodios" aria-label="Buscar episodios">
-        <button type="submit">Buscar</button>
+        <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="<?= esc(__('Buscar episodios')) ?>" aria-label="<?= esc(__('Buscar episodios')) ?>">
+        <button type="submit"><?= __('Buscar') ?></button>
       </form>
     </div>
   </div>
@@ -59,7 +59,7 @@ $_navPages = isset($dbPath) ? getPublishedPagesForNav($dbPath) : [];
 ?>
 <nav class="pages-nav" aria-label="Navegación principal">
   <div class="pages-nav-item">
-    <a href="/">Inicio</a>
+    <a href="/"><?= __('Inicio') ?></a>
   </div>
   <?php foreach ($_navPages as $_navPage): ?>
     <?php if ($_navPage['children']): ?>

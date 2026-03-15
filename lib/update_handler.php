@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/version.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Consulta la API de GitHub para obtener la información de la última release.
@@ -30,7 +31,7 @@ function getLatestReleaseInfo(): array
         curl_close($ch);
 
         if ($json === false || $httpCode !== 200) {
-            return ['version' => '', 'tar_url' => '', 'error' => 'No se pudo conectar con GitHub (HTTP ' . $httpCode . ').'];
+            return ['version' => '', 'tar_url' => '', 'error' => __('No se pudo conectar con GitHub (HTTP %d).', $httpCode)];
         }
     } else {
         $ctx  = stream_context_create([
@@ -42,13 +43,13 @@ function getLatestReleaseInfo(): array
         ]);
         $json = @file_get_contents($apiUrl, false, $ctx);
         if ($json === false) {
-            return ['version' => '', 'tar_url' => '', 'error' => 'No se pudo conectar con GitHub.'];
+            return ['version' => '', 'tar_url' => '', 'error' => __('No se pudo conectar con GitHub.')];
         }
     }
 
     $data = json_decode((string) $json, true);
     if (!is_array($data) || !isset($data['tag_name'])) {
-        return ['version' => '', 'tar_url' => '', 'error' => 'Respuesta inesperada de GitHub.'];
+        return ['version' => '', 'tar_url' => '', 'error' => __('Respuesta inesperada de GitHub.')];
     }
 
     // tag_name es "v0.9" → extraemos "0.9"
@@ -56,7 +57,7 @@ function getLatestReleaseInfo(): array
     $version = ltrim($tagName, 'v');
 
     if (!preg_match('/^\d+\.\d+/', $version)) {
-        return ['version' => '', 'tar_url' => '', 'error' => 'Versión no reconocida: ' . $tagName . '.'];
+        return ['version' => '', 'tar_url' => '', 'error' => __('Versión no reconocida: %s.', $tagName)];
     }
 
     // Buscar el asset .tar.gz subido manualmente a la release
@@ -75,7 +76,7 @@ function getLatestReleaseInfo(): array
     }
 
     if ($tarUrl === '') {
-        return ['version' => $version, 'tar_url' => '', 'error' => 'No se encontró el archivo .tar.gz en la release.'];
+        return ['version' => $version, 'tar_url' => '', 'error' => __('No se encontró el archivo .tar.gz en la release.')];
     }
 
     return ['version' => $version, 'tar_url' => $tarUrl, 'error' => ''];
@@ -182,24 +183,24 @@ function performUpdate(string $tarUrl, string $appDir): array
         }
     }
     if (!$ok) {
-        return ['ok' => false, 'message' => 'URL de descarga no permitida.'];
+        return ['ok' => false, 'message' => __('URL de descarga no permitida.')];
     }
 
     if (!class_exists('PharData')) {
-        return ['ok' => false, 'message' => 'La extensión phar no está disponible en este servidor. Actualiza manualmente.'];
+        return ['ok' => false, 'message' => __('La extensión phar no está disponible en este servidor. Actualiza manualmente.')];
     }
 
     // Fichero temporal para el .tar.gz
     $tmpBase = tempnam(sys_get_temp_dir(), 'ep_update_');
     if ($tmpBase === false) {
-        return ['ok' => false, 'message' => 'No se pudo crear el archivo temporal.'];
+        return ['ok' => false, 'message' => __('No se pudo crear el archivo temporal.')];
     }
     $tmpFile = $tmpBase . '.tar.gz';
     @unlink($tmpBase); // tempnam crea el fichero base; lo renombramos con extensión
 
     if (!_epDownloadTar($tarUrl, $tmpFile)) {
         @unlink($tmpFile);
-        return ['ok' => false, 'message' => 'No se pudo descargar el archivo de actualización.'];
+        return ['ok' => false, 'message' => __('No se pudo descargar el archivo de actualización.')];
     }
 
     // Extraer en directorio temporal y copiar sobre $appDir (equivalente a --strip-components=1)
@@ -220,7 +221,7 @@ function performUpdate(string $tarUrl, string $appDir): array
     } catch (Throwable $ex) {
         _epDeleteRecursive($tempDir);
         @unlink($tmpFile);
-        return ['ok' => false, 'message' => 'Error al extraer el paquete: ' . $ex->getMessage()];
+        return ['ok' => false, 'message' => __('Error al extraer el paquete: %s', $ex->getMessage())];
     }
 
     // Limpiar temporales siempre
@@ -232,7 +233,7 @@ function performUpdate(string $tarUrl, string $appDir): array
         opcache_reset();
     }
 
-    return ['ok' => true, 'message' => 'Actualización completada.'];
+    return ['ok' => true, 'message' => __('Actualización completada.')];
 }
 
 /**

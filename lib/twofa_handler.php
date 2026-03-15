@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/totp.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Carga y procesa el estado de la gestión de 2FA del usuario en sesión.
@@ -38,7 +39,7 @@ function loadTwofaData(string $dbPath): array
         $row = $stmt->fetch();
 
         if (!$row) {
-            $error = 'Usuario no encontrado.';
+            $error = __('Usuario no encontrado.');
             return compact('state', 'newCodes', 'qrUri', 'pendingSecret', 'recoveryCount', 'error', 'notice');
         }
 
@@ -82,12 +83,12 @@ function loadTwofaData(string $dbPath): array
                 // Verifica el primer código TOTP para confirmar que el usuario ha configurado bien su app.
                 $pendingSecret = (string) ($_SESSION['totp_setup_secret'] ?? '');
                 if ($pendingSecret === '') {
-                    $error = 'No hay configuración de 2FA en curso. Vuelve a empezar.';
+                    $error = __('No hay configuración de 2FA en curso. Vuelve a empezar.');
                     $state = 'disabled';
                 } else {
                     $code = trim((string) ($_POST['totp_code'] ?? ''));
                     if (!totpVerify($pendingSecret, $code)) {
-                        $error = 'Código incorrecto. Asegúrate de que tu app está sincronizada y vuelve a intentarlo.';
+                        $error = __('Código incorrecto. Asegúrate de que tu app está sincronizada y vuelve a intentarlo.');
                         $state         = 'setup_pending';
                         $qrUri         = totpQrUri($pendingSecret, $username, $issuer);
                     } else {
@@ -105,25 +106,25 @@ function loadTwofaData(string $dbPath): array
                         $state         = 'enabled';
                         $newCodes      = $codes['plain'];
                         $recoveryCount = count($newCodes);
-                        $notice        = '2FA activado correctamente. Guarda los códigos de recuperación en un lugar seguro.';
+                        $notice        = __('2FA activado correctamente. Guarda los códigos de recuperación en un lugar seguro.');
                     }
                 }
 
             } elseif ($action === 'disable') {
                 if (!$totpEnabled || $totpSecret === '') {
-                    $error = '2FA ya está desactivado.';
+                    $error = __('2FA ya está desactivado.');
                 } else {
                     $upd = $pdo->prepare(
                         'UPDATE management SET totp_secret = NULL, totp_enabled = 0, totp_recovery_codes = NULL WHERE id = :id'
                     );
                     $upd->execute([':id' => $userId]);
                     $state  = 'disabled';
-                    $notice = '2FA desactivado.';
+                    $notice = __('2FA desactivado.');
                 }
 
             } elseif ($action === 'regenerate_codes') {
                 if (!$totpEnabled || $totpSecret === '') {
-                    $error = '2FA no está activo.';
+                    $error = __('2FA no está activo.');
                 } else {
                     $codes = totpGenerateRecoveryCodes(8);
                     $upd = $pdo->prepare('UPDATE management SET totp_recovery_codes = :rc WHERE id = :id');
@@ -131,7 +132,7 @@ function loadTwofaData(string $dbPath): array
                     $state         = 'enabled';
                     $newCodes      = $codes['plain'];
                     $recoveryCount = count($newCodes);
-                    $notice        = 'Nuevos códigos de recuperación generados. Los anteriores ya no son válidos.';
+                    $notice        = __('Nuevos códigos de recuperación generados. Los anteriores ya no son válidos.');
                 }
             }
         }

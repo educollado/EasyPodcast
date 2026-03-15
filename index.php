@@ -85,7 +85,7 @@ if ($error !== '') {
       <?php if ($error !== ''): ?>
         <p class="error"><?= esc($error) ?></p>
       <?php elseif (!$episodes): ?>
-        <p class="empty">Todavía no hay capítulos publicados.</p>
+        <p class="empty"><?= __('Todavía no hay capítulos publicados.') ?></p>
       <?php else: ?>
         <?php foreach ($episodes as $episode): ?>
           <article class="episode reveal">
@@ -93,12 +93,12 @@ if ($error !== '') {
             <?php // Usa portada del podcast cuando falta la portada del episodio. ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
             <?php // Genera srcset responsive de miniaturas cuadradas y reutiliza variantes existentes. ?>
-            <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
+            <?php $episodeTitle = (string) ($episode['title'] !== '' && $episode['title'] !== null ? $episode['title'] : __('Sin título')); ?>
             <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
             <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144,220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <a href="<?= esc($episodeHref) ?>" tabindex="-1" aria-hidden="true">
-                <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 160px, (max-width: 620px) 88px, 112px"<?php endif; ?> alt="Portada del capítulo">
+                <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 160px, (max-width: 620px) 88px, 112px"<?php endif; ?> alt="<?= esc(__('Portada del capítulo')) ?>">
               </a>
             <?php else: ?>
               <div class="cover" aria-hidden="true"></div>
@@ -112,12 +112,12 @@ if ($error !== '') {
               <p class="excerpt">
                 <?= esc((string) $excerpt['text']) ?>
                 <?php if (!empty($excerpt['truncated'])): ?>
-                  <a class="read-more" href="<?= esc($episodeHref) ?>">Leer más</a>
+                  <a class="read-more" href="<?= esc($episodeHref) ?>"><?= __('Leer más') ?></a>
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
                 <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
-                  Tu navegador no soporta audio HTML5.
+                  <?= __('Tu navegador no soporta audio HTML5.') ?>
                 </audio>
               <?php endif; ?>
             </div>
@@ -128,13 +128,13 @@ if ($error !== '') {
             <span>Página <?= (int) $page ?> de <?= (int) $totalPages ?></span>
             <div class="links">
               <?php if ($page > 1): ?>
-                <a class="page-link" href="index.php?page=<?= $page - 1 ?>">Anterior</a>
+                <a class="page-link" href="index.php?page=<?= $page - 1 ?>"><?= __('Anterior') ?></a>
               <?php endif; ?>
               <?php for ($p = 1; $p <= $totalPages; $p++): ?>
                 <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="index.php?page=<?= $p ?>"><?= $p ?></a>
               <?php endfor; ?>
               <?php if ($page < $totalPages): ?>
-                <a class="page-link" href="index.php?page=<?= $page + 1 ?>">Siguiente</a>
+                <a class="page-link" href="index.php?page=<?= $page + 1 ?>"><?= __('Siguiente') ?></a>
               <?php endif; ?>
             </div>
           </nav>

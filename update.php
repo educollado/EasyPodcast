@@ -47,11 +47,11 @@ extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetch
   <?php $currentAdminPage = 'update'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Actualizar EasyPodcast</h1>
-      <p>Comprueba si hay una nueva versión disponible y aplícala sin perder datos.</p>
+      <h1><?= __('Actualizar EasyPodcast') ?></h1>
+      <p><?= __('Comprueba si hay una nueva versión disponible y aplícala sin perder datos.') ?></p>
 
       <?php if ($updated): ?>
-        <div class="notice">EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado.</div>
+        <div class="notice"><?= __('EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado.') ?></div>
       <?php endif; ?>
 
       <?php if ($updateResult !== null && !$updateResult['ok']): ?>
@@ -63,12 +63,12 @@ extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetch
         <!-- Versiones -->
         <div style="display: flex; gap: 2.5rem; flex-wrap: wrap;">
           <div>
-            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;">Instalada</span>
+            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;"><?= __('Instalada') ?></span>
             <strong style="font-size: 1.5rem; font-family: var(--font-display);"><?= esc($currentVersion) ?></strong>
           </div>
           <?php if ($fetchError === '' && $latestVersion !== ''): ?>
           <div>
-            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;">Última disponible</span>
+            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;"><?= __('Última disponible') ?></span>
             <strong style="font-size: 1.5rem; font-family: var(--font-display); color: <?= $updateAvailable ? 'var(--accent)' : 'var(--ok)' ?>;"><?= esc($latestVersion) ?></strong>
           </div>
           <?php endif; ?>
@@ -91,7 +91,7 @@ extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetch
           </form>
 
         <?php else: ?>
-          <div class="notice">Ya tienes la última versión instalada.</div>
+          <div class="notice"><?= __('Ya tienes la última versión instalada.') ?></div>
 
         <?php endif; ?>
 

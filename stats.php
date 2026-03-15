@@ -26,7 +26,7 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Estadísticas</title>
+  <title><?= __('Estadísticas') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <style>
     .stats-grid {
@@ -71,7 +71,7 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
   <?php $currentAdminPage = 'stats'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Estadísticas</h1>
+      <h1><?= __('Estadísticas') ?></h1>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -80,32 +80,32 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
       <div class="stats-grid">
 
         <div class="stat-card">
-          <span class="stat-label">Publicados</span>
+          <span class="stat-label"><?= __('Publicados') ?></span>
           <span class="stat-value accent"><?= $published ?></span>
-          <span class="stat-sub">episodios en el feed</span>
+          <span class="stat-sub"><?= __('episodios en el feed') ?></span>
         </div>
 
         <div class="stat-card">
-          <span class="stat-label">Borradores</span>
+          <span class="stat-label"><?= __('Borradores') ?></span>
           <span class="stat-value"><?= $drafts ?></span>
-          <span class="stat-sub">sin publicar</span>
+          <span class="stat-sub"><?= __('sin publicar') ?></span>
         </div>
 
         <div class="stat-card">
-          <span class="stat-label">Total</span>
+          <span class="stat-label"><?= __('Total') ?></span>
           <span class="stat-value"><?= $total ?></span>
-          <span class="stat-sub">episodios en la BD</span>
+          <span class="stat-sub"><?= __('episodios en la BD') ?></span>
         </div>
 
         <div class="stat-card">
-          <span class="stat-label">Tamaño de audios</span>
+          <span class="stat-label"><?= __('Tamaño de audios') ?></span>
           <span class="stat-value"><?= esc(statsFormatBytes($audioSizeBytes)) ?></span>
-          <span class="stat-sub">según metadatos de BD</span>
+          <span class="stat-sub"><?= __('según metadatos de BD') ?></span>
         </div>
 
         <?php if ($lastTitle !== ''): ?>
         <div class="stat-card stat-wide">
-          <span class="stat-label">Último publicado</span>
+          <span class="stat-label"><?= __('Último publicado') ?></span>
           <span class="stat-value" style="font-size:1.1rem; font-weight:600;"><?= esc($lastTitle) ?></span>
           <?php if ($lastPubDate !== ''): ?>
             <span class="stat-sub"><?= esc($lastPubDate) ?></span>
@@ -119,27 +119,27 @@ extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBy
       <div class="stats-grid">
 
         <div class="stat-card">
-          <span class="stat-label">Estado</span>
+          <span class="stat-label"><?= __('Estado') ?></span>
           <span class="stat-value" style="font-size:1.2rem;">
             <?php if ($cacheEnabled): ?>
-              <span style="color:#059669;">Activa</span>
+              <span style="color:#059669;"><?= __('Activa') ?></span>
             <?php else: ?>
-              <span style="color:var(--muted);">Inactiva</span>
+              <span style="color:var(--muted);"><?= __('Inactiva') ?></span>
             <?php endif; ?>
           </span>
-          <span class="stat-sub"><a href="cache_management.php" style="color:var(--accent);">Gestionar caché</a></span>
+          <span class="stat-sub"><a href="cache_management.php" style="color:var(--accent);"><?= __('Gestionar caché') ?></a></span>
         </div>
 
         <div class="stat-card">
-          <span class="stat-label">Páginas en caché</span>
+          <span class="stat-label"><?= __('Páginas en caché') ?></span>
           <span class="stat-value"><?= $cacheFiles ?></span>
-          <span class="stat-sub">ficheros .cache</span>
+          <span class="stat-sub"><?= __('ficheros .cache') ?></span>
         </div>
 
         <div class="stat-card">
-          <span class="stat-label">Tamaño de caché</span>
+          <span class="stat-label"><?= __('Tamaño de caché') ?></span>
           <span class="stat-value"><?= esc(statsFormatBytes($cacheSizeBytes)) ?></span>
-          <span class="stat-sub">HTML cacheado</span>
+          <span class="stat-sub"><?= __('HTML cacheado') ?></span>
         </div>
 
       </div>

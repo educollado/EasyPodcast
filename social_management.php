@@ -38,15 +38,15 @@ $labels = [
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Redes Sociales</title>
+  <title><?= __('Redes Sociales') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'social'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Redes Sociales</h1>
-      <p>Los enlaces configurados aparecerán como iconos en la cabecera de la web pública.</p>
+      <h1><?= __('Redes Sociales') ?></h1>
+      <p><?= __('Los enlaces configurados aparecerán como iconos en la cabecera de la web pública.') ?></p>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -71,7 +71,7 @@ $labels = [
         </div>
 
         <div class="actions" style="margin-top:1rem;">
-          <button class="btn" type="submit">Guardar redes sociales</button>
+          <button class="btn" type="submit"><?= __('Guardar redes sociales') ?></button>
         </div>
       </form>
     </main>

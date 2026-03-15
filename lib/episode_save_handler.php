@@ -7,6 +7,7 @@ require_once __DIR__ . '/upload_service.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/../feed_builder.php';
 require_once __DIR__ . '/sitemap_builder.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Valida el formulario de episodio. Función pura: sin acceso a BD ni efectos laterales.
@@ -20,26 +21,26 @@ function validateEpisodeForm(array $form): ?string
 {
     // explicit admite tres estados: heredar del podcast (''), no ('0') o sí ('1').
     if (!in_array($form['explicit'] ?? '', ['', '0', '1'], true)) {
-        return 'El valor de explícito no es válido.';
+        return __('El valor de explícito no es válido.');
     }
 
     if (!in_array($form['status'] ?? '', ['draft', 'published'], true)) {
-        return 'El estado debe ser draft o published.';
+        return __('El estado debe ser draft o published.');
     }
 
     // episode_type es opcional; si se informa debe ser uno de los valores del estándar iTunes.
     if (($form['episode_type'] ?? '') !== '' && !in_array($form['episode_type'], ['full', 'trailer', 'bonus'], true)) {
-        return 'El tipo de episodio debe ser full, trailer o bonus.';
+        return __('El tipo de episodio debe ser full, trailer o bonus.');
     }
 
     if (($form['title'] ?? '') === '' || ($form['description'] ?? '') === '') {
-        return 'Título y descripción son obligatorios.';
+        return __('Título y descripción son obligatorios.');
     }
 
     // Valida el formato solo si pub_date viene informado (puede llegar vacío cuando
     // saveEpisode aún no lo ha auto-completado, o en tests que pasen un valor explícito).
     if (($form['pub_date'] ?? '') !== '' && normalizeDateTime($form['pub_date']) === null) {
-        return 'La fecha de publicación no es válida.';
+        return __('La fecha de publicación no es válida.');
     }
 
     // Los tres campos numéricos son opcionales (cadena vacía permitida).
@@ -50,7 +51,7 @@ function validateEpisodeForm(array $form): ?string
             continue;
         }
         if (!ctype_digit($value) || (int) $value < 0) {
-            return 'Revisa los campos numéricos: deben ser enteros positivos.';
+            return __('Revisa los campos numéricos: deben ser enteros positivos.');
         }
     }
 
@@ -228,13 +229,13 @@ function saveEpisode(
     // Se comprueba aquí (y no en validateEpisodeForm) porque la URL y el tamaño
     // pueden provenir del fichero recién subido y no existir aún en el formulario inicial.
     if ($form['audio_url'] === '') {
-        return ['error' => 'Debes indicar la URL de audio o subir un fichero de audio.', 'notice' => '', 'form' => $form];
+        return ['error' => __('Debes indicar la URL de audio o subir un fichero de audio.'), 'notice' => '', 'form' => $form];
     }
     if ($form['audio_mime_type'] === '') {
-        return ['error' => 'El MIME del audio es obligatorio.', 'notice' => '', 'form' => $form];
+        return ['error' => __('El MIME del audio es obligatorio.'), 'notice' => '', 'form' => $form];
     }
     if ($form['audio_size_bytes'] === '' || !ctype_digit($form['audio_size_bytes']) || (int) $form['audio_size_bytes'] <= 0) {
-        return ['error' => 'El tamaño del audio debe ser un entero mayor que 0.', 'notice' => '', 'form' => $form];
+        return ['error' => __('El tamaño del audio debe ser un entero mayor que 0.'), 'notice' => '', 'form' => $form];
     }
 
     // 5. Fallbacks de defaults del podcast.
@@ -336,8 +337,8 @@ function saveEpisode(
 
     // 10. Mensaje y reset del formulario al crear.
     $notice = ($isEditing && $episodeId !== null)
-        ? 'Capítulo actualizado correctamente.'
-        : 'Capítulo guardado correctamente.';
+        ? __('Capítulo actualizado correctamente.')
+        : __('Capítulo guardado correctamente.');
 
     // Tras una creación exitosa reseteamos el formulario para que el usuario pueda
     // añadir otro episodio de inmediato. En edición conservamos los datos guardados.
@@ -352,10 +353,10 @@ function saveEpisode(
         writePodcastFeedFile($pdo, dirname(__DIR__) . '/feed.xml', resolveFeedSelfHref($pdo));
         writePodcastSitemapFile($pdo, dirname(__DIR__) . '/sitemap.xml');
     } catch (Throwable $feedError) {
-        $notice .= ' (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
+        $notice .= ' ' . __('(Aviso: no se pudo regenerar feed.xml/sitemap.xml)');
     }
     if (!clearWebCache()) {
-        $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+        $notice .= ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
     }
     // id3Notice se adjunta al notice para que el usuario lo vea en un único bloque de aviso.
     if ($id3Notice !== '') {

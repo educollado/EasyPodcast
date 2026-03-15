@@ -46,7 +46,7 @@ if (!empty($deleteError)) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Páginas</title>
+  <title><?= __('Páginas') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
@@ -54,8 +54,8 @@ if (!empty($deleteError)) {
   <div class="admin-wrap">
     <section class="card list-card">
       <div class="title-row">
-        <h1>Páginas</h1>
-        <a class="btn add-link" href="add_page.php">Añadir Página</a>
+        <h1><?= __('Páginas') ?></h1>
+        <a class="btn add-link" href="add_page.php"><?= __('Añadir Página') ?></a>
       </div>
 
       <?php if ($error !== ''): ?>
@@ -67,17 +67,17 @@ if (!empty($deleteError)) {
       <?php endif; ?>
 
       <?php if (!$pagesList): ?>
-        <p class="muted">Todavía no hay páginas creadas.</p>
+        <p class="muted"><?= __('Todavía no hay páginas creadas.') ?></p>
       <?php else: ?>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Título</th>
-                <th>URL</th>
-                <th>Estado</th>
-                <th>Orden</th>
-                <th>Acción</th>
+                <th><?= __('Título') ?></th>
+                <th><?= __('URL') ?></th>
+                <th><?= __('Estado') ?></th>
+                <th><?= __('Orden') ?></th>
+                <th><?= __('Acción') ?></th>
               </tr>
             </thead>
             <tbody>
@@ -98,12 +98,12 @@ if (!empty($deleteError)) {
                   <td><?= (int) ($p['sort_order'] ?? 0) ?></td>
                   <td>
                     <div class="row-actions">
-                      <a class="edit-link" href="add_page.php?page_id=<?= (int) ($p['id'] ?? 0) ?>">Editar</a>
+                      <a class="edit-link" href="add_page.php?page_id=<?= (int) ($p['id'] ?? 0) ?>"><?= __('Editar') ?></a>
                       <form class="inline-form" method="post" action="pages_management.php"
                             onsubmit="return confirm('¿Borrar la página «<?= esc(addslashes((string) ($p['title'] ?? ''))) ?>»?');">
                         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                         <input type="hidden" name="delete_page_id" value="<?= (int) ($p['id'] ?? 0) ?>">
-                        <button class="delete-text" type="submit">Borrar</button>
+                        <button class="delete-text" type="submit"><?= __('Borrar') ?></button>
                       </form>
                     </div>
                   </td>

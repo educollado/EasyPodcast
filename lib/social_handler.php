@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/cache_service.php';
+require_once __DIR__ . '/i18n.php';
 
 /** Campos de la tabla social en el orden en que se muestran. */
 const SOCIAL_FIELDS = ['blog', 'linkedin', 'mastodon', 'x', 'pixelfed', 'instagram', 'youtube', 'github', 'bluesky'];
@@ -132,7 +133,7 @@ function loadSocialData(string $dbPath): array
             // Validar que los valores no vacíos sean URLs válidas.
             foreach ($form as $key => $val) {
                 if ($val !== '' && filter_var($val, FILTER_VALIDATE_URL) === false) {
-                    $error = 'El valor de "' . $key . '" no es una URL válida.';
+                    $error = __('El valor de "%s" no es una URL válida.', $key);
                     break;
                 }
             }
@@ -154,7 +155,7 @@ function loadSocialData(string $dbPath): array
                 }
 
                 clearWebCache();
-                $notice = 'Redes sociales guardadas correctamente.';
+                $notice = __('Redes sociales guardadas correctamente.');
             }
         }
     } catch (Throwable $e) {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/cache_service.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Devuelve las estadísticas básicas del podcast a partir de la BD y del sistema de caché.
@@ -69,7 +70,7 @@ function loadStatsData(string $dbPath): array
         $audioSizeBytes = (int) ($sizeRow['total'] ?? 0);
 
     } catch (Throwable $e) {
-        $error = 'Error al cargar estadísticas: ' . $e->getMessage();
+        $error = __('Error al cargar estadísticas: %s', $e->getMessage());
     }
 
     // Estado de la caché web.

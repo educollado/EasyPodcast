@@ -32,15 +32,15 @@ extract($data); // error, notice, imagesExport, audiosExport
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Copias de seguridad</title>
+  <title><?= __('Copias de seguridad') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
   <?php $currentAdminPage = 'backups'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
   <main class="card">
-    <h1>Copias de seguridad</h1>
-    <p>Gestiona por separado la base de datos y los ficheros multimedia.</p>
+    <h1><?= __('Copias de seguridad') ?></h1>
+    <p><?= __('Gestiona por separado la base de datos y los ficheros multimedia.') ?></p>
 
     <?php if ($error !== ''): ?>
       <div class="error"><?= esc($error) ?></div>
@@ -52,30 +52,30 @@ extract($data); // error, notice, imagesExport, audiosExport
 
     <div class="backup-groups">
       <section class="tool-box" aria-label="Bloque base de datos">
-        <h2>Base de Datos</h2>
-        <p>Exporta o importa el archivo SQLite del podcast.</p>
+        <h2><?= __('Base de Datos') ?></h2>
+        <p><?= __('Exporta o importa el archivo SQLite del podcast.') ?></p>
         <div class="db-tools">
-          <a class="btn db-export" href="backups.php?action=export_db">Exportar base de datos</a>
+          <a class="btn db-export" href="backups.php?action=export_db"><?= __('Exportar base de datos') ?></a>
           <form class="db-import-form" method="post" action="backups.php" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="db_action" value="import_db">
-            <label for="db_file">Importar base de datos</label>
+            <label for="db_file"><?= __('Importar base de datos') ?></label>
             <input id="db_file" type="file" name="db_file" accept=".sqlite,.db" required>
-            <button class="btn db-import" type="submit">Importar base de datos</button>
+            <button class="btn db-import" type="submit"><?= __('Importar base de datos') ?></button>
           </form>
         </div>
       </section>
 
       <section class="tool-box" aria-label="Bloque ficheros">
-        <h2>Ficheros</h2>
+        <h2><?= __('Ficheros') ?></h2>
         <p>Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB.</p>
         <div class="db-tools">
           <div>
-            <strong>Exportar imágenes</strong>
+            <strong><?= __('Exportar imágenes') ?></strong>
             <?php if ($imagesExport['error'] !== ''): ?>
               <p class="error"><?= esc((string) $imagesExport['error']) ?></p>
             <?php elseif ($imagesExport['totalFiles'] === 0): ?>
-              <p>No hay ficheros en <code>images/</code>.</p>
+              <p><?= __('No hay ficheros en <code>images/</code>.') ?></p>
             <?php else: ?>
               <p>
                 Total: <?= (int) $imagesExport['totalFiles'] ?> ficheros.
@@ -104,11 +104,11 @@ extract($data); // error, notice, imagesExport, audiosExport
           </div>
 
           <div>
-            <strong>Exportar audios</strong>
+            <strong><?= __('Exportar audios') ?></strong>
             <?php if ($audiosExport['error'] !== ''): ?>
               <p class="error"><?= esc((string) $audiosExport['error']) ?></p>
             <?php elseif ($audiosExport['totalFiles'] === 0): ?>
-              <p>No hay ficheros en <code>audios/</code>.</p>
+              <p><?= __('No hay ficheros en <code>audios/</code>.') ?></p>
             <?php else: ?>
               <p>
                 Total: <?= (int) $audiosExport['totalFiles'] ?> ficheros.
@@ -140,11 +140,11 @@ extract($data); // error, notice, imagesExport, audiosExport
           <form class="db-import-form" method="post" action="backups.php" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="files_action" value="import_files_zip">
-            <label for="files_zip">Importar ficheros (uno o varios ZIP o audios)</label>
+            <label for="files_zip"><?= __('Importar ficheros (uno o varios ZIP o audios)') ?></label>
             <input id="files_zip" type="file" name="files_zip[]" accept=".zip" multiple>
-            <label for="audio_files">Audios MP3 sueltos (opcional)</label>
+            <label for="audio_files"><?= __('Audios MP3 sueltos (opcional)') ?></label>
             <input id="audio_files" type="file" name="audio_files[]" accept=".mp3,audio/mpeg" multiple>
-            <button class="btn files-import" type="submit">Importar ZIP(s) y/o audios</button>
+            <button class="btn files-import" type="submit"><?= __('Importar ZIP(s) y/o audios') ?></button>
           </form>
         </div>
       </section>

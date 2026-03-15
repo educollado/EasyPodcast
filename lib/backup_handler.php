@@ -10,6 +10,7 @@ require_once __DIR__ . '/../feed_builder.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/i18n.php';
 
 const MEDIA_PART_MAX_BYTES = 133169152; // 127 MiB
 
@@ -135,14 +136,14 @@ function streamZipPart(array $partFiles, string $downloadName, string $zipRoot):
 {
     $tmpZipPath = tempnam(sys_get_temp_dir(), 'easy_podcast_part_');
     if ($tmpZipPath === false) {
-        throw new RuntimeException('No se pudo preparar el archivo temporal para exportar.');
+        throw new RuntimeException(__('No se pudo preparar el archivo temporal para exportar.'));
     }
 
     $zip = new ZipArchive();
     $openResult = $zip->open($tmpZipPath, ZipArchive::OVERWRITE);
     if ($openResult !== true) {
         @unlink($tmpZipPath);
-        throw new RuntimeException('No se pudo crear el archivo ZIP de exportación.');
+        throw new RuntimeException(__('No se pudo crear el archivo ZIP de exportación.'));
     }
 
     $zip->addEmptyDir($zipRoot);
@@ -157,7 +158,7 @@ function streamZipPart(array $partFiles, string $downloadName, string $zipRoot):
 
     if ($filesAdded === 0) {
         @unlink($tmpZipPath);
-        throw new RuntimeException('No hay archivos para exportar en esta parte.');
+        throw new RuntimeException(__('No hay archivos para exportar en esta parte.'));
     }
 
     header('Content-Type: application/zip');
@@ -263,7 +264,7 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
     $zip = new ZipArchive();
     $openResult = $zip->open($uploadedPath);
     if ($openResult !== true) {
-        throw new RuntimeException('No se pudo abrir el ZIP para importar ficheros.');
+        throw new RuntimeException(__('No se pudo abrir el ZIP para importar ficheros.'));
     }
 
     $writtenFiles = 0;
@@ -282,7 +283,7 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
 
         if (strpos($entryName, '../') !== false || str_contains($entryName, "\0")) {
             $zip->close();
-            throw new RuntimeException('El ZIP contiene rutas no permitidas.');
+            throw new RuntimeException(__('El ZIP contiene rutas no permitidas.'));
         }
 
         $isAllowedRoot = str_starts_with($entryName, 'images/') || str_starts_with($entryName, 'audios/');
@@ -301,7 +302,7 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
             if (!is_dir($dirPath)) {
                 if (!mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
                     $zip->close();
-                    throw new RuntimeException('No se pudo crear un directorio durante la importación.');
+                    throw new RuntimeException(__('No se pudo crear un directorio durante la importación.'));
                 }
                 $createdDirs++;
             }
@@ -311,19 +312,19 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
         $parentDir = dirname($targetPath);
         if (!is_dir($parentDir) && !mkdir($parentDir, 0755, true) && !is_dir($parentDir)) {
             $zip->close();
-            throw new RuntimeException('No se pudo preparar directorios para extraer ficheros.');
+            throw new RuntimeException(__('No se pudo preparar directorios para extraer ficheros.'));
         }
 
         $stream = $zip->getStream((string) $entryStat['name']);
         if ($stream === false) {
             $zip->close();
-            throw new RuntimeException('No se pudo leer un fichero dentro del ZIP.');
+            throw new RuntimeException(__('No se pudo leer un fichero dentro del ZIP.'));
         }
         $out = fopen($targetPath, 'wb');
         if ($out === false) {
             fclose($stream);
             $zip->close();
-            throw new RuntimeException('No se pudo escribir un fichero en destino.');
+            throw new RuntimeException(__('No se pudo escribir un fichero en destino.'));
         }
 
         while (!feof($stream)) {
@@ -332,13 +333,13 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
                 fclose($out);
                 fclose($stream);
                 $zip->close();
-                throw new RuntimeException('Error al leer datos del ZIP.');
+                throw new RuntimeException(__('Error al leer datos del ZIP.'));
             }
             if ($chunk !== '' && fwrite($out, $chunk) === false) {
                 fclose($out);
                 fclose($stream);
                 $zip->close();
-                throw new RuntimeException('Error al guardar un fichero importado.');
+                throw new RuntimeException(__('Error al guardar un fichero importado.'));
             }
         }
 
@@ -350,7 +351,7 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
     $zip->close();
 
     if ($foundValidEntries === 0) {
-        throw new RuntimeException('El ZIP no contiene rutas válidas de images/ o audios/.');
+        throw new RuntimeException(__('El ZIP no contiene rutas válidas de images/ o audios/.'));
     }
 
     return ['written' => $writtenFiles, 'dirs' => $createdDirs, 'valid' => $foundValidEntries];
@@ -371,7 +372,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
         // Exportación directa de la base de datos actual.
         // No crea copia persistente en servidor: transmite el fichero existente y termina.
         if (!is_file($dbPath)) {
-            $error = 'No se encontró la base de datos para exportar.';
+            $error = __('No se encontró la base de datos para exportar.');
         } else {
             $downloadName = 'easy_podcast_backup_' . date('Ymd_His') . '.sqlite';
             header('Content-Type: application/octet-stream');
@@ -387,7 +388,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
     if (isset($_GET['action']) && $_GET['action'] === 'export_media_part') {
         // Exportación de ficheros multimedia en partes <= 127 MiB.
         if (!class_exists('ZipArchive')) {
-            $error = 'La extensión ZipArchive no está disponible en este servidor.';
+            $error = __('La extensión ZipArchive no está disponible en este servidor.');
         } else {
             $type = (string) ($_GET['type'] ?? '');
             $part = max(1, (int) ($_GET['part'] ?? 1));
@@ -395,7 +396,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
             $isAudios = $type === 'audios';
 
             if (!$isImages && !$isAudios) {
-                $error = 'Tipo de exportación inválido.';
+                $error = __('Tipo de exportación inválido.');
             } else {
                 $zipRoot = $isImages ? 'images' : 'audios';
                 $sourceDir = $projectRoot . '/' . $zipRoot;
@@ -403,12 +404,11 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                 try {
                     $plan = buildMediaExportPlan($sourceDir, $zipRoot);
                     if ($plan['totalFiles'] === 0) {
-                        $error = 'No hay archivos para exportar en ' . $zipRoot . '/.';
+                        $error = __('No hay archivos para exportar en %s/.', $zipRoot);
                     } elseif (count($plan['parts']) === 0) {
-                        $error = 'No hay ficheros exportables en ZIP para ' . $zipRoot
-                            . '/. Descarga manualmente los que superan 127 MB desde la lista inferior.';
+                        $error = __('No hay ficheros exportables en ZIP para %s/. Descarga manualmente los que superan 127 MB desde la lista inferior.', $zipRoot);
                     } elseif (!isset($plan['parts'][$part - 1])) {
-                        $error = 'La parte solicitada no existe para ' . $zipRoot . '.';
+                        $error = __('La parte solicitada no existe para %s.', $zipRoot);
                     } else {
                         $downloadName = 'easy_podcast_' . $zipRoot
                             . '_part' . str_pad((string) $part, 3, '0', STR_PAD_LEFT)
@@ -428,7 +428,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
         // Importación de base de datos SQLite.
         // Flujo: validar subida -> validar estructura -> backup previo -> restaurar -> regenerar feed.
         if (!isset($_FILES['db_file']) || !is_array($_FILES['db_file'])) {
-            $error = 'Selecciona un archivo de base de datos.';
+            $error = __('Selecciona un archivo de base de datos.');
         } else {
             $uploadError = (int) ($_FILES['db_file']['error'] ?? UPLOAD_ERR_NO_FILE);
             $uploadedPath = (string) ($_FILES['db_file']['tmp_name'] ?? '');
@@ -436,9 +436,9 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
             $validExtension = preg_match('/\.(sqlite|db)$/', $originalName) === 1;
 
             if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
-                $error = 'No se pudo subir el archivo.';
+                $error = __('No se pudo subir el archivo.');
             } elseif (!$validExtension) {
-                $error = 'El archivo debe tener extensión .sqlite o .db.';
+                $error = __('El archivo debe tener extensión .sqlite o .db.');
             } else {
                 try {
                     // Verificación rápida de integridad funcional: la DB debe contener tablas clave.
@@ -453,18 +453,18 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                         ->fetchColumn();
 
                     if ($hasPodcastTable === 0 || $hasEpisodesTable === 0) {
-                        $error = 'La base de datos importada no parece válida para EasyPodcast.';
+                        $error = __('La base de datos importada no parece válida para EasyPodcast.');
                     } elseif (!class_exists('SQLite3')) {
-                        $error = 'La extensión SQLite3 no está disponible en este servidor.';
+                        $error = __('La extensión SQLite3 no está disponible en este servidor.');
                     } else {
                         // Antes de sobrescribir, crea snapshot de seguridad de la base actual.
                         $backupDir = $projectRoot . '/backups';
                         if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true) && !is_dir($backupDir)) {
-                            $error = 'No se pudo crear el directorio de backups.';
+                            $error = __('No se pudo crear el directorio de backups.');
                         } else {
                             $backupPath = $backupDir . '/podcast-before-import-' . date('Ymd_His') . '.sqlite';
                             if (!copy($dbPath, $backupPath)) {
-                                $error = 'No se pudo crear el backup previo de seguridad.';
+                                $error = __('No se pudo crear el backup previo de seguridad.');
                             } else {
                                 $probe = null;
 
@@ -476,7 +476,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                                 $targetDb->close();
 
                                 if (!$importOk) {
-                                    $error = 'Falló la importación de la base de datos.';
+                                    $error = __('Falló la importación de la base de datos.');
                                 } else {
                                     $pdo = new PDO('sqlite:' . $dbPath);
                                     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -486,24 +486,24 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                                         // Tras importar, sincroniza feed.xml/sitemap.xml con la nueva base.
                                         writePodcastFeedFile($pdo, $projectRoot . '/feed.xml', resolveFeedSelfHref($pdo));
                                         writePodcastSitemapFile($pdo, $projectRoot . '/sitemap.xml');
-                                        $notice = 'Base de datos importada correctamente y feed.xml/sitemap.xml regenerados.';
+                                        $notice = __('Base de datos importada correctamente y feed.xml/sitemap.xml regenerados.');
                                     } catch (Throwable $feedError) {
-                                        $notice = 'Base de datos importada correctamente, pero no se pudo regenerar feed.xml/sitemap.xml.';
+                                        $notice = __('Base de datos importada correctamente, pero no se pudo regenerar feed.xml/sitemap.xml.');
                                     }
                                     if (!clearWebCache()) {
-                                        $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                                        $notice .= ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
                                     }
 
                                     // Limpia el backup temporal tras importación satisfactoria.
                                     if (!@unlink($backupPath) && is_file($backupPath)) {
-                                        $notice .= ' (Aviso: no se pudo borrar el backup temporal en /backups)';
+                                        $notice .= ' ' . __('(Aviso: no se pudo borrar el backup temporal en /backups)');
                                     }
                                 }
                             }
                         }
                     }
                 } catch (Throwable $e) {
-                    $error = 'No se pudo validar/importar el archivo: ' . $e->getMessage();
+                    $error = __('No se pudo validar/importar el archivo: %s', $e->getMessage());
                 }
             }
         }
@@ -535,7 +535,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
         }
 
         if (!$hasZipCandidate && !$hasAudioCandidate) {
-            $error = 'Selecciona al menos un ZIP o un audio MP3.';
+            $error = __('Selecciona al menos un ZIP o un audio MP3.');
         } else {
             $archivesProcessed = 0;
             $writtenFiles = 0;
@@ -543,7 +543,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
             $audiosUploaded = 0;
 
             if ($hasZipCandidate && !class_exists('ZipArchive')) {
-                $error = 'La extensión ZipArchive no está disponible en este servidor.';
+                $error = __('La extensión ZipArchive no está disponible en este servidor.');
             }
 
             if ($error === '') {
@@ -556,11 +556,11 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                         continue;
                     }
                     if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
-                        $error = 'No se pudo subir uno de los ZIP de ficheros.';
+                        $error = __('No se pudo subir uno de los ZIP de ficheros.');
                         break;
                     }
                     if (preg_match('/\.zip$/', $originalName) !== 1) {
-                        $error = 'Todos los ficheros ZIP deben tener extensión .zip.';
+                        $error = __('Todos los ficheros ZIP deben tener extensión .zip.');
                         break;
                     }
 
@@ -579,7 +579,7 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
             if ($error === '') {
                 $audiosDir = $projectRoot . '/audios';
                 if (!is_dir($audiosDir) && !mkdir($audiosDir, 0755, true) && !is_dir($audiosDir)) {
-                    $error = 'No se pudo crear el directorio audios/.';
+                    $error = __('No se pudo crear el directorio audios/.');
                 } else {
                     foreach ($audioUploads as $upload) {
                         $uploadError = (int) $upload['error'];
@@ -591,18 +591,18 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
                             continue;
                         }
                         if ($uploadError !== UPLOAD_ERR_OK || $uploadedPath === '' || !is_uploaded_file($uploadedPath)) {
-                            $error = 'No se pudo subir uno de los audios MP3.';
+                            $error = __('No se pudo subir uno de los audios MP3.');
                             break;
                         }
                         if (preg_match('/\.mp3$/', $lowerName) !== 1) {
-                            $error = 'Todos los audios sueltos deben tener extensión .mp3.';
+                            $error = __('Todos los audios sueltos deben tener extensión .mp3.');
                             break;
                         }
 
                         $safeName = sanitizeAudioFilename($originalName);
                         $targetPath = resolveUniquePath($audiosDir, $safeName);
                         if (!move_uploaded_file($uploadedPath, $targetPath)) {
-                            $error = 'No se pudo guardar uno de los audios MP3 en audios/.';
+                            $error = __('No se pudo guardar uno de los audios MP3 en audios/.');
                             break;
                         }
                         $audiosUploaded++;
@@ -611,22 +611,19 @@ function loadBackupsData(string $dbPath, string $projectRoot): array
             }
 
             if ($error === '' && $archivesProcessed === 0 && $audiosUploaded === 0) {
-                $error = 'Selecciona al menos un ZIP o un audio MP3.';
+                $error = __('Selecciona al menos un ZIP o un audio MP3.');
             } elseif ($error === '') {
-                $notice = 'Importacion completada. ZIP procesados: ' . $archivesProcessed
-                    . '. Archivos escritos desde ZIP: ' . $writtenFiles
-                    . '. Directorios creados: ' . $createdDirs
-                    . '. Audios MP3 subidos: ' . $audiosUploaded . '.';
+                $notice = __('Importacion completada. ZIP procesados: %d. Archivos escritos desde ZIP: %d. Directorios creados: %d. Audios MP3 subidos: %d.', $archivesProcessed, $writtenFiles, $createdDirs, $audiosUploaded);
                 try {
                     $pdo = new PDO('sqlite:' . $dbPath);
                     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
                     writePodcastSitemapFile($pdo, $projectRoot . '/sitemap.xml');
                 } catch (Throwable $sitemapError) {
-                    $notice .= ' (Aviso: no se pudo regenerar sitemap.xml)';
+                    $notice .= ' ' . __('(Aviso: no se pudo regenerar sitemap.xml)');
                 }
                 if (!clearWebCache()) {
-                    $notice .= ' (Aviso: no se pudo limpiar completamente la caché)';
+                    $notice .= ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
                 }
             }
         }

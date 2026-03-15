@@ -34,7 +34,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Buscar | <?= esc($podcastTitle) ?></title>
+  <title><?= __('Buscar') ?> | <?= esc($podcastTitle) ?></title>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
   <?php if ($_fediverseCreator !== ''): ?>
@@ -50,7 +50,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
   <link rel="alternate" type="application/rss+xml" title="<?= esc($podcastTitle) ?> RSS" href="<?= esc($rssUrl) ?>">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="<?= esc($podcastTitle) ?>">
-  <meta property="og:title" content="Buscar | <?= esc($podcastTitle) ?>">
+  <meta property="og:title" content="<?= esc(__('Buscar')) ?> | <?= esc($podcastTitle) ?>">
   <meta property="og:description" content="<?= esc($metaDescription) ?>">
   <meta property="og:url" content="<?= esc($canonicalUrl) ?>">
   <meta property="og:image" content="<?= esc($ogImage) ?>">
@@ -74,21 +74,21 @@ header('X-Robots-Tag: noindex, follow, noarchive');
       <?php if ($error !== ''): ?>
         <p class="error"><?= esc($error) ?></p>
       <?php elseif ($query === ''): ?>
-        <p class="empty">Escribe un término para buscar episodios.</p>
+        <p class="empty"><?= __('Escribe un término para buscar episodios.') ?></p>
       <?php elseif (!$episodes): ?>
-        <p class="empty">No hay resultados para "<?= esc($query) ?>".</p>
+        <p class="empty"><?= esc(__('No hay resultados para "%s".', $query)) ?></p>
       <?php else: ?>
-        <p class="meta">Resultados para "<?= esc($query) ?>": <?= (int) $totalEpisodes ?></p>
+        <p class="meta"><?= esc(__('Resultados para "%s": %d', $query, (int) $totalEpisodes)) ?></p>
         <?php foreach ($episodes as $episode): ?>
           <article class="episode reveal">
             <?php $episodeImage = trim((string) ($episode['image_url'] ?? '')); ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
-            <?php $episodeTitle = (string) ($episode['title'] ?? 'Sin título'); ?>
+            <?php $episodeTitle = ($episode['title'] ?? '') !== '' ? (string) $episode['title'] : __('Sin título'); ?>
             <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
             <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <a href="<?= esc($episodeHref) ?>" tabindex="-1" aria-hidden="true">
-                <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 160px, (max-width: 620px) 88px, 112px"<?php endif; ?> alt="Portada del capítulo">
+                <img class="cover" src="<?= esc($coverSources['src'] !== '' ? $coverSources['src'] : $cover) ?>"<?php if ($coverSources['srcset'] !== ''): ?> srcset="<?= esc($coverSources['srcset']) ?>" sizes="(max-width: 460px) 160px, (max-width: 620px) 88px, 112px"<?php endif; ?> alt="<?= esc(__('Portada del capítulo')) ?>">
               </a>
             <?php else: ?>
               <div class="cover" aria-hidden="true"></div>
@@ -100,12 +100,12 @@ header('X-Robots-Tag: noindex, follow, noarchive');
               <p class="excerpt">
                 <?= esc((string) $excerpt['text']) ?>
                 <?php if (!empty($excerpt['truncated'])): ?>
-                  <a class="read-more" href="<?= esc($episodeHref) ?>">Leer más</a>
+                  <a class="read-more" href="<?= esc($episodeHref) ?>"><?= __('Leer más') ?></a>
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
                 <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
-                  Tu navegador no soporta audio HTML5.
+                  <?= __('Tu navegador no soporta audio HTML5.') ?>
                 </audio>
               <?php endif; ?>
             </div>
@@ -117,7 +117,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
             <div class="links">
               <?php if ($page > 1): ?>
                 <?php $prevParams = ['q' => $query, 'page' => $page - 1]; ?>
-                <a class="page-link" href="/search.php?<?= esc(http_build_query($prevParams)) ?>">Anterior</a>
+                <a class="page-link" href="/search.php?<?= esc(http_build_query($prevParams)) ?>"><?= __('Anterior') ?></a>
               <?php endif; ?>
               <?php for ($p = 1; $p <= $totalPages; $p++): ?>
                 <?php $pageParams = ['q' => $query, 'page' => $p]; ?>
@@ -125,7 +125,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
               <?php endfor; ?>
               <?php if ($page < $totalPages): ?>
                 <?php $nextParams = ['q' => $query, 'page' => $page + 1]; ?>
-                <a class="page-link" href="/search.php?<?= esc(http_build_query($nextParams)) ?>">Siguiente</a>
+                <a class="page-link" href="/search.php?<?= esc(http_build_query($nextParams)) ?>"><?= __('Siguiente') ?></a>
               <?php endif; ?>
             </div>
           </nav>

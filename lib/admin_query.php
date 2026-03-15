@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/totp.php';
+require_once __DIR__ . '/i18n.php';
 
 /**
  * Procesa la sesión de administración (login, setup, logout) y retorna
@@ -63,11 +64,11 @@ function loadAdminData(string $dbPath): array
                 $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
 
                 if ($username === '' || $password === '' || $passwordConfirm === '') {
-                    $error = 'Completa usuario, contraseña y confirmación.';
+                    $error = __('Completa usuario, contraseña y confirmación.');
                 } elseif ($password !== $passwordConfirm) {
-                    $error = 'Las contraseñas no coinciden.';
+                    $error = __('Las contraseñas no coinciden.');
                 } elseif (strlen($password) < 8) {
-                    $error = 'La contraseña debe tener al menos 8 caracteres.';
+                    $error = __('La contraseña debe tener al menos 8 caracteres.');
                 } else {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
                     $stmt = $pdo->prepare('INSERT INTO management (username, password) VALUES (:username, :password)');
@@ -77,27 +78,27 @@ function loadAdminData(string $dbPath): array
                     ]);
 
                     $_SESSION['admin_user'] = $username;
-                    $notice = 'Usuario administrador creado correctamente.';
+                    $notice = __('Usuario administrador creado correctamente.');
                     $adminCount = 1;
                 }
             } else {
                 // Modo normal: autentica un usuario admin existente.
                 if ($username === '' || $password === '') {
-                    $error = 'Introduce usuario y contraseña.';
+                    $error = __('Introduce usuario y contraseña.');
                 } else {
                     $stmt = $pdo->prepare('SELECT id, username, password, totp_enabled, totp_secret, totp_recovery_codes FROM management WHERE username = :username LIMIT 1');
                     $stmt->execute([':username' => $username]);
                     $row = $stmt->fetch();
 
                     if (!$row) {
-                        $error = 'Credenciales inválidas.';
+                        $error = __('Credenciales inválidas.');
                     } else {
                         $stored = (string) $row['password'];
                         // El fallback con hash_equals permite migrar contraseñas legacy en texto plano.
                         $valid = password_verify($password, $stored) || hash_equals($stored, $password);
 
                         if (!$valid) {
-                            $error = 'Credenciales inválidas.';
+                            $error = __('Credenciales inválidas.');
                         } else {
                             // Si una contraseña legacy coincide por fallback, se rehashea de forma transparente.
                             if (!password_verify($password, $stored)) {
@@ -160,7 +161,7 @@ function verifyTotpLogin(string $dbPath): string
 
     $code = trim((string) ($_POST['totp_code'] ?? ''));
     if ($code === '') {
-        return 'Introduce el código de verificación.';
+        return __('Introduce el código de verificación.');
     }
 
     try {
@@ -204,8 +205,8 @@ function verifyTotpLogin(string $dbPath): string
             exit;
         }
 
-        return 'Código incorrecto. Inténtalo de nuevo.';
+        return __('Código incorrecto. Inténtalo de nuevo.');
     } catch (Throwable $e) {
-        return 'Error interno al verificar el código.';
+        return __('Error interno al verificar el código.');
     }
 }

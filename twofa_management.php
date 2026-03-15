@@ -26,7 +26,7 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Autenticación en dos pasos</title>
+  <title><?= __('Autenticación en dos pasos (2FA)') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <style>
     .twofa-status { display:flex; align-items:center; gap:.6rem; margin-bottom:1.2rem; }
@@ -49,7 +49,7 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
   <?php $currentAdminPage = 'twofa'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1>Autenticación en dos pasos (2FA)</h1>
+      <h1><?= __('Autenticación en dos pasos (2FA)') ?></h1>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -62,29 +62,28 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
       <?php if ($state === 'disabled'): ?>
         <!-- ===================== 2FA DESACTIVADO ===================== -->
         <div class="twofa-status">
-          Estado: <span class="twofa-badge off">Desactivado</span>
+          <?= __('Estado') ?>: <span class="twofa-badge off"><?= __('Desactivado') ?></span>
         </div>
-        <p>Activa la autenticación en dos pasos para proteger tu cuenta con Google Authenticator
-           u otra app compatible con TOTP.</p>
+        <p><?= __('Activa la autenticación en dos pasos para proteger tu cuenta con Google Authenticator u otra app compatible con TOTP.') ?></p>
 
         <form method="post" action="twofa_management.php">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="twofa_action" value="start_setup">
           <div class="actions">
-            <button class="btn" type="submit">Activar 2FA</button>
+            <button class="btn" type="submit"><?= __('Activar 2FA') ?></button>
           </div>
         </form>
 
       <?php elseif ($state === 'setup_pending'): ?>
         <!-- ===================== CONFIGURACIÓN EN CURSO ===================== -->
         <div class="twofa-status">
-          Estado: <span class="twofa-badge off">Configurando…</span>
+          <?= __('Estado') ?>: <span class="twofa-badge off"><?= __('Configurando…') ?></span>
         </div>
 
         <p><strong>Paso 1</strong> — Escanea este código QR con tu app de autenticación:</p>
         <div id="qr-container"></div>
 
-        <p><strong>¿No puedes escanear?</strong> Introduce esta clave manualmente en tu app:</p>
+        <p><?= __('¿No puedes escanear? Introduce esta clave manualmente en tu app:') ?></p>
         <div class="secret-text"><?= esc($pendingSecret) ?></div>
 
         <p style="margin-top:1rem;"><strong>Paso 2</strong> — Introduce el código de 6 dígitos que muestra la app para confirmar:</p>
@@ -93,13 +92,13 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="twofa_action" value="confirm_setup">
           <label>
-            Código de verificación
+            <?= __('Código de verificación') ?>
             <input class="totp-input" type="text" name="totp_code" inputmode="numeric"
                    maxlength="6" required autofocus placeholder="000000" autocomplete="one-time-code">
           </label>
           <div class="actions" style="margin-top:.8rem;">
-            <a class="btn back" href="twofa_management.php">Cancelar</a>
-            <button class="btn" type="submit">Confirmar y activar</button>
+            <a class="btn back" href="twofa_management.php"><?= __('Cancelar') ?></a>
+            <button class="btn" type="submit"><?= __('Confirmar y activar') ?></button>
           </div>
         </form>
 
@@ -116,14 +115,14 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
       <?php elseif ($state === 'enabled'): ?>
         <!-- ===================== 2FA ACTIVO ===================== -->
         <div class="twofa-status">
-          Estado: <span class="twofa-badge on">Activo</span>
+          <?= __('Estado') ?>: <span class="twofa-badge on"><?= __('Activo') ?></span>
         </div>
 
         <?php if (!empty($newCodes)): ?>
           <!-- Códigos nuevos: se muestran una única vez -->
           <div class="notice" style="background:#fffbeb; border-color:#f59e0b;">
-            <strong>Guarda estos códigos de recuperación ahora.</strong>
-            No volverán a mostrarse. Úsalos si pierdes acceso a tu app de autenticación.
+            <strong><?= __('Guarda estos códigos de recuperación ahora.') ?></strong>
+            <?= __('No volverán a mostrarse. Úsalos si pierdes acceso a tu app de autenticación.') ?>
           </div>
           <div class="recovery-grid">
             <?php foreach ($newCodes as $code): ?>
@@ -133,18 +132,18 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
           <hr class="section-sep">
         <?php endif; ?>
 
-        <p>Códigos de recuperación disponibles: <strong><?= $recoveryCount ?></strong> de 8</p>
+        <p><?= __('Códigos de recuperación disponibles: <strong>%d</strong> de 8', $recoveryCount) ?></p>
 
         <!-- Regenerar códigos -->
         <details style="margin-top:1rem;">
-          <summary style="cursor:pointer; color:var(--accent); font-weight:600;">Regenerar códigos de recuperación</summary>
+          <summary style="cursor:pointer; color:var(--accent); font-weight:600;"><?= __('Regenerar códigos de recuperación') ?></summary>
           <div style="margin-top:.8rem;">
-            <p>Los códigos actuales quedarán anulados.</p>
+            <p><?= __('Los códigos actuales quedarán anulados.') ?></p>
             <form method="post" action="twofa_management.php">
               <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
               <input type="hidden" name="twofa_action" value="regenerate_codes">
               <div class="actions">
-                <button class="btn" type="submit">Regenerar códigos</button>
+                <button class="btn" type="submit"><?= __('Regenerar códigos') ?></button>
               </div>
             </form>
           </div>
@@ -152,13 +151,13 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
 
         <!-- Desactivar 2FA -->
         <div class="danger-zone">
-          <h3>Desactivar 2FA</h3>
-          <p>Se eliminará el secreto y los códigos de recuperación.</p>
+          <h3><?= __('Desactivar 2FA') ?></h3>
+          <p><?= __('Se eliminará el secreto y los códigos de recuperación.') ?></p>
           <form method="post" action="twofa_management.php">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="twofa_action" value="disable">
             <div class="actions">
-              <button class="btn" type="submit" style="background:var(--danger);">Desactivar 2FA</button>
+              <button class="btn" type="submit" style="background:var(--danger);"><?= __('Desactivar 2FA') ?></button>
             </div>
           </form>
         </div>

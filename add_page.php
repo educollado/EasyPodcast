@@ -28,7 +28,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= $isEditing ? 'Editar Página' : 'Añadir Página' ?></title>
+  <title><?= $isEditing ? __('Editar Página') : __('Añadir Página') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <!-- EasyMDE: editor Markdown con barra de herramientas -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -37,8 +37,8 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
   <?php $currentAdminPage = 'pages'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1><?= $isEditing ? 'Editar Página' : 'Añadir Página' ?></h1>
-      <p><?= $isEditing ? 'Edita la página seleccionada.' : 'Crea una nueva página estática.' ?></p>
+      <h1><?= $isEditing ? __('Editar Página') : __('Añadir Página') ?></h1>
+      <p><?= $isEditing ? __('Edita la página seleccionada.') : __('Crea una nueva página estática.') ?></p>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -73,15 +73,15 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="grid two" style="margin-top:.8rem;">
           <label>
-            Slug *
+            <?= __('Slug *') ?>
             <input id="page_slug" type="text" name="slug" value="<?= esc($form['slug']) ?>"
                    pattern="[a-z0-9-]+" required placeholder="mi-pagina">
-            <span class="help">Solo letras minúsculas, números y guiones. Se genera desde el título.</span>
+            <span class="help"><?= __('Solo letras minúsculas, números y guiones. Se genera desde el título.') ?></span>
           </label>
           <label>
-            Página padre
+            <?= __('Página padre') ?>
             <select name="parent_id">
-              <option value="">— Sin padre (primer nivel) —</option>
+              <option value=""><?= __('— Sin padre (primer nivel) —') ?></option>
               <?php foreach ($topLevelPages as $tp): ?>
                 <?php
                   // En edición, excluir la propia página del selector de padre.
@@ -100,24 +100,24 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="grid two" style="margin-top:.8rem;">
           <label>
-            Orden (numérico, menor = antes)
+            <?= __('Orden (numérico, menor = antes)') ?>
             <input type="number" name="sort_order" min="0" step="1" value="<?= (int) $form['sort_order'] ?>">
           </label>
         </div>
 
         <div class="grid" style="margin-top:.8rem;">
           <label>
-            Contenido <span style="font-weight:400;color:#5f6b73;font-size:.85rem;">(admite Markdown)</span>
+            <?= __('Contenido') ?> <span style="font-weight:400;color:#5f6b73;font-size:.85rem;">(admite Markdown)</span>
             <textarea id="page_content" name="content"><?= esc($form['content']) ?></textarea>
           </label>
         </div>
 
         <div class="actions" style="margin-top:1rem;">
           <?php if ($isEditing): ?>
-            <a class="btn" href="<?= esc(buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener">Vista previa</a>
+            <a class="btn" href="<?= esc(buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener"><?= __('Vista previa') ?></a>
           <?php endif; ?>
-          <a class="btn" href="pages_management.php">Volver a la lista</a>
-          <button class="btn" type="submit"><?= $isEditing ? 'Actualizar página' : 'Guardar página' ?></button>
+          <a class="btn" href="pages_management.php"><?= __('Volver a la lista') ?></a>
+          <button class="btn" type="submit"><?= $isEditing ? __('Actualizar página') : __('Guardar página') ?></button>
         </div>
       </form>
     </main>

@@ -32,7 +32,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></title>
+  <title><?= $isEditing ? __('Editar Capítulo') : __('Añadir Capítulo') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <!-- EasyMDE: editor Markdown con barra de herramientas (solo en admin, cargado desde CDN) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -41,8 +41,8 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
   <?php $currentAdminPage = 'add'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1><?= $isEditing ? 'Editar Capítulo' : 'Añadir Capítulo' ?></h1>
-      <p><?= $isEditing ? 'Edita el capítulo seleccionado.' : 'Completa los datos para insertar un episodio en la tabla <strong>episodes</strong>.' ?></p>
+      <h1><?= $isEditing ? __('Editar Capítulo') : __('Añadir Capítulo') ?></h1>
+      <p><?= $isEditing ? __('Edita el capítulo seleccionado.') : __('Completa los datos para insertar un episodio en la tabla <strong>episodes</strong>.') ?></p>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -59,11 +59,11 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         <?php endif; ?>
         <div class="grid two">
           <label>
-            GUID (opcional)
+            <?= __('GUID (opcional)') ?>
             <input type="text" name="guid" value="<?= esc($form['guid']) ?>" placeholder="Si está vacío se genera automáticamente">
           </label>
           <label>
-            Estado
+            <?= __('Estado') ?>
             <select id="status_select" name="status">
               <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
               <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
@@ -73,21 +73,21 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
 
         <div id="pub_date_row" class="grid two" style="margin-top:.8rem;<?= $form['status'] !== 'published' ? 'display:none;' : '' ?>">
           <label>
-            Fecha de publicación
+            <?= __('Fecha de publicación') ?>
             <input id="pub_date" type="datetime-local" name="pub_date" value="<?= esc($form['pub_date']) ?>">
-            <span class="help">Si se deja vacío se asigna la fecha actual al publicar.</span>
+            <span class="help"><?= __('Si se deja vacío se asigna la fecha actual al publicar.') ?></span>
           </label>
         </div>
 
         <div class="grid two" style="margin-top: .8rem;">
           <label style="align-self: start">
-            Título *
+            <?= __('Título *') ?>
             <input id="title" type="text" name="title" value="<?= esc($form['title']) ?>" required>
           </label>
           <label>
-            URL del capítulo (opcional)
+            <?= __('URL del capítulo (opcional)') ?>
             <input id="episode_link" type="url" name="link" value="<?= esc($form['link']) ?>">
-            <button id="generate_link_button" class="small-btn" type="button">Generar URL</button>
+            <button id="generate_link_button" class="small-btn" type="button"><?= __('Generar URL') ?></button>
           </label>
         </div>
 
@@ -100,72 +100,72 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
 
         <div class="grid two" style="margin-top: .8rem;">
           <label>
-            Audio (URL)
+            <?= __('Audio (URL)') ?>
             <input type="url" name="audio_url" value="<?= esc($form['audio_url']) ?>">
-            <span class="help">Si subes audio, esta URL se rellena automáticamente con /audios/fichero.</span>
+            <span class="help"><?= __('Si subes audio, esta URL se rellena automáticamente con /audios/fichero.') ?></span>
           </label>
           <label style="align-self: start">
-            O subir audio del capítulo
+            <?= __('O subir audio del capítulo') ?>
             <input id="audio_file" type="file" name="audio_file" accept="audio/*">
           </label>
           <label>
-            MIME audio *
+            <?= __('MIME audio *') ?>
             <input id="audio_mime_type" type="text" name="audio_mime_type" value="<?= esc($form['audio_mime_type']) ?>" placeholder="audio/mpeg">
           </label>
           <label>
-            Tamaño audio en bytes *
+            <?= __('Tamaño audio en bytes *') ?>
             <input id="audio_size_bytes" type="number" name="audio_size_bytes" min="1" step="1" value="<?= esc($form['audio_size_bytes']) ?>">
           </label>
           <label>
-            Duración (HH:MM:SS)
+            <?= __('Duración (HH:MM:SS)') ?>
             <input id="duration" type="text" name="duration" value="<?= esc($form['duration']) ?>" placeholder="00:42:10">
           </label>
           <label>
-            Explícito
+            <?= __('Explícito') ?>
             <select name="explicit">
-              <option value="" <?= $form['explicit'] === '' ? 'selected' : '' ?>>Heredar del podcast</option>
+              <option value="" <?= $form['explicit'] === '' ? 'selected' : '' ?>><?= __('Heredar del podcast') ?></option>
               <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>>No</option>
               <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>>Sí</option>
             </select>
           </label>
           <label>
-            Temporada
+            <?= __('Temporada') ?>
             <input type="number" name="season_number" min="0" step="1" value="<?= esc($form['season_number']) ?>">
           </label>
           <label>
-            Número de episodio
+            <?= __('Número de episodio') ?>
             <input type="number" name="episode_number" min="0" step="1" value="<?= esc($form['episode_number']) ?>">
           </label>
           <label>
-            Imagen del capítulo (URL)
+            <?= __('Imagen del capítulo (URL)') ?>
             <input type="url" name="image_url" value="<?= esc($form['image_url']) ?>">
-            <span class="help">Si subes imagen, esta URL se rellena automáticamente con /images/fichero.</span>
+            <span class="help"><?= __('Si subes imagen, esta URL se rellena automáticamente con /images/fichero.') ?></span>
           </label>
           <label style="align-self: start">
-            O subir imagen del capítulo
+            <?= __('O subir imagen del capítulo') ?>
             <input type="file" name="image_file" accept="image/*">
           </label>
           <label style="align-self: start">
-            Tipo de episodio
+            <?= __('Tipo de episodio') ?>
             <select name="episode_type">
-              <option value="" <?= $form['episode_type'] === '' ? 'selected' : '' ?>>Sin definir</option>
+              <option value="" <?= $form['episode_type'] === '' ? 'selected' : '' ?>><?= __('Sin definir') ?></option>
               <option value="full" <?= $form['episode_type'] === 'full' ? 'selected' : '' ?>>full</option>
               <option value="trailer" <?= $form['episode_type'] === 'trailer' ? 'selected' : '' ?>>trailer</option>
               <option value="bonus" <?= $form['episode_type'] === 'bonus' ? 'selected' : '' ?>>bonus</option>
             </select>
           </label>
           <label>
-            Autor
+            <?= __('Autor') ?>
             <input type="text" name="author" value="<?= esc($form['author']) ?>">
           </label>
         </div>
 
         <div class="actions">
           <?php if ($isEditing): ?>
-            <a class="btn" href="<?= esc(resolveEpisodeHref($form['link'], '', $form['title'])) ?>" target="_blank">Vista previa</a>
-            <button class="btn" type="submit" name="rewrite_audio_metadata" value="1">Actualizar metadatos del MP3 actual</button>
+            <a class="btn" href="<?= esc(resolveEpisodeHref($form['link'], '', $form['title'])) ?>" target="_blank"><?= __('Vista previa') ?></a>
+            <button class="btn" type="submit" name="rewrite_audio_metadata" value="1"><?= __('Actualizar metadatos del MP3 actual') ?></button>
           <?php endif; ?>
-          <button class="btn" type="submit"><?= $isEditing ? 'Actualizar capítulo' : 'Guardar capítulo' ?></button>
+          <button class="btn" type="submit"><?= $isEditing ? __('Actualizar capítulo') : __('Guardar capítulo') ?></button>
         </div>
       </form>
     </main>

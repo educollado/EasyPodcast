@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/cache_service.php';
+require_once __DIR__ . '/i18n.php';
 
 /** Slugs reservados que no pueden usarse como ruta de primer nivel. */
 const PAGE_RESERVED_SLUGS = ['admin', 'feed', 'search', 'cache', 'audios', 'images', 'assets', 'backups', 'robots'];
@@ -14,7 +15,7 @@ const PAGE_RESERVED_SLUGS = ['admin', 'feed', 'search', 'cache', 'audios', 'imag
 function ensurePageParentIsValid(?int $parentId, ?int $editId): void
 {
     if ($editId !== null && $parentId !== null && $parentId === $editId) {
-        throw new RuntimeException('Una página no puede ser su propia página padre.');
+        throw new RuntimeException(__('Una página no puede ser su propia página padre.'));
     }
 }
 
@@ -58,12 +59,12 @@ function validatePageForm(array $post): array
 
     $errors = [];
     if ($form['title'] === '') {
-        $errors[] = 'El título es obligatorio.';
+        $errors[] = __('El título es obligatorio.');
     }
     if ($form['slug'] === '') {
-        $errors[] = 'El slug es obligatorio.';
+        $errors[] = __('El slug es obligatorio.');
     } elseif (!preg_match('/^[a-z0-9-]+$/', $form['slug'])) {
-        $errors[] = 'El slug solo puede contener letras minúsculas, números y guiones.';
+        $errors[] = __('El slug solo puede contener letras minúsculas, números y guiones.');
     }
 
     return ['errors' => $errors, 'form' => $form];
@@ -86,13 +87,13 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
         $parentStmt->execute([$parentId]);
         $parentRow = $parentStmt->fetch(PDO::FETCH_ASSOC);
         if (!$parentRow) {
-            throw new RuntimeException('La página padre seleccionada no existe.');
+            throw new RuntimeException(__('La página padre seleccionada no existe.'));
         }
         $fullPath = $parentRow['slug'] . '/' . $slug;
     } else {
         $fullPath = $slug;
         if (in_array($slug, PAGE_RESERVED_SLUGS, true)) {
-            throw new RuntimeException('El slug "' . $slug . '" es una ruta reservada del sistema.');
+            throw new RuntimeException(__('El slug "%s" es una ruta reservada del sistema.', $slug));
         }
     }
 
@@ -105,7 +106,7 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
         $uniqueStmt->execute([$fullPath]);
     }
     if ($uniqueStmt->fetch()) {
-        throw new RuntimeException('Ya existe una página con la ruta "' . $fullPath . '".');
+        throw new RuntimeException(__('Ya existe una página con la ruta "%s".', $fullPath));
     }
 
     $now = date('Y-m-d H:i:s');
@@ -156,7 +157,7 @@ function deletePage(PDO $pdo, int $id): string
     $childStmt = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE parent_id = ?");
     $childStmt->execute([$id]);
     if ((int) $childStmt->fetchColumn() > 0) {
-        return 'No se puede borrar una página que tiene subpáginas. Borra primero las subpáginas.';
+        return __('No se puede borrar una página que tiene subpáginas. Borra primero las subpáginas.');
     }
 
     $stmt = $pdo->prepare("DELETE FROM pages WHERE id = ?");
@@ -178,7 +179,7 @@ function loadPagesManagementData(string $dbPath): array
     ];
 
     if (isset($_GET['notice']) && $_GET['notice'] === 'deleted') {
-        $result['notice'] = 'Página borrada correctamente.';
+        $result['notice'] = __('Página borrada correctamente.');
     }
 
     try {
@@ -229,7 +230,7 @@ function loadPagesManagementData(string $dbPath): array
         }
         $result['pagesList'] = $list;
     } catch (Throwable $e) {
-        $result['error'] = 'Error al cargar las páginas: ' . $e->getMessage();
+        $result['error'] = __('Error al cargar las páginas: %s', $e->getMessage());
     }
 
     return $result;
@@ -298,7 +299,7 @@ function loadAddPageData(string $dbPath): array
 
             try {
                 savePage($pdo, $validated['form'], $editId);
-                $result['notice']        = $editId !== null ? 'Página actualizada correctamente.' : 'Página creada correctamente.';
+                $result['notice']        = $editId !== null ? __('Página actualizada correctamente.') : __('Página creada correctamente.');
                 $result['isEditing']     = $editId !== null;
                 $result['editingPageId'] = $editId;
 
@@ -333,11 +334,11 @@ function loadAddPageData(string $dbPath): array
                 $result['isEditing']     = true;
                 $result['editingPageId'] = $editId;
             } else {
-                $result['error'] = 'Página no encontrada.';
+                $result['error'] = __('Página no encontrada.');
             }
         }
     } catch (Throwable $e) {
-        $result['error'] = 'Error interno: ' . $e->getMessage();
+        $result['error'] = __('Error interno: %s', $e->getMessage());
     }
 
     return $result;
