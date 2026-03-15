@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+
+- Internacionalización (i18n) del panel de administración: todos los textos del panel pasan por `__()` para soporte multiidioma.
+- Selector de idioma en el panel de administración y en `podcast_management.php`: permite cambiar el idioma de la interfaz sin reiniciar.
+- Mejora de rendimiento: resolución de episodios por `link` indexado con fast path O(log n).
+- Corrección de rutas de episodio/páginas y validación de padre propio.
+- Corrección de resolución de episodios con URL completa en el fast path.
+
 ## 1.2.3
 
 - `import_feed.php`: aviso visible si cURL no está disponible en el servidor en lugar de fallo silencioso.
