@@ -1040,7 +1040,7 @@ msgid "Portada del podcast"
 msgstr "Podcast-Cover"
 
 msgid "Inicio"
-msgstr "Start"
+msgstr "Startseite"
 
 msgid "Descargar"
 msgstr "Herunterladen"
