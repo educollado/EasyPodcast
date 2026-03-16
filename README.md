@@ -187,29 +187,32 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 7) {
-    migration_v7($pdo);
-    $pdo->exec('PRAGMA user_version = 7');
+if ($version < 9) {
+    migration_v9($pdo);
+    $pdo->exec('PRAGMA user_version = 9');
 }
 
 // 2. Función de migración
-function migration_v7(PDO $pdo): void
+function migration_v9(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 7`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 9`.
 
 #### Historial de versiones
 
 | Versión | Cambios |
 |---|---|
 | 1 | Añade `rss_item_limit`, `home_items_per_page`, `write_audio_metadata`, `cache_enabled` a `podcast` |
+| 2 | Crea tabla `api_tokens` |
 | 3 | Hace `pub_date` nullable en `episodes` |
 | 4 | Añade columnas TOTP a `management` |
 | 5 | Crea tabla `social` |
 | 6 | Crea tabla `pages` con índice `idx_pages_status` |
+| 7 | Crea índice `idx_episodes_link` sobre `episodes(link)` |
+| 8 | Añade `app_language` a `podcast` (idioma de la interfaz) |
 
 ---
 
