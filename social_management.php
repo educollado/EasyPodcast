@@ -22,7 +22,7 @@ $data = loadSocialData($dbPath);
 extract($data); // form, error, notice
 
 $labels = [
-    'blog'      => ['Blog / Web personal', 'https://tudominio.com'],
+    'blog'      => [__('Blog / Web personal'), 'https://tudominio.com'],
     'linkedin'  => ['LinkedIn',            'https://linkedin.com/in/usuario'],
     'mastodon'  => ['Mastodon',            'https://mastodon.social/@usuario'],
     'x'         => ['X (Twitter)',         'https://x.com/usuario'],
@@ -34,7 +34,7 @@ $labels = [
 ];
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

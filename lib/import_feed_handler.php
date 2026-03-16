@@ -455,10 +455,10 @@ function runFeedImport(
     }
 
     // HTML inicial
-    echo '<!doctype html><html lang="es"><head>' . "\n";
+    echo '<!doctype html><html lang="' . esc(i18n_html_lang()) . '"><head>' . "\n";
     echo '<meta charset="utf-8">' . "\n";
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n";
-    echo '<title>Importando feed RSS</title>' . "\n";
+    echo '<title>' . esc(__('Importando feed RSS')) . '</title>' . "\n";
     echo '<link rel="stylesheet" href="/assets/css/admin-common.css">' . "\n";
     echo '</head><body>' . "\n";
 
@@ -469,16 +469,16 @@ function runFeedImport(
     }
 
     echo '<div class="admin-wrap"><main class="card">' . "\n";
-    echo '<h1>Importando feed RSS</h1>' . "\n";
+    echo '<h1>' . __('Importando feed RSS') . '</h1>' . "\n";
     flush();
 
     // --- 1. Parsear feed ---
-    streamLine('<p>Descargando y parseando el feed…</p>');
+    streamLine('<p>' . __('Descargando y parseando el feed…') . '</p>');
 
     $previewResult = loadFeedPreview($feedUrl);
     if ($previewResult['error'] !== '') {
         streamLine('<div class="error">' . esc($previewResult['error']) . '</div>');
-        streamLine('<div class="actions"><a class="btn" href="import_feed.php">Volver</a></div>');
+        streamLine('<div class="actions"><a class="btn" href="import_feed.php">' . __('Volver') . '</a></div>');
         streamLine('</main></div></body></html>');
         exit;
     }
@@ -494,7 +494,7 @@ function runFeedImport(
 
     $total = count($episodes);
 
-    streamLine('<p>Feed parseado: <strong>' . $total . ' episodios</strong> seleccionados para importar.</p>');
+    streamLine('<p>' . __('Feed parseado: <strong>%d episodios</strong> seleccionados para importar.', $total) . '</p>');
 
     // --- 2. Conexión BD ---
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -518,17 +518,17 @@ function runFeedImport(
         // Primera importación: la tabla podcast está vacía → INSERT con todos los campos del feed.
         // Se ignora la selección de overwrite_fields porque no hay datos que proteger.
         if ($podcastMeta['image_url'] !== '') {
-            streamLine('<p>Descargando imagen del podcast…</p>');
+            streamLine('<p>' . __('Descargando imagen del podcast…') . '</p>');
             $imgResult = downloadImage($podcastMeta['image_url'], $imagesDir, $baseUrl, 'podcast-cover');
             if ($imgResult['error'] !== null) {
-                streamLine('<p><em>⚠ No se pudo descargar la imagen del podcast: ' . esc($imgResult['error']) . '</em></p>');
+                streamLine('<p><em>⚠ ' . __('No se pudo descargar la imagen del podcast: %s', esc($imgResult['error'])) . '</em></p>');
             } else {
                 $podcastMeta['image_url'] = $imgResult['localUrl'];
-                streamLine('<p>✓ Imagen del podcast descargada.</p>');
+                streamLine('<p>✓ ' . __('Imagen del podcast descargada.') . '</p>');
             }
         }
 
-        streamLine('<p>Creando datos del podcast desde el feed (primera importación)…</p>');
+        streamLine('<p>' . __('Creando datos del podcast desde el feed (primera importación)…') . '</p>');
         $pdo->prepare(
             'INSERT INTO podcast
              (title, description, link, language, author, owner_name, owner_email,
@@ -550,22 +550,22 @@ function runFeedImport(
             ':copyright'   => $podcastMeta['copyright']   !== '' ? $podcastMeta['copyright']   : null,
             ':itunes_type' => $podcastMeta['itunes_type'] !== '' ? $podcastMeta['itunes_type'] : 'episodic',
         ]);
-        streamLine('<p>✓ Datos del podcast creados correctamente.</p>');
+        streamLine('<p>✓ ' . __('Datos del podcast creados correctamente.') . '</p>');
 
     } elseif (!empty($fieldsToUpdate)) {
         // Fila existente: actualizar solo los campos seleccionados por el usuario.
         if (in_array('image_url', $fieldsToUpdate, true) && $podcastMeta['image_url'] !== '') {
-            streamLine('<p>Descargando imagen del podcast…</p>');
+            streamLine('<p>' . __('Descargando imagen del podcast…') . '</p>');
             $imgResult = downloadImage($podcastMeta['image_url'], $imagesDir, $baseUrl, 'podcast-cover');
             if ($imgResult['error'] !== null) {
-                streamLine('<p><em>⚠ No se pudo descargar la imagen del podcast: ' . esc($imgResult['error']) . '</em></p>');
+                streamLine('<p><em>⚠ ' . __('No se pudo descargar la imagen del podcast: %s', esc($imgResult['error'])) . '</em></p>');
             } else {
                 $podcastMeta['image_url'] = $imgResult['localUrl'];
-                streamLine('<p>✓ Imagen del podcast descargada.</p>');
+                streamLine('<p>✓ ' . __('Imagen del podcast descargada.') . '</p>');
             }
         }
 
-        streamLine('<p>Actualizando metadatos del podcast (' . count($fieldsToUpdate) . ' campos)…</p>');
+        streamLine('<p>' . __('Actualizando metadatos del podcast (%d campos)…', count($fieldsToUpdate)) . '</p>');
         $setClauses = [];
         $params     = [':id' => (int) $existingPodcastId];
         foreach ($fieldsToUpdate as $field) {
@@ -573,10 +573,10 @@ function runFeedImport(
             $params[':' . $field] = $podcastMeta[$field];
         }
         $pdo->prepare('UPDATE podcast SET ' . implode(', ', $setClauses) . ' WHERE id = :id')->execute($params);
-        streamLine('<p>✓ Metadatos del podcast actualizados.</p>');
+        streamLine('<p>✓ ' . __('Metadatos del podcast actualizados.') . '</p>');
 
     } else {
-        streamLine('<p><em>ℹ Metadatos del podcast: ningún campo seleccionado — se omite la actualización.</em></p>');
+        streamLine('<p><em>ℹ ' . __('Metadatos del podcast: ningún campo seleccionado — se omite la actualización.') . '</em></p>');
     }
 
     // --- 5. Bucle de episodios ---
@@ -594,12 +594,12 @@ function runFeedImport(
           :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
     );
 
-    streamLine('<hr><h2>Episodios</h2>');
+    streamLine('<hr><h2>' . __('Episodios') . '</h2>');
     streamLine('<ul style="list-style:none;padding:0;margin:0">');
 
     foreach ($episodes as $i => $ep) {
         $num      = $i + 1;
-        $epTitle  = $ep['title'] !== '' ? $ep['title'] : '(sin título)';
+        $epTitle  = $ep['title'] !== '' ? $ep['title'] : __('(sin título)');
         $titleEsc = esc($epTitle);
 
         // Comprobar duplicado por GUID
@@ -607,7 +607,7 @@ function runFeedImport(
             $checkGuidStmt->execute([':guid' => $ep['guid']]);
             if ((int) $checkGuidStmt->fetchColumn() > 0) {
                 $skipped++;
-                streamLine('<li style="padding:.2rem 0">⏭ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>saltado (GUID ya existe)</em></li>');
+                streamLine('<li style="padding:.2rem 0">⏭ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('saltado (GUID ya existe)') . '</em></li>');
                 continue;
             }
         }
@@ -615,7 +615,7 @@ function runFeedImport(
         // Sin enclosure de audio: saltar
         if ($ep['audio_url'] === '') {
             $errors++;
-            streamLine('<li style="padding:.2rem 0;color:var(--error,#c00)">✗ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>sin enclosure de audio</em></li>');
+            streamLine('<li style="padding:.2rem 0;color:var(--error,#c00)">✗ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('sin enclosure de audio') . '</em></li>');
             continue;
         }
 
@@ -629,11 +629,11 @@ function runFeedImport(
         }
 
         // Descargar audio (fallo salta el episodio)
-        streamLine('<li style="padding:.2rem 0">⬇ [' . $num . '/' . $total . '] ' . $titleEsc . ' — descargando audio…');
+        streamLine('<li style="padding:.2rem 0">⬇ [' . $num . '/' . $total . '] ' . $titleEsc . ' — ' . __('descargando audio…'));
         $audioResult = downloadAudio($ep['audio_url'], $audiosDir, $baseUrl, 'audio-ep-' . $num);
         if ($audioResult['error'] !== null) {
             $errors++;
-            echo ' <strong style="color:var(--error,#c00)">Error: ' . esc($audioResult['error']) . '</strong></li>' . "\n";
+            echo ' <strong style="color:var(--error,#c00)">' . __('Error: %s', esc($audioResult['error'])) . '</strong></li>' . "\n";
             echo str_repeat(' ', 1024) . "\n";
             if (ob_get_level() > 0) {
                 ob_flush();
@@ -681,7 +681,7 @@ function runFeedImport(
             flush();
         } catch (Throwable $e) {
             $errors++;
-            echo ' <strong style="color:var(--error,#c00)">Error BD: ' . esc($e->getMessage()) . '</strong></li>' . "\n";
+            echo ' <strong style="color:var(--error,#c00)">' . __('Error BD: %s', esc($e->getMessage())) . '</strong></li>' . "\n";
             echo str_repeat(' ', 1024) . "\n";
             if (ob_get_level() > 0) {
                 ob_flush();
@@ -693,27 +693,25 @@ function runFeedImport(
     streamLine('</ul><hr>');
 
     // --- 6. Regenerar feed.xml, sitemap.xml y caché ---
-    streamLine('<p>Regenerando feed.xml y sitemap.xml…</p>');
+    streamLine('<p>' . __('Regenerando feed.xml y sitemap.xml…') . '</p>');
     try {
         writePodcastFeedFile($pdo, dirname(__DIR__) . '/feed.xml', resolveFeedSelfHref($pdo));
         writePodcastSitemapFile($pdo, dirname(__DIR__) . '/sitemap.xml');
-        streamLine('<p>✓ feed.xml y sitemap.xml regenerados.</p>');
+        streamLine('<p>✓ ' . __('feed.xml y sitemap.xml regenerados.') . '</p>');
     } catch (Throwable $e) {
-        streamLine('<p><em>⚠ No se pudo regenerar feed/sitemap: ' . esc($e->getMessage()) . '</em></p>');
+        streamLine('<p><em>⚠ ' . __('No se pudo regenerar feed/sitemap: %s', esc($e->getMessage())) . '</em></p>');
     }
 
     clearWebCache();
-    streamLine('<p>✓ Caché borrada.</p>');
+    streamLine('<p>✓ ' . __('Caché borrada.') . '</p>');
 
     // --- 7. Resumen final ---
-    streamLine('<div class="notice"><strong>Importación completada:</strong> '
-        . $imported . ' importados, '
-        . $skipped  . ' saltados, '
-        . $errors   . ' errores.</div>');
+    streamLine('<div class="notice"><strong>' . __('Importación completada:') . '</strong> '
+        . __('%d importados, %d saltados, %d errores.', $imported, $skipped, $errors) . '</div>');
 
     streamLine('<div class="actions" style="margin-top:1rem">');
-    streamLine('<a class="btn" href="episodes_management.php">Ver episodios</a>');
-    streamLine('<a class="btn" href="import_feed.php">Importar otro feed</a>');
+    streamLine('<a class="btn" href="episodes_management.php">' . __('Ver episodios') . '</a>');
+    streamLine('<a class="btn" href="import_feed.php">' . __('Importar otro feed') . '</a>');
     streamLine('</div>');
 
     streamLine('</main></div></body></html>');

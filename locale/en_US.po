@@ -1233,3 +1233,223 @@ msgstr "Log out"
 
 msgid "Podcast creado con %s, hecho en %s con ❤️ por %s"
 msgstr "Podcast created with %s, made in %s with ❤️ by %s"
+
+# ---------------------------------------------------------------------------
+# Additional i18n fixes
+# ---------------------------------------------------------------------------
+
+msgid "Acceso prohibido"
+msgstr "Access forbidden"
+
+msgid "El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo."
+msgstr "The content you're trying to access is forbidden and you don't have permission to view it."
+
+msgid "Volver al inicio"
+msgstr "Back to home"
+
+msgid "Página no encontrada"
+msgstr "Page not found"
+
+msgid "La página que estás buscando no existe o ha sido movida a otra dirección."
+msgstr "The page you are looking for does not exist or has been moved to another address."
+
+msgid "Navegación del panel"
+msgstr "Admin navigation"
+
+msgid "Bloque base de datos"
+msgstr "Database section"
+
+msgid "Bloque ficheros"
+msgstr "Files section"
+
+msgid "Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB."
+msgstr "Export <code>images/</code> and <code>audios/</code> separately in ZIP parts up to 127 MB."
+
+msgid "Total: %d ficheros."
+msgstr "Total: %d files."
+
+msgid "Exportables en ZIP: %d en %d parte(s)."
+msgstr "Exportable in ZIP: %d in %d part(s)."
+
+msgid "Descargar imágenes parte %d (%.2f MB)"
+msgstr "Download images part %d (%.2f MB)"
+
+msgid "Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "Some files in <code>images/</code> exceed 127 MB and are not included in the ZIP."
+
+msgid "Descárgalos manualmente:"
+msgstr "Download them manually:"
+
+msgid "y %d audios no exportables en ZIP."
+msgstr "and %d audio files cannot be exported in ZIP."
+
+msgid "Descargar audios parte %d (%.2f MB)"
+msgstr "Download audio part %d (%.2f MB)"
+
+msgid "Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "Some files in <code>audios/</code> exceed 127 MB and are not included in the ZIP."
+
+msgid "Importar ficheros (uno o varios ZIP o audios)"
+msgstr "Import files (one or more ZIPs or audio files)"
+
+msgid "Categorías"
+msgstr "Categories"
+
+msgid "(máx. 3 — Apple Podcasts)"
+msgstr "(max. 3 — Apple Podcasts)"
+
+msgid "Añadir categoría..."
+msgstr "Add category..."
+
+msgid "Blog / Web personal"
+msgstr "Blog / Personal website"
+
+msgid "¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican."
+msgstr "Do you want to update EasyPodcast to v%s?\n\nThe application files will be downloaded and extracted.\nThe database and audio/image files will not be modified."
+
+msgid "Actualizando…"
+msgstr "Updating…"
+
+msgid "Hay una nueva versión disponible:"
+msgstr "A new version is available:"
+
+msgid "Actualizar a v%s"
+msgstr "Update to v%s"
+
+msgid "La actualización descarga el paquete desde"
+msgstr "The update downloads the package from"
+
+msgid "GitHub Releases"
+msgstr "GitHub Releases"
+
+msgid "y extrae los archivos sobre la instalación actual."
+msgstr "and extracts the files over the current installation."
+
+msgid "La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan."
+msgstr "The <code>podcast.sqlite</code> database, the audio files, and the images are not touched."
+
+msgid "Descripción"
+msgstr "Description"
+
+msgid "Categoría"
+msgstr "Category"
+
+msgid "Imagen"
+msgstr "Image"
+
+msgid "Sí"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Metadatos del podcast"
+msgstr "Podcast metadata"
+
+msgid "Marca los campos que quieres sobreescribir con los valores del feed."
+msgstr "Select the fields you want to overwrite with the feed values."
+
+msgid "Seleccionar todos los campos"
+msgstr "Select all fields"
+
+msgid "Campo"
+msgstr "Field"
+
+msgid "Valor actual"
+msgstr "Current value"
+
+msgid "Valor del feed"
+msgstr "Feed value"
+
+msgid "Episodios encontrados (%d)"
+msgstr "Episodes found (%d)"
+
+msgid "Seleccionar todos los episodios"
+msgstr "Select all episodes"
+
+msgid "Fecha"
+msgstr "Date"
+
+msgid "Duración"
+msgstr "Duration"
+
+msgid "Opciones de importación"
+msgstr "Import options"
+
+msgid "Importando feed RSS"
+msgstr "Importing RSS feed"
+
+msgid "Descargando y parseando el feed…"
+msgstr "Downloading and parsing the feed…"
+
+msgid "Volver"
+msgstr "Back"
+
+msgid "Feed parseado: <strong>%d episodios</strong> seleccionados para importar."
+msgstr "Feed parsed: <strong>%d episodes</strong> selected for import."
+
+msgid "Descargando imagen del podcast…"
+msgstr "Downloading podcast image…"
+
+msgid "No se pudo descargar la imagen del podcast: %s"
+msgstr "The podcast image could not be downloaded: %s"
+
+msgid "Imagen del podcast descargada."
+msgstr "Podcast image downloaded."
+
+msgid "Creando datos del podcast desde el feed (primera importación)…"
+msgstr "Creating podcast data from the feed (first import)…"
+
+msgid "Datos del podcast creados correctamente."
+msgstr "Podcast data created successfully."
+
+msgid "Actualizando metadatos del podcast (%d campos)…"
+msgstr "Updating podcast metadata (%d fields)…"
+
+msgid "Metadatos del podcast actualizados."
+msgstr "Podcast metadata updated."
+
+msgid "Metadatos del podcast: ningún campo seleccionado — se omite la actualización."
+msgstr "Podcast metadata: no field selected — update skipped."
+
+msgid "Episodios"
+msgstr "Episodes"
+
+msgid "saltado (GUID ya existe)"
+msgstr "skipped (GUID already exists)"
+
+msgid "sin enclosure de audio"
+msgstr "no audio enclosure"
+
+msgid "descargando audio…"
+msgstr "downloading audio…"
+
+msgid "Error: %s"
+msgstr "Error: %s"
+
+msgid "Error BD: %s"
+msgstr "DB error: %s"
+
+msgid "Regenerando feed.xml y sitemap.xml…"
+msgstr "Regenerating feed.xml and sitemap.xml…"
+
+msgid "feed.xml y sitemap.xml regenerados."
+msgstr "feed.xml and sitemap.xml regenerated."
+
+msgid "No se pudo regenerar feed/sitemap: %s"
+msgstr "feed/sitemap could not be regenerated: %s"
+
+msgid "Caché borrada."
+msgstr "Cache cleared."
+
+msgid "Importación completada:"
+msgstr "Import completed:"
+
+msgid "%d importados, %d saltados, %d errores."
+msgstr "%d imported, %d skipped, %d errors."
+
+msgid "Ver episodios"
+msgstr "View episodes"
+
+msgid "Importar otro feed"
+msgstr "Import another feed"

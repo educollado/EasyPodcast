@@ -24,7 +24,7 @@ $data = loadAddPageData($dbPath);
 extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

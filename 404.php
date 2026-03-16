@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 http_response_code(404);
 
+require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+loadAppLocale($dbPath);
 $podcast = null;
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -23,11 +25,11 @@ $podcastImage       = (string) ($podcast['image_url']   ?? '');
 $searchQuery        = '';
 
 ?><!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Página no encontrada – <?= esc($podcastTitle) ?></title>
+  <title><?= __('Página no encontrada') ?> – <?= esc($podcastTitle) ?></title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
@@ -42,9 +44,9 @@ $searchQuery        = '';
 
     <main class="card" style="text-align:center;padding:3.5rem 2rem;">
       <p style="font-family:var(--font-display);font-size:clamp(4rem,15vw,7rem);font-weight:700;line-height:1;margin:0;color:var(--accent);letter-spacing:-0.03em;">404</p>
-      <h2 style="font-family:var(--font-display);font-size:clamp(1.2rem,4vw,1.6rem);margin:.75rem 0 .6rem;">Página no encontrada</h2>
-      <p style="color:var(--muted);margin:0 auto;max-width:38ch;">La página que estás buscando no existe o ha sido movida a otra dirección.</p>
-      <a href="/" style="display:inline-block;margin-top:2rem;padding:.5rem 1.4rem;border-radius:20px;background:var(--accent);color:#fff;font-weight:600;font-size:.9rem;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='var(--accent-dark)'" onmouseout="this.style.background='var(--accent)'">Volver al inicio</a>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.2rem,4vw,1.6rem);margin:.75rem 0 .6rem;"><?= __('Página no encontrada') ?></h2>
+      <p style="color:var(--muted);margin:0 auto;max-width:38ch;"><?= __('La página que estás buscando no existe o ha sido movida a otra dirección.') ?></p>
+      <a href="/" style="display:inline-block;margin-top:2rem;padding:.5rem 1.4rem;border-radius:20px;background:var(--accent);color:#fff;font-weight:600;font-size:.9rem;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='var(--accent-dark)'" onmouseout="this.style.background='var(--accent)'"><?= __('Volver al inicio') ?></a>
     </main>
 
     <?php require __DIR__ . '/footer.php'; ?>

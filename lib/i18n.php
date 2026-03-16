@@ -15,13 +15,28 @@ declare(strict_types=1);
  */
 
 $GLOBALS['_i18n'] = [];
+$GLOBALS['_i18n_locale'] = 'es_ES';
 
 function i18n_load(string $locale): void
 {
+    $locale = preg_match('/^[a-z]{2}_[A-Z]{2}$/', $locale) ? $locale : 'es_ES';
+    $GLOBALS['_i18n_locale'] = $locale;
+    $GLOBALS['_i18n'] = [];
+
     $file = __DIR__ . '/../locale/' . $locale . '.po';
     if (file_exists($file)) {
         $GLOBALS['_i18n'] = i18n_parse_po($file);
     }
+}
+
+function i18n_current_locale(): string
+{
+    return (string) ($GLOBALS['_i18n_locale'] ?? 'es_ES');
+}
+
+function i18n_html_lang(): string
+{
+    return str_replace('_', '-', i18n_current_locale());
 }
 
 /**

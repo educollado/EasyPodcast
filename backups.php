@@ -28,7 +28,7 @@ $data = loadBackupsData($dbPath, __DIR__);
 extract($data); // error, notice, imagesExport, audiosExport
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,7 +51,7 @@ extract($data); // error, notice, imagesExport, audiosExport
     <?php endif; ?>
 
     <div class="backup-groups">
-      <section class="tool-box" aria-label="Bloque base de datos">
+      <section class="tool-box" aria-label="<?= esc(__('Bloque base de datos')) ?>">
         <h2><?= __('Base de Datos') ?></h2>
         <p><?= __('Exporta o importa el archivo SQLite del podcast.') ?></p>
         <div class="db-tools">
@@ -66,9 +66,9 @@ extract($data); // error, notice, imagesExport, audiosExport
         </div>
       </section>
 
-      <section class="tool-box" aria-label="Bloque ficheros">
+      <section class="tool-box" aria-label="<?= esc(__('Bloque ficheros')) ?>">
         <h2><?= __('Ficheros') ?></h2>
-        <p>Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB.</p>
+        <p><?= __('Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB.') ?></p>
         <div class="db-tools">
           <div>
             <strong><?= __('Exportar imágenes') ?></strong>
@@ -78,18 +78,18 @@ extract($data); // error, notice, imagesExport, audiosExport
               <p><?= __('No hay ficheros en <code>images/</code>.') ?></p>
             <?php else: ?>
               <p>
-                Total: <?= (int) $imagesExport['totalFiles'] ?> ficheros.
-                Exportables en ZIP: <?= (int) $imagesExport['exportedFiles'] ?> en <?= count($imagesExport['parts']) ?> parte(s).
+                <?= __('Total: %d ficheros.', (int) $imagesExport['totalFiles']) ?>
+                <?= __('Exportables en ZIP: %d en %d parte(s).', (int) $imagesExport['exportedFiles'], count($imagesExport['parts'])) ?>
               </p>
               <?php foreach ($imagesExport['parts'] as $idx => $part): ?>
                 <a class="btn files-export" href="backups.php?action=export_media_part&amp;type=images&amp;part=<?= $idx + 1 ?>">
-                  Descargar imágenes parte <?= $idx + 1 ?> (<?= number_format($part['bytes'] / 1048576, 2) ?> MB)
+                  <?= __('Descargar imágenes parte %d (%.2f MB)', $idx + 1, $part['bytes'] / 1048576) ?>
                 </a>
               <?php endforeach; ?>
               <?php if (count($imagesExport['skipped']) > 0): ?>
                 <p class="error">
-                  Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP.
-                  Descargalos manualmente:
+                  <?= __('Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP.') ?>
+                  <?= __('Descárgalos manualmente:') ?>
                 </p>
                 <?php foreach ($imagesExport['skipped'] as $skipped): ?>
                   <p>
@@ -111,19 +111,19 @@ extract($data); // error, notice, imagesExport, audiosExport
               <p><?= __('No hay ficheros en <code>audios/</code>.') ?></p>
             <?php else: ?>
               <p>
-                Total: <?= (int) $audiosExport['totalFiles'] ?> ficheros.
-                Exportables en ZIP: <?= (int) $audiosExport['exportedFiles'] ?> en <?= count($audiosExport['parts']) ?> parte(s)
-                y <?= count($audiosExport['skipped']) ?> audios no exportables en ZIP.
+                <?= __('Total: %d ficheros.', (int) $audiosExport['totalFiles']) ?>
+                <?= __('Exportables en ZIP: %d en %d parte(s).', (int) $audiosExport['exportedFiles'], count($audiosExport['parts'])) ?>
+                <?= __('y %d audios no exportables en ZIP.', count($audiosExport['skipped'])) ?>
               </p>
               <?php foreach ($audiosExport['parts'] as $idx => $part): ?>
                 <a class="btn files-export" href="backups.php?action=export_media_part&amp;type=audios&amp;part=<?= $idx + 1 ?>">
-                  Descargar audios parte <?= $idx + 1 ?> (<?= number_format($part['bytes'] / 1048576, 2) ?> MB)
+                  <?= __('Descargar audios parte %d (%.2f MB)', $idx + 1, $part['bytes'] / 1048576) ?>
                 </a>
               <?php endforeach; ?>
               <?php if (count($audiosExport['skipped']) > 0): ?>
                 <p class="error">
-                  Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP.
-                  Descargalos manualmente:
+                  <?= __('Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP.') ?>
+                  <?= __('Descárgalos manualmente:') ?>
                 </p>
                 <?php foreach ($audiosExport['skipped'] as $skipped): ?>
                   <p>

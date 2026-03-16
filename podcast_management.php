@@ -24,7 +24,7 @@ $data = loadPodcastManagementData($dbPath);
 extract($data);  // form, error, notice
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,7 +50,7 @@ extract($data);  // form, error, notice
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <div class="grid two">
           <label>
-            Título *
+            <?= __('Título *') ?>
             <input type="text" name="title" value="<?= esc($form['title']) ?>" required>
           </label>
           <label>
@@ -76,10 +76,12 @@ extract($data);  // form, error, notice
             $localeFiles = glob($localeDir . '/*.po') ?: [];
             $localeLabels = [
                 'ca_ES' => 'Català',
+                'de_DE' => 'Deutsch',
                 'en_US' => 'English (US)',
                 'es_ES' => 'Español (España)',
                 'fr_FR' => 'Français',
                 'gl_ES' => 'Galego',
+                'it_IT' => 'Italiano',
                 'pt_PT' => 'Português (Portugal)',
             ];
             sort($localeFiles);
@@ -111,11 +113,11 @@ extract($data);  // form, error, notice
             <input type="email" name="owner_email" value="<?= esc($form['owner_email']) ?>">
           </label>
           <div class="label-block">
-            Categorías <small>(máx. 3 — Apple Podcasts)</small>
+            <?= __('Categorías') ?> <small><?= __('(máx. 3 — Apple Podcasts)') ?></small>
             <div class="category-picker">
               <div class="category-chips" id="category-chips"></div>
               <select id="category-select">
-                <option value="">Añadir categoría...</option>
+                <option value=""><?= __('Añadir categoría...') ?></option>
                 <optgroup label="Arts">
                   <option value="Arts">Arts</option>
                   <option value="Books">Books</option>

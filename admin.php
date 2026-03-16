@@ -60,7 +60,7 @@ if ($isLoggedIn) {
 }
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -141,7 +141,7 @@ if ($isLoggedIn) {
           </a>
           <a class="admin-card" href="import_feed.php">
             <div class="admin-card-icon">📥</div>
-            <h2>Importar feed</h2>
+            <h2><?= __('Importar feed RSS') ?></h2>
             <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
           </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
@@ -152,10 +152,12 @@ if ($isLoggedIn) {
           <?php
             $localeLabels = [
                 'ca_ES' => 'Català',
+                'de_DE' => 'Deutsch',
                 'en_US' => 'English',
                 'es_ES' => 'Español',
                 'fr_FR' => 'Français',
                 'gl_ES' => 'Galego',
+                'it_IT' => 'Italiano',
                 'pt_PT' => 'Português',
             ];
             $localeFiles = glob(__DIR__ . '/locale/*.po') ?: [];

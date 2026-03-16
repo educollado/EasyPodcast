@@ -34,13 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 $updated = isset($_GET['updated']);
 $data    = loadUpdateData();
 extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetchError
+
+$confirmUpdateMessage = __('¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican.', $latestVersion);
+$updatingLabel        = __('Actualizando…');
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Actualizar · EasyPodcast</title>
+  <title><?= __('Actualizar EasyPodcast') ?> · EasyPodcast</title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
 </head>
 <body>
@@ -80,14 +83,14 @@ extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetch
 
         <?php elseif ($updateAvailable): ?>
           <div style="background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12; padding: .75rem 1rem; border-radius: 8px; font-size: .91rem;">
-            Hay una nueva versión disponible: <strong>v<?= esc($latestVersion) ?></strong>
+            <?= __('Hay una nueva versión disponible:') ?> <strong>v<?= esc($latestVersion) ?></strong>
           </div>
           <form method="post" action="update.php"
-                onsubmit="if (!confirm('¿Actualizar EasyPodcast a v<?= esc($latestVersion) ?>?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican.')) return false; this.querySelector('.btn-update').textContent = 'Actualizando…'; this.querySelector('.btn-update').disabled = true;">
+                onsubmit='if (!confirm(<?= json_encode($confirmUpdateMessage, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP) ?>)) return false; this.querySelector(".btn-update").textContent = <?= json_encode($updatingLabel, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP) ?>; this.querySelector(".btn-update").disabled = true;'>
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="tar_url" value="<?= esc($tarUrl) ?>">
-            <button class="btn btn-update" type="submit">Actualizar a v<?= esc($latestVersion) ?></button>
+            <button class="btn btn-update" type="submit"><?= __('Actualizar a v%s', $latestVersion) ?></button>
           </form>
 
         <?php else: ?>
@@ -98,10 +101,10 @@ extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetch
       </div>
 
       <p style="margin-top: 1.5rem; font-size: .83rem; border-top: 1px solid var(--border); padding-top: 1rem;">
-        La actualización descarga el paquete desde
-        <a href="https://github.com/educollado/EasyPodcast/releases/latest" target="_blank" rel="noopener" style="color: var(--accent);">GitHub Releases</a>
-        y extrae los archivos sobre la instalación actual.
-        La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan.
+        <?= __('La actualización descarga el paquete desde') ?>
+        <a href="https://github.com/educollado/EasyPodcast/releases/latest" target="_blank" rel="noopener" style="color: var(--accent);"><?= __('GitHub Releases') ?></a>
+        <?= __('y extrae los archivos sobre la instalación actual.') ?>
+        <?= __('La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan.') ?>
       </p>
     </main>
   </div>

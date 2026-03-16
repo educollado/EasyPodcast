@@ -1233,3 +1233,223 @@ msgstr "Sortir"
 
 msgid "Podcast creado con %s, hecho en %s con ❤️ por %s"
 msgstr "Podcast creat amb %s, fet a %s amb ❤️ per %s"
+
+# ---------------------------------------------------------------------------
+# Ajustos i18n addicionals
+# ---------------------------------------------------------------------------
+
+msgid "Acceso prohibido"
+msgstr "Accés prohibit"
+
+msgid "El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo."
+msgstr "El contingut al qual estàs intentant accedir està prohibit i no tens permís per veure'l."
+
+msgid "Volver al inicio"
+msgstr "Tornar a l'inici"
+
+msgid "Página no encontrada"
+msgstr "Pàgina no trobada"
+
+msgid "La página que estás buscando no existe o ha sido movida a otra dirección."
+msgstr "La pàgina que busques no existeix o s'ha mogut a una altra adreça."
+
+msgid "Navegación del panel"
+msgstr "Navegació del panell"
+
+msgid "Bloque base de datos"
+msgstr "Bloc de base de dades"
+
+msgid "Bloque ficheros"
+msgstr "Bloc de fitxers"
+
+msgid "Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB."
+msgstr "Exporta per separat <code>images/</code> i <code>audios/</code> en parts ZIP de fins a 127 MB."
+
+msgid "Total: %d ficheros."
+msgstr "Total: %d fitxers."
+
+msgid "Exportables en ZIP: %d en %d parte(s)."
+msgstr "Exportables en ZIP: %d en %d part(s)."
+
+msgid "Descargar imágenes parte %d (%.2f MB)"
+msgstr "Descarregar imatges part %d (%.2f MB)"
+
+msgid "Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "Alguns fitxers d'<code>images/</code> superen 127 MB i no s'inclouen al ZIP."
+
+msgid "Descárgalos manualmente:"
+msgstr "Descarrega'ls manualment:"
+
+msgid "y %d audios no exportables en ZIP."
+msgstr "i %d àudios no exportables en ZIP."
+
+msgid "Descargar audios parte %d (%.2f MB)"
+msgstr "Descarregar àudios part %d (%.2f MB)"
+
+msgid "Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "Alguns fitxers d'<code>audios/</code> superen 127 MB i no s'inclouen al ZIP."
+
+msgid "Importar ficheros (uno o varios ZIP o audios)"
+msgstr "Importar fitxers (un o diversos ZIP o àudios)"
+
+msgid "Categorías"
+msgstr "Categories"
+
+msgid "(máx. 3 — Apple Podcasts)"
+msgstr "(màx. 3 — Apple Podcasts)"
+
+msgid "Añadir categoría..."
+msgstr "Afegir categoria..."
+
+msgid "Blog / Web personal"
+msgstr "Blog / Web personal"
+
+msgid "¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican."
+msgstr "Vols actualitzar EasyPodcast a la v%s?\n\nEs descarregaran i s'extrauran els fitxers de l'aplicació.\nLa base de dades i els fitxers d'àudio/imatge no es modificaran."
+
+msgid "Actualizando…"
+msgstr "Actualitzant…"
+
+msgid "Hay una nueva versión disponible:"
+msgstr "Hi ha una nova versió disponible:"
+
+msgid "Actualizar a v%s"
+msgstr "Actualitzar a v%s"
+
+msgid "La actualización descarga el paquete desde"
+msgstr "L'actualització descarrega el paquet des de"
+
+msgid "GitHub Releases"
+msgstr "GitHub Releases"
+
+msgid "y extrae los archivos sobre la instalación actual."
+msgstr "i extreu els fitxers sobre la instal·lació actual."
+
+msgid "La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan."
+msgstr "La base de dades <code>podcast.sqlite</code>, els àudios i les imatges no es toquen."
+
+msgid "Descripción"
+msgstr "Descripció"
+
+msgid "Categoría"
+msgstr "Categoria"
+
+msgid "Imagen"
+msgstr "Imatge"
+
+msgid "Sí"
+msgstr "Sí"
+
+msgid "No"
+msgstr "No"
+
+msgid "Metadatos del podcast"
+msgstr "Metadades del pòdcast"
+
+msgid "Marca los campos que quieres sobreescribir con los valores del feed."
+msgstr "Marca els camps que vols sobreescriure amb els valors del feed."
+
+msgid "Seleccionar todos los campos"
+msgstr "Seleccionar tots els camps"
+
+msgid "Campo"
+msgstr "Camp"
+
+msgid "Valor actual"
+msgstr "Valor actual"
+
+msgid "Valor del feed"
+msgstr "Valor del feed"
+
+msgid "Episodios encontrados (%d)"
+msgstr "Episodis trobats (%d)"
+
+msgid "Seleccionar todos los episodios"
+msgstr "Seleccionar tots els episodis"
+
+msgid "Fecha"
+msgstr "Data"
+
+msgid "Duración"
+msgstr "Durada"
+
+msgid "Opciones de importación"
+msgstr "Opcions d'importació"
+
+msgid "Importando feed RSS"
+msgstr "Important feed RSS"
+
+msgid "Descargando y parseando el feed…"
+msgstr "Descarregant i analitzant el feed…"
+
+msgid "Volver"
+msgstr "Tornar"
+
+msgid "Feed parseado: <strong>%d episodios</strong> seleccionados para importar."
+msgstr "Feed analitzat: <strong>%d episodis</strong> seleccionats per importar."
+
+msgid "Descargando imagen del podcast…"
+msgstr "Descarregant la imatge del pòdcast…"
+
+msgid "No se pudo descargar la imagen del podcast: %s"
+msgstr "No s'ha pogut descarregar la imatge del pòdcast: %s"
+
+msgid "Imagen del podcast descargada."
+msgstr "Imatge del pòdcast descarregada."
+
+msgid "Creando datos del podcast desde el feed (primera importación)…"
+msgstr "Creant dades del pòdcast des del feed (primera importació)…"
+
+msgid "Datos del podcast creados correctamente."
+msgstr "Dades del pòdcast creades correctament."
+
+msgid "Actualizando metadatos del podcast (%d campos)…"
+msgstr "Actualitzant metadades del pòdcast (%d camps)…"
+
+msgid "Metadatos del podcast actualizados."
+msgstr "Metadades del pòdcast actualitzades."
+
+msgid "Metadatos del podcast: ningún campo seleccionado — se omite la actualización."
+msgstr "Metadades del pòdcast: no s'ha seleccionat cap camp — s'omet l'actualització."
+
+msgid "Episodios"
+msgstr "Episodis"
+
+msgid "saltado (GUID ya existe)"
+msgstr "omès (el GUID ja existeix)"
+
+msgid "sin enclosure de audio"
+msgstr "sense enclosure d'àudio"
+
+msgid "descargando audio…"
+msgstr "descarregant àudio…"
+
+msgid "Error: %s"
+msgstr "Error: %s"
+
+msgid "Error BD: %s"
+msgstr "Error de BD: %s"
+
+msgid "Regenerando feed.xml y sitemap.xml…"
+msgstr "Regenerant feed.xml i sitemap.xml…"
+
+msgid "feed.xml y sitemap.xml regenerados."
+msgstr "feed.xml i sitemap.xml regenerats."
+
+msgid "No se pudo regenerar feed/sitemap: %s"
+msgstr "No s'ha pogut regenerar feed/sitemap: %s"
+
+msgid "Caché borrada."
+msgstr "Memòria cau esborrada."
+
+msgid "Importación completada:"
+msgstr "Importació completada:"
+
+msgid "%d importados, %d saltados, %d errores."
+msgstr "%d importats, %d omesos, %d errors."
+
+msgid "Ver episodios"
+msgstr "Veure episodis"
+
+msgid "Importar otro feed"
+msgstr "Importar un altre feed"

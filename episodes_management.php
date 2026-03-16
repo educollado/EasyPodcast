@@ -29,7 +29,7 @@ $data = loadEpisodesManagementData($dbPath, $requestedPage);
 extract($data);  // episodesList, currentPage, totalEpisodes, totalPages, error, notice
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

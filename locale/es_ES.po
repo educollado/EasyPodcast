@@ -1233,3 +1233,223 @@ msgstr ""
 
 msgid "Podcast creado con %s, hecho en %s con ❤️ por %s"
 msgstr ""
+
+# ---------------------------------------------------------------------------
+# Ajustes i18n adicionales
+# ---------------------------------------------------------------------------
+
+msgid "Acceso prohibido"
+msgstr ""
+
+msgid "El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo."
+msgstr ""
+
+msgid "Volver al inicio"
+msgstr ""
+
+msgid "Página no encontrada"
+msgstr ""
+
+msgid "La página que estás buscando no existe o ha sido movida a otra dirección."
+msgstr ""
+
+msgid "Navegación del panel"
+msgstr ""
+
+msgid "Bloque base de datos"
+msgstr ""
+
+msgid "Bloque ficheros"
+msgstr ""
+
+msgid "Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB."
+msgstr ""
+
+msgid "Total: %d ficheros."
+msgstr ""
+
+msgid "Exportables en ZIP: %d en %d parte(s)."
+msgstr ""
+
+msgid "Descargar imágenes parte %d (%.2f MB)"
+msgstr ""
+
+msgid "Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr ""
+
+msgid "Descárgalos manualmente:"
+msgstr ""
+
+msgid "y %d audios no exportables en ZIP."
+msgstr ""
+
+msgid "Descargar audios parte %d (%.2f MB)"
+msgstr ""
+
+msgid "Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr ""
+
+msgid "Importar ficheros (uno o varios ZIP o audios)"
+msgstr ""
+
+msgid "Categorías"
+msgstr ""
+
+msgid "(máx. 3 — Apple Podcasts)"
+msgstr ""
+
+msgid "Añadir categoría..."
+msgstr ""
+
+msgid "Blog / Web personal"
+msgstr ""
+
+msgid "¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican."
+msgstr ""
+
+msgid "Actualizando…"
+msgstr ""
+
+msgid "Hay una nueva versión disponible:"
+msgstr ""
+
+msgid "Actualizar a v%s"
+msgstr ""
+
+msgid "La actualización descarga el paquete desde"
+msgstr ""
+
+msgid "GitHub Releases"
+msgstr ""
+
+msgid "y extrae los archivos sobre la instalación actual."
+msgstr ""
+
+msgid "La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan."
+msgstr ""
+
+msgid "Descripción"
+msgstr ""
+
+msgid "Categoría"
+msgstr ""
+
+msgid "Imagen"
+msgstr ""
+
+msgid "Sí"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Metadatos del podcast"
+msgstr ""
+
+msgid "Marca los campos que quieres sobreescribir con los valores del feed."
+msgstr ""
+
+msgid "Seleccionar todos los campos"
+msgstr ""
+
+msgid "Campo"
+msgstr ""
+
+msgid "Valor actual"
+msgstr ""
+
+msgid "Valor del feed"
+msgstr ""
+
+msgid "Episodios encontrados (%d)"
+msgstr ""
+
+msgid "Seleccionar todos los episodios"
+msgstr ""
+
+msgid "Fecha"
+msgstr ""
+
+msgid "Duración"
+msgstr ""
+
+msgid "Opciones de importación"
+msgstr ""
+
+msgid "Importando feed RSS"
+msgstr ""
+
+msgid "Descargando y parseando el feed…"
+msgstr ""
+
+msgid "Volver"
+msgstr ""
+
+msgid "Feed parseado: <strong>%d episodios</strong> seleccionados para importar."
+msgstr ""
+
+msgid "Descargando imagen del podcast…"
+msgstr ""
+
+msgid "No se pudo descargar la imagen del podcast: %s"
+msgstr ""
+
+msgid "Imagen del podcast descargada."
+msgstr ""
+
+msgid "Creando datos del podcast desde el feed (primera importación)…"
+msgstr ""
+
+msgid "Datos del podcast creados correctamente."
+msgstr ""
+
+msgid "Actualizando metadatos del podcast (%d campos)…"
+msgstr ""
+
+msgid "Metadatos del podcast actualizados."
+msgstr ""
+
+msgid "Metadatos del podcast: ningún campo seleccionado — se omite la actualización."
+msgstr ""
+
+msgid "Episodios"
+msgstr ""
+
+msgid "saltado (GUID ya existe)"
+msgstr ""
+
+msgid "sin enclosure de audio"
+msgstr ""
+
+msgid "descargando audio…"
+msgstr ""
+
+msgid "Error: %s"
+msgstr ""
+
+msgid "Error BD: %s"
+msgstr ""
+
+msgid "Regenerando feed.xml y sitemap.xml…"
+msgstr ""
+
+msgid "feed.xml y sitemap.xml regenerados."
+msgstr ""
+
+msgid "No se pudo regenerar feed/sitemap: %s"
+msgstr ""
+
+msgid "Caché borrada."
+msgstr ""
+
+msgid "Importación completada:"
+msgstr ""
+
+msgid "%d importados, %d saltados, %d errores."
+msgstr ""
+
+msgid "Ver episodios"
+msgstr ""
+
+msgid "Importar otro feed"
+msgstr ""

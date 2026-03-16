@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
 }
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= esc(i18n_html_lang()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
                    placeholder="https://ejemplo.com/feed.xml" required autofocus>
           </label>
           <div class="actions" style="margin-top:1rem">
-            <button class="btn" type="submit">Vista previa</button>
+            <button class="btn" type="submit"><?= __('Vista previa') ?></button>
           </div>
         </form>
 
@@ -108,23 +108,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           // Campos mapeables del feed → etiqueta
           // 'link' no aparece: la URL principal siempre se toma del host actual, no del feed.
           $metaFields = [
-              'title'       => 'Título',
-              'description' => 'Descripción',
-              'language'    => 'Idioma',
-              'author'      => 'Autor',
-              'owner_name'  => 'Owner name',
-              'owner_email' => 'Owner email',
-              'category'    => 'Categoría',
-              'explicit'    => 'Explícito',
-              'itunes_type' => 'Tipo iTunes',
-              'copyright'   => 'Copyright',
-              'image_url'   => 'Imagen',
+              'title'       => __('Título'),
+              'description' => __('Descripción'),
+              'language'    => __('Idioma'),
+              'author'      => __('Autor'),
+              'owner_name'  => __('Owner name'),
+              'owner_email' => __('Owner email'),
+              'category'    => __('Categoría'),
+              'explicit'    => __('Explícito'),
+              'itunes_type' => __('Tipo iTunes'),
+              'copyright'   => __('Copyright'),
+              'image_url'   => __('Imagen'),
           ];
 
           // Helper: valor legible para mostrar en tabla
           $displayVal = static function (string $field, $raw): string {
               $v = (string) $raw;
-              if ($field === 'explicit') { return $v === '1' || $v === 'true' ? 'Sí' : 'No'; }
+              if ($field === 'explicit') { return $v === '1' || $v === 'true' ? __('Sí') : __('No'); }
               if ($field === 'description') { return mb_strimwidth($v, 0, 150, '…'); }
               return $v;
           };
@@ -137,20 +137,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           <input type="hidden" name="feed_url" value="<?= esc($feedUrl) ?>">
 
           <!-- Tabla de comparación de metadatos -->
-          <h2 style="margin-top:1.5rem">Metadatos del podcast</h2>
+          <h2 style="margin-top:1.5rem"><?= __('Metadatos del podcast') ?></h2>
           <p style="margin-bottom:.75rem;font-size:.9rem">
-            Marca los campos que quieres sobreescribir con los valores del feed.
+            <?= __('Marca los campos que quieres sobreescribir con los valores del feed.') ?>
           </p>
           <div style="overflow-x:auto;margin-bottom:1.5rem">
             <table style="width:100%;border-collapse:collapse;font-size:.9rem">
               <thead>
                 <tr>
                   <th style="padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:2rem">
-                    <input type="checkbox" id="select-all-meta" checked title="Seleccionar todos los campos">
+                    <input type="checkbox" id="select-all-meta" checked title="<?= esc(__('Seleccionar todos los campos')) ?>">
                   </th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:14%">Campo</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Valor actual</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Valor del feed</th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:14%"><?= __('Campo') ?></th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Valor actual') ?></th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Valor del feed') ?></th>
                 </tr>
               </thead>
               <tbody>
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
                       <?= $currentVal !== '' ? esc($currentVal) : '<em>—</em>' ?>
                     </td>
                     <td style="padding:.3rem .5rem;vertical-align:top;word-break:break-word">
-                      <?= $feedVal !== '' && $feedVal !== 'No' ? esc($feedVal) : '<span style="color:var(--muted,#999)">' . esc($feedVal ?: '—') . '</span>' ?>
+                      <?= $hasValue ? esc($feedVal) : '<span style="color:var(--muted,#999)">' . esc($feedVal ?: '—') . '</span>' ?>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -179,20 +179,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           </div>
 
           <!-- Tabla de episodios -->
-          <h2>Episodios encontrados (<?= count($episodes) ?>)</h2>
+          <h2><?= __('Episodios encontrados (%d)', count($episodes)) ?></h2>
           <div style="overflow-x:auto;margin-bottom:1.5rem">
             <table style="width:100%;border-collapse:collapse;font-size:.9rem">
               <thead>
                 <tr>
                   <th style="padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:2rem">
-                    <input type="checkbox" id="select-all-eps" checked title="Seleccionar todos los episodios">
+                    <input type="checkbox" id="select-all-eps" checked title="<?= esc(__('Seleccionar todos los episodios')) ?>">
                   </th>
                   <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">#</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Título</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Fecha</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Duración</th>
-                  <th style="text-align:center;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Imagen</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">Estado</th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Título') ?></th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Fecha') ?></th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Duración') ?></th>
+                  <th style="text-align:center;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Imagen') ?></th>
+                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Estado') ?></th>
                 </tr>
               </thead>
               <tbody>
@@ -216,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           </div>
 
           <fieldset style="border:1px solid var(--border,#ddd);padding:1rem;margin-bottom:1rem;border-radius:4px">
-            <legend style="padding:0 .5rem;font-weight:600">Opciones de importación</legend>
+            <legend style="padding:0 .5rem;font-weight:600"><?= __('Opciones de importación') ?></legend>
             <label style="display:flex;align-items:center;gap:.5rem;font-weight:400">
               <input type="checkbox" name="import_duplicates">
               <?= __('Importar episodios aunque su GUID ya exista en la base de datos') ?>
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           </div>
 
           <div class="actions">
-            <a class="btn" href="import_feed.php">Cancelar</a>
+            <a class="btn" href="import_feed.php"><?= __('Cancelar') ?></a>
             <button class="btn" type="submit" id="import-btn"><?= __('Iniciar importación') ?></button>
           </div>
         </form>

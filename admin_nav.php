@@ -6,7 +6,7 @@
 require_once __DIR__ . '/lib/version.php';
 $_navPage = $currentAdminPage ?? '';
 ?>
-<nav class="admin-nav" aria-label="Navegación del panel">
+<nav class="admin-nav" aria-label="<?= esc(__('Navegación del panel')) ?>">
   <a class="admin-nav-brand" href="admin.php">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
   <div class="admin-nav-links">
     <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php"><?= __('Panel') ?></a>
@@ -19,7 +19,7 @@ $_navPage = $currentAdminPage ?? '';
     <a class="admin-nav-link <?= $_navPage === 'social'    ? 'active' : '' ?>" href="social_management.php"><?= __('Redes') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'password'  ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'pages'     ? 'active' : '' ?>" href="pages_management.php"><?= __('Páginas') ?></a>
-    <a class="admin-nav-link <?= $_navPage === 'stats'     ? 'active' : '' ?>" href="stats.php"><?= __('Stats') ?></a>
+    <a class="admin-nav-link <?= $_navPage === 'stats'     ? 'active' : '' ?>" href="stats.php"><?= __('Estadísticas') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'update'    ? 'active' : '' ?>" href="update.php"><?= __('Actualizar') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'import'    ? 'active' : '' ?>" href="import_feed.php"><?= __('Importar') ?></a>
     <a class="admin-nav-link" href="/" target="_blank" rel="noopener"><?= __('Ver web ↗') ?></a>
