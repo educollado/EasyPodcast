@@ -176,6 +176,7 @@ docker run -d \
 | `management` | Credenciales y configuración 2FA (TOTP) |
 | `social` | Enlaces a redes sociales (una fila) |
 | `pages` | Páginas estáticas con jerarquía padre/hijo |
+| `api_tokens` | Tokens de API (reservada) |
 
 ### Migraciones de esquema
 
