@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1
+
+- Añadidos locales de alemán (`de_DE`) e italiano (`it_IT`).
+- Corrección de traducción alemana: "Inicio" → "Startseite".
+- Completadas las cadenas i18n de `import_feed.php` y `import_feed_handler.php`.
+
 ## 1.5.0
 
 - Internacionalización (i18n) del panel de administración: todos los textos del panel pasan por `__()` para soporte multiidioma.

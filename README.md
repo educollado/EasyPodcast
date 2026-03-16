@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.5.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.5.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,12 +102,11 @@ docker run -d \
 
 ---
 
-## Novedades 1.5.0
+## Novedades 1.5.1
 
-- Internacionalización (i18n) del panel de administración: todos los textos pasan por `__()` para soporte multiidioma.
-- Selector de idioma en el panel y en `podcast_management.php`.
-- Mejora de rendimiento: resolución de episodios por `link` indexado con fast path O(log n).
-- Corrección de rutas de episodio/páginas y validación de padre propio.
+- Añadidos locales de alemán (`de_DE`) e italiano (`it_IT`).
+- Corrección de traducción alemana: "Inicio" → "Startseite".
+- Completadas las cadenas i18n de `import_feed.php` y `import_feed_handler.php`.
 
 ---
 
