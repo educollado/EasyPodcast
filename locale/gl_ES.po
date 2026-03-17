@@ -1453,3 +1453,356 @@ msgstr "Ver episodios"
 
 msgid "Importar otro feed"
 msgstr "Importar outro feed"
+
+# ---------------------------------------------------------------------------
+# api_tokens_handler.php / api_tokens.php / api_docs.php
+# ---------------------------------------------------------------------------
+
+msgid "El nombre del token es obligatorio."
+msgstr "O nome do token é obrigatorio."
+
+msgid "Token generado correctamente. Cópialo ahora: no se mostrará de nuevo."
+msgstr "Token xerado correctamente. Cópiao agora: non se volverá mostrar."
+
+msgid "Token revocado correctamente."
+msgstr "Token revogado correctamente."
+
+msgid "Error al gestionar tokens: %s"
+msgstr "Erro ao xestionar os tokens: %s"
+
+msgid "Tokens API"
+msgstr "Tokens API"
+
+msgid "Tokens de API"
+msgstr "Tokens da API"
+
+msgid "Genera tokens para autenticar peticiones a la API REST. Cada token solo se muestra una vez al crearlo."
+msgstr "Xera tokens para autenticar peticións á API REST. Cada token só se mostra unha vez ao crealo."
+
+msgid "Token generado (guárdalo ahora):"
+msgstr "Token xerado (gárdao agora):"
+
+msgid "Generar nuevo token"
+msgstr "Xerar novo token"
+
+msgid "Nombre del token *"
+msgstr "Nome do token *"
+
+msgid "p.ej. integración-n8n"
+msgstr "p.ex. integración-n8n"
+
+msgid "Fecha de expiración (opcional)"
+msgstr "Data de caducidade (opcional)"
+
+msgid "Generar token"
+msgstr "Xerar token"
+
+msgid "Tokens activos"
+msgstr "Tokens activos"
+
+msgid "No hay tokens creados."
+msgstr "Non hai tokens creados."
+
+msgid "Nombre"
+msgstr "Nome"
+
+msgid "Token (últimos 8 chars)"
+msgstr "Token (últimos 8 caracteres)"
+
+msgid "Creado"
+msgstr "Creado"
+
+msgid "Expira"
+msgstr "Expira"
+
+msgid "Último uso"
+msgstr "Último uso"
+
+msgid "Sin expiración"
+msgstr "Sen caducidade"
+
+msgid "Nunca"
+msgstr "Nunca"
+
+msgid "¿Revocar este token?"
+msgstr "Revogar este token?"
+
+msgid "Revocar"
+msgstr "Revogar"
+
+msgid "→ Ver documentación de la API"
+msgstr "→ Ver documentación da API"
+
+msgid "← Gestionar tokens"
+msgstr "← Xestionar tokens"
+
+msgid "Documentación API REST"
+msgstr "Documentación API REST"
+
+msgid "La API REST permite gestionar el podcast de forma programática. Todas las peticiones requieren autenticación."
+msgstr "A API REST permite xestionar o podcast de forma programática. Todas as peticións requiren autenticación."
+
+msgid "Autenticación"
+msgstr "Autenticación"
+
+msgid "Incluye tu token en la cabecera"
+msgstr "Inclúe o teu token na cabeceira"
+
+msgid "Gestiona tus tokens en"
+msgstr "Xestiona os teus tokens en"
+
+msgid "Formato de respuesta"
+msgstr "Formato de resposta"
+
+msgid "Todas las respuestas son JSON:"
+msgstr "Todas as respostas son JSON:"
+
+msgid "En caso de error:"
+msgstr "En caso de erro:"
+
+msgid "Descripción del error"
+msgstr "Descrición do erro"
+
+msgid "Lista paginada"
+msgstr "Lista paxinada"
+
+msgid "Parámetro"
+msgstr "Parámetro"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Página (defecto: 1)"
+msgstr "Páxina (por defecto: 1)"
+
+msgid "Resultados por página, máx. 100 (defecto: 20)"
+msgstr "Resultados por páxina, máx. 100 (por defecto: 20)"
+
+msgid "opcional"
+msgstr "opcional"
+
+msgid "o"
+msgstr "ou"
+
+msgid "sí"
+msgstr "si"
+
+msgid "no"
+msgstr "non"
+
+msgid "Obtener episodio"
+msgstr "Obter episodio"
+
+msgid "Crear episodio"
+msgstr "Crear episodio"
+
+msgid "Acepta"
+msgstr "Acepta"
+
+msgid "para subir ficheros"
+msgstr "para subir ficheiros"
+
+msgid "Req."
+msgstr "Obr."
+
+msgid "Título del episodio"
+msgstr "Título do episodio"
+
+msgid "URL del audio (*o subir audio_file)"
+msgstr "URL do audio (*ou subir audio_file)"
+
+msgid "Tamaño en bytes (*si no se sube fichero)"
+msgstr "Tamaño en bytes (*se non se sobe ficheiro)"
+
+msgid "MIME del audio (defecto: audio/mpeg)"
+msgstr "MIME do audio (por defecto: audio/mpeg)"
+
+msgid "defecto"
+msgstr "defecto"
+
+msgid "Fecha ISO 8601 (auto-asignada al publicar)"
+msgstr "Data ISO 8601 (asignada automaticamente ao publicar)"
+
+msgid "Fichero de audio (multipart)"
+msgstr "Ficheiro de audio (multipart)"
+
+msgid "Imagen del episodio (multipart)"
+msgstr "Imaxe do episodio (multipart)"
+
+msgid "URL de imagen alternativa"
+msgstr "URL de imaxe alternativa"
+
+msgid "Número de temporada"
+msgstr "Número de tempada"
+
+msgid "hereda del podcast"
+msgstr "herda do podcast"
+
+msgid "Autor del episodio"
+msgstr "Autor do episodio"
+
+msgid "Episodio de prueba"
+msgstr "Episodio de proba"
+
+msgid "Actualizar episodio"
+msgstr "Actualizar episodio"
+
+msgid "Mismo formato que crear. Solo los campos enviados se modifican."
+msgstr "Mesmo formato ca crear. Só se modifican os campos enviados."
+
+msgid "Borrar episodio"
+msgstr "Borrar episodio"
+
+msgid "Obtener metadatos del canal"
+msgstr "Obter metadatos da canle"
+
+msgid "Actualizar metadatos"
+msgstr "Actualizar metadatos"
+
+msgid "Campos actualizables:"
+msgstr "Campos actualizables:"
+
+msgid "Para subir imagen del canal usa"
+msgstr "Para subir a imaxe da canle usa"
+
+msgid "con el campo"
+msgstr "co campo"
+
+msgid "Mi Podcast Actualizado"
+msgstr "O meu podcast actualizado"
+
+msgid "Obtener página"
+msgstr "Obter páxina"
+
+msgid "Crear página"
+msgstr "Crear páxina"
+
+msgid "Título de la página"
+msgstr "Título da páxina"
+
+msgid "Slug URL (minúsculas, números y guiones)"
+msgstr "Slug URL (minúsculas, números e guións)"
+
+msgid "Contenido HTML/Markdown"
+msgstr "Contido HTML/Markdown"
+
+msgid "ID de página padre (para subpáginas)"
+msgstr "ID da páxina nai (para subpáxinas)"
+
+msgid "Orden de aparición (defecto: 0)"
+msgstr "Orde de aparición (por defecto: 0)"
+
+msgid "Sobre nosotros"
+msgstr "Sobre nós"
+
+msgid "Para cambiar el slug, envía también"
+msgstr "Para cambiar o slug, envía tamén"
+
+msgid "con la ruta actual."
+msgstr "coa ruta actual."
+
+msgid "Borrar página"
+msgstr "Borrar páxina"
+
+msgid "Falla si la página tiene subpáginas hijas."
+msgstr "Falla se a páxina ten subpáxinas fillas."
+
+msgid "Redes sociales"
+msgstr "Redes sociais"
+
+msgid "Obtener enlaces"
+msgstr "Obter ligazóns"
+
+msgid "Actualizar enlaces"
+msgstr "Actualizar ligazóns"
+
+msgid "Campos:"
+msgstr "Campos:"
+
+msgid "Todos opcionales; los no enviados conservan su valor actual. URLs vacías eliminan el enlace."
+msgstr "Todos opcionais; os non enviados conservan o seu valor actual. Os URL baleiros eliminan a ligazón."
+
+msgid "Limpiar caché web e imágenes"
+msgstr "Limpar a caché web e de imaxes"
+
+msgid "Regenerar variantes de imagen"
+msgstr "Rexenerar variantes de imaxe"
+
+msgid "Feed"
+msgstr "Feed"
+
+msgid "Estadísticas del podcast"
+msgstr "Estatísticas do podcast"
+
+msgid "Regenerar feed.xml y sitemap.xml"
+msgstr "Rexenerar feed.xml e sitemap.xml"
+
+msgid "Códigos de estado HTTP"
+msgstr "Códigos de estado HTTP"
+
+msgid "Petición correcta"
+msgstr "Petición correcta"
+
+msgid "Recurso creado correctamente"
+msgstr "Recurso creado correctamente"
+
+msgid "Respuesta a preflight OPTIONS"
+msgstr "Resposta ao preflight OPTIONS"
+
+msgid "Datos inválidos o campos requeridos ausentes"
+msgstr "Datos inválidos ou campos obrigatorios ausentes"
+
+msgid "Token ausente o inválido"
+msgstr "Token ausente ou inválido"
+
+msgid "Recurso no encontrado"
+msgstr "Recurso non atopado"
+
+msgid "Método HTTP no permitido"
+msgstr "Método HTTP non permitido"
+
+msgid "Error del servidor"
+msgstr "Erro do servidor"
+
+msgid "Mismos parámetros de paginación que episodios."
+msgstr "Os mesmos parámetros de paxinación ca nos episodios."
+
+msgid "Genera y revoca tokens para la API REST"
+msgstr "Xera e revoga tokens para a API REST"
+
+# ---------------------------------------------------------------------------
+# api_docs.php — sección Sistema
+# ---------------------------------------------------------------------------
+
+msgid "Sistema"
+msgstr "Sistema"
+
+msgid "Consultar versión actual y disponible"
+msgstr "Consultar versión actual e dispoñible"
+
+msgid "Si no se puede contactar con GitHub, el campo"
+msgstr "Se non se pode contactar con GitHub, o campo"
+
+msgid "contendrá el motivo; la respuesta sigue siendo 200."
+msgstr "conterá o motivo; a resposta segue sendo 200."
+
+msgid "Actualizar la aplicación"
+msgstr "Actualizar a aplicación"
+
+msgid "Atención:"
+msgstr "Atención:"
+
+msgid "esta operación descarga e instala la última release desde GitHub y es irreversible. Asegúrate de tener una copia de seguridad antes de ejecutarla."
+msgstr "esta operación descarga e instala a última versión desde GitHub e é irreversible. Asegúrate de ter unha copia de seguridade antes de executala."
+
+msgid "Códigos de error posibles:"
+msgstr "Códigos de erro posibles:"
+
+msgid "(ya en la versión más reciente)"
+msgstr "(xa na versión máis recente)"
+
+msgid "(error al contactar GitHub)"
+msgstr "(erro ao contactar GitHub)"
+
+msgid "(error durante la instalación)"
+msgstr "(erro durante a instalación)"

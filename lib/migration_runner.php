@@ -59,6 +59,33 @@ function runMigrations(string $dbPath): void
     if ($version < 8) {
         migration_v8($pdo);
         $pdo->exec('PRAGMA user_version = 8');
+        $version = 8;
+    }
+
+    if ($version < 9) {
+        migration_v9($pdo);
+        $pdo->exec('PRAGMA user_version = 9');
+    }
+}
+
+/**
+ * Migración v9: añade columnas name y last_used_at a api_tokens.
+ * name identifica el token con un nombre legible; last_used_at registra el último uso.
+ */
+function migration_v9(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(api_tokens)')->fetchAll(),
+        'name'
+    );
+    $pending = [
+        'name'         => "ALTER TABLE api_tokens ADD COLUMN name TEXT NOT NULL DEFAULT ''",
+        'last_used_at' => 'ALTER TABLE api_tokens ADD COLUMN last_used_at TEXT',
+    ];
+    foreach ($pending as $col => $sql) {
+        if (!in_array($col, $existing, true)) {
+            $pdo->exec($sql);
+        }
     }
 }
 

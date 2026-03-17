@@ -188,19 +188,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 9) {
-    migration_v9($pdo);
-    $pdo->exec('PRAGMA user_version = 9');
+if ($version < 10) {
+    migration_v10($pdo);
+    $pdo->exec('PRAGMA user_version = 10');
 }
 
 // 2. Función de migración
-function migration_v9(PDO $pdo): void
+function migration_v10(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 9`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
 
 #### Historial de versiones
 
@@ -214,6 +214,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 9`.
 | 6 | Crea tabla `pages` con índice `idx_pages_status` |
 | 7 | Crea índice `idx_episodes_link` sobre `episodes(link)` |
 | 8 | Añade `app_language` a `podcast` (idioma de la interfaz) |
+| 9 | Añade `name` y `last_used_at` a `api_tokens` |
 
 ---
 

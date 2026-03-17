@@ -50,8 +50,6 @@ ON episodes(status, pub_date);
 -- Permite resolución O(log n) de URLs por link guardado (/YYYY/MM/slug).
 CREATE INDEX IF NOT EXISTS idx_episodes_link ON episodes(link);
 
-PRAGMA user_version = 8;
-
 -- social: enlaces a redes sociales del autor (fila única).
 CREATE TABLE IF NOT EXISTS social (
   id INTEGER PRIMARY KEY,
@@ -82,6 +80,19 @@ CREATE TABLE IF NOT EXISTS pages (
 );
 
 CREATE INDEX IF NOT EXISTS idx_pages_status ON pages(status, parent_id, sort_order);
+
+-- api_tokens: tokens de autenticación para la API REST.
+CREATE TABLE IF NOT EXISTS api_tokens (
+  id INTEGER PRIMARY KEY,
+  token TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  user_id INTEGER NOT NULL,
+  expires_at TEXT,
+  last_used_at TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+PRAGMA user_version = 9;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

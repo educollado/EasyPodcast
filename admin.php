@@ -144,6 +144,11 @@ if ($isLoggedIn) {
             <h2><?= __('Importar feed RSS') ?></h2>
             <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
           </a>
+          <a class="admin-card" href="api_tokens.php">
+            <div class="admin-card-icon">🔌</div>
+            <h2>API Tokens</h2>
+            <p><?= __('Genera y revoca tokens para la API REST') ?></p>
+          </a>
           <a class="admin-card" href="/" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2><?= __('Ver podcast') ?></h2>

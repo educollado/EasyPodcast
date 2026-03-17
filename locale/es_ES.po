@@ -1453,3 +1453,365 @@ msgstr ""
 
 msgid "Importar otro feed"
 msgstr ""
+
+# ---------------------------------------------------------------------------
+# api_tokens_handler.php / api_tokens.php / api_docs.php
+# ---------------------------------------------------------------------------
+
+msgid "El nombre del token es obligatorio."
+msgstr ""
+
+msgid "Token generado correctamente. Cópialo ahora: no se mostrará de nuevo."
+msgstr ""
+
+msgid "Token revocado correctamente."
+msgstr ""
+
+msgid "Error al gestionar tokens: %s"
+msgstr ""
+
+msgid "Tokens API"
+msgstr ""
+
+msgid "Tokens de API"
+msgstr ""
+
+msgid "Genera tokens para autenticar peticiones a la API REST. Cada token solo se muestra una vez al crearlo."
+msgstr ""
+
+msgid "Token generado (guárdalo ahora):"
+msgstr ""
+
+msgid "Generar nuevo token"
+msgstr ""
+
+msgid "Nombre del token *"
+msgstr ""
+
+msgid "p.ej. integración-n8n"
+msgstr ""
+
+msgid "Fecha de expiración (opcional)"
+msgstr ""
+
+msgid "Generar token"
+msgstr ""
+
+msgid "Tokens activos"
+msgstr ""
+
+msgid "No hay tokens creados."
+msgstr ""
+
+msgid "Nombre"
+msgstr ""
+
+msgid "Token (últimos 8 chars)"
+msgstr ""
+
+msgid "Creado"
+msgstr ""
+
+msgid "Expira"
+msgstr ""
+
+msgid "Último uso"
+msgstr ""
+
+msgid "Sin expiración"
+msgstr ""
+
+msgid "Nunca"
+msgstr ""
+
+msgid "¿Revocar este token?"
+msgstr ""
+
+msgid "Revocar"
+msgstr ""
+
+msgid "→ Ver documentación de la API"
+msgstr ""
+
+msgid "← Gestionar tokens"
+msgstr ""
+
+msgid "Documentación API REST"
+msgstr ""
+
+msgid "La API REST permite gestionar el podcast de forma programática. Todas las peticiones requieren autenticación."
+msgstr ""
+
+msgid "Autenticación"
+msgstr ""
+
+msgid "Incluye tu token en la cabecera"
+msgstr ""
+
+msgid "Gestiona tus tokens en"
+msgstr ""
+
+msgid "Formato de respuesta"
+msgstr ""
+
+msgid "Todas las respuestas son JSON:"
+msgstr ""
+
+msgid "En caso de error:"
+msgstr ""
+
+msgid "Descripción del error"
+msgstr ""
+
+msgid "Lista paginada"
+msgstr ""
+
+msgid "Parámetro"
+msgstr ""
+
+msgid "Tipo"
+msgstr ""
+
+msgid "Página (defecto: 1)"
+msgstr ""
+
+msgid "Resultados por página, máx. 100 (defecto: 20)"
+msgstr ""
+
+msgid "opcional"
+msgstr ""
+
+msgid "o"
+msgstr ""
+
+msgid "sí"
+msgstr ""
+
+msgid "no"
+msgstr ""
+
+msgid "Obtener episodio"
+msgstr ""
+
+msgid "Crear episodio"
+msgstr ""
+
+msgid "Acepta"
+msgstr ""
+
+msgid "para subir ficheros"
+msgstr ""
+
+msgid "Req."
+msgstr ""
+
+msgid "Título del episodio"
+msgstr ""
+
+msgid "URL del audio (*o subir audio_file)"
+msgstr ""
+
+msgid "Tamaño en bytes (*si no se sube fichero)"
+msgstr ""
+
+msgid "MIME del audio (defecto: audio/mpeg)"
+msgstr ""
+
+msgid "defecto"
+msgstr ""
+
+msgid "Fecha ISO 8601 (auto-asignada al publicar)"
+msgstr ""
+
+msgid "Fichero de audio (multipart)"
+msgstr ""
+
+msgid "Imagen del episodio (multipart)"
+msgstr ""
+
+msgid "URL de imagen alternativa"
+msgstr ""
+
+msgid "Número de temporada"
+msgstr ""
+
+msgid "Número de episodio"
+msgstr ""
+
+msgid "hereda del podcast"
+msgstr ""
+
+msgid "Duración (HH:MM:SS)"
+msgstr ""
+
+msgid "Autor del episodio"
+msgstr ""
+
+msgid "Episodio de prueba"
+msgstr ""
+
+msgid "Actualizar episodio"
+msgstr ""
+
+msgid "Mismo formato que crear. Solo los campos enviados se modifican."
+msgstr ""
+
+msgid "Borrar episodio"
+msgstr ""
+
+msgid "Obtener metadatos del canal"
+msgstr ""
+
+msgid "Actualizar metadatos"
+msgstr ""
+
+msgid "Campos actualizables:"
+msgstr ""
+
+msgid "Para subir imagen del canal usa"
+msgstr ""
+
+msgid "con el campo"
+msgstr ""
+
+msgid "Mi Podcast Actualizado"
+msgstr ""
+
+msgid "Obtener página"
+msgstr ""
+
+msgid "Crear página"
+msgstr ""
+
+msgid "Título de la página"
+msgstr ""
+
+msgid "Slug URL (minúsculas, números y guiones)"
+msgstr ""
+
+msgid "Contenido HTML/Markdown"
+msgstr ""
+
+msgid "ID de página padre (para subpáginas)"
+msgstr ""
+
+msgid "Orden de aparición (defecto: 0)"
+msgstr ""
+
+msgid "Sobre nosotros"
+msgstr ""
+
+msgid "Actualizar página"
+msgstr ""
+
+msgid "Para cambiar el slug, envía también"
+msgstr ""
+
+msgid "con la ruta actual."
+msgstr ""
+
+msgid "Borrar página"
+msgstr ""
+
+msgid "Falla si la página tiene subpáginas hijas."
+msgstr ""
+
+msgid "Redes sociales"
+msgstr ""
+
+msgid "Obtener enlaces"
+msgstr ""
+
+msgid "Actualizar enlaces"
+msgstr ""
+
+msgid "Campos:"
+msgstr ""
+
+msgid "Todos opcionales; los no enviados conservan su valor actual. URLs vacías eliminan el enlace."
+msgstr ""
+
+msgid "Limpiar caché web e imágenes"
+msgstr ""
+
+msgid "Regenerar variantes de imagen"
+msgstr ""
+
+msgid "Feed"
+msgstr ""
+
+msgid "Estadísticas del podcast"
+msgstr ""
+
+msgid "Regenerar feed.xml y sitemap.xml"
+msgstr ""
+
+msgid "Códigos de estado HTTP"
+msgstr ""
+
+msgid "Petición correcta"
+msgstr ""
+
+msgid "Recurso creado correctamente"
+msgstr ""
+
+msgid "Respuesta a preflight OPTIONS"
+msgstr ""
+
+msgid "Datos inválidos o campos requeridos ausentes"
+msgstr ""
+
+msgid "Token ausente o inválido"
+msgstr ""
+
+msgid "Recurso no encontrado"
+msgstr ""
+
+msgid "Método HTTP no permitido"
+msgstr ""
+
+msgid "Error del servidor"
+msgstr ""
+
+msgid "Mismos parámetros de paginación que episodios."
+msgstr ""
+
+msgid "Genera y revoca tokens para la API REST"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# api_docs.php — sección Sistema
+# ---------------------------------------------------------------------------
+
+msgid "Sistema"
+msgstr ""
+
+msgid "Consultar versión actual y disponible"
+msgstr ""
+
+msgid "Si no se puede contactar con GitHub, el campo"
+msgstr ""
+
+msgid "contendrá el motivo; la respuesta sigue siendo 200."
+msgstr ""
+
+msgid "Actualizar la aplicación"
+msgstr ""
+
+msgid "Atención:"
+msgstr ""
+
+msgid "esta operación descarga e instala la última release desde GitHub y es irreversible. Asegúrate de tener una copia de seguridad antes de ejecutarla."
+msgstr ""
+
+msgid "Códigos de error posibles:"
+msgstr ""
+
+msgid "(ya en la versión más reciente)"
+msgstr ""
+
+msgid "(error al contactar GitHub)"
+msgstr ""
+
+msgid "(error durante la instalación)"
+msgstr ""
