@@ -123,7 +123,8 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
           <table class="params-table">
             <tr><th><?= __('Campo') ?></th><th><?= __('Req.') ?></th><th><?= __('Descripción') ?></th></tr>
             <tr><td>title</td><td>✓</td><td><?= __('Título del episodio') ?></td></tr>
-            <tr><td>description</td><td>✓</td><td><?= __('Descripción') ?></td></tr>
+            <tr><td>description</td><td>✓</td><td><?= __('Contenido HTML del episodio (máx. 10000 caracteres)') ?></td></tr>
+            <tr><td>short_description</td><td></td><td><?= __('Descripción en texto plano (máx. 4000 caracteres). Se muestra en portada y en el feed RSS.') ?></td></tr>
             <tr><td>audio_url</td><td>✓*</td><td><?= __('URL del audio (*o subir audio_file)') ?></td></tr>
             <tr><td>audio_size_bytes</td><td>✓*</td><td><?= __('Tamaño en bytes (*si no se sube fichero)') ?></td></tr>
             <tr><td>audio_mime_type</td><td></td><td><?= __('MIME del audio (defecto: audio/mpeg)') ?></td></tr>
@@ -207,7 +208,7 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
             <tr><th><?= __('Campo') ?></th><th><?= __('Req.') ?></th><th><?= __('Descripción') ?></th></tr>
             <tr><td>title</td><td>✓</td><td><?= __('Título de la página') ?></td></tr>
             <tr><td>slug</td><td>✓</td><td><?= __('Slug URL (minúsculas, números y guiones)') ?></td></tr>
-            <tr><td>content</td><td></td><td><?= __('Contenido HTML/Markdown') ?></td></tr>
+            <tr><td>content</td><td></td><td><?= __('Contenido HTML de la página') ?></td></tr>
             <tr><td>parent_id</td><td></td><td><?= __('ID de página padre (para subpáginas)') ?></td></tr>
             <tr><td>sort_order</td><td></td><td><?= __('Orden de aparición (defecto: 0)') ?></td></tr>
             <tr><td>status</td><td></td><td><code class="inline">draft</code> (<?= __('defecto') ?>) <?= __('o') ?> <code class="inline">published</code></td></tr>

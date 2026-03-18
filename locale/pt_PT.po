@@ -1818,3 +1818,12 @@ msgstr "Máx. 4000 caracteres. Se preenchido, é mostrado na página inicial em 
 
 msgid "Máx. 10000 caracteres (incluyendo etiquetas HTML)."
 msgstr "Máx. 10000 caracteres (incluindo etiquetas HTML)."
+
+msgid "Contenido HTML del episodio (máx. 10000 caracteres)"
+msgstr "Conteúdo HTML do episódio (máx. 10000 caracteres)"
+
+msgid "Descripción en texto plano (máx. 4000 caracteres). Se muestra en portada y en el feed RSS."
+msgstr "Descrição em texto simples (máx. 4000 caracteres). Mostrada na página inicial e no feed RSS."
+
+msgid "Contenido HTML de la página"
+msgstr "Conteúdo HTML da página"
