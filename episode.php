@@ -126,8 +126,8 @@ if ($error !== '') {
                 <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
-            <?php if (!empty($episode['description'])): ?>
-              <div class="desc"><?= $episode['description'] ?></div>
+            <?php if (!empty($episode['content'])): ?>
+              <div class="desc"><?= $episode['content'] ?></div>
             <?php endif; ?>
           </div>
         </article>

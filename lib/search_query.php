@@ -47,7 +47,7 @@ function loadSearchData(string $dbPath, string $query, int $requestedPage): arra
                 "SELECT COUNT(*)
                  FROM episodes
                  WHERE status = 'published'
-                   AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')"
+                   AND (title LIKE :term ESCAPE '\\' OR content LIKE :term ESCAPE '\\')"
             );
             $countStmt->execute([':term' => $term]);
             $totalEpisodes = (int) $countStmt->fetchColumn();
@@ -60,10 +60,10 @@ function loadSearchData(string $dbPath, string $query, int $requestedPage): arra
 
             // Recupera solo los episodios de la página actual.
             $episodesStmt = $pdo->prepare(
-                "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
+                "SELECT id, title, content, short_description, link, pub_date, audio_url, duration, image_url
                  FROM episodes
                  WHERE status = 'published'
-                   AND (title LIKE :term ESCAPE '\\' OR description LIKE :term ESCAPE '\\')
+                   AND (title LIKE :term ESCAPE '\\' OR content LIKE :term ESCAPE '\\')
                  ORDER BY datetime(pub_date) DESC, id DESC
                  LIMIT :limit OFFSET :offset"
             );

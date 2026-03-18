@@ -169,8 +169,8 @@ function buildPageSeoData(array $podcast, ?array $page, string $error): array
     $fullTitle = $pageTitle !== '' ? $pageTitle . ' — ' . $podcastTitle : $podcastTitle;
     $canonical = $baseSeoUrl . '/' . ltrim((string) ($page['full_path'] ?? ''), '/');
 
-    // Meta description a partir del contenido Markdown (sin marcas, max 160 chars).
-    $plainContent = preg_replace('/[#*_\[\]`>~]+/', '', (string) ($page['content'] ?? '')) ?? '';
+    // Meta description a partir del contenido HTML (sin etiquetas, max 160 chars).
+    $plainContent = strip_tags((string) ($page['content'] ?? ''));
     $metaDesc     = mb_substr(trim($plainContent), 0, 160);
 
     return [

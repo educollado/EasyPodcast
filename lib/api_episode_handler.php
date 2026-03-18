@@ -6,6 +6,19 @@ require_once __DIR__ . '/api_helpers.php';
 require_once __DIR__ . '/episode_save_handler.php';
 
 /**
+ * Prepara un array de episodio para la respuesta API.
+ * Expone 'short_description' (BD) como 'description' (API) para alinear la nomenclatura.
+ */
+function episodeToApiResponse(array $episode): array
+{
+    if (array_key_exists('short_description', $episode)) {
+        $episode['description'] = $episode['short_description'];
+        unset($episode['short_description']);
+    }
+    return $episode;
+}
+
+/**
  * GET /api/v1/episodes
  * Lista paginada con filtro opcional de status.
  * Parámetros: page (int), limit (int, max 100), status (draft|published).
@@ -44,7 +57,7 @@ function apiListEpisodes(PDO $pdo, array $params): void
     apiJsonResponse([
         'success' => true,
         'data'    => [
-            'items'       => $episodes,
+            'items'       => array_map('episodeToApiResponse', $episodes),
             'total'       => $total,
             'page'        => $page,
             'limit'       => $limit,
@@ -66,7 +79,7 @@ function apiGetEpisode(PDO $pdo, int $id): void
         apiError('Episodio no encontrado.', 404);
     }
 
-    apiJsonResponse(['success' => true, 'data' => $episode]);
+    apiJsonResponse(['success' => true, 'data' => episodeToApiResponse($episode)]);
 }
 
 /**
@@ -75,6 +88,11 @@ function apiGetEpisode(PDO $pdo, int $id): void
  */
 function apiCreateEpisode(PDO $pdo, array $body, array $files, array $podcastDefaults): void
 {
+    // Mapear 'description' (nombre API) a 'short_description' (nombre interno de BD).
+    if (isset($body['description']) && !isset($body['short_description'])) {
+        $body['short_description'] = $body['description'];
+    }
+    unset($body['description']);
     // Normalizar valores a string para compatibilidad con validateEpisodeForm.
     $bodyStrings = array_map(fn($v) => $v !== null ? (string) $v : '', $body);
     $form        = array_merge(episodeFormDefaults($podcastDefaults), $bodyStrings);
@@ -91,7 +109,7 @@ function apiCreateEpisode(PDO $pdo, array $body, array $files, array $podcastDef
     $stmt->execute([':id' => $lastId]);
     $episode = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    apiJsonResponse(['success' => true, 'data' => $episode ?: []], 201);
+    apiJsonResponse(['success' => true, 'data' => episodeToApiResponse($episode ?: [])], 201);
 }
 
 /**
@@ -108,6 +126,11 @@ function apiUpdateEpisode(PDO $pdo, int $id, array $body, array $files, array $p
         apiError('Episodio no encontrado.', 404);
     }
 
+    // Mapear 'description' (nombre API) a 'short_description' (nombre interno de BD).
+    if (isset($body['description']) && !isset($body['short_description'])) {
+        $body['short_description'] = $body['description'];
+    }
+    unset($body['description']);
     // Normalizar valores existentes de BD a string (ctype_digit espera strings).
     $existingStrings = array_map(fn($v) => $v !== null ? (string) $v : '', $existing);
     $bodyStrings     = array_map(fn($v) => $v !== null ? (string) $v : '', $body);
@@ -124,7 +147,7 @@ function apiUpdateEpisode(PDO $pdo, int $id, array $body, array $files, array $p
     $stmt->execute([':id' => $id]);
     $updated = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    apiJsonResponse(['success' => true, 'data' => $updated ?: []]);
+    apiJsonResponse(['success' => true, 'data' => episodeToApiResponse($updated ?: [])]);
 }
 
 /**

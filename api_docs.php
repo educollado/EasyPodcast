@@ -123,8 +123,8 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
           <table class="params-table">
             <tr><th><?= __('Campo') ?></th><th><?= __('Req.') ?></th><th><?= __('Descripción') ?></th></tr>
             <tr><td>title</td><td>✓</td><td><?= __('Título del episodio') ?></td></tr>
-            <tr><td>description</td><td>✓</td><td><?= __('Contenido HTML del episodio (máx. 10000 caracteres)') ?></td></tr>
-            <tr><td>short_description</td><td></td><td><?= __('Descripción en texto plano (máx. 4000 caracteres). Se muestra en portada y en el feed RSS.') ?></td></tr>
+            <tr><td>content</td><td>✓</td><td><?= __('Contenido HTML del episodio (máx. 10000 caracteres)') ?></td></tr>
+            <tr><td>description</td><td></td><td><?= __('Descripción en texto plano (máx. 4000 caracteres). Se muestra en portada y en el feed RSS.') ?></td></tr>
             <tr><td>audio_url</td><td>✓*</td><td><?= __('URL del audio (*o subir audio_file)') ?></td></tr>
             <tr><td>audio_size_bytes</td><td>✓*</td><td><?= __('Tamaño en bytes (*si no se sube fichero)') ?></td></tr>
             <tr><td>audio_mime_type</td><td></td><td><?= __('MIME del audio (defecto: audio/mpeg)') ?></td></tr>
@@ -143,7 +143,7 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
           <pre>curl -s -X POST \
   -H "Authorization: Bearer TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"title":"<?= __('Episodio de prueba') ?>","description":"<?= __('Descripción') ?>","audio_url":"https://ejemplo.com/ep1.mp3","audio_size_bytes":"5000000","status":"draft"}' \
+  -d '{"title":"<?= __('Episodio de prueba') ?>","content":"<?= __('Contenido del episodio') ?>","audio_url":"https://ejemplo.com/ep1.mp3","audio_size_bytes":"5000000","status":"draft"}' \
   "<?= esc($baseUrl) ?>/api/v1/episodes"</pre>
           <pre>{ "success": true, "data": { "id": 5, "title": "<?= __('Episodio de prueba') ?>", ... } }</pre>
         </div>

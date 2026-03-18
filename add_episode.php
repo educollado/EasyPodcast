@@ -102,7 +102,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
           <label>
             <?= __('Contenido *') ?>
             <span class="help"><?= __('Máx. 10000 caracteres (incluyendo etiquetas HTML).') ?></span>
-            <textarea id="description" name="description" maxlength="10000" required><?= esc($form['description']) ?></textarea>
+            <textarea id="content" name="content" maxlength="10000" required><?= esc($form['content']) ?></textarea>
           </label>
         </div>
 
@@ -181,7 +181,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
   <script src="/assets/js/jodit.min.js"></script>
   <script>
     (function () {
-      var descArea = document.getElementById('description');
+      var descArea = document.getElementById('content');
       if (descArea) {
         Jodit.make(descArea, {
           language: 'es',

@@ -37,7 +37,7 @@ function loadAddEpisodeData(string $dbPath): array
               id INTEGER PRIMARY KEY,
               guid TEXT NOT NULL UNIQUE,
               title TEXT NOT NULL,
-              description TEXT NOT NULL,
+              content TEXT NOT NULL,
               short_description TEXT,
               link TEXT,
               pub_date TEXT,

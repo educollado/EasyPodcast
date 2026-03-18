@@ -13,7 +13,7 @@ function makeValidForm(): array
     return [
         'guid'             => '',
         'title'            => 'Mi episodio de prueba',
-        'description'      => 'Una descripción completa del episodio.',
+        'content'          => 'Una descripción completa del episodio.',
         'link'             => '',
         'pub_date'         => '2024-06-15T10:00',
         'audio_url'        => 'https://example.com/audio.mp3',
@@ -42,7 +42,7 @@ test('validateEpisodeForm: título vacío → error de obligatorio', function ()
 
 test('validateEpisodeForm: descripción vacía → error de obligatorio', function () {
     $form = makeValidForm();
-    $form['description'] = '';
+    $form['content'] = '';
     assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
 });
 
@@ -158,7 +158,7 @@ test('validateEpisodeForm: season y episode con valores válidos → válido', f
 
 test('episodeFormDefaults: contiene todas las claves del formulario', function () {
     $defaults = episodeFormDefaults(['image_url' => '', 'author' => '']);
-    $expectedKeys = ['guid', 'title', 'description', 'link', 'pub_date', 'audio_url',
+    $expectedKeys = ['guid', 'title', 'content', 'link', 'pub_date', 'audio_url',
                      'audio_mime_type', 'audio_size_bytes', 'duration', 'explicit',
                      'season_number', 'episode_number', 'episode_type', 'image_url',
                      'author', 'status'];

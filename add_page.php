@@ -30,8 +30,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? __('Editar Página') : __('Añadir Página') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
-  <!-- EasyMDE: editor Markdown con barra de herramientas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+  <link rel="stylesheet" href="/assets/css/jodit.min.css">
 </head>
 <body>
   <?php $currentAdminPage = 'pages'; require __DIR__ . '/admin_nav.php'; ?>
@@ -107,7 +106,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="grid" style="margin-top:.8rem;">
           <label>
-            <?= __('Contenido') ?> <span style="font-weight:400;color:#5f6b73;font-size:.85rem;">(admite Markdown)</span>
+            <?= __('Contenido') ?>
             <textarea id="page_content" name="content"><?= esc($form['content']) ?></textarea>
           </label>
         </div>
@@ -122,23 +121,18 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
       </form>
     </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="/assets/js/jodit.min.js"></script>
   <script>
     (function () {
       var contentArea = document.getElementById('page_content');
       if (contentArea) {
-        new EasyMDE({
-          element: contentArea,
-          toolbar: [
-            'bold', 'italic', 'heading', '|',
-            'unordered-list', 'ordered-list', '|',
-            'link', 'image', '|',
-            'preview'
-          ],
-          spellChecker: false,
-          forceSync: true,
-          status: false,
-          minHeight: '200px'
+        Jodit.make(contentArea, {
+          language: 'es',
+          toolbar: true,
+          buttons: 'bold,italic,underline,strikethrough,|,ul,ol,|,link,|,clean',
+          height: 250,
+          enter: 'p',
+          cleanHTML: { fillEmptyParagraph: false }
         });
       }
 

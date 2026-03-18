@@ -156,17 +156,17 @@ function parseFeedChannel(SimpleXMLElement $channel): array
  */
 function parseFeedItem(SimpleXMLElement $item): array
 {
-    $itunes  = $item->children('http://www.itunes.com/dtds/podcast-1.0.dtd');
-    $content = $item->children('http://purl.org/rss/1.0/modules/content/');
+    $itunes     = $item->children('http://www.itunes.com/dtds/podcast-1.0.dtd');
+    $contentNs  = $item->children('http://purl.org/rss/1.0/modules/content/');
 
-    // Descripción enriquecida: content:encoded > itunes:summary > description
-    $description = '';
-    if (isset($content->encoded) && trim((string) $content->encoded) !== '') {
-        $description = trim((string) $content->encoded);
+    // Contenido enriquecido: content:encoded > itunes:summary > description
+    $episodeContent = '';
+    if (isset($contentNs->encoded) && trim((string) $contentNs->encoded) !== '') {
+        $episodeContent = trim((string) $contentNs->encoded);
     } elseif (isset($itunes->summary) && trim((string) $itunes->summary) !== '') {
-        $description = trim((string) $itunes->summary);
+        $episodeContent = trim((string) $itunes->summary);
     } else {
-        $description = trim((string) ($item->description ?? ''));
+        $episodeContent = trim((string) ($item->description ?? ''));
     }
 
     // Enclosure
@@ -197,7 +197,7 @@ function parseFeedItem(SimpleXMLElement $item): array
     return [
         'guid'           => $guid,
         'title'          => trim((string) ($item->title         ?? '')),
-        'description'    => $description,
+        'content'        => $episodeContent,
         'audio_url'      => $audioUrl,
         'audio_mime'     => $audioMime,
         'audio_size'     => $audioSize,
@@ -587,10 +587,10 @@ function runFeedImport(
     $checkGuidStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE guid = :guid LIMIT 1');
     $insertStmt    = $pdo->prepare(
         'INSERT INTO episodes
-         (guid, title, description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
+         (guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
           duration, explicit, season_number, episode_number, episode_type, image_url, author, status, updated_at)
          VALUES
-         (:guid, :title, :description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
+         (:guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
           :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
     );
 
@@ -657,7 +657,7 @@ function runFeedImport(
             $insertStmt->execute([
                 ':guid'             => $guid,
                 ':title'            => $ep['title'],
-                ':description'      => $ep['description'],
+                ':content'          => $ep['content'],
                 ':link'             => $link !== '' ? $link : null,
                 ':pub_date'         => $ep['pub_date'],
                 ':audio_url'        => $audioResult['localUrl'],

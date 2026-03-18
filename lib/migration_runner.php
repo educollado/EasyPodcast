@@ -71,6 +71,27 @@ function runMigrations(string $dbPath): void
     if ($version < 10) {
         migration_v10($pdo);
         $pdo->exec('PRAGMA user_version = 10');
+        $version = 10;
+    }
+
+    if ($version < 11) {
+        migration_v11($pdo);
+        $pdo->exec('PRAGMA user_version = 11');
+    }
+}
+
+/**
+ * Migración v11: renombra la columna description a content en episodes.
+ * El campo contenía HTML del episodio; 'content' refleja mejor su propósito.
+ */
+function migration_v11(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(episodes)')->fetchAll(),
+        'name'
+    );
+    if (in_array('description', $existing, true) && !in_array('content', $existing, true)) {
+        $pdo->exec('ALTER TABLE episodes RENAME COLUMN description TO content');
     }
 }
 

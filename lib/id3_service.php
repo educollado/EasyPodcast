@@ -77,7 +77,7 @@ function buildEpisodeId3Metadata(array $form, array $podcastDefaults): array
         'artist' => (string) (($form['author'] ?? '') !== '' ? $form['author'] : ($podcastDefaults['author'] ?? '')),
         'album' => (string) ($podcastDefaults['title'] ?? ''),
         'year' => $pubYear,
-        'comment' => summarizeId3Comment((string) ($form['description'] ?? ''), $commentMaxLength),
+        'comment' => summarizeId3Comment((string) ($form['content'] ?? ''), $commentMaxLength),
         'track' => $episodeNumber,
         'image_path' => resolveLocalImagePathFromUrl(
             (string) (($form['image_url'] ?? '') !== '' ? $form['image_url'] : ($podcastDefaults['image_url'] ?? ''))

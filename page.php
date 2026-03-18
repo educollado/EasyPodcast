@@ -108,7 +108,7 @@ if ($error !== '') {
             <h1><?= esc((string) ($page['title'] ?? 'Sin título')) ?></h1>
 
             <?php if (!empty($page['content'])): ?>
-              <div class="desc"><?= renderMarkdown((string) $page['content']) ?></div>
+              <div class="desc"><?= $page['content'] ?></div>
             <?php endif; ?>
 
             <?php if ($children): ?>

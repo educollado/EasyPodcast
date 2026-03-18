@@ -94,7 +94,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
               <div class="cover" aria-hidden="true"></div>
             <?php endif; ?>
             <div class="episode-content">
-              <?php $excerpt = firstChars((string) ($episode['description'] ?? ''), 240); ?>
+              <?php $excerpt = firstChars(strip_tags((string) ($episode['content'] ?? '')), 240); ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
               <p class="excerpt">

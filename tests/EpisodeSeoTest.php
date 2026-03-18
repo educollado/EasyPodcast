@@ -21,7 +21,7 @@ test('buildEpisodeSeoData: episode null → pageTitle igual a podcastTitle', fun
 
 test('buildEpisodeSeoData: episode presente → pageTitle con separador |', function () {
     $podcast = ['title' => 'Mi podcast', 'link' => 'https://example.com'];
-    $episode = ['title' => 'Episodio 1', 'description' => ''];
+    $episode = ['title' => 'Episodio 1', 'content' => ''];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'episodio-1', '');
     assert_eq('Episodio 1 | Mi podcast', $seo['pageTitle']);
 });
@@ -33,7 +33,7 @@ test('buildEpisodeSeoData: episode null → episodeJsonLd = {}', function () {
 
 test('buildEpisodeSeoData: episode presente → JSON-LD contiene PodcastEpisode', function () {
     $podcast = ['title' => 'Mi podcast', 'link' => 'https://example.com'];
-    $episode = ['title' => 'Ep 1', 'description' => 'Desc', 'pub_date' => '2024-03-01'];
+    $episode = ['title' => 'Ep 1', 'content' => 'Desc', 'pub_date' => '2024-03-01'];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep-1', '');
     assert_contains('"@type":"PodcastEpisode"', $seo['episodeJsonLd']);
     assert_contains('"name":"Ep 1"', $seo['episodeJsonLd']);
@@ -41,7 +41,7 @@ test('buildEpisodeSeoData: episode presente → JSON-LD contiene PodcastEpisode'
 
 test('buildEpisodeSeoData: JSON-LD contiene partOfSeries con nombre del podcast', function () {
     $podcast = ['title' => 'Podcast X', 'link' => 'https://example.com'];
-    $episode = ['title' => 'Ep', 'description' => ''];
+    $episode = ['title' => 'Ep', 'content' => ''];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
     assert_contains('PodcastSeries', $seo['episodeJsonLd']);
     assert_contains('Podcast X', $seo['episodeJsonLd']);
@@ -79,21 +79,21 @@ test('buildEpisodeSeoData: cover cae en imagen del podcast cuando episodio no ti
 
 test('buildEpisodeSeoData: metaDescription desde descripción del episodio', function () {
     $podcast = ['link' => 'https://example.com', 'description' => 'Desc podcast'];
-    $episode = ['title' => 'Ep', 'description' => 'Desc episodio'];
+    $episode = ['title' => 'Ep', 'content' => 'Desc episodio'];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
     assert_eq('Desc episodio', $seo['metaDescription']);
 });
 
 test('buildEpisodeSeoData: metaDescription cae en descripción del podcast si episodio no tiene', function () {
     $podcast = ['link' => 'https://example.com', 'description' => 'Desc podcast'];
-    $episode = ['title' => 'Ep', 'description' => ''];
+    $episode = ['title' => 'Ep', 'content' => ''];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
     assert_eq('Desc podcast', $seo['metaDescription']);
 });
 
 test('buildEpisodeSeoData: metaDescription fallback cuando no hay descripción en ningún lado', function () {
     $podcast = ['title' => 'Podcast X', 'link' => 'https://example.com', 'description' => ''];
-    $episode = ['title' => 'Ep', 'description' => ''];
+    $episode = ['title' => 'Ep', 'content' => ''];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
     assert_contains('Podcast X', $seo['metaDescription']);
 });
@@ -112,7 +112,7 @@ test('buildEpisodeSeoData: rssUrl apunta a /feed.xml', function () {
 
 test('buildEpisodeSeoData: JSON-LD incluye associatedMedia cuando hay audio_url', function () {
     $podcast = ['title' => 'P', 'link' => 'https://example.com'];
-    $episode = ['title' => 'Ep', 'description' => '', 'audio_url' => '/audios/ep.mp3'];
+    $episode = ['title' => 'Ep', 'content' => '', 'audio_url' => '/audios/ep.mp3'];
     $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
     assert_contains('associatedMedia', $seo['episodeJsonLd']);
     assert_contains('ep.mp3', $seo['episodeJsonLd']);

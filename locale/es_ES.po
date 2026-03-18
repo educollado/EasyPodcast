@@ -1689,7 +1689,7 @@ msgstr ""
 msgid "Slug URL (minúsculas, números y guiones)"
 msgstr ""
 
-msgid "Contenido HTML/Markdown"
+msgid "Contenido HTML"
 msgstr ""
 
 msgid "ID de página padre (para subpáginas)"
@@ -1835,4 +1835,7 @@ msgid "Descripción en texto plano (máx. 4000 caracteres). Se muestra en portad
 msgstr ""
 
 msgid "Contenido HTML de la página"
+msgstr ""
+
+msgid "Contenido del episodio"
 msgstr ""

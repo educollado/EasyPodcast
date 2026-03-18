@@ -34,7 +34,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
     $robotsContent = $error !== '' ? 'noindex,follow' : 'index,follow';
     $episodeTitle  = (string) ($e['title'] ?? $podcastTitle);
     $pageTitle     = $episode !== null ? ($episodeTitle . ' | ' . $podcastTitle) : $podcastTitle;
-    $metaDescription = compactMetaText((string) ($e['description'] ?? ''), 160);
+    $metaDescription = compactMetaText((string) ($e['content'] ?? ''), 160);
     if ($metaDescription === '') {
         $metaDescription = compactMetaText((string) ($p['description'] ?? ''), 160);
     }
@@ -51,7 +51,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
             '@type'         => 'PodcastEpisode',
             'name'          => $episodeTitle,
             'url'           => $canonicalUrl,
-            'description'   => (string) ($e['description'] ?? ''),
+            'description'   => (string) ($e['content'] ?? ''),
             'datePublished' => (string) ($e['pub_date'] ?? ''),
             'dateModified'  => (string) ($e['updated_at'] ?? $e['pub_date'] ?? ''),
             'partOfSeries'  => [

@@ -42,7 +42,7 @@ function loadHomeData(string $dbPath, int $requestedPage): array
 
         // Recupera solo episodios de la página actual (solo publicados).
         $stmt = $pdo->prepare(
-            "SELECT id, title, description, link, pub_date, audio_url, duration, image_url
+            "SELECT id, title, content, short_description, link, pub_date, audio_url, duration, image_url
              FROM episodes
              WHERE status = 'published'
              ORDER BY datetime(pub_date) DESC, id DESC

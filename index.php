@@ -107,7 +107,7 @@ if ($error !== '') {
               <?php
                 $excerptSource = ($episode['short_description'] ?? '') !== ''
                     ? (string) $episode['short_description']
-                    : strip_tags((string) ($episode['description'] ?? ''));
+                    : strip_tags((string) ($episode['content'] ?? ''));
                 $excerpt = firstChars($excerptSource, 200);
               ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>

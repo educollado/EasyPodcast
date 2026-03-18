@@ -1683,8 +1683,8 @@ msgstr "Page title"
 msgid "Slug URL (minúsculas, números y guiones)"
 msgstr "URL slug (lowercase letters, numbers, and hyphens)"
 
-msgid "Contenido HTML/Markdown"
-msgstr "HTML/Markdown content"
+msgid "Contenido HTML"
+msgstr "HTML content"
 
 msgid "ID de página padre (para subpáginas)"
 msgstr "Parent page ID (for subpages)"
@@ -1827,3 +1827,6 @@ msgstr "Plain text description (max. 4000 characters). Shown on home page and in
 
 msgid "Contenido HTML de la página"
 msgstr "HTML content of the page"
+
+msgid "Contenido del episodio"
+msgstr "Episode content"
