@@ -206,6 +206,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
     $xml->writeAttribute('version', '2.0');
     $xml->writeAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
     $xml->writeAttribute('xmlns:itunes', 'http://www.itunes.com/dtds/podcast-1.0.dtd');
+    $xml->writeAttribute('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
 
     $xml->startElement('channel');
 
@@ -267,7 +268,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
 
         $xml->writeElement('title', (string) $episode['title']);
 
-        $xml->startElement('description');
+        $xml->startElement('content:encoded');
         $xml->writeCdata(stripMarkdown((string) $episode['description']));
         $xml->endElement();
 
