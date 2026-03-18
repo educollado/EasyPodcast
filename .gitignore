@@ -1,0 +1,9 @@
+.gitignore
+podcast.sqlite
+AGENTS.md
+CLAUDE.md
+.claude
+*.zip
+deploy.sh
+tools/
+.insyncdl
