@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.0
+
+- API REST con autenticación por token Bearer: endpoints para episodios, podcast, páginas, redes sociales, estadísticas, caché y feed; gestión de tokens desde `api_tokens.php` y documentación en `api_docs.php`.
+- Campo `short_description` en episodios: texto breve para portada y extractos en el feed RSS (migración v10).
+- Editor HTML Jodit en sustitución del editor Markdown en `add_episode.php`: edición visual con compatibilidad completa de HTML.
+- Descripción de episodios almacenada como HTML en columna `content` (renombrada desde `description`, migración v11).
+- Renderizado HTML de la descripción en la página de episodio.
+- Feed RSS: contenido completo del episodio en `content:encoded`.
+
 ## 1.5.1
 
 - Añadidos locales de alemán (`de_DE`) e italiano (`it_IT`).

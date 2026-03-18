@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.5.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.6.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,11 +102,14 @@ docker run -d \
 
 ---
 
-## Novedades 1.5.1
+## Novedades 1.6.0
 
-- Añadidos locales de alemán (`de_DE`) e italiano (`it_IT`).
-- Corrección de traducción alemana: "Inicio" → "Startseite".
-- Completadas las cadenas i18n de `import_feed.php` y `import_feed_handler.php`.
+- API REST con autenticación por token Bearer: endpoints para episodios, podcast, páginas, redes sociales, estadísticas, caché y feed; gestión de tokens desde `api_tokens.php` y documentación en `api_docs.php`.
+- Campo `short_description` en episodios: texto breve para portada y extractos en el feed RSS (migración v10).
+- Editor HTML Jodit en sustitución del editor Markdown en `add_episode.php`: edición visual con compatibilidad completa de HTML.
+- Descripción de episodios almacenada como HTML en columna `content` (renombrada desde `description`, migración v11).
+- Renderizado HTML de la descripción en la página de episodio.
+- Feed RSS: contenido completo del episodio en `content:encoded`.
 
 ---
 
@@ -188,13 +191,13 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 10) {
-    migration_v10($pdo);
-    $pdo->exec('PRAGMA user_version = 10');
+if ($version < 12) {
+    migration_v12($pdo);
+    $pdo->exec('PRAGMA user_version = 12');
 }
 
 // 2. Función de migración
-function migration_v10(PDO $pdo): void
+function migration_v12(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
@@ -215,6 +218,8 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
 | 7 | Crea índice `idx_episodes_link` sobre `episodes(link)` |
 | 8 | Añade `app_language` a `podcast` (idioma de la interfaz) |
 | 9 | Añade `name` y `last_used_at` a `api_tokens` |
+| 10 | Añade `short_description` a `episodes` |
+| 11 | Renombra columna `description` → `content` en `episodes` |
 
 ---
 
