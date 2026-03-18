@@ -104,7 +104,7 @@ if ($error !== '') {
               <div class="cover" aria-hidden="true"></div>
             <?php endif; ?>
             <div class="episode-content">
-              <?php $excerpt = firstChars(stripMarkdown((string) ($episode['description'] ?? '')), 200); ?>
+              <?php $excerpt = firstChars(strip_tags((string) ($episode['description'] ?? '')), 200); ?>
               <h2><a href="<?= esc($episodeHref) ?>"><?= esc($episodeTitle) ?></a></h2>
               <p class="meta">
                 <?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?>

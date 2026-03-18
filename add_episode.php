@@ -34,8 +34,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? __('Editar Capítulo') : __('Añadir Capítulo') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
-  <!-- EasyMDE: editor Markdown con barra de herramientas (solo en admin, cargado desde CDN) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+  <link rel="stylesheet" href="/assets/css/jodit.min.css">
 </head>
 <body>
   <?php $currentAdminPage = 'add'; require __DIR__ . '/admin_nav.php'; ?>
@@ -93,7 +92,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
 
         <div class="grid" style="margin-top: .8rem;">
           <label>
-            Descripción * <span style="font-weight:400;color:#5f6b73;font-size:.85rem;">(admite Markdown: **negrita**, *cursiva*, listas, enlaces)</span>
+            Descripción *
             <textarea id="description" name="description" required><?= esc($form['description']) ?></textarea>
           </label>
         </div>
@@ -170,26 +169,18 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
       </form>
     </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="/assets/js/jodit.min.js"></script>
   <script>
-    // Inicializa EasyMDE sobre el textarea de descripción.
-    // forceSync: true mantiene el textarea original sincronizado en cada pulsación,
-    // de modo que el formulario envía el Markdown al hacer submit sin JS adicional.
     (function () {
       var descArea = document.getElementById('description');
       if (descArea) {
-        new EasyMDE({
-          element: descArea,
-          toolbar: [
-            'bold', 'italic', 'heading', '|',
-            'unordered-list', 'ordered-list', '|',
-            'link', 'image', '|',
-            'preview'
-          ],
-          spellChecker: false,
-          forceSync: true,  // imprescindible para que el submit recoja el contenido del editor
-          status: false,
-          minHeight: '140px'
+        Jodit.make(descArea, {
+          language: 'es',
+          toolbar: true,
+          buttons: 'bold,italic,underline,strikethrough,|,ul,ol,|,link,|,clean',
+          height: 250,
+          enter: 'p',
+          cleanHTML: { fillEmptyParagraph: false }
         });
       }
     })();
