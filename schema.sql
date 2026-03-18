@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS episodes (
   guid TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
+  short_description TEXT,
   link TEXT,
   pub_date TEXT,
   audio_url TEXT NOT NULL,
@@ -92,7 +93,7 @@ CREATE TABLE IF NOT EXISTS api_tokens (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
-PRAGMA user_version = 9;
+PRAGMA user_version = 10;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

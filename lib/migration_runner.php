@@ -65,6 +65,27 @@ function runMigrations(string $dbPath): void
     if ($version < 9) {
         migration_v9($pdo);
         $pdo->exec('PRAGMA user_version = 9');
+        $version = 9;
+    }
+
+    if ($version < 10) {
+        migration_v10($pdo);
+        $pdo->exec('PRAGMA user_version = 10');
+    }
+}
+
+/**
+ * Migración v10: añade short_description a episodes para descripción en texto plano.
+ * Si se rellena, se muestra en portada en lugar del excerpt del contenido HTML.
+ */
+function migration_v10(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(episodes)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('short_description', $existing, true)) {
+        $pdo->exec('ALTER TABLE episodes ADD COLUMN short_description TEXT');
     }
 }
 

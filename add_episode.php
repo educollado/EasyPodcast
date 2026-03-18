@@ -92,8 +92,17 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
 
         <div class="grid" style="margin-top: .8rem;">
           <label>
-            Descripción *
-            <textarea id="description" name="description" required><?= esc($form['description']) ?></textarea>
+            <?= __('Descripción (sólo texto)') ?>
+            <span class="help"><?= __('Máx. 4000 caracteres. Si está rellena, se muestra en portada en lugar del contenido.') ?></span>
+            <textarea name="short_description" maxlength="4000"><?= esc($form['short_description']) ?></textarea>
+          </label>
+        </div>
+
+        <div class="grid" style="margin-top: .8rem;">
+          <label>
+            <?= __('Contenido *') ?>
+            <span class="help"><?= __('Máx. 10000 caracteres (incluyendo etiquetas HTML).') ?></span>
+            <textarea id="description" name="description" maxlength="10000" required><?= esc($form['description']) ?></textarea>
           </label>
         </div>
 

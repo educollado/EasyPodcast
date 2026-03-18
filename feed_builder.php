@@ -268,6 +268,15 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
 
         $xml->writeElement('title', (string) $episode['title']);
 
+        // description e itunes:summary usan short_description (texto plano).
+        // content:encoded contiene el HTML completo del episodio.
+        if (!empty($episode['short_description'])) {
+            $xml->startElement('description');
+            $xml->writeCdata((string) $episode['short_description']);
+            $xml->endElement();
+            writeTextIfNotEmpty($xml, 'itunes:summary', (string) $episode['short_description']);
+        }
+
         $xml->startElement('content:encoded');
         $xml->writeCdata((string) $episode['description']);
         $xml->endElement();

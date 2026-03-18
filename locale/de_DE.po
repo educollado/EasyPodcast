@@ -1670,3 +1670,15 @@ msgstr "(Fehler beim Kontaktieren von GitHub)"
 
 msgid "(error durante la instalación)"
 msgstr "(Fehler während der Installation)"
+
+msgid "Contenido *"
+msgstr "Inhalt *"
+
+msgid "Descripción (sólo texto)"
+msgstr "Beschreibung (nur Text)"
+
+msgid "Máx. 4000 caracteres. Si está rellena, se muestra en portada en lugar del contenido."
+msgstr "Max. 4000 Zeichen. Wenn ausgefüllt, wird es auf der Startseite statt des Inhalts angezeigt."
+
+msgid "Máx. 10000 caracteres (incluyendo etiquetas HTML)."
+msgstr "Max. 10000 Zeichen (einschließlich HTML-Tags)."

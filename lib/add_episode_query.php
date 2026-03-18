@@ -38,6 +38,7 @@ function loadAddEpisodeData(string $dbPath): array
               guid TEXT NOT NULL UNIQUE,
               title TEXT NOT NULL,
               description TEXT NOT NULL,
+              short_description TEXT,
               link TEXT,
               pub_date TEXT,
               audio_url TEXT NOT NULL,

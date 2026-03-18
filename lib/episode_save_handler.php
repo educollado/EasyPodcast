@@ -72,6 +72,7 @@ function episodeFormDefaults(array $podcastDefaults): array
         'guid'             => '',
         'title'            => '',
         'description'      => '',
+        'short_description' => '',
         'link'             => '',
         // pub_date se gestiona automáticamente: no se muestra en el formulario.
         // Se asigna en saveEpisode según el estado del episodio.
@@ -283,6 +284,7 @@ function saveEpisode(
              SET guid = :guid,
                  title = :title,
                  description = :description,
+                 short_description = :short_description,
                  link = :link,
                  pub_date = :pub_date,
                  audio_url = :audio_url,
@@ -302,10 +304,10 @@ function saveEpisode(
     } else {
         $stmt = $pdo->prepare(
             'INSERT INTO episodes
-             (guid, title, description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
+             (guid, title, description, short_description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
               duration, explicit, season_number, episode_number, episode_type, image_url, author, status, updated_at)
              VALUES
-             (:guid, :title, :description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
+             (:guid, :title, :description, :short_description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
               :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
         );
     }
@@ -313,10 +315,11 @@ function saveEpisode(
     // Los campos opcionales se guardan como NULL en BD cuando están vacíos,
     // en lugar de cadena vacía, para que los JOINs y filtros funcionen correctamente.
     $params = [
-        ':guid'             => $form['guid'],
-        ':title'            => $form['title'],
-        ':description'      => $form['description'],
-        ':link'             => $form['link'] !== '' ? $form['link'] : null,
+        ':guid'              => $form['guid'],
+        ':title'             => $form['title'],
+        ':description'       => $form['description'],
+        ':short_description' => $form['short_description'] !== '' ? $form['short_description'] : null,
+        ':link'              => $form['link'] !== '' ? $form['link'] : null,
         ':pub_date'         => $pubDateNormalized,
         ':audio_url'        => $form['audio_url'],
         ':audio_mime_type'  => $form['audio_mime_type'],

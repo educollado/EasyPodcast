@@ -1815,3 +1815,15 @@ msgstr ""
 
 msgid "(error durante la instalación)"
 msgstr ""
+
+msgid "Contenido *"
+msgstr ""
+
+msgid "Descripción (sólo texto)"
+msgstr ""
+
+msgid "Máx. 4000 caracteres. Si está rellena, se muestra en portada en lugar del contenido."
+msgstr ""
+
+msgid "Máx. 10000 caracteres (incluyendo etiquetas HTML)."
+msgstr ""
