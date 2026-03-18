@@ -127,7 +127,7 @@ if ($error !== '') {
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['description'])): ?>
-              <div class="desc"><?= renderMarkdown((string) $episode['description']) ?></div>
+              <div class="desc"><?= $episode['description'] ?></div>
             <?php endif; ?>
           </div>
         </article>
