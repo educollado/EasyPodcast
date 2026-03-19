@@ -186,8 +186,9 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         Jodit.make(descArea, {
           language: 'es',
           toolbar: true,
-          buttons: 'bold,italic,underline,strikethrough,|,ul,ol,|,link,|,clean',
-          height: 250,
+          buttons: 'paragraph,fontsize,|,bold,italic,underline,strikethrough,superscript,subscript,|,copyformat,eraser,clean,|,ul,ol,|,indent,outdent,|,left,center,right,justify,|,link,image,video,table,hr,|,undo,redo,|,find,preview,fullsize,source',
+          toolbarAdaptive: false,
+          height: 300,
           enter: 'p',
           cleanHTML: { fillEmptyParagraph: false }
         });
