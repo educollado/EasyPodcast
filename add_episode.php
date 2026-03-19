@@ -35,6 +35,94 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
   <title><?= $isEditing ? __('Editar Capítulo') : __('Añadir Capítulo') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <link rel="stylesheet" href="/assets/css/jodit.min.css">
+  <style>
+    #recorder-section summary { list-style:none; }
+    #recorder-section summary::-webkit-details-marker { display:none; }
+    #recorder-section > summary {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .4rem .85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      font-size: .88rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .12s, color .12s;
+    }
+    #recorder-section > summary:hover { border-color: var(--accent); color: var(--accent); }
+    .rec-body {
+      margin-top: .6rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+    }
+    .rec-controls { display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; }
+    #btn-record {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1.15rem;
+      border: 0;
+      border-radius: 8px;
+      background: #dc2626;
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .12s;
+    }
+    #btn-record:hover:not(:disabled) { background: #b91c1c; }
+    #btn-record:disabled { background: #f87171; cursor: not-allowed; }
+    .rec-dot {
+      display: inline-block;
+      width: .65rem; height: .65rem;
+      background: #fff;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    @keyframes rec-pulse { 0%,100%{opacity:1} 50%{opacity:.15} }
+    #btn-record.is-recording .rec-dot { animation: rec-pulse .85s ease-in-out infinite; }
+    #btn-stop {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1.15rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .12s, color .12s;
+    }
+    #btn-stop:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+    #btn-stop:disabled { opacity: .38; cursor: not-allowed; }
+    .rec-stop-sq {
+      display: inline-block;
+      width: .65rem; height: .65rem;
+      background: currentColor;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+    #rec-timer {
+      font-family: monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--text);
+      min-width: 5.5rem;
+      transition: color .2s;
+    }
+    #rec-timer.is-running { color: #dc2626; }
+    #rec-status { font-style:italic; font-size:.85rem; color:var(--muted); }
+    #rec-preview { width:100%; margin-top:.75rem; }
+    #btn-use-recording { margin-top:.6rem; }
+  </style>
 </head>
 <body>
   <?php $currentAdminPage = 'add'; require __DIR__ . '/admin_nav.php'; ?>
@@ -116,6 +204,25 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <?= __('O subir audio del capítulo') ?>
             <input id="audio_file" type="file" name="audio_file" accept="audio/*">
           </label>
+          <details id="recorder-section" style="grid-column: 1 / -1; margin-top: .35rem">
+            <summary>🎙 <?= __('Grabar desde micrófono') ?></summary>
+            <div class="rec-body">
+              <div class="rec-controls">
+                <button type="button" id="btn-record">
+                  <span class="rec-dot"></span>
+                  <?= __('Grabar') ?>
+                </button>
+                <button type="button" id="btn-stop" disabled>
+                  <span class="rec-stop-sq"></span>
+                  <?= __('Parar') ?>
+                </button>
+                <span id="rec-timer">00:00:00</span>
+                <span id="rec-status"></span>
+              </div>
+              <audio id="rec-preview" controls style="display:none"></audio>
+              <button type="button" id="btn-use-recording" class="btn" style="display:none">✓ <?= __('Usar esta grabación') ?></button>
+            </div>
+          </details>
           <label>
             <?= __('MIME audio *') ?>
             <input id="audio_mime_type" type="text" name="audio_mime_type" value="<?= esc($form['audio_mime_type']) ?>" placeholder="audio/mpeg">
@@ -178,6 +285,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
       </form>
     </main>
   </div>
+  <script src="/assets/js/lame.min.js"></script>
   <script src="/assets/js/jodit.min.js"></script>
   <script>
     (function () {
@@ -285,6 +393,169 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
       if (!statusSelect || !pubDateRow) { return; }
       statusSelect.addEventListener('change', function () {
         pubDateRow.style.display = statusSelect.value === 'published' ? '' : 'none';
+      });
+    }());
+  </script>
+  <script>
+    // Grabación de audio desde el micrófono con codificación MP3 en cliente (lamejs).
+    (function () {
+      var btnRecord  = document.getElementById('btn-record');
+      var btnStop    = document.getElementById('btn-stop');
+      var btnUse     = document.getElementById('btn-use-recording');
+      var recTimer   = document.getElementById('rec-timer');
+      var recStatus  = document.getElementById('rec-status');
+      var recPreview = document.getElementById('rec-preview');
+      var audioFileInput = document.getElementById('audio_file');
+
+      if (!btnRecord || !btnStop || !audioFileInput) { return; }
+
+      var mediaRecorder  = null;
+      var chunks         = [];
+      var stream         = null;
+      var timerInterval  = null;
+      var startTime      = 0;
+      var mp3Blob        = null;
+      var audioDuration  = 0;
+
+      function padTwo(n) { return String(n).padStart(2, '0'); }
+
+      function formatTime(totalSec) {
+        var h = Math.floor(totalSec / 3600);
+        var m = Math.floor((totalSec % 3600) / 60);
+        var s = totalSec % 60;
+        return padTwo(h) + ':' + padTwo(m) + ':' + padTwo(s);
+      }
+
+      function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(function () {
+          var elapsed = Math.floor((Date.now() - startTime) / 1000);
+          recTimer.textContent = formatTime(elapsed);
+        }, 1000);
+      }
+
+      function stopTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      }
+
+      function float32ToInt16(buffer) {
+        var out = new Int16Array(buffer.length);
+        for (var i = 0; i < buffer.length; i++) {
+          var s = Math.max(-1, Math.min(1, buffer[i]));
+          out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return out;
+      }
+
+      function encodeToMp3() {
+        var blob = new Blob(chunks, { type: 'audio/webm' });
+        blob.arrayBuffer().then(function (buffer) {
+          var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          audioCtx.decodeAudioData(buffer, function (audioBuffer) {
+            audioDuration = audioBuffer.duration;
+            var channels   = audioBuffer.numberOfChannels;
+            var sampleRate = audioBuffer.sampleRate;
+
+            if (audioDuration > 1800) {
+              recStatus.textContent = 'Codificando MP3 (grabación larga, puede tardar)…';
+            }
+
+            var left  = audioBuffer.getChannelData(0);
+            var right = channels > 1 ? audioBuffer.getChannelData(1) : left;
+
+            var encoder   = new lamejs.Mp3Encoder(channels, sampleRate, 128);
+            var mp3Parts  = [];
+            var blockSize = 1152;
+
+            for (var i = 0; i < left.length; i += blockSize) {
+              var leftChunk  = float32ToInt16(left.subarray(i, i + blockSize));
+              var rightChunk = channels > 1 ? float32ToInt16(right.subarray(i, i + blockSize)) : leftChunk;
+              var encoded    = encoder.encodeBuffer(leftChunk, rightChunk);
+              if (encoded.length > 0) { mp3Parts.push(encoded); }
+            }
+
+            var flushed = encoder.flush();
+            if (flushed.length > 0) { mp3Parts.push(flushed); }
+
+            mp3Blob = new Blob(mp3Parts, { type: 'audio/mpeg' });
+
+            var url = URL.createObjectURL(mp3Blob);
+            recPreview.src          = url;
+            recPreview.style.display = 'block';
+            btnUse.style.display    = '';
+            recStatus.textContent   = '';
+            btnRecord.disabled      = false;
+            audioCtx.close();
+          }, function () {
+            recStatus.textContent = 'Error al decodificar el audio grabado.';
+            btnRecord.disabled    = false;
+          });
+        });
+      }
+
+      btnRecord.addEventListener('click', function () {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Tu navegador no soporta grabación de audio.');
+          return;
+        }
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
+          stream         = s;
+          chunks         = [];
+          mp3Blob        = null;
+          audioDuration  = 0;
+          recPreview.style.display = 'none';
+          btnUse.style.display     = 'none';
+          recStatus.textContent    = '';
+
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = function (e) {
+            if (e.data && e.data.size > 0) { chunks.push(e.data); }
+          };
+          mediaRecorder.onstop = encodeToMp3;
+          mediaRecorder.start();
+
+          startTimer();
+          btnRecord.disabled = true;
+          btnRecord.classList.add('is-recording');
+          recTimer.classList.add('is-running');
+          btnStop.disabled   = false;
+        }).catch(function (err) {
+          alert('No se pudo acceder al micrófono: ' + err.message);
+        });
+      });
+
+      btnStop.addEventListener('click', function () {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        if (stream) {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          stream = null;
+        }
+        stopTimer();
+        btnRecord.classList.remove('is-recording');
+        recTimer.classList.remove('is-running');
+        recStatus.textContent = 'Codificando MP3…';
+        btnStop.disabled      = true;
+      });
+
+      btnUse.addEventListener('click', function () {
+        if (!mp3Blob) { return; }
+
+        var now      = new Date();
+        var fileName = 'grabacion-' + now.getFullYear() + '-' +
+          padTwo(now.getMonth() + 1) + '-' + padTwo(now.getDate()) + '.mp3';
+
+        var file = new File([mp3Blob], fileName, { type: 'audio/mpeg' });
+        var dt   = new DataTransfer();
+        dt.items.add(file);
+        audioFileInput.files = dt.files;
+        // Disparar change para que el código existente rellene mime/size/duration
+        audioFileInput.dispatchEvent(new Event('change'));
+
+        // Cerrar el panel de grabación
+        var details = document.getElementById('recorder-section');
+        if (details) { details.removeAttribute('open'); }
       });
     }());
   </script>
