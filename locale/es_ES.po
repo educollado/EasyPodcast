@@ -1839,3 +1839,55 @@ msgstr ""
 
 msgid "Contenido del episodio"
 msgstr ""
+
+# ---------------------------------------------------------------------------
+# media_cleanup.php / lib/media_cleanup_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Limpiar archivos huérfanos"
+msgstr ""
+
+msgid "Archivos en <code>audios/</code> e <code>images/</code> que no están vinculados a ningún episodio."
+msgstr ""
+
+msgid "No se encontraron archivos sin usar."
+msgstr ""
+
+msgid "Audios sin usar"
+msgstr ""
+
+msgid "Imágenes sin usar"
+msgstr ""
+
+msgid "Archivo"
+msgstr ""
+
+msgid "Tamaño"
+msgstr ""
+
+msgid "Seleccionar todo"
+msgstr ""
+
+msgid "Deseleccionar todo"
+msgstr ""
+
+msgid "Borrar seleccionados"
+msgstr ""
+
+msgid "Selecciona al menos un archivo."
+msgstr ""
+
+msgid "¿Borrar los archivos seleccionados? Esta acción no se puede deshacer."
+msgstr ""
+
+msgid "Limpiar"
+msgstr ""
+
+msgid "Borra audios e imágenes que no usa ningún episodio"
+msgstr ""
+
+msgid "%d archivo(s) eliminado(s), %s liberados."
+msgstr ""
+
+msgid "No se eliminó ningún archivo."
+msgstr ""

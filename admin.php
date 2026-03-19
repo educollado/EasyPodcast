@@ -144,6 +144,11 @@ if ($isLoggedIn) {
             <h2><?= __('Importar feed RSS') ?></h2>
             <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
           </a>
+          <a class="admin-card" href="media_cleanup.php">
+            <div class="admin-card-icon">🧹</div>
+            <h2><?= __('Limpiar') ?></h2>
+            <p><?= __('Borra audios e imágenes que no usa ningún episodio') ?></p>
+          </a>
           <a class="admin-card" href="api_tokens.php">
             <div class="admin-card-icon">🔌</div>
             <h2>API Tokens</h2>

@@ -1830,3 +1830,55 @@ msgstr "Contingut HTML de la pàgina"
 
 msgid "Contenido del episodio"
 msgstr "Contingut de l'episodi"
+
+# ---------------------------------------------------------------------------
+# media_cleanup.php / lib/media_cleanup_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Limpiar archivos huérfanos"
+msgstr "Netejar fitxers orfes"
+
+msgid "Archivos en <code>audios/</code> e <code>images/</code> que no están vinculados a ningún episodio."
+msgstr "Fitxers a <code>audios/</code> i <code>images/</code> que no estan vinculats a cap episodi."
+
+msgid "No se encontraron archivos sin usar."
+msgstr "No s'han trobat fitxers sense usar."
+
+msgid "Audios sin usar"
+msgstr "Àudios sense usar"
+
+msgid "Imágenes sin usar"
+msgstr "Imatges sense usar"
+
+msgid "Archivo"
+msgstr "Fitxer"
+
+msgid "Tamaño"
+msgstr "Mida"
+
+msgid "Seleccionar todo"
+msgstr "Seleccionar tot"
+
+msgid "Deseleccionar todo"
+msgstr "Desseleccionar tot"
+
+msgid "Borrar seleccionados"
+msgstr "Esborrar seleccionats"
+
+msgid "Selecciona al menos un archivo."
+msgstr "Selecciona almenys un fitxer."
+
+msgid "¿Borrar los archivos seleccionados? Esta acción no se puede deshacer."
+msgstr "Esborrar els fitxers seleccionats? Aquesta acció no es pot desfer."
+
+msgid "Limpiar"
+msgstr "Netejar"
+
+msgid "Borra audios e imágenes que no usa ningún episodio"
+msgstr "Esborra àudios i imatges que no usa cap episodi"
+
+msgid "%d archivo(s) eliminado(s), %s liberados."
+msgstr "%d fitxer(s) eliminat(s), %s alliberats."
+
+msgid "No se eliminó ningún archivo."
+msgstr "No s'ha eliminat cap fitxer."

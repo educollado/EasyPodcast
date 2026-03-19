@@ -1830,3 +1830,55 @@ msgstr "Contenu HTML de la page"
 
 msgid "Contenido del episodio"
 msgstr "Contenu de l'épisode"
+
+# ---------------------------------------------------------------------------
+# media_cleanup.php / lib/media_cleanup_handler.php
+# ---------------------------------------------------------------------------
+
+msgid "Limpiar archivos huérfanos"
+msgstr "Nettoyer les fichiers orphelins"
+
+msgid "Archivos en <code>audios/</code> e <code>images/</code> que no están vinculados a ningún episodio."
+msgstr "Fichiers dans <code>audios/</code> et <code>images/</code> non liés à aucun épisode."
+
+msgid "No se encontraron archivos sin usar."
+msgstr "Aucun fichier inutilisé trouvé."
+
+msgid "Audios sin usar"
+msgstr "Audios inutilisés"
+
+msgid "Imágenes sin usar"
+msgstr "Images inutilisées"
+
+msgid "Archivo"
+msgstr "Fichier"
+
+msgid "Tamaño"
+msgstr "Taille"
+
+msgid "Seleccionar todo"
+msgstr "Tout sélectionner"
+
+msgid "Deseleccionar todo"
+msgstr "Tout désélectionner"
+
+msgid "Borrar seleccionados"
+msgstr "Supprimer la sélection"
+
+msgid "Selecciona al menos un archivo."
+msgstr "Sélectionnez au moins un fichier."
+
+msgid "¿Borrar los archivos seleccionados? Esta acción no se puede deshacer."
+msgstr "Supprimer les fichiers sélectionnés ? Cette action est irréversible."
+
+msgid "Limpiar"
+msgstr "Nettoyer"
+
+msgid "Borra audios e imágenes que no usa ningún episodio"
+msgstr "Supprime les audios et images non utilisés par aucun épisode"
+
+msgid "%d archivo(s) eliminado(s), %s liberados."
+msgstr "%d fichier(s) supprimé(s), %s libérés."
+
+msgid "No se eliminó ningún archivo."
+msgstr "Aucun fichier n'a été supprimé."
