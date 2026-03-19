@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.6.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.6.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,14 +102,10 @@ docker run -d \
 
 ---
 
-## Novedades 1.6.0
+## Novedades 1.6.1
 
-- API REST con autenticación por token Bearer: endpoints para episodios, podcast, páginas, redes sociales, estadísticas, caché y feed; gestión de tokens desde `api_tokens.php` y documentación en `api_docs.php`.
-- Campo `short_description` en episodios: texto breve para portada y extractos en el feed RSS (migración v10).
-- Editor HTML Jodit en sustitución del editor Markdown en `add_episode.php`: edición visual con compatibilidad completa de HTML.
-- Descripción de episodios almacenada como HTML en columna `content` (renombrada desde `description`, migración v11).
-- Renderizado HTML de la descripción en la página de episodio.
-- Feed RSS: contenido completo del episodio en `content:encoded`.
+- Opción "Recordar este dispositivo durante 7 días" en el paso 2FA: cookie firmada con HMAC-SHA256 usando el `totp_secret`; se invalida automáticamente al desactivar o resetear el 2FA o al hacer logout.
+- Grabador de audio desde micrófono en `add_episode.php`: captura, codificación MP3 en cliente con lamejs y botones con animación de pulso durante la grabación.
 
 ---
 
