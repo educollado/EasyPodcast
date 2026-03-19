@@ -34,6 +34,12 @@ $slug  = trim((string) ($_GET['slug'] ?? ''));
 $data = loadEpisodeData($dbPath, $year, $month, $slug, $isAdminPreview);
 extract($data);  // podcast, episode, error, httpStatus
 
+if ($httpStatus === 404) {
+    ob_end_clean();
+    require __DIR__ . '/404.php';
+    exit;
+}
+
 $isDraft = $episode !== null && ($episode['status'] ?? '') === 'draft';
 
 if ($httpStatus !== 200) {
