@@ -1891,3 +1891,6 @@ msgstr ""
 
 msgid "No se eliminó ningún archivo."
 msgstr ""
+
+msgid "Recordar este dispositivo durante 7 días"
+msgstr ""

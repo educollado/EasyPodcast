@@ -47,6 +47,7 @@ function loadAdminData(string $dbPath): array
         if (isset($_GET['logout'])) {
             $_SESSION = [];
             session_destroy();
+            clearTrustedDeviceCookie();
             header('Location: admin.php');
             exit;
         }
@@ -112,7 +113,13 @@ function loadAdminData(string $dbPath): array
                             }
 
                             if ((int) ($row['totp_enabled'] ?? 0) === 1 && (string) ($row['totp_secret'] ?? '') !== '') {
-                                // 2FA activo: sesión pendiente hasta verificar el código TOTP.
+                                // 2FA activo: comprobar si el dispositivo ya fue marcado como confiado.
+                                if (isTrustedDevice((string) $row['username'], (string) $row['totp_secret'])) {
+                                    $_SESSION['admin_user'] = (string) $row['username'];
+                                    header('Location: admin.php');
+                                    exit;
+                                }
+                                // Sesión pendiente hasta verificar el código TOTP.
                                 session_regenerate_id(true);
                                 $_SESSION['totp_pending_user'] = (string) $row['username'];
                                 header('Location: admin.php');
@@ -188,6 +195,9 @@ function verifyTotpLogin(string $dbPath): string
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
             $_SESSION['admin_user'] = $pendingUser;
+            if (!empty($_POST['remember_device'])) {
+                setTrustedDeviceCookie($pendingUser, $secret);
+            }
             header('Location: admin.php');
             exit;
         }
@@ -201,6 +211,9 @@ function verifyTotpLogin(string $dbPath): string
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
             $_SESSION['admin_user'] = $pendingUser;
+            if (!empty($_POST['remember_device'])) {
+                setTrustedDeviceCookie($pendingUser, $secret);
+            }
             header('Location: admin.php');
             exit;
         }
@@ -209,4 +222,63 @@ function verifyTotpLogin(string $dbPath): string
     } catch (Throwable $e) {
         return __('Error interno al verificar el código.');
     }
+}
+
+/**
+ * Comprueba si la cookie del dispositivo confiado es válida.
+ * La cookie tiene el formato: hex_token|expires_unix|hmac
+ * El HMAC se calcula sobre "hex_token|expires_unix|username" usando totp_secret como clave.
+ * Si el usuario desactiva o resetea el 2FA, el secreto cambia y la cookie queda invalidada.
+ */
+function isTrustedDevice(string $username, string $totpSecret): bool
+{
+    $cookie = (string) ($_COOKIE['easypodcast_trusted'] ?? '');
+    if ($cookie === '') {
+        return false;
+    }
+
+    $parts = explode('|', $cookie, 3);
+    if (count($parts) !== 3) {
+        return false;
+    }
+
+    [$token, $expires, $hmac] = $parts;
+
+    if ((int) $expires <= time()) {
+        return false;
+    }
+
+    $expected = hash_hmac('sha256', "{$token}|{$expires}|{$username}", $totpSecret);
+
+    return hash_equals($expected, $hmac);
+}
+
+/**
+ * Establece la cookie de dispositivo confiado durante 7 días.
+ */
+function setTrustedDeviceCookie(string $username, string $totpSecret): void
+{
+    $token   = bin2hex(random_bytes(16));
+    $expires = time() + 604800; // 7 días
+    $hmac    = hash_hmac('sha256', "{$token}|{$expires}|{$username}", $totpSecret);
+    $value   = "{$token}|{$expires}|{$hmac}";
+
+    setcookie('easypodcast_trusted', $value, [
+        'expires'  => $expires,
+        'path'     => '/',
+        'httponly' => true,
+        'secure'   => true,
+        'samesite' => 'Strict',
+    ]);
+}
+
+/**
+ * Borra la cookie de dispositivo confiado (al hacer logout).
+ */
+function clearTrustedDeviceCookie(): void
+{
+    setcookie('easypodcast_trusted', '', [
+        'expires' => 1,
+        'path'    => '/',
+    ]);
 }

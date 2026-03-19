@@ -211,6 +211,10 @@ if ($isLoggedIn) {
                  autocomplete="one-time-code" autofocus placeholder="000000"
                  style="letter-spacing:.15em; font-size:1.25rem;">
         </label>
+        <label style="display:flex; flex-direction:row; align-items:center; gap:.5rem; font-size:.9rem;">
+          <input type="checkbox" name="remember_device" value="1">
+          <?= __('Recordar este dispositivo durante 7 días') ?>
+        </label>
         <button class="btn" type="submit"><?= __('Verificar') ?></button>
       </form>
       <div style="margin-top:.75rem; text-align:right;">

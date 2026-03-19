@@ -1746,3 +1746,6 @@ msgstr "%d Datei(en) gelöscht, %s freigegeben."
 
 msgid "No se eliminó ningún archivo."
 msgstr "Es wurde keine Datei gelöscht."
+
+msgid "Recordar este dispositivo durante 7 días"
+msgstr "Dieses Gerät 7 Tage lang merken"

@@ -1882,3 +1882,6 @@ msgstr "%d fichier(s) supprimé(s), %s libérés."
 
 msgid "No se eliminó ningún archivo."
 msgstr "Aucun fichier n'a été supprimé."
+
+msgid "Recordar este dispositivo durante 7 días"
+msgstr "Se souvenir de cet appareil pendant 7 jours"

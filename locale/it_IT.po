@@ -1746,3 +1746,6 @@ msgstr "%d file eliminato/i, %s liberati."
 
 msgid "No se eliminó ningún archivo."
 msgstr "Nessun file è stato eliminato."
+
+msgid "Recordar este dispositivo durante 7 días"
+msgstr "Ricorda questo dispositivo per 7 giorni"
