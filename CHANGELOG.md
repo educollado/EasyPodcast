@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.2
+
+- Corrección de migración de base de datos al actualizar desde versiones anteriores a 1.6.0: `migration_v9` ahora crea la tabla `api_tokens` si no existe, evitando el error fatal que dejaba la instalación rota tras la actualización.
+
 ## 1.6.1
 
 - Opción "Recordar este dispositivo durante 7 días" en el paso 2FA: cookie firmada con HMAC-SHA256 usando el `totp_secret`; se invalida automáticamente al desactivar o resetear el 2FA o al hacer logout.

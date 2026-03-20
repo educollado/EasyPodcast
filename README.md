@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.6.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.6.2-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,10 +102,9 @@ docker run -d \
 
 ---
 
-## Novedades 1.6.1
+## Novedades 1.6.2
 
-- Opción "Recordar este dispositivo durante 7 días" en el paso 2FA: cookie firmada con HMAC-SHA256 usando el `totp_secret`; se invalida automáticamente al desactivar o resetear el 2FA o al hacer logout.
-- Grabador de audio desde micrófono en `add_episode.php`: captura, codificación MP3 en cliente con lamejs y botones con animación de pulso durante la grabación.
+- Corrección de migración de base de datos al actualizar desde versiones anteriores a 1.6.0: `migration_v9` ahora crea la tabla `api_tokens` si no existe, evitando el error fatal que dejaba la instalación rota tras la actualización.
 
 ---
 

@@ -113,9 +113,34 @@ function migration_v10(PDO $pdo): void
 /**
  * Migración v9: añade columnas name y last_used_at a api_tokens.
  * name identifica el token con un nombre legible; last_used_at registra el último uso.
+ *
+ * Nota de compatibilidad: en upgrades desde versiones anteriores a 1.6.0 la
+ * numeración de migraciones cambió y migration_v2 (que crea api_tokens) puede
+ * haberse saltado si el PRAGMA user_version ya era >= 2. En ese caso se crea
+ * la tabla completa aquí para no dejar la instalación rota.
  */
 function migration_v9(PDO $pdo): void
 {
+    $tableExists = (bool) $pdo
+        ->query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='api_tokens' LIMIT 1")
+        ->fetchColumn();
+
+    if (!$tableExists) {
+        // Upgrade desde esquema pre-1.6.0: crear tabla con todas las columnas de una vez.
+        $pdo->exec(
+            "CREATE TABLE api_tokens (
+              id INTEGER PRIMARY KEY,
+              token TEXT NOT NULL,
+              user_id INTEGER NOT NULL,
+              expires_at TEXT,
+              created_at TEXT DEFAULT (datetime('now')),
+              name TEXT NOT NULL DEFAULT '',
+              last_used_at TEXT
+            )"
+        );
+        return;
+    }
+
     $existing = array_column(
         $pdo->query('PRAGMA table_info(api_tokens)')->fetchAll(),
         'name'
