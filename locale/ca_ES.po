@@ -682,9 +682,6 @@ msgstr "Desar capítol"
 # Vistas — episodes_management.php
 # ---------------------------------------------------------------------------
 
-msgid "Capítulos Existentes"
-msgstr "Capítols existents"
-
 msgid "Todavía no hay capítulos guardados."
 msgstr "Encara no hi ha capítols desats."
 
@@ -1885,3 +1882,18 @@ msgstr "No s'ha eliminat cap fitxer."
 
 msgid "Recordar este dispositivo durante 7 días"
 msgstr "Recorda aquest dispositiu durant 7 dies"
+
+msgid "Capítulos en Borrador"
+msgstr "Capítols en esborrany"
+
+msgid "Capítulos Publicados"
+msgstr "Capítols publicats"
+
+msgid "Todavía no hay capítulos publicados."
+msgstr "Encara no hi ha capítols publicats."
+
+msgid "Limpiar búsqueda"
+msgstr "Esborrar cerca"
+
+msgid "No se encontraron capítulos para \"%s\"."
+msgstr "No s'han trobat capítols per a "%s"."

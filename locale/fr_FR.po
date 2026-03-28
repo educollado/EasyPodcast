@@ -682,9 +682,6 @@ msgstr "Enregistrer l'épisode"
 # Vistas — episodes_management.php
 # ---------------------------------------------------------------------------
 
-msgid "Capítulos Existentes"
-msgstr "Épisodes existants"
-
 msgid "Todavía no hay capítulos guardados."
 msgstr "Il n'y a pas encore d'épisodes enregistrés."
 
@@ -1885,3 +1882,18 @@ msgstr "Aucun fichier n'a été supprimé."
 
 msgid "Recordar este dispositivo durante 7 días"
 msgstr "Se souvenir de cet appareil pendant 7 jours"
+
+msgid "Capítulos en Borrador"
+msgstr "Épisodes brouillons"
+
+msgid "Capítulos Publicados"
+msgstr "Épisodes publiés"
+
+msgid "Todavía no hay capítulos publicados."
+msgstr "Pas encore d'épisodes publiés."
+
+msgid "Limpiar búsqueda"
+msgstr "Effacer la recherche"
+
+msgid "No se encontraron capítulos para \"%s\"."
+msgstr "Aucun épisode trouvé pour "%s"."

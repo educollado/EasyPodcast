@@ -13,17 +13,20 @@ require_once __DIR__ . '/episode_helpers.php';
  * En POST gestiona el borrado con patrón PRG (redirige y termina).
  * En error de BD responde HTTP 500 y termina la ejecución.
  *
- * @return array{episodesList:array, currentPage:int, totalEpisodes:int, totalPages:int, error:string, notice:string}
+ * @return array{searchQuery:string, searchResults:array, draftEpisodes:array, publishedEpisodes:array, draftCurrentPage:int, draftTotalPages:int, totalDrafts:int, currentPage:int, totalPublished:int, totalPages:int, error:string, notice:string}
  */
-function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
+function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $requestedDraftPage, string $searchQuery = ''): array
 {
-    $error        = '';
-    $notice       = '';
-    $episodesList = [];
-    $perPage      = 50;
-    $currentPage  = $requestedPage;
-    $totalEpisodes = 0;
-    $totalPages   = 1;
+    $error            = '';
+    $notice           = '';
+    $perPage          = 10;
+    $currentPage      = $requestedPage;
+    $totalPublished   = 0;
+    $totalPages       = 1;
+    $draftCurrentPage = $requestedDraftPage;
+    $totalDrafts      = 0;
+    $draftTotalPages  = 1;
+    $searchResults    = [];
 
     // Mensajes de estado tras redirección PRG.
     $statusParam = (string) ($_GET['status'] ?? '');
@@ -134,24 +137,60 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
             }
         }
 
-        // Carga paginada de todos los episodios (publicados y borradores).
-        $totalEpisodes = (int) $pdo->query('SELECT COUNT(*) FROM episodes')->fetchColumn();
-        $totalPages    = max(1, (int) ceil($totalEpisodes / $perPage));
+        // Búsqueda: si hay query, devuelve resultados y omite las secciones paginadas.
+        if ($searchQuery !== '') {
+            $searchStmt = $pdo->prepare(
+                "SELECT id, title, guid, status, pub_date, link
+                 FROM episodes
+                 WHERE title LIKE :q
+                 ORDER BY title ASC
+                 LIMIT 100"
+            );
+            $searchStmt->execute([':q' => '%' . $searchQuery . '%']);
+            $searchResults = $searchStmt->fetchAll();
+
+            return compact('searchQuery', 'searchResults', 'draftEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
+        }
+
+        // Borradores: paginados.
+        $totalDrafts     = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'draft'")->fetchColumn();
+        $draftTotalPages = max(1, (int) ceil($totalDrafts / $perPage));
+        if ($draftCurrentPage > $draftTotalPages) {
+            $draftCurrentPage = $draftTotalPages;
+        }
+        $draftOffset = ($draftCurrentPage - 1) * $perPage;
+
+        $draftStmt = $pdo->prepare(
+            'SELECT id, title, guid, status, pub_date, link
+             FROM episodes
+             WHERE status = \'draft\'
+             ORDER BY id DESC
+             LIMIT :limit OFFSET :offset'
+        );
+        $draftStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $draftStmt->bindValue(':offset', $draftOffset, PDO::PARAM_INT);
+        $draftStmt->execute();
+        $draftEpisodes = $draftStmt->fetchAll();
+
+        // Publicados: paginados.
+        $totalPublished = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")->fetchColumn();
+        $totalPages     = max(1, (int) ceil($totalPublished / $perPage));
         if ($currentPage > $totalPages) {
             $currentPage = $totalPages;
         }
         $offset = ($currentPage - 1) * $perPage;
 
-        $episodesListStmt = $pdo->prepare(
-            'SELECT id, title, guid, status, pub_date
+        $publishedStmt = $pdo->prepare(
+            'SELECT id, title, guid, status, pub_date, link
              FROM episodes
+             WHERE status = \'published\'
              ORDER BY datetime(pub_date) DESC, id DESC
              LIMIT :limit OFFSET :offset'
         );
-        $episodesListStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-        $episodesListStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $episodesListStmt->execute();
-        $episodesList = $episodesListStmt->fetchAll();
+        $publishedStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $publishedStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $publishedStmt->execute();
+        $publishedEpisodes = $publishedStmt->fetchAll();
     } catch (Throwable $e) {
         http_response_code(500);
         header('Content-Type: text/plain; charset=UTF-8');
@@ -159,5 +198,5 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage): array
         exit;
     }
 
-    return compact('episodesList', 'currentPage', 'totalEpisodes', 'totalPages', 'error', 'notice');
+    return compact('searchQuery', 'searchResults', 'draftEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
 }

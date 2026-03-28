@@ -682,9 +682,6 @@ msgstr ""
 # Vistas — episodes_management.php
 # ---------------------------------------------------------------------------
 
-msgid "Capítulos Existentes"
-msgstr ""
-
 msgid "Todavía no hay capítulos guardados."
 msgstr ""
 
@@ -1893,4 +1890,19 @@ msgid "No se eliminó ningún archivo."
 msgstr ""
 
 msgid "Recordar este dispositivo durante 7 días"
+msgstr ""
+
+msgid "Capítulos en Borrador"
+msgstr ""
+
+msgid "Capítulos Publicados"
+msgstr ""
+
+msgid "Todavía no hay capítulos publicados."
+msgstr ""
+
+msgid "Limpiar búsqueda"
+msgstr ""
+
+msgid "No se encontraron capítulos para \"%s\"."
 msgstr ""

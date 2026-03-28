@@ -616,9 +616,6 @@ msgstr "Episode aktualisieren"
 msgid "Guardar capítulo"
 msgstr "Episode speichern"
 
-msgid "Capítulos Existentes"
-msgstr "Vorhandene Episoden"
-
 msgid "Todavía no hay capítulos guardados."
 msgstr "Es sind noch keine Episoden gespeichert."
 
@@ -1749,3 +1746,18 @@ msgstr "Es wurde keine Datei gelöscht."
 
 msgid "Recordar este dispositivo durante 7 días"
 msgstr "Dieses Gerät 7 Tage lang merken"
+
+msgid "Capítulos en Borrador"
+msgstr "Entwurfsepisoden"
+
+msgid "Capítulos Publicados"
+msgstr "Veröffentlichte Episoden"
+
+msgid "Todavía no hay capítulos publicados."
+msgstr "Noch keine veröffentlichten Episoden."
+
+msgid "Limpiar búsqueda"
+msgstr "Suche leeren"
+
+msgid "No se encontraron capítulos para \"%s\"."
+msgstr "Keine Episoden gefunden für "%s"."

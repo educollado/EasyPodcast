@@ -682,9 +682,6 @@ msgstr "Save episode"
 # Vistas — episodes_management.php
 # ---------------------------------------------------------------------------
 
-msgid "Capítulos Existentes"
-msgstr "Existing Episodes"
-
 msgid "Todavía no hay capítulos guardados."
 msgstr "There are no saved episodes yet."
 
@@ -1885,3 +1882,18 @@ msgstr "No files were deleted."
 
 msgid "Recordar este dispositivo durante 7 días"
 msgstr "Remember this device for 7 days"
+
+msgid "Capítulos en Borrador"
+msgstr "Draft Episodes"
+
+msgid "Capítulos Publicados"
+msgstr "Published Episodes"
+
+msgid "Todavía no hay capítulos publicados."
+msgstr "No published episodes yet."
+
+msgid "Limpiar búsqueda"
+msgstr "Clear search"
+
+msgid "No se encontraron capítulos para \"%s\"."
+msgstr "No episodes found for "%s"."
