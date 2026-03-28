@@ -383,6 +383,16 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         generateLinkButton.addEventListener('click', buildEpisodeLink);
       }
 
+      // Auto-generar URL mientras el usuario escribe el título, siempre que el
+      // campo de link esté vacío (si el usuario ya escribió algo, no se sobreescribe).
+      if (titleInput && linkInput) {
+        titleInput.addEventListener('input', function () {
+          if (linkInput.value.trim() === '') {
+            buildEpisodeLink();
+          }
+        });
+      }
+
     })();
   </script>
   <script>
@@ -546,16 +556,56 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         var fileName = 'grabacion-' + now.getFullYear() + '-' +
           padTwo(now.getMonth() + 1) + '-' + padTwo(now.getDate()) + '.mp3';
 
-        var file = new File([mp3Blob], fileName, { type: 'audio/mpeg' });
-        var dt   = new DataTransfer();
-        dt.items.add(file);
-        audioFileInput.files = dt.files;
-        // Disparar change para que el código existente rellene mime/size/duration
-        audioFileInput.dispatchEvent(new Event('change'));
+        var csrfInput = document.querySelector('input[name="csrf_token"]');
+        if (!csrfInput) { return; }
 
-        // Cerrar el panel de grabación
-        var details = document.getElementById('recorder-section');
-        if (details) { details.removeAttribute('open'); }
+        btnUse.disabled    = true;
+        btnUse.textContent = '⏳ Subiendo grabación…';
+        recStatus.textContent = '';
+
+        var fd = new FormData();
+        fd.append('csrf_token', csrfInput.value);
+        fd.append('audio_file', mp3Blob, fileName);
+
+        fetch('upload_audio_ajax.php', { method: 'POST', body: fd })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.error) {
+              recStatus.textContent = 'Error al subir: ' + data.error;
+              btnUse.disabled    = false;
+              btnUse.textContent = '✓ Usar esta grabación';
+              return;
+            }
+
+            // Rellenar los campos del formulario con los valores del fichero ya subido.
+            var audioUrlInput = document.querySelector('input[name="audio_url"]');
+            var mimeInput2    = document.getElementById('audio_mime_type');
+            var sizeInput2    = document.getElementById('audio_size_bytes');
+            var durationInput = document.getElementById('duration');
+
+            if (audioUrlInput) { audioUrlInput.value = data.url; }
+            if (mimeInput2)    { mimeInput2.value    = data.mime || 'audio/mpeg'; }
+            if (sizeInput2)    { sizeInput2.value    = String(data.size || ''); }
+            if (durationInput && audioDuration > 0) {
+              var totalSec = Math.floor(audioDuration);
+              var dh = Math.floor(totalSec / 3600);
+              var dm = Math.floor((totalSec % 3600) / 60);
+              var ds = totalSec % 60;
+              durationInput.value = padTwo(dh) + ':' + padTwo(dm) + ':' + padTwo(ds);
+            }
+
+            btnUse.textContent = '✓ Grabación subida';
+            recStatus.textContent = 'Audio guardado correctamente.';
+
+            // Cerrar el panel de grabación
+            var details = document.getElementById('recorder-section');
+            if (details) { details.removeAttribute('open'); }
+          })
+          .catch(function () {
+            recStatus.textContent = 'Error de red al subir el audio. Inténtalo de nuevo.';
+            btnUse.disabled    = false;
+            btnUse.textContent = '✓ Usar esta grabación';
+          });
       });
     }());
   </script>

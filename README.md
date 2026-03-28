@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.6.2-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.6.3-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,9 +102,10 @@ docker run -d \
 
 ---
 
-## Novedades 1.6.2
+## Novedades 1.6.3
 
-- Corrección de migración de base de datos al actualizar desde versiones anteriores a 1.6.0: `migration_v9` ahora crea la tabla `api_tokens` si no existe, evitando el error fatal que dejaba la instalación rota tras la actualización.
+- La grabación de audio desde el micrófono en `add_episode.php` ya no se pierde si hay un error de validación al enviar el formulario: al pulsar "Usar esta grabación" el audio se sube inmediatamente al servidor vía AJAX y los campos de audio se rellenan automáticamente.
+- La URL del capítulo se genera automáticamente mientras el usuario escribe el título.
 
 ---
 
