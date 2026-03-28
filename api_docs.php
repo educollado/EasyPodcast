@@ -21,12 +21,13 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_SERVER['HTTP_HOST'] ?? 'tu-dominio.com'), '/');
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc(__('Documentación API REST')) ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
   <style>
     .api-section { margin: 2rem 0; border-top: 1px solid var(--border, #e0e0e0); padding-top: 1.5rem; }
     .endpoint-block { background: var(--bg-alt, #f8f8f8); border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0; }

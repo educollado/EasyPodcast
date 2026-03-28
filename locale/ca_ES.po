@@ -1925,3 +1925,13 @@ msgstr "Avís: l'actualització manual de metadades només està disponible per 
 msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
 msgstr "Variants redimensionades de les imatges del podcast i episodis, emmagatzemades a %s. Regenerar-les esborra les actuals i les torna a crear en les mides 80, 144 i 220 px."
 
+# ---------------------------------------------------------------------------
+# admin.php — selector de tema visual
+# ---------------------------------------------------------------------------
+
+msgid "Apariencia"
+msgstr "Aparença"
+
+msgid "Tema por defecto"
+msgstr "Tema per defecte"
+

@@ -77,6 +77,26 @@ function runMigrations(string $dbPath): void
     if ($version < 11) {
         migration_v11($pdo);
         $pdo->exec('PRAGMA user_version = 11');
+        $version = 11;
+    }
+
+    if ($version < 12) {
+        migration_v12($pdo);
+        $pdo->exec('PRAGMA user_version = 12');
+    }
+}
+
+/**
+ * Migración v12: añade columna admin_theme a podcast para el tema visual del sitio.
+ */
+function migration_v12(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('admin_theme', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN admin_theme TEXT NOT NULL DEFAULT 'default'");
     }
 }
 

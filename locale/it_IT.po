@@ -1789,3 +1789,13 @@ msgstr "Avviso: l'aggiornamento manuale dei metadati è disponibile solo per i f
 msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
 msgstr "Varianti ridimensionate delle immagini del podcast e degli episodi, memorizzate in %s. Rigenerarle elimina quelle attuali e le ricrea nelle dimensioni 80, 144 e 220 px."
 
+# ---------------------------------------------------------------------------
+# admin.php — selettore tema visivo
+# ---------------------------------------------------------------------------
+
+msgid "Apariencia"
+msgstr "Aspetto"
+
+msgid "Tema por defecto"
+msgstr "Tema predefinito"
+

@@ -1925,3 +1925,13 @@ msgstr "Avertissement : la mise à jour manuelle des métadonnées n'est disponi
 msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
 msgstr "Variantes redimensionnées des images du podcast et des épisodes, stockées dans %s. Les régénérer supprime les actuelles et les recrée aux tailles 80, 144 et 220 px."
 
+# ---------------------------------------------------------------------------
+# admin.php — sélecteur de thème visuel
+# ---------------------------------------------------------------------------
+
+msgid "Apariencia"
+msgstr "Apparence"
+
+msgid "Tema por defecto"
+msgstr "Thème par défaut"
+

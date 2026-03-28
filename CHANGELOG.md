@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0
+
+- Selector de temas visuales: el administrador elige el tema desde el panel (tarjeta **Apariencia**) y se aplica a toda la web —panel y páginas públicas— sin JavaScript ni parpadeo (server-side via `data-theme` en `<html>`).
+- 9 temas incluidos: Amber Parchment (por defecto), Ember Noir, Arctic Tide, Crimson Dusk, Frost Haven, Matrix Core, Monokai, Pink Essence y Silver Void.
+- El tema se almacena en `podcast.admin_theme` (migración v12).
+- Eliminado el toggle de modo oscuro por localStorage; la apariencia del sitio la controla el administrador.
+
 ## 1.6.4
 
 - Corrección del actualizador interno en Docker: `.htaccess` queda excluido del tarball de release (`export-ignore`) para que el updater nunca lo sobreescriba; se eliminaba el redirect HTTPS desactivado por el entrypoint, causando un bucle de redirección infinito tras cada actualización.

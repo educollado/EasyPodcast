@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS podcast (
   home_items_per_page INTEGER NOT NULL DEFAULT 20,
   write_audio_metadata INTEGER NOT NULL DEFAULT 0,
   cache_enabled INTEGER NOT NULL DEFAULT 0,
-  app_language TEXT NOT NULL DEFAULT 'es_ES'
+  app_language TEXT NOT NULL DEFAULT 'es_ES',
+  admin_theme TEXT NOT NULL DEFAULT 'default'
 );
 
 -- episodes: una fila por episodio.
@@ -93,7 +94,7 @@ CREATE TABLE IF NOT EXISTS api_tokens (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
-PRAGMA user_version = 11;
+PRAGMA user_version = 12;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.6.4-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.7.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,16 +102,11 @@ docker run -d \
 
 ---
 
-## Novedades 1.6.4
+## Novedades 1.7.0
 
-- Corrección del actualizador interno en Docker: `.htaccess` excluido del tarball de release para que el updater nunca elimine el redirect HTTPS desactivado por el entrypoint.
-- `performUpdate` crea el fichero de señal `docker/.disable_https_redirect` al actualizar si `DISABLE_HTTPS_REDIRECT=true`.
-
-## Novedades 1.6.3
-
-- La grabación de audio desde el micrófono en `add_episode.php` ya no se pierde si hay un error de validación al enviar el formulario: al pulsar "Usar esta grabación" el audio se sube inmediatamente al servidor vía AJAX y los campos de audio se rellenan automáticamente.
-- La URL del capítulo se genera automáticamente mientras el usuario escribe el título.
-- Tras aplicar una actualización desde `update.php`, se muestran las novedades de la versión recién instalada.
+- Selector de temas visuales: el administrador elige el tema desde el panel (tarjeta **Apariencia**) y se aplica a toda la web —panel y páginas públicas— sin JavaScript ni parpadeo.
+- 9 temas incluidos: Amber Parchment, Ember Noir, Arctic Tide, Crimson Dusk, Frost Haven, Matrix Core, Monokai, Pink Essence y Silver Void.
+- Eliminado el toggle de modo oscuro por localStorage.
 
 ---
 
@@ -193,19 +188,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 12) {
-    migration_v12($pdo);
-    $pdo->exec('PRAGMA user_version = 12');
+if ($version < 13) {
+    migration_v13($pdo);
+    $pdo->exec('PRAGMA user_version = 13');
 }
 
 // 2. Función de migración
-function migration_v12(PDO $pdo): void
+function migration_v13(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 13`.
 
 #### Historial de versiones
 
@@ -222,6 +217,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
 | 9 | Añade `name` y `last_used_at` a `api_tokens` |
 | 10 | Añade `short_description` a `episodes` |
 | 11 | Renombra columna `description` → `content` en `episodes` |
+| 12 | Añade `admin_theme` a `podcast` (tema visual del sitio) |
 
 ---
 
@@ -247,9 +243,11 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
 │   ├── public_episode_helpers.php   # Rutas y slugs públicos
 │   ├── cache_service.php            # Caché (lectura/escritura/limpieza)
 │   ├── csrf.php                     # Protección CSRF
+│   ├── admin_theme.php              # Temas visuales (carga y selección)
 │   ├── import_feed_handler.php      # Parser de feed externo
 │   └── backup_handler.php           # Exportación/importación de datos
 ├── assets/css/                      # Hojas de estilo por página
+│   ├── themes.css                   # Temas visuales (aplicados via data-theme)
 ├── audios/                          # Audios subidos
 ├── images/                          # Imágenes subidas
 └── cache/                           # Caché pública en runtime
@@ -257,17 +255,33 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 10`.
 
 ---
 
-## Personalización / temas
+## Temas visuales
 
-Modifica o reemplaza los archivos de `assets/css/`:
+El administrador elige el tema desde el panel (`admin.php` → tarjeta **Apariencia**). El slug se guarda en `podcast.admin_theme` y se aplica server-side mediante el atributo `data-theme` en `<html>`, sin JavaScript ni parpadeo.
 
-| CSS | Página |
+| Slug | Nombre | Estilo |
+|---|---|---|
+| `default` | Amber Parchment | Claro cálido, acento terracota |
+| `oscuro` | Ember Noir | Oscuro cálido, acento naranja |
+| `agua` | Arctic Tide | Claro azul |
+| `fuego` | Crimson Dusk | Claro naranja |
+| `invierno` | Frost Haven | Claro azul frío |
+| `hacker` | Matrix Core | Oscuro, texto verde terminal |
+| `monokai` | Monokai | Oscuro, paleta Monokai |
+| `pink-essence` | Pink Essence | Claro rosa, acento magenta |
+| `monocromo` | Silver Void | Escala de grises pura |
+
+Los temas se definen en `assets/css/themes.css` mediante variables CSS con selectores `html[data-theme="slug"]`. Para añadir uno nuevo basta con agregar la entrada en `lib/admin_theme.php` (`ADMIN_THEMES`) y el bloque de variables en `themes.css`.
+
+### Archivos CSS
+
+| CSS | Uso |
 |---|---|
 | `common.css` | Estilos base públicos |
 | `index.css` | Portada |
 | `episode.css` | Página de episodio |
-| `header.css` | Cabecera compartida + toggle de tema |
-| `dark.css` | Modo oscuro (cargado el último) |
+| `header.css` | Cabecera compartida |
+| `themes.css` | Temas visuales (cargado el último en todas las páginas) |
 | `admin-common.css` | Estilos base del panel admin |
 | `admin.css` | Login/panel |
 | `podcast_management.css` | Gestión del podcast |

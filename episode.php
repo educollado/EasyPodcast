@@ -61,7 +61,7 @@ if ($error !== '') {
 }
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -83,12 +83,10 @@ if ($error !== '') {
   <link rel="apple-touch-icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <?php // Aplica el tema guardado ANTES de cargar el CSS para evitar parpadeo (FOUC). ?>
-  <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/episode.css">
-  <link rel="stylesheet" href="/assets/css/dark.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
   <script type="application/ld+json"><?= $episodeJsonLd ?></script>
 </head>
 <body>

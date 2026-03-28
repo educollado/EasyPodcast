@@ -21,6 +21,21 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 $isLoggedIn    = isset($_SESSION['admin_user']);
 $isTotpPending = !$isLoggedIn && isset($_SESSION['totp_pending_user']);
 
+// Cambio de tema visual desde el panel.
+if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'set_theme') {
+    csrf_verify();
+    $theme = trim((string) ($_POST['app_theme'] ?? 'default'));
+    if (isset(ADMIN_THEMES[$theme])) {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare('UPDATE podcast SET admin_theme = :theme');
+        $stmt->execute([':theme' => $theme]);
+        clearWebCache();
+    }
+    header('Location: admin.php');
+    exit;
+}
+
 // Cambio de idioma rápido desde el panel.
 if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'set_language') {
     csrf_verify();
@@ -47,12 +62,19 @@ extract($data); // adminCount, isSetupMode, error, notice
 
 // Idioma activo para mostrar el selector.
 $currentAppLanguage = 'es_ES';
+// Tema activo para mostrar el selector.
+$currentAdminTheme  = 'default';
 if ($isLoggedIn) {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
-        $col = $pdo->query('SELECT app_language FROM podcast LIMIT 1')->fetchColumn();
-        if (is_string($col) && $col !== '') {
-            $currentAppLanguage = $col;
+        $row = $pdo->query('SELECT app_language, admin_theme FROM podcast LIMIT 1')->fetch();
+        if (is_array($row)) {
+            if (is_string($row['app_language'] ?? null) && $row['app_language'] !== '') {
+                $currentAppLanguage = $row['app_language'];
+            }
+            if (is_string($row['admin_theme'] ?? null) && isset(ADMIN_THEMES[$row['admin_theme']])) {
+                $currentAdminTheme = $row['admin_theme'];
+            }
         }
     } catch (Throwable $e) {
         // Usa el fallback.
@@ -60,12 +82,13 @@ if ($isLoggedIn) {
 }
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Administración') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body class="<?= $isLoggedIn ? '' : 'login-page' ?>">
   <?php if ($isLoggedIn): ?>
@@ -184,6 +207,18 @@ if ($isLoggedIn) {
                 $label = $localeLabels[$lc] ?? $lc;
               ?>
                 <option value="<?= esc($lc) ?>" <?= $currentAppLanguage === $lc ? 'selected' : '' ?>><?= esc($label) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </form>
+
+          <form method="post" action="admin.php" class="admin-card" style="cursor:default; text-align:left;">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+            <input type="hidden" name="action" value="set_theme">
+            <div class="admin-card-icon">🎨</div>
+            <h2><?= __('Apariencia') ?></h2>
+            <select name="app_theme" onchange="this.form.submit()" style="width:100%; margin-top:.3rem;">
+              <?php foreach (ADMIN_THEMES as $slug => $themeLabel): ?>
+                <option value="<?= esc($slug) ?>" <?= $currentAdminTheme === $slug ? 'selected' : '' ?>><?= esc($themeLabel) ?></option>
               <?php endforeach; ?>
             </select>
           </form>

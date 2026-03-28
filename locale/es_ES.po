@@ -1934,3 +1934,13 @@ msgstr ""
 msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
 msgstr ""
 
+# ---------------------------------------------------------------------------
+# admin.php — selector de tema visual
+# ---------------------------------------------------------------------------
+
+msgid "Apariencia"
+msgstr ""
+
+msgid "Tema por defecto"
+msgstr ""
+

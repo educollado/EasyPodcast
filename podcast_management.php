@@ -24,12 +24,13 @@ $data = loadPodcastManagementData($dbPath);
 extract($data);  // form, error, notice
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Gestión Podcast') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
   <?php $currentAdminPage = 'podcast'; require __DIR__ . '/admin_nav.php'; ?>

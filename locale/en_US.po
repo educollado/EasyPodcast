@@ -1925,3 +1925,13 @@ msgstr "Warning: manual metadata update is only available for MP3 files."
 msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
 msgstr "Resized variants of podcast and episode images, stored in %s. Regenerating them deletes the current ones and recreates them at sizes 80, 144 and 220 px."
 
+# ---------------------------------------------------------------------------
+# admin.php — visual theme selector
+# ---------------------------------------------------------------------------
+
+msgid "Apariencia"
+msgstr "Appearance"
+
+msgid "Tema por defecto"
+msgstr "Default theme"
+

@@ -22,12 +22,13 @@ $data = loadApiTokensData($dbPath);
 extract($data); // tokens, error, notice, newToken
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc(__('Tokens API')) ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
   <?php $currentAdminPage = 'api_tokens'; require __DIR__ . '/admin_nav.php'; ?>

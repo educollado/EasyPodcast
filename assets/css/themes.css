@@ -1,0 +1,489 @@
+/* ==========================================================
+   Temas visuales — cargado último en todas las páginas.
+   Especificidad html[data-theme="X"] (0,1,1) supera :root (0,1,0).
+   El tema 'default' usa las variables definidas en :root (common.css/admin-common.css).
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   oscuro — modo oscuro original (el que antes era dark.css)
+   ---------------------------------------------------------- */
+html[data-theme="oscuro"] {
+  --bg:          #161310;
+  --card:        #201c18;
+  --text:        #f4ede3;
+  --muted:       #9e9088;
+  --accent:      #e06c35;
+  --accent-dark: #c85a25;
+  --border:      #2e2a25;
+  --danger:      #e05555;
+  --ok:          #5aad6a;
+  --shadow:      0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.28);
+}
+
+html[data-theme="oscuro"] body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(224,108,53,.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(224,108,53,.04) 0%, transparent 50%);
+}
+
+html[data-theme="oscuro"] input,
+html[data-theme="oscuro"] textarea,
+html[data-theme="oscuro"] select {
+  background: #2a2420;
+  color: #f4ede3;
+  border-color: #2e2a25;
+}
+
+html[data-theme="oscuro"] input::placeholder,
+html[data-theme="oscuro"] textarea::placeholder {
+  color: #9e9088;
+}
+
+html[data-theme="oscuro"] .error {
+  background: #2a1510;
+  color: #e07060;
+  border-color: #5a2a20;
+}
+
+html[data-theme="oscuro"] .notice {
+  background: #1a2010;
+  color: #a0c070;
+  border-color: #3a4820;
+}
+
+html[data-theme="oscuro"] .search-form input[type="search"] {
+  background: #2a2420;
+  color: var(--text);
+}
+
+html[data-theme="oscuro"] .page-link {
+  background: var(--card);
+}
+
+html[data-theme="oscuro"] .page-link:hover {
+  background: #2a2420;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="oscuro"] .episode .meta,
+html[data-theme="oscuro"] .detail .meta {
+  background: rgba(224,108,53,.09);
+}
+
+html[data-theme="oscuro"] .download {
+  background: rgba(224,108,53,.08);
+  border-color: rgba(224,108,53,.2);
+}
+
+html[data-theme="oscuro"] .episode:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="oscuro"] .pagination {
+  background: var(--card);
+}
+
+html[data-theme="oscuro"] .admin-card {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* ----------------------------------------------------------
+   agua
+   ---------------------------------------------------------- */
+html[data-theme="agua"] {
+  --bg:          #e8f4fc;
+  --card:        #f2faff;
+  --text:        #0d2a3e;
+  --muted:       #4a7a9b;
+  --accent:      #0077b6;
+  --accent-dark: #005a8a;
+  --border:      #b0d4e8;
+  --danger:      #c0392b;
+  --ok:          #1a7a3a;
+  --shadow:      0 1px 3px rgba(0,100,180,0.08), 0 6px 20px rgba(0,100,180,0.07);
+}
+
+html[data-theme="agua"] body {
+  background-color: var(--bg);
+}
+
+html[data-theme="agua"] .search-form input[type="search"] {
+  background: #d0eaf6;
+  color: var(--text);
+}
+
+html[data-theme="agua"] .page-link:hover {
+  background: #cce8f6;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ----------------------------------------------------------
+   fuego
+   ---------------------------------------------------------- */
+html[data-theme="fuego"] {
+  --bg:          #fef5ee;
+  --card:        #fffaf6;
+  --text:        #2a0d00;
+  --muted:       #8a5a40;
+  --accent:      #c0390c;
+  --accent-dark: #9a2d08;
+  --border:      #f0c0a0;
+  --danger:      #c0392b;
+  --ok:          #1a7a3a;
+  --shadow:      0 1px 3px rgba(180,60,0,0.08), 0 6px 20px rgba(180,60,0,0.07);
+}
+
+html[data-theme="fuego"] body {
+  background-color: var(--bg);
+}
+
+html[data-theme="fuego"] .search-form input[type="search"] {
+  background: #fce8d8;
+  color: var(--text);
+}
+
+html[data-theme="fuego"] .page-link:hover {
+  background: #fce0c8;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ----------------------------------------------------------
+   invierno
+   ---------------------------------------------------------- */
+html[data-theme="invierno"] {
+  --bg:          #e6eef8;
+  --card:        #f0f6ff;
+  --text:        #101e30;
+  --muted:       #4a5e78;
+  --accent:      #2855a0;
+  --accent-dark: #1c3e7a;
+  --border:      #a8c0e0;
+  --danger:      #c0392b;
+  --ok:          #1a7a3a;
+  --shadow:      0 1px 3px rgba(20,60,140,0.08), 0 6px 20px rgba(20,60,140,0.07);
+}
+
+html[data-theme="invierno"] body {
+  background-color: var(--bg);
+}
+
+html[data-theme="invierno"] .search-form input[type="search"] {
+  background: #d8e6f6;
+  color: var(--text);
+}
+
+html[data-theme="invierno"] .page-link:hover {
+  background: #c8dcf4;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ----------------------------------------------------------
+   hacker — fondo muy oscuro con acento verde terminal
+   Los colores hardcodeados de admin-common.css e index.css
+   requieren overrides específicos de selectores.
+   ---------------------------------------------------------- */
+html[data-theme="hacker"] {
+  --bg:          #080d08;
+  --card:        #0c140c;
+  --text:        #00e640;
+  --muted:       #3a7a3a;
+  --accent:      #00cc33;
+  --accent-dark: #009922;
+  --border:      #1a3a1a;
+  --danger:      #ff4400;
+  --ok:          #00cc33;
+  --shadow:      0 1px 3px rgba(0,200,50,0.12), 0 6px 20px rgba(0,200,50,0.10);
+}
+
+html[data-theme="hacker"] body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+html[data-theme="hacker"] input,
+html[data-theme="hacker"] textarea,
+html[data-theme="hacker"] select {
+  background: #0a140a;
+  color: #00e640;
+  border-color: #1a3a1a;
+}
+
+html[data-theme="hacker"] input::placeholder,
+html[data-theme="hacker"] textarea::placeholder {
+  color: #3a7a3a;
+}
+
+html[data-theme="hacker"] .error {
+  background: #1a0400;
+  color: #ff4400;
+  border-color: #660000;
+}
+
+html[data-theme="hacker"] .notice {
+  background: #001a08;
+  color: #00e640;
+  border-color: #004010;
+}
+
+html[data-theme="hacker"] .btn,
+html[data-theme="hacker"] button[type="submit"],
+html[data-theme="hacker"] button.btn {
+  background: #009922;
+  color: #000;
+  border-color: #00cc33;
+}
+
+html[data-theme="hacker"] .btn:hover,
+html[data-theme="hacker"] button[type="submit"]:hover,
+html[data-theme="hacker"] button.btn:hover {
+  background: #00cc33;
+}
+
+/* Botones peligrosos: backup/import/delete */
+html[data-theme="hacker"] .btn-danger,
+html[data-theme="hacker"] .btn.delete {
+  background: #660000;
+  color: #ff4400;
+  border-color: #880000;
+}
+
+html[data-theme="hacker"] .btn-danger:hover,
+html[data-theme="hacker"] .btn.delete:hover {
+  background: #880000;
+}
+
+html[data-theme="hacker"] .search-form input[type="search"] {
+  background: #0a140a;
+  color: #00e640;
+}
+
+html[data-theme="hacker"] .page-link:hover {
+  background: #1a3a1a;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="hacker"] .admin-card {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="hacker"] .admin-card:hover {
+  border-color: var(--accent);
+}
+
+/* ----------------------------------------------------------
+   monokai — paleta del editor Monokai (fondo oscuro cálido)
+   Los colores hardcodeados requieren overrides como en hacker.
+   ---------------------------------------------------------- */
+html[data-theme="monokai"] {
+  --bg:          #272822;
+  --card:        #3e3d32;
+  --text:        #f8f8f2;
+  --muted:       #75715e;
+  --accent:      #a6e22e;
+  --accent-dark: #7fb922;
+  --border:      #49483e;
+  --danger:      #f92672;
+  --ok:          #a6e22e;
+  --shadow:      0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.28);
+}
+
+html[data-theme="monokai"] body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+html[data-theme="monokai"] input,
+html[data-theme="monokai"] textarea,
+html[data-theme="monokai"] select {
+  background: #1e1f1c;
+  color: #f8f8f2;
+  border-color: #49483e;
+}
+
+html[data-theme="monokai"] input::placeholder,
+html[data-theme="monokai"] textarea::placeholder {
+  color: #75715e;
+}
+
+html[data-theme="monokai"] .error {
+  background: #3a1020;
+  color: #f92672;
+  border-color: #7a1840;
+}
+
+html[data-theme="monokai"] .notice {
+  background: #1e2a10;
+  color: #a6e22e;
+  border-color: #3e5a18;
+}
+
+html[data-theme="monokai"] .btn,
+html[data-theme="monokai"] button[type="submit"],
+html[data-theme="monokai"] button.btn {
+  background: #7fb922;
+  color: #272822;
+  border-color: #a6e22e;
+}
+
+html[data-theme="monokai"] .btn:hover,
+html[data-theme="monokai"] button[type="submit"]:hover,
+html[data-theme="monokai"] button.btn:hover {
+  background: #a6e22e;
+}
+
+html[data-theme="monokai"] .btn-danger,
+html[data-theme="monokai"] .btn.delete {
+  background: #7a0030;
+  color: #f92672;
+  border-color: #aa0040;
+}
+
+html[data-theme="monokai"] .btn-danger:hover,
+html[data-theme="monokai"] .btn.delete:hover {
+  background: #aa0040;
+}
+
+html[data-theme="monokai"] .search-form input[type="search"] {
+  background: #1e1f1c;
+  color: #f8f8f2;
+}
+
+html[data-theme="monokai"] .page-link {
+  background: var(--card);
+}
+
+html[data-theme="monokai"] .page-link:hover {
+  background: #49483e;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="monokai"] .episode .meta,
+html[data-theme="monokai"] .detail .meta {
+  background: rgba(166,226,46,.09);
+}
+
+html[data-theme="monokai"] .download {
+  background: rgba(166,226,46,.08);
+  border-color: rgba(166,226,46,.2);
+}
+
+html[data-theme="monokai"] .episode:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="monokai"] .pagination {
+  background: var(--card);
+}
+
+html[data-theme="monokai"] .admin-card {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="monokai"] .admin-card:hover {
+  border-color: var(--accent);
+}
+
+/* ----------------------------------------------------------
+   pink-essence — rosa suave con acentos magenta
+   ---------------------------------------------------------- */
+html[data-theme="pink-essence"] {
+  --bg:          #fdf0f5;
+  --card:        #fff5f8;
+  --text:        #2a0f1e;
+  --muted:       #9a5070;
+  --accent:      #c8236e;
+  --accent-dark: #9e1856;
+  --border:      #f0b8d4;
+  --danger:      #c0392b;
+  --ok:          #1a7a3a;
+  --shadow:      0 1px 3px rgba(200,35,110,0.08), 0 6px 20px rgba(200,35,110,0.07);
+}
+
+html[data-theme="pink-essence"] body {
+  background-color: var(--bg);
+}
+
+html[data-theme="pink-essence"] .search-form input[type="search"] {
+  background: #fce0ec;
+  color: var(--text);
+}
+
+html[data-theme="pink-essence"] .page-link:hover {
+  background: #fad8e8;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="pink-essence"] .episode .meta,
+html[data-theme="pink-essence"] .detail .meta {
+  background: rgba(200,35,110,.07);
+}
+
+html[data-theme="pink-essence"] .download {
+  background: rgba(200,35,110,.06);
+  border-color: rgba(200,35,110,.18);
+}
+
+/* ----------------------------------------------------------
+   monocromo — escala de grises pura
+   ---------------------------------------------------------- */
+html[data-theme="monocromo"] {
+  --bg:          #f2f2f2;
+  --card:        #ffffff;
+  --text:        #000000;
+  --muted:       #666666;
+  --accent:      #222222;
+  --accent-dark: #000000;
+  --border:      #cccccc;
+  --danger:      #333333;
+  --ok:          #444444;
+  --shadow:      0 1px 3px rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.07);
+}
+
+html[data-theme="monocromo"] body {
+  background-color: var(--bg);
+}
+
+html[data-theme="monocromo"] .btn,
+html[data-theme="monocromo"] button[type="submit"],
+html[data-theme="monocromo"] button.btn {
+  background: #222222;
+  color: #ffffff;
+}
+
+html[data-theme="monocromo"] .btn:hover,
+html[data-theme="monocromo"] button[type="submit"]:hover,
+html[data-theme="monocromo"] button.btn:hover {
+  background: #000000;
+}
+
+html[data-theme="monocromo"] .btn-danger,
+html[data-theme="monocromo"] .btn.delete {
+  background: #555555;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+html[data-theme="monocromo"] .search-form input[type="search"] {
+  background: #e8e8e8;
+  color: #000000;
+}
+
+html[data-theme="monocromo"] .page-link:hover {
+  background: #e0e0e0;
+  border-color: #222222;
+  color: #000000;
+}

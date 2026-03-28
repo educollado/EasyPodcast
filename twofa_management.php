@@ -22,12 +22,13 @@ $data = loadTwofaData($dbPath);
 extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, notice
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Autenticación en dos pasos (2FA)') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
   <style>
     .twofa-status { display:flex; align-items:center; gap:.6rem; margin-bottom:1.2rem; }
     .twofa-badge  { display:inline-block; padding:.2rem .7rem; border-radius:999px; font-size:.8rem; font-weight:600; }

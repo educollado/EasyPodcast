@@ -9,6 +9,7 @@ require_once __DIR__ . '/lib/view_helpers.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 loadAppLocale($dbPath);
+loadAdminTheme($dbPath);
 $podcast = null;
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -25,7 +26,7 @@ $podcastImage       = (string) ($podcast['image_url']   ?? '');
 $searchQuery        = '';
 
 ?><!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,10 +34,9 @@ $searchQuery        = '';
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
-  <script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/header.css">
-  <link rel="stylesheet" href="/assets/css/dark.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
   <div class="container">

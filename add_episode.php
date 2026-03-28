@@ -28,12 +28,13 @@ $data = loadAddEpisodeData($dbPath);
 extract($data);  // form, isEditing, editingEpisodeId, error, notice
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEditing ? __('Editar Capítulo') : __('Añadir Capítulo') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
   <link rel="stylesheet" href="/assets/css/jodit.min.css">
   <style>
     #recorder-section summary { list-style:none; }

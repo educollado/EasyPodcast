@@ -28,12 +28,13 @@ $data = loadBackupsData($dbPath, __DIR__);
 extract($data); // error, notice, imagesExport, audiosExport
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Copias de seguridad') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
   <?php $currentAdminPage = 'backups'; require __DIR__ . '/admin_nav.php'; ?>
