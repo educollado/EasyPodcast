@@ -5,6 +5,10 @@ ErrorDocument 403 /403.php
 <IfModule mod_rewrite.c>
 RewriteEngine on
 # Fuerza HTTPS en todas las rutas.
+# En Docker con DISABLE_HTTPS_REDIRECT=true el entrypoint crea este fichero
+# de señal; mientras exista, el redirect no se activa aunque el updater
+# restaure .htaccess con los ficheros de la nueva versión.
+RewriteCond %{DOCUMENT_ROOT}/docker/.disable_https_redirect !-f
 RewriteCond %{HTTPS} !=on [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 # Bloquea acceso directo a archivos/rutas sensibles.

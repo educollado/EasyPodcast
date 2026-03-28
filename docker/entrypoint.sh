@@ -16,10 +16,10 @@ if [ ! -f "$DB_PATH" ]; then
 fi
 
 # Opción para desactivar la redirección HTTPS en desarrollo local.
-# Úsala cuando no haya reverse proxy ni certificado TLS.
+# Crea un fichero de señal que .htaccess comprueba antes de redirigir,
+# en lugar de modificar .htaccess (que el updater podría sobreescribir).
 if [ "${DISABLE_HTTPS_REDIRECT:-false}" = "true" ]; then
-    sed -i '/RewriteCond %{HTTPS} !=on \[NC\]/d' /var/www/html/.htaccess
-    sed -i '/RewriteRule \^ https:\/\//d' /var/www/html/.htaccess
+    touch /var/www/html/docker/.disable_https_redirect
     echo "[entrypoint] Redirección HTTPS desactivada."
 fi
 
