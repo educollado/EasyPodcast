@@ -123,7 +123,7 @@ function handleAudioUpload(array $fileData, array $form, array $podcastDefaults,
     if ($audioExtension === 'mp3' && ($podcastDefaults['write_audio_metadata'] ?? 0) === 1) {
         $id3Metadata = buildEpisodeId3Metadata($form, $podcastDefaults);
         if (!writeMp3Id3Tags($targetPath, $id3Metadata)) {
-            $id3Notice = 'Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido.';
+            $id3Notice = __('Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido.');
         }
     }
 
@@ -158,7 +158,7 @@ function handleId3Rewrite(string $audioUrl, array $form, array $podcastDefaults)
     // no se reescribe aunque el usuario haya pulsado el botón manual.
     if (($podcastDefaults['write_audio_metadata'] ?? 0) !== 1) {
         return [
-            'id3Notice' => 'Aviso: activa primero "Escribir metadatos ID3 en MP3 al subir episodio" en Gestión Podcast.',
+            'id3Notice' => __('Aviso: activa primero "Escribir metadatos ID3 en MP3 al subir episodio" en Gestión Podcast.'),
             'sizeBytes' => null,
         ];
     }
@@ -168,7 +168,7 @@ function handleId3Rewrite(string $audioUrl, array $form, array $podcastDefaults)
     $existingAudioPath = resolveLocalAudioPathFromUrl($audioUrl);
     if ($existingAudioPath === null) {
         return [
-            'id3Notice' => 'Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos.',
+            'id3Notice' => __('Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos.'),
             'sizeBytes' => null,
         ];
     }
@@ -176,7 +176,7 @@ function handleId3Rewrite(string $audioUrl, array $form, array $podcastDefaults)
     // La reescritura manual solo tiene sentido para MP3; otros formatos no usan ID3.
     if (strtolower((string) pathinfo($existingAudioPath, PATHINFO_EXTENSION)) !== 'mp3') {
         return [
-            'id3Notice' => 'Aviso: la actualización manual de metadatos solo está disponible para MP3.',
+            'id3Notice' => __('Aviso: la actualización manual de metadatos solo está disponible para MP3.'),
             'sizeBytes' => null,
         ];
     }
@@ -198,8 +198,8 @@ function handleId3Rewrite(string $audioUrl, array $form, array $podcastDefaults)
     $hashAfter = hash_file('sha1', $existingAudioPath) ?: null;
 
     $id3Notice = ($hashBefore !== null && $hashAfter !== null && $hashBefore === $hashAfter)
-        ? 'Metadatos ID3 revisados: el MP3 ya tenía esos valores.'
-        : 'Metadatos ID3 actualizados en el MP3 existente.';
+        ? __('Metadatos ID3 revisados: el MP3 ya tenía esos valores.')
+        : __('Metadatos ID3 actualizados en el MP3 existente.');
 
     return ['id3Notice' => $id3Notice, 'sizeBytes' => $sizeBytes];
 }

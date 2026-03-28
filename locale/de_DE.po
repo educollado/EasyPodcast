@@ -1767,3 +1767,25 @@ msgstr "Episode erfolgreich gelöscht."
 
 msgid "No se encontró el capítulo que se intentó borrar."
 msgstr "Die zu löschende Episode wurde nicht gefunden."
+
+msgid "Metadatos ID3 revisados: el MP3 ya tenía esos valores."
+msgstr "ID3-Metadaten überprüft: die MP3 hatte diese Werte bereits."
+
+msgid "Metadatos ID3 actualizados en el MP3 existente."
+msgstr "ID3-Metadaten in der vorhandenen MP3 aktualisiert."
+
+msgid "Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido."
+msgstr "Warnung: ID3-Tags konnten nicht in die hochgeladene MP3 geschrieben werden."
+
+msgid "Aviso: activa primero \"Escribir metadatos ID3 en MP3 al subir episodio\" en Gestión Podcast."
+msgstr "Warnung: Aktiviere zuerst „ID3-Metadaten beim Hochladen in MP3 schreiben\" in der Podcast-Verwaltung."
+
+msgid "Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos."
+msgstr "Warnung: Keine lokale MP3 in /audios/ gefunden, um Metadaten zu aktualisieren."
+
+msgid "Aviso: la actualización manual de metadatos solo está disponible para MP3."
+msgstr "Warnung: Die manuelle Metadaten-Aktualisierung ist nur für MP3-Dateien verfügbar."
+
+msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
+msgstr "Verkleinerte Varianten der Podcast- und Episodenbilder, gespeichert in %s. Bei der Neugenerierung werden die aktuellen gelöscht und in den Größen 80, 144 und 220 px neu erstellt."
+

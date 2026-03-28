@@ -71,8 +71,7 @@ extract($data); // cacheEnabled, error, notice
 
       <section style="margin-top:1.5rem;">
         <h2><?= __('Imágenes generadas') ?></h2>
-        <p>Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en <code>/images/generated/</code>.
-           Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px.</p>
+        <p><?= __('Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px.', '<code>/images/generated/</code>') ?></p>
 
         <form method="post" action="cache_management.php">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">

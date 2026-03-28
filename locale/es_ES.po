@@ -1912,3 +1912,25 @@ msgstr ""
 
 msgid "No se encontró el capítulo que se intentó borrar."
 msgstr ""
+
+msgid "Metadatos ID3 revisados: el MP3 ya tenía esos valores."
+msgstr ""
+
+msgid "Metadatos ID3 actualizados en el MP3 existente."
+msgstr ""
+
+msgid "Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido."
+msgstr ""
+
+msgid "Aviso: activa primero \"Escribir metadatos ID3 en MP3 al subir episodio\" en Gestión Podcast."
+msgstr ""
+
+msgid "Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos."
+msgstr ""
+
+msgid "Aviso: la actualización manual de metadatos solo está disponible para MP3."
+msgstr ""
+
+msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
+msgstr ""
+

@@ -1903,3 +1903,25 @@ msgstr "Capítol eliminat correctament."
 
 msgid "No se encontró el capítulo que se intentó borrar."
 msgstr "No s'ha trobat el capítol que s'intentava eliminar."
+
+msgid "Metadatos ID3 revisados: el MP3 ya tenía esos valores."
+msgstr "Metadades ID3 revisades: el MP3 ja tenia aquests valors."
+
+msgid "Metadatos ID3 actualizados en el MP3 existente."
+msgstr "Metadades ID3 actualitzades al MP3 existent."
+
+msgid "Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido."
+msgstr "Avís: no s'han pogut escriure etiquetes ID3 al MP3 pujat."
+
+msgid "Aviso: activa primero \"Escribir metadatos ID3 en MP3 al subir episodio\" en Gestión Podcast."
+msgstr "Avís: activa primer \"Escriure metadades ID3 a l'MP3 en pujar l'episodi\" a Gestió del Podcast."
+
+msgid "Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos."
+msgstr "Avís: no s'ha trobat cap MP3 local a /audios/ per actualitzar metadades."
+
+msgid "Aviso: la actualización manual de metadatos solo está disponible para MP3."
+msgstr "Avís: l'actualització manual de metadades només està disponible per a MP3."
+
+msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
+msgstr "Variants redimensionades de les imatges del podcast i episodis, emmagatzemades a %s. Regenerar-les esborra les actuals i les torna a crear en les mides 80, 144 i 220 px."
+
