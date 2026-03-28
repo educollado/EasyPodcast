@@ -31,15 +31,15 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
     // Mensajes de estado tras redirección PRG.
     $statusParam = (string) ($_GET['status'] ?? '');
     if ($statusParam === 'deleted') {
-        $notice = 'Capítulo borrado correctamente.';
+        $notice = __('Capítulo borrado correctamente.');
     } elseif ($statusParam === 'delete_error') {
-        $error = 'No se encontró el capítulo que se intentó borrar.';
+        $error = __('No se encontró el capítulo que se intentó borrar.');
     } elseif ($statusParam === 'feed_warning') {
-        $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar feed.xml/sitemap.xml)';
+        $notice = __('Capítulo borrado correctamente.') . ' ' . __('(Aviso: no se pudo regenerar feed.xml/sitemap.xml)');
     } elseif ($statusParam === 'cache_warning') {
-        $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo limpiar completamente la caché)';
+        $notice = __('Capítulo borrado correctamente.') . ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
     } elseif ($statusParam === 'feed_cache_warning') {
-        $notice = 'Capítulo borrado correctamente. (Aviso: no se pudo regenerar feed.xml/sitemap.xml ni limpiar completamente la caché)';
+        $notice = __('Capítulo borrado correctamente.') . ' ' . __('(Aviso: no se pudo regenerar feed.xml/sitemap.xml)') . ' ' . __('(Aviso: no se pudo limpiar completamente la caché)');
     }
 
     try {

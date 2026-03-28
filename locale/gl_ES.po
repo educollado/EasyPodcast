@@ -1897,3 +1897,9 @@ msgstr "Limpar busca"
 
 msgid "No se encontraron capítulos para \"%s\"."
 msgstr "Non se atoparon capítulos para "%s"."
+
+msgid "Capítulo borrado correctamente."
+msgstr "Capítulo eliminado correctamente."
+
+msgid "No se encontró el capítulo que se intentó borrar."
+msgstr "Non se atopou o capítulo que se intentou borrar."

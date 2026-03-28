@@ -1897,3 +1897,9 @@ msgstr "Esborrar cerca"
 
 msgid "No se encontraron capítulos para \"%s\"."
 msgstr "No s'han trobat capítols per a "%s"."
+
+msgid "Capítulo borrado correctamente."
+msgstr "Capítol eliminat correctament."
+
+msgid "No se encontró el capítulo que se intentó borrar."
+msgstr "No s'ha trobat el capítol que s'intentava eliminar."

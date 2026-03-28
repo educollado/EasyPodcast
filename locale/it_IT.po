@@ -1761,3 +1761,9 @@ msgstr "Cancella ricerca"
 
 msgid "No se encontraron capítulos para \"%s\"."
 msgstr "Nessun episodio trovato per "%s"."
+
+msgid "Capítulo borrado correctamente."
+msgstr "Episodio eliminato con successo."
+
+msgid "No se encontró el capítulo que se intentó borrar."
+msgstr "L'episodio da eliminare non è stato trovato."

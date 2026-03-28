@@ -1906,3 +1906,9 @@ msgstr ""
 
 msgid "No se encontraron capítulos para \"%s\"."
 msgstr ""
+
+msgid "Capítulo borrado correctamente."
+msgstr ""
+
+msgid "No se encontró el capítulo que se intentó borrar."
+msgstr ""
