@@ -237,11 +237,38 @@ function performUpdate(string $tarUrl, string $appDir): array
 }
 
 /**
+ * Extrae las notas de la versión indicada desde CHANGELOG.md.
+ *
+ * Devuelve el bloque de texto entre el encabezado "## X.Y.Z" de esa versión
+ * y el siguiente encabezado "## ", o cadena vacía si no se encuentra.
+ *
+ * @param string $version Versión a buscar (p.ej. "1.6.3")
+ * @param string $appDir  Directorio raíz de la aplicación
+ */
+function getChangelogForVersion(string $version, string $appDir): string
+{
+    $path = $appDir . '/CHANGELOG.md';
+    if (!is_file($path)) {
+        return '';
+    }
+    $content = file_get_contents($path);
+    if ($content === false || $content === '') {
+        return '';
+    }
+    $pattern = '/^## ' . preg_quote($version, '/') . '[^\n]*\n(.*?)(?=^## |\Z)/ms';
+    if (preg_match($pattern, $content, $m)) {
+        return trim((string) $m[1]);
+    }
+    return '';
+}
+
+/**
  * Carga todos los datos necesarios para la vista de actualización.
  *
- * @return array{currentVersion: string, latestVersion: string, tarUrl: string, updateAvailable: bool, fetchError: string}
+ * @param string $appDir Directorio raíz de la aplicación (para leer CHANGELOG.md)
+ * @return array{currentVersion: string, latestVersion: string, tarUrl: string, updateAvailable: bool, fetchError: string, changelogNotes: string}
  */
-function loadUpdateData(): array
+function loadUpdateData(string $appDir = ''): array
 {
     $currentVersion = APP_VERSION;
     $info           = getLatestReleaseInfo();
@@ -254,5 +281,8 @@ function loadUpdateData(): array
         $updateAvailable = version_compare($latestVersion, $currentVersion, '>');
     }
 
-    return compact('currentVersion', 'latestVersion', 'tarUrl', 'updateAvailable', 'fetchError');
+    // Notas del CHANGELOG para la versión instalada actualmente (útil tras actualizar).
+    $changelogNotes = $appDir !== '' ? getChangelogForVersion($currentVersion, $appDir) : '';
+
+    return compact('currentVersion', 'latestVersion', 'tarUrl', 'updateAvailable', 'fetchError', 'changelogNotes');
 }

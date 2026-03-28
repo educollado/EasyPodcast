@@ -4,6 +4,7 @@
 
 - La grabación de audio desde el micrófono en `add_episode.php` ya no se pierde si hay un error de validación al enviar el formulario: al pulsar "Usar esta grabación" el audio se sube inmediatamente al servidor vía AJAX (`upload_audio_ajax.php`) y los campos `audio_url`, MIME, tamaño y duración se rellenan automáticamente.
 - La URL del capítulo se genera automáticamente mientras el usuario escribe el título, sin necesidad de pulsar el botón "Generar URL".
+- Tras aplicar una actualización desde `update.php`, se muestran las novedades de la versión recién instalada leídas desde `CHANGELOG.md`.
 
 ## 1.6.2
 

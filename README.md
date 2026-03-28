@@ -106,6 +106,7 @@ docker run -d \
 
 - La grabación de audio desde el micrófono en `add_episode.php` ya no se pierde si hay un error de validación al enviar el formulario: al pulsar "Usar esta grabación" el audio se sube inmediatamente al servidor vía AJAX y los campos de audio se rellenan automáticamente.
 - La URL del capítulo se genera automáticamente mientras el usuario escribe el título.
+- Tras aplicar una actualización desde `update.php`, se muestran las novedades de la versión recién instalada.
 
 ---
 

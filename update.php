@@ -32,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 }
 
 $updated = isset($_GET['updated']);
-$data    = loadUpdateData();
-extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetchError
+$data    = loadUpdateData(__DIR__);
+extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetchError, changelogNotes
 
 $confirmUpdateMessage = __('¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican.', $latestVersion);
 $updatingLabel        = __('Actualizando…');
@@ -55,6 +55,19 @@ $updatingLabel        = __('Actualizando…');
 
       <?php if ($updated): ?>
         <div class="notice"><?= __('EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado.') ?></div>
+        <?php if ($changelogNotes !== ''): ?>
+          <div style="margin-top: .85rem; padding: 1rem 1.15rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card);">
+            <strong style="font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);"><?= __('Novedades v%s', $currentVersion) ?></strong>
+            <ul style="margin: .6rem 0 0; padding-left: 1.4rem; font-size: .91rem; line-height: 1.65;">
+              <?php foreach (explode("\n", $changelogNotes) as $line): ?>
+                <?php $line = trim($line); if ($line === '') { continue; } ?>
+                <?php $line = ltrim($line, '- '); ?>
+                <?php $line = preg_replace('/`([^`]+)`/', '<code>$1</code>', htmlspecialchars($line, ENT_QUOTES, 'UTF-8')); ?>
+                <li><?= $line ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endif; ?>
       <?php endif; ?>
 
       <?php if ($updateResult !== null && !$updateResult['ok']): ?>
