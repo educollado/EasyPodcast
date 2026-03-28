@@ -228,6 +228,13 @@ function performUpdate(string $tarUrl, string $appDir): array
     _epDeleteRecursive($tempDir);
     @unlink($tmpFile);
 
+    // Si DISABLE_HTTPS_REDIRECT está activo (Docker sin terminación TLS directa),
+    // asegurarse de que el fichero de señal existe para que .htaccess no active
+    // el redirect HTTPS después de que el updater haya copiado los nuevos ficheros.
+    if (getenv('DISABLE_HTTPS_REDIRECT') === 'true') {
+        @touch($appDir . '/docker/.disable_https_redirect');
+    }
+
     // Limpiar caché de opcodes para que el nuevo código entre en vigor de inmediato
     if (function_exists('opcache_reset')) {
         opcache_reset();

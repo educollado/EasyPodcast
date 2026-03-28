@@ -1,0 +1,5 @@
+# Excluye .htaccess del tarball/zipball que GitHub genera para cada release.
+# El updater interno descarga ese tarball; si .htaccess no está incluido,
+# nunca sobreescribe la versión que el servidor ya tiene (y que el entrypoint
+# de Docker puede haber modificado para desactivar el redirect HTTPS).
+.htaccess export-ignore

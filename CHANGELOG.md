@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.4
+
+- Corrección del actualizador interno en Docker: `.htaccess` queda excluido del tarball de release (`export-ignore`) para que el updater nunca lo sobreescriba; se eliminaba el redirect HTTPS desactivado por el entrypoint, causando un bucle de redirección infinito tras cada actualización.
+- `performUpdate` crea el fichero de señal `docker/.disable_https_redirect` al actualizar si `DISABLE_HTTPS_REDIRECT=true`, garantizando que el redirect no se activa aunque el contenedor no se haya reiniciado.
+
 ## 1.6.3
 
 - La grabación de audio desde el micrófono en `add_episode.php` ya no se pierde si hay un error de validación al enviar el formulario: al pulsar "Usar esta grabación" el audio se sube inmediatamente al servidor vía AJAX (`upload_audio_ajax.php`) y los campos `audio_url`, MIME, tamaño y duración se rellenan automáticamente.

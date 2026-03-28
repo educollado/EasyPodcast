@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.6.3-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.6.4-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -101,6 +101,11 @@ docker run -d \
 ```
 
 ---
+
+## Novedades 1.6.4
+
+- Corrección del actualizador interno en Docker: `.htaccess` excluido del tarball de release para que el updater nunca elimine el redirect HTTPS desactivado por el entrypoint.
+- `performUpdate` crea el fichero de señal `docker/.disable_https_redirect` al actualizar si `DISABLE_HTTPS_REDIRECT=true`.
 
 ## Novedades 1.6.3
 
