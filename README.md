@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.7.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.7.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,11 +102,9 @@ docker run -d \
 
 ---
 
-## Novedades 1.7.0
+## Novedades 1.7.1
 
-- Selector de temas visuales: el administrador elige el tema desde el panel (tarjeta **Apariencia**) y se aplica a toda la web —panel y páginas públicas— sin JavaScript ni parpadeo.
-- 9 temas incluidos: Amber Parchment, Ember Noir, Arctic Tide, Crimson Dusk, Frost Haven, Matrix Core, Monokai, Pink Essence y Silver Void.
-- Eliminado el toggle de modo oscuro por localStorage.
+- Corrección de error 500 al cambiar tema en instalaciones donde `user_version` ya era 12 pero faltaba la columna `admin_theme`.
 
 ---
 
@@ -188,19 +186,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 13) {
-    migration_v13($pdo);
-    $pdo->exec('PRAGMA user_version = 13');
+if ($version < 14) {
+    migration_v14($pdo);
+    $pdo->exec('PRAGMA user_version = 14');
 }
 
 // 2. Función de migración
-function migration_v13(PDO $pdo): void
+function migration_v14(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 13`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 14`.
 
 #### Historial de versiones
 
@@ -218,6 +216,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 13`.
 | 10 | Añade `short_description` a `episodes` |
 | 11 | Renombra columna `description` → `content` en `episodes` |
 | 12 | Añade `admin_theme` a `podcast` (tema visual del sitio) |
+| 13 | Reparación idempotente: añade `admin_theme` si falta pese a `user_version = 12` |
 
 ---
 

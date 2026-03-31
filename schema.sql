@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS api_tokens (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
-PRAGMA user_version = 12;
+PRAGMA user_version = 13;
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (

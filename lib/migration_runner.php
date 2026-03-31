@@ -83,6 +83,29 @@ function runMigrations(string $dbPath): void
     if ($version < 12) {
         migration_v12($pdo);
         $pdo->exec('PRAGMA user_version = 12');
+        $version = 12;
+    }
+
+    if ($version < 13) {
+        migration_v13($pdo);
+        $pdo->exec('PRAGMA user_version = 13');
+    }
+}
+
+/**
+ * Migración v13: garantía de reparación — añade admin_theme si no existe.
+ * Algunos usuarios que actualizaron desde versiones con user_version = 12 en
+ * schema.sql (antes de que se añadiera la columna) se quedaron sin ella.
+ * Esta migración es un no-op para instalaciones correctas.
+ */
+function migration_v13(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('admin_theme', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN admin_theme TEXT NOT NULL DEFAULT 'default'");
     }
 }
 

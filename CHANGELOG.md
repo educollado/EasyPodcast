@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.1
+
+- Corrección de migración de base de datos al actualizar desde versiones donde `user_version` ya era 12 pero la columna `podcast.admin_theme` no existía: la nueva migración v13 detecta y añade la columna de forma idempotente, resolviendo el error 500 al cambiar de tema.
+
 ## 1.7.0
 
 - Selector de temas visuales: el administrador elige el tema desde el panel (tarjeta **Apariencia**) y se aplica a toda la web —panel y páginas públicas— sin JavaScript ni parpadeo (server-side via `data-theme` en `<html>`).
