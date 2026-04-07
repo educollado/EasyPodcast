@@ -455,11 +455,12 @@ function runFeedImport(
     }
 
     // HTML inicial
-    echo '<!doctype html><html lang="' . esc(i18n_html_lang()) . '"><head>' . "\n";
+    echo '<!doctype html><html lang="' . esc(i18n_html_lang()) . '" data-theme="' . esc(adminTheme()) . '"><head>' . "\n";
     echo '<meta charset="utf-8">' . "\n";
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n";
     echo '<title>' . esc(__('Importando feed RSS')) . '</title>' . "\n";
     echo '<link rel="stylesheet" href="/assets/css/admin-common.css">' . "\n";
+    echo '<link rel="stylesheet" href="/assets/css/themes.css">' . "\n";
     echo '</head><body>' . "\n";
 
     // Barra de navegación
