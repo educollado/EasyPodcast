@@ -80,7 +80,7 @@ test('validateEpisodeForm: explicit "1" → válido', function () {
 test('validateEpisodeForm: status inválido → error', function () {
     $form = makeValidForm();
     $form['status'] = 'pending';
-    assert_eq('El estado debe ser draft o published.', validateEpisodeForm($form));
+    assert_eq('El estado debe ser draft, published o scheduled.', validateEpisodeForm($form));
 });
 
 test('validateEpisodeForm: status "published" → válido', function () {

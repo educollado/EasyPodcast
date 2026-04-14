@@ -1799,3 +1799,22 @@ msgstr "Aspetto"
 msgid "Tema por defecto"
 msgstr "Tema predefinito"
 
+
+# ---------------------------------------------------------------------------
+# lib/scheduler.php + stato scheduled
+# ---------------------------------------------------------------------------
+
+msgid "El estado debe ser draft, published o scheduled."
+msgstr "Lo stato deve essere draft, published o scheduled."
+
+msgid "La fecha de publicación es obligatoria para programar un capítulo."
+msgstr "La data di pubblicazione è obbligatoria per programmare un episodio."
+
+msgid "Capítulos Programados"
+msgstr "Episodi Programmati"
+
+msgid "Publicación programada"
+msgstr "Pubblicazione programmata"
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
+msgstr "Se lasciato vuoto, viene assegnata la data corrente alla pubblicazione. Obbligatoria per gli episodi programmati."

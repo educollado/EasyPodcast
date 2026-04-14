@@ -154,16 +154,17 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <?= __('Estado') ?>
             <select id="status_select" name="status">
               <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
+              <option value="scheduled" <?= $form['status'] === 'scheduled' ? 'selected' : '' ?>>scheduled</option>
               <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
             </select>
           </label>
         </div>
 
-        <div id="pub_date_row" class="grid two" style="margin-top:.8rem;<?= $form['status'] !== 'published' ? 'display:none;' : '' ?>">
+        <div id="pub_date_row" class="grid two" style="margin-top:.8rem;<?= ($form['status'] !== 'published' && $form['status'] !== 'scheduled') ? 'display:none;' : '' ?>">
           <label>
             <?= __('Fecha de publicación') ?>
             <input id="pub_date" type="datetime-local" name="pub_date" value="<?= esc($form['pub_date']) ?>">
-            <span class="help"><?= __('Si se deja vacío se asigna la fecha actual al publicar.') ?></span>
+            <span class="help"><?= __('Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria.') ?></span>
           </label>
         </div>
 
@@ -403,7 +404,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
       var pubDateRow   = document.getElementById('pub_date_row');
       if (!statusSelect || !pubDateRow) { return; }
       statusSelect.addEventListener('change', function () {
-        pubDateRow.style.display = statusSelect.value === 'published' ? '' : 'none';
+        pubDateRow.style.display = (statusSelect.value === 'published' || statusSelect.value === 'scheduled') ? '' : 'none';
       });
     }());
   </script>

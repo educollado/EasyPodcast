@@ -24,8 +24,12 @@ function validateEpisodeForm(array $form): ?string
         return __('El valor de explícito no es válido.');
     }
 
-    if (!in_array($form['status'] ?? '', ['draft', 'published'], true)) {
-        return __('El estado debe ser draft o published.');
+    if (!in_array($form['status'] ?? '', ['draft', 'published', 'scheduled'], true)) {
+        return __('El estado debe ser draft, published o scheduled.');
+    }
+
+    if ($form['status'] === 'scheduled' && trim($form['pub_date'] ?? '') === '') {
+        return __('La fecha de publicación es obligatoria para programar un capítulo.');
     }
 
     // episode_type es opcional; si se informa debe ser uno de los valores del estándar iTunes.
@@ -176,12 +180,17 @@ function saveEpisode(
         // El usuario eligió una fecha explícita: se usa tal cual (ya validada arriba).
     } elseif ($form['status'] === 'published') {
         $form['pub_date'] = $hasPreviousPubDate ? $existingPubDate : date('Y-m-d\\TH:i');
+    } elseif ($form['status'] === 'scheduled') {
+        // Fecha obligatoria (validada en validateEpisodeForm). Si llega vacía, conservar la existente.
+        $form['pub_date'] = $hasPreviousPubDate ? $existingPubDate : '';
     } else {
-        $form['pub_date'] = '';
+        $form['pub_date'] = ''; // draft
     }
 
-    // Primera publicación: episodio publicado sin fecha previa → regenerar link con fecha real.
-    $isFirstPublish = $form['status'] === 'published' && !$hasPreviousPubDate;
+    // Primera publicación/programación sin fecha previa → generar el link con la fecha programada.
+    // Para 'scheduled' el link se genera aquí para que, cuando el scheduler publique por SQL,
+    // el episodio ya tenga su URL canónica en BD.
+    $isFirstPublish = ($form['status'] === 'published' || $form['status'] === 'scheduled') && !$hasPreviousPubDate;
 
     // 1. Validación básica del formulario.
     // Se hace antes de cualquier operación de I/O para fallar rápido.

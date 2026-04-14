@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0
+
+- Publicación programada de episodios (sin cron): nuevo estado `scheduled` que permite fijar una fecha y hora futura de publicación. El episodio se publica automáticamente en la siguiente petición web cuando la fecha llega, sin necesidad de configurar cron en el servidor.
+- El link canónico del episodio se genera al programarlo, garantizando que la URL no cambia al publicarse.
+- Nueva sección "Capítulos Programados" en `episodes_management.php`, ordenada por fecha de publicación ascendente.
+
 ## 1.7.1
 
 - Corrección de migración de base de datos al actualizar desde versiones donde `user_version` ya era 12 pero la columna `podcast.admin_theme` no existía: la nueva migración v13 detecta y añade la columna de forma idempotente, resolviendo el error 500 al cambiar de tema.

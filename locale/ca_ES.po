@@ -1935,3 +1935,22 @@ msgstr "Aparença"
 msgid "Tema por defecto"
 msgstr "Tema per defecte"
 
+
+# ---------------------------------------------------------------------------
+# lib/scheduler.php + estat scheduled
+# ---------------------------------------------------------------------------
+
+msgid "El estado debe ser draft, published o scheduled."
+msgstr "L'estat ha de ser draft, published o scheduled."
+
+msgid "La fecha de publicación es obligatoria para programar un capítulo."
+msgstr "La data de publicació és obligatòria per programar un capítol."
+
+msgid "Capítulos Programados"
+msgstr "Capítols Programats"
+
+msgid "Publicación programada"
+msgstr "Publicació programada"
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
+msgstr "Si es deixa buit, s'assigna la data actual en publicar. Per als capítols programats és obligatòria."

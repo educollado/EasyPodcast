@@ -28,7 +28,7 @@ $requestedDraftPage = max(1, (int) ($_GET['draft_page'] ?? 1));
 $searchQuery        = trim((string) ($_GET['q'] ?? ''));
 
 $data = loadEpisodesManagementData($dbPath, $requestedPage, $requestedDraftPage, $searchQuery);
-extract($data);  // searchQuery, searchResults, draftEpisodes, publishedEpisodes, draftCurrentPage, draftTotalPages, totalDrafts, currentPage, totalPublished, totalPages, error, notice
+extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes, publishedEpisodes, draftCurrentPage, draftTotalPages, totalDrafts, totalScheduled, currentPage, totalPublished, totalPages, error, notice
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -108,7 +108,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, publishedEpisodes
           </div>
         <?php endif; ?>
 
-      <?php elseif (!$totalDrafts && !$totalPublished): ?>
+      <?php elseif (!$totalDrafts && !$totalScheduled && !$totalPublished): ?>
         <p class="muted"><?= __('Todavía no hay capítulos guardados.') ?></p>
       <?php else: ?>
 
@@ -168,6 +168,49 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, publishedEpisodes
               <?php endif; ?>
             </div>
           </nav>
+        <?php endif; ?>
+
+        <?php if ($totalScheduled > 0): ?>
+          <h1><?= __('Capítulos Programados') ?></h1>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><?= __('ID') ?></th>
+                  <th><?= __('Título') ?></th>
+                  <th><?= __('Publicación programada') ?></th>
+                  <th><?= __('Acción') ?></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($scheduledEpisodes as $episode): ?>
+                  <tr>
+                    <td><?= (int) ($episode['id'] ?? 0) ?></td>
+                    <td>
+                      <?= esc((string) ($episode['title'] ?? '')) ?><br>
+                      <small class="muted guid"><?= esc((string) ($episode['guid'] ?? '')) ?></small>
+                    </td>
+                    <td><?= esc((string) ($episode['pub_date'] ?? '')) ?></td>
+                    <td>
+                      <div class="row-actions">
+                        <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
+                        <?php $scheduledPreviewHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? '')); ?>
+                        <?php if ($scheduledPreviewHref !== ''): ?>
+                          <a class="edit-link" href="<?= esc($scheduledPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
+                        <?php endif; ?>
+                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
+                          <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+                          <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
+                          <input type="hidden" name="return_page" value="<?= $currentPage ?>">
+                          <button class="delete-text" type="submit"><?= __('Borrar') ?></button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
 
         <h1><?= __('Capítulos Publicados') ?></h1>

@@ -1935,3 +1935,22 @@ msgstr "Appearance"
 msgid "Tema por defecto"
 msgstr "Default theme"
 
+
+# ---------------------------------------------------------------------------
+# lib/scheduler.php + estado scheduled
+# ---------------------------------------------------------------------------
+
+msgid "El estado debe ser draft, published o scheduled."
+msgstr "The status must be draft, published, or scheduled."
+
+msgid "La fecha de publicación es obligatoria para programar un capítulo."
+msgstr "The publication date is required to schedule an episode."
+
+msgid "Capítulos Programados"
+msgstr "Scheduled Episodes"
+
+msgid "Publicación programada"
+msgstr "Scheduled publication"
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
+msgstr "If left empty, the current date is assigned when publishing. Required for scheduled episodes."

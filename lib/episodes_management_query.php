@@ -13,7 +13,7 @@ require_once __DIR__ . '/episode_helpers.php';
  * En POST gestiona el borrado con patrón PRG (redirige y termina).
  * En error de BD responde HTTP 500 y termina la ejecución.
  *
- * @return array{searchQuery:string, searchResults:array, draftEpisodes:array, publishedEpisodes:array, draftCurrentPage:int, draftTotalPages:int, totalDrafts:int, currentPage:int, totalPublished:int, totalPages:int, error:string, notice:string}
+ * @return array{searchQuery:string, searchResults:array, draftEpisodes:array, scheduledEpisodes:array, publishedEpisodes:array, draftCurrentPage:int, draftTotalPages:int, totalDrafts:int, totalScheduled:int, currentPage:int, totalPublished:int, totalPages:int, error:string, notice:string}
  */
 function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $requestedDraftPage, string $searchQuery = ''): array
 {
@@ -26,6 +26,8 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
     $draftCurrentPage = $requestedDraftPage;
     $totalDrafts      = 0;
     $draftTotalPages  = 1;
+    $scheduledEpisodes = [];
+    $totalScheduled    = 0;
     $searchResults    = [];
 
     // Mensajes de estado tras redirección PRG.
@@ -149,7 +151,7 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
             $searchStmt->execute([':q' => '%' . $searchQuery . '%']);
             $searchResults = $searchStmt->fetchAll();
 
-            return compact('searchQuery', 'searchResults', 'draftEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
+            return compact('searchQuery', 'searchResults', 'draftEpisodes', 'scheduledEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'totalScheduled', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
         }
 
         // Borradores: paginados.
@@ -171,6 +173,16 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         $draftStmt->bindValue(':offset', $draftOffset, PDO::PARAM_INT);
         $draftStmt->execute();
         $draftEpisodes = $draftStmt->fetchAll();
+
+        // Programados: sin paginación (suelen ser pocos), ordenados por fecha de publicación ascendente.
+        $totalScheduled    = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'scheduled'")->fetchColumn();
+        $scheduledStmt     = $pdo->query(
+            "SELECT id, title, guid, status, pub_date, link
+             FROM episodes
+             WHERE status = 'scheduled'
+             ORDER BY datetime(pub_date) ASC"
+        );
+        $scheduledEpisodes = $scheduledStmt->fetchAll();
 
         // Publicados: paginados.
         $totalPublished = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")->fetchColumn();
