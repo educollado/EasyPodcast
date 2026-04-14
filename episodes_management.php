@@ -92,9 +92,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, publishedEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
-                        <?php if (($episode['status'] ?? '') === 'published'): ?>
-                          <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
-                        <?php endif; ?>
+                        <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <form class="inline-form" method="post" action="episodes_management.php?q=<?= esc(urlencode($searchQuery)) ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
@@ -138,6 +136,10 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, publishedEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
+                        <?php $draftPreviewHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? '')); ?>
+                        <?php if ($draftPreviewHref !== ''): ?>
+                          <a class="edit-link" href="<?= esc($draftPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
+                        <?php endif; ?>
                         <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
