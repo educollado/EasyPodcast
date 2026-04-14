@@ -210,5 +210,5 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         exit;
     }
 
-    return compact('searchQuery', 'searchResults', 'draftEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
+    return compact('searchQuery', 'searchResults', 'draftEpisodes', 'scheduledEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'totalScheduled', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
 }
