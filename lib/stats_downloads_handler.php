@@ -11,15 +11,22 @@ declare(strict_types=1);
 function getDailyStats(PDO $pdo): array
 {
     try {
-        $stmt = $pdo->query(
-            "SELECT 
-                id, episode_id, episode_title, episode_guid,
-                ip_address, user_agent, referer,
-                action_type,
-                download_date, datetime(download_date) as formatted_date
-             FROM estadisticas
-             ORDER BY download_date DESC"
+        // Verificar si la columna action_type existe
+        $columns = array_column(
+            $pdo->query('PRAGMA table_info(estadisticas)')->fetchAll(),
+            'name'
         );
+        $hasActionType = in_array('action_type', $columns, true);
+        
+        $sql = "SELECT 
+            id, episode_id, episode_title, episode_guid,
+            ip_address, user_agent, referer,
+            " . ($hasActionType ? 'action_type,' : "'download' as action_type,") . 
+            " download_date, datetime(download_date) as formatted_date
+         FROM estadisticas
+         ORDER BY download_date DESC";
+        
+        $stmt = $pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
         error_log("Error al obtener estadísticas diarias: " . $e->getMessage());
