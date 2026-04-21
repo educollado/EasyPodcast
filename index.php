@@ -119,7 +119,7 @@ if ($error !== '') {
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
-                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
+                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int)($episode['id'] ?? 0) ?>">
                   <?= __('Tu navegador no soporta audio HTML5.') ?>
                 </audio>
               <?php endif; ?>
@@ -147,6 +147,25 @@ if ($error !== '') {
     <?php require __DIR__ . '/footer.php'; ?>
   </div>
   <script>
+    // Trackear reproducciones
+    document.querySelectorAll('audio.player').forEach(audio => {
+      let tracked = false;
+      audio.addEventListener('play', function() {
+        if (tracked) return;
+        tracked = true;
+        const episodeId = this.dataset.episodeId;
+        if (episodeId && parseInt(episodeId) > 0) {
+          fetch('/track.php?episode_id=' + episodeId + '&action=play', {
+            method: 'GET',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          }).catch(() => {});
+        }
+      });
+      audio.addEventListener('loadedmetadata', () => { tracked = false; });
+    });
+
   (function () {
     if (!('IntersectionObserver' in window)) return;
     var obs = new IntersectionObserver(function (entries) {

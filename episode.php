@@ -127,7 +127,7 @@ if ($error !== '') {
                 $metaParens = $metaParts ? ' (' . implode(' — ', $metaParts) . ')' : '';
               ?>
               <p class="audio-meta">
-                <a class="download" href="/download.php?episode_id=<?= (int)($episode['id'] ?? 0) ?>" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
+                <a class="download" href="/track.php?episode_id=<?= (int)($episode['id'] ?? 0) ?>&action=download" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['content'])): ?>
@@ -139,6 +139,27 @@ if ($error !== '') {
     </main>
     <?php require __DIR__ . '/footer.php'; ?>
   </div>
+  <script>
+    // Trackear reproducciones
+    document.querySelectorAll('audio.player').forEach(audio => {
+      let tracked = false;
+      audio.addEventListener('play', function() {
+        if (tracked) return;
+        tracked = true;
+        const episodeId = <?= json_encode((int)($episode['id'] ?? 0)) ?>;
+        if (episodeId > 0) {
+          fetch('/track.php?episode_id=' + episodeId + '&action=play', {
+            method: 'GET',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          }).catch(() => {});
+        }
+      });
+      // Reiniciar tracked al cambiar de src (por si el audio se recarga)
+      audio.addEventListener('loadedmetadata', () => { tracked = false; });
+    });
+  </script>
 </body>
 </html>
 <?php

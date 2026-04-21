@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS estadisticas (
   ip_address TEXT NOT NULL,
   user_agent TEXT,
   referer TEXT,
+  action_type TEXT NOT NULL DEFAULT 'download',
   download_date TEXT DEFAULT (datetime('now')),
   FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
 );
@@ -168,4 +169,4 @@ BEGIN
   ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 14;
+PRAGMA user_version = 15;

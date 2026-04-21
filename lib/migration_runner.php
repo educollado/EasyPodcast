@@ -97,6 +97,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 14');
         $version = 14;
     }
+
+    if ($version < 15) {
+        migration_v15($pdo);
+        $pdo->exec('PRAGMA user_version = 15');
+        $version = 15;
+    }
 }
 
 /**
@@ -474,4 +480,18 @@ function migration_v14(PDO $pdo): void
            ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
          END"
     );
+}
+
+/**
+ * Migración v15: añade columna action_type a estadisticas para diferenciar descargas de reproducciones.
+ */
+function migration_v15(PDO $pdo): void
+{
+    $existingColumns = array_column(
+        $pdo->query('PRAGMA table_info(estadisticas)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('action_type', $existingColumns, true)) {
+        $pdo->exec("ALTER TABLE estadisticas ADD COLUMN action_type TEXT NOT NULL DEFAULT 'download'");
+    }
 }
