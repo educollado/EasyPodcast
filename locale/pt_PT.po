@@ -988,6 +988,54 @@ msgstr "Inativa"
 msgid "Gestionar caché"
 msgstr "Gerir cache"
 
+msgid "Estadísticas de descargas"
+msgstr "Estatísticas de downloads"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Últimos %d downloads e reproduções (até 7 dias)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Ainda não há dados de downloads ou reproduções"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Reproducción"
+msgstr "Reprodução"
+
+msgid "Descarga"
+msgstr "Download"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Total de downloads e reproduções por episódio"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Ainda não há downloads nem reproduções registadas"
+
+msgid "Año/Mes"
+msgstr "Ano/Mês"
+
+msgid "Año"
+msgstr "Ano"
+
+msgid "Capítulo"
+msgstr "Episódio"
+
+msgid "Descargas"
+msgstr "Downloads"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Todos los años"
+msgstr "Todos os anos"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episódios, rascunhos, tamanho de áudios e downloads/reproduções"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------

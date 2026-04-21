@@ -988,6 +988,54 @@ msgstr "Inactiva"
 msgid "Gestionar caché"
 msgstr "Xestionar caché"
 
+msgid "Estadísticas de descargas"
+msgstr "Estadísticas de descargas"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Últimas %d descargas e reproducións (ata 7 días)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Aínda non hai datos de descargas nin reproduccións"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Reproducción"
+msgstr "Reprodución"
+
+msgid "Descarga"
+msgstr "Descarga"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Total de descargas e reproducións por capítulo"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Aínda non hai descargas nin reproduccións rexistradas"
+
+msgid "Año/Mes"
+msgstr "Ano/Mes"
+
+msgid "Año"
+msgstr "Ano"
+
+msgid "Capítulo"
+msgstr "Capítulo"
+
+msgid "Descargas"
+msgstr "Descargas"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Todos los años"
+msgstr "Todos os anos"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episodios, borradores, tamaño de audios e descargas/reproducións"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------

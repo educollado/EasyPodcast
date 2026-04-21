@@ -988,6 +988,54 @@ msgstr "Inactiva"
 msgid "Gestionar caché"
 msgstr "Gestionar memòria cau"
 
+msgid "Estadísticas de descargas"
+msgstr "Estadístiques de descàrregues"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Últimes %d descàrregues i reproduccions (fins a 7 dies)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Encara no hi ha dades de descàrregues o reproduccions"
+
+msgid "Tipo"
+msgstr "Tipus"
+
+msgid "Reproducción"
+msgstr "Reproducció"
+
+msgid "Descarga"
+msgstr "Descarrega"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Total de descàrregues i reproduccions per capítol"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Encara no hi ha descàrregues ni reproduccions registrades"
+
+msgid "Año/Mes"
+msgstr "Any/Mes"
+
+msgid "Año"
+msgstr "Any"
+
+msgid "Capítulo"
+msgstr "Capítol"
+
+msgid "Descargas"
+msgstr "Descàrregues"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Todos los años"
+msgstr "Tots els anys"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episodis, esborranys, mida de l'àudio i descàrregues/reproduccions"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------

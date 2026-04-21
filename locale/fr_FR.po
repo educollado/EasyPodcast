@@ -988,6 +988,54 @@ msgstr "Désactivé"
 msgid "Gestionar caché"
 msgstr "Gérer le cache"
 
+msgid "Estadísticas de descargas"
+msgstr "Statistiques de téléchargements"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Derniers %d téléchargements et lectures (jusqu'à 7 jours)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Aucune donnée de téléchargement ou de lecture pour l'instant"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Reproducción"
+msgstr "Lecture"
+
+msgid "Descarga"
+msgstr "Téléchargement"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Total des téléchargements et lectures par épisode"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Aucun téléchargement ou lecture enregistré"
+
+msgid "Año/Mes"
+msgstr "Année/Mois"
+
+msgid "Año"
+msgstr "Année"
+
+msgid "Capítulo"
+msgstr "Épisode"
+
+msgid "Descargas"
+msgstr "Téléchargements"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Todos los años"
+msgstr "Toutes les années"
+
+msgid "Filtrar"
+msgstr "Filtrer"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Épisodes, brouillons, taille des fichiers audio et téléchargements/lectures"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------

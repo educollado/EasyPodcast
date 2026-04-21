@@ -895,6 +895,54 @@ msgstr "Inattiva"
 msgid "Gestionar caché"
 msgstr "Gestisci cache"
 
+msgid "Estadísticas de descargas"
+msgstr "Statistiche di download"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Ultimi %d download e riproduzioni (fino a 7 giorni)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Nessun dato di download o riproduzioni ancora"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Reproducción"
+msgstr "Riproduzione"
+
+msgid "Descarga"
+msgstr "Download"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Totale download e riproduzioni per episodio"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Nessun download o riproduzione registrato"
+
+msgid "Año/Mes"
+msgstr "Anno/Mese"
+
+msgid "Año"
+msgstr "Anno"
+
+msgid "Capítulo"
+msgstr "Episodio"
+
+msgid "Descargas"
+msgstr "Download"
+
+msgid "Total"
+msgstr "Totale"
+
+msgid "Todos los años"
+msgstr "Tutti gli anni"
+
+msgid "Filtrar"
+msgstr "Filtra"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episodi, bozze, dimensione audio e download/riproduzioni"
+
 msgid "Páginas"
 msgstr "Pagine"
 

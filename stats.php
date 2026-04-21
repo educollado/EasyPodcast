@@ -222,7 +222,10 @@ if ($filterYear > 0) {
                   <td><?= esc($stat['episode_title']) ?></td>
                   <td>
                     <span style="font-size:.8rem; padding:.2rem .4rem; border-radius:var(--radius); background:var(--bg); color:var(--fg);">
-                      <?= esc($stat['action_type'] === 'play' ? __('Reproducción') : __('Descarga')) ?>
+                      <?php
+                        $type = (string) ($stat['action_type'] ?? 'download');
+                        echo esc($type === 'play' ? __('Reproducción') : __('Descarga'));
+                      ?>
                     </span>
                   </td>
                   <td class="ip-tag"><?= esc($stat['ip_address']) ?></td>

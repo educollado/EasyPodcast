@@ -895,6 +895,54 @@ msgstr "Inaktiv"
 msgid "Gestionar caché"
 msgstr "Cache verwalten"
 
+msgid "Estadísticas de descargas"
+msgstr "Download-Statistiken"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Letzte %d Downloads und Wiedergaben (bis zu 7 Tage)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "Noch keine Download- oder Wiedergabedaten"
+
+msgid "Tipo"
+msgstr "Typ"
+
+msgid "Reproducción"
+msgstr "Wiedergabe"
+
+msgid "Descarga"
+msgstr "Download"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Gesamtzahl der Downloads und Wiedergaben pro Episode"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "Noch keine Downloads oder Wiedergaben registriert"
+
+msgid "Año/Mes"
+msgstr "Jahr/Monat"
+
+msgid "Año"
+msgstr "Jahr"
+
+msgid "Capítulo"
+msgstr "Episode"
+
+msgid "Descargas"
+msgstr "Downloads"
+
+msgid "Total"
+msgstr "Gesamt"
+
+msgid "Todos los años"
+msgstr "Alle Jahre"
+
+msgid "Filtrar"
+msgstr "Filtern"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episoden, Entwürfe, Audiogröße und Downloads/Wiedergaben"
+
 msgid "Páginas"
 msgstr "Seiten"
 
