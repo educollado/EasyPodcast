@@ -988,6 +988,54 @@ msgstr "Disabled"
 msgid "Gestionar caché"
 msgstr "Manage cache"
 
+msgid "Estadísticas de descargas"
+msgstr "Download statistics"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "Last %d downloads and plays (up to 7 days)"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "No download or play data yet"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Reproducción"
+msgstr "Play"
+
+msgid "Descarga"
+msgstr "Download"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "Total downloads and plays per episode"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "No downloads or plays recorded yet"
+
+msgid "Año/Mes"
+msgstr "Year/Month"
+
+msgid "Año"
+msgstr "Year"
+
+msgid "Capítulo"
+msgstr "Episode"
+
+msgid "Descargas"
+msgstr "Downloads"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Todos los años"
+msgstr "All years"
+
+msgid "Filtrar"
+msgstr "Filter"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "Episodes, drafts, audio size, and downloads/plays"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------

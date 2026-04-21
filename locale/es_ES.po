@@ -988,6 +988,54 @@ msgstr ""
 msgid "Gestionar caché"
 msgstr ""
 
+msgid "Estadísticas de descargas"
+msgstr ""
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr ""
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr ""
+
+msgid "Tipo"
+msgstr ""
+
+msgid "Reproducción"
+msgstr ""
+
+msgid "Descarga"
+msgstr ""
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr ""
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr ""
+
+msgid "Año/Mes"
+msgstr ""
+
+msgid "Año"
+msgstr ""
+
+msgid "Capítulo"
+msgstr ""
+
+msgid "Descargas"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Todos los años"
+msgstr ""
+
+msgid "Filtrar"
+msgstr ""
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr ""
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------
