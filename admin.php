@@ -155,7 +155,7 @@ if ($isLoggedIn) {
           <a class="admin-card" href="stats.php">
             <div class="admin-card-icon">📊</div>
             <h2><?= __('Estadísticas') ?></h2>
-            <p><?= __('Episodios, borradores y tamaño de audios') ?></p>
+            <p><?= __('Episodios, borradores, tamaño de audios y descargas/reproducciones') ?></p>
           </a>
           <a class="admin-card" href="update.php">
             <div class="admin-card-icon">⬆️</div>

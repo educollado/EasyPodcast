@@ -1,7 +1,7 @@
 <?php
 // admin_nav.php — Barra de navegación compartida del panel de administración.
 // Requiere que $currentAdminPage esté definida antes de incluir.
-// Valores válidos: 'dashboard' | 'podcast' | 'episodes' | 'add' | 'backups' | 'stats' | 'stats_downloads'
+// Valores válidos: 'dashboard' | 'podcast' | 'episodes' | 'add' | 'backups' | 'stats'
 
 require_once __DIR__ . '/lib/version.php';
 $_navPage = $currentAdminPage ?? '';
@@ -15,7 +15,6 @@ $_navPage = $currentAdminPage ?? '';
     <a class="admin-nav-link <?= $_navPage === 'add'       ? 'active' : '' ?>" href="add_episode.php"><?= __('Añadir') ?></a>
     <a class="admin-nav-link <?= in_array($_navPage, ['api_tokens', 'api_docs'], true) ? 'active' : '' ?>" href="api_tokens.php">API</a>
     <a class="admin-nav-link <?= $_navPage === 'stats' ? 'active' : '' ?>" href="stats.php"><?= __('Estadísticas') ?></a>
-    <a class="admin-nav-link <?= $_navPage === 'stats_downloads' ? 'active' : '' ?>" href="stats_downloads.php"><?= __('Descargas') ?></a>
     <a class="admin-nav-link" href="/" target="_blank" rel="noopener"><?= __('Ver web ↗') ?></a>
   </div>
   <a class="admin-nav-logout" href="admin.php?logout=1"><?= __('Salir') ?></a>
