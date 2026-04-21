@@ -102,14 +102,6 @@ docker run -d \
 
 ---
 
-## Novedades 1.8.6
-
-- **Workflow de release automática**: creación automatica de releases en GitHub al hacer push de tags `v*` con generación de archivos `.tar.gz` y `.zip` como assets.
-- Publicación programada de episodios sin cron: nuevo estado `scheduled` con fecha y hora de publicación futura. El episodio se publica automáticamente en la siguiente petición web.
-- Nueva sección "Capítulos Programados" en la gestión de episodios.
-
----
-
 ## Funcionalidades
 
 ### Web pública
