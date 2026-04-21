@@ -223,7 +223,7 @@ if ($filterYear > 0) {
                   <td>
                     <span style="font-size:.8rem; padding:.2rem .4rem; border-radius:var(--radius); background:var(--bg); color:var(--fg);">
                       <?php
-                        $type = (string) ($stat['action_type'] ?? 'download');
+                        $type = isset($stat['action_type']) && $stat['action_type'] === 'play' ? 'play' : 'download';
                         echo esc($type === 'play' ? __('Reproducción') : __('Descarga'));
                       ?>
                     </span>

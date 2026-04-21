@@ -15,6 +15,7 @@ function getDailyStats(PDO $pdo): array
             "SELECT 
                 id, episode_id, episode_title, episode_guid,
                 ip_address, user_agent, referer,
+                action_type,
                 download_date, datetime(download_date) as formatted_date
              FROM estadisticas
              ORDER BY download_date DESC"

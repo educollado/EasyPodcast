@@ -1004,7 +1004,7 @@ msgid "Reproducción"
 msgstr "Reproducció"
 
 msgid "Descarga"
-msgstr "Descarrega"
+msgstr "Descàrrega"
 
 msgid "Total de descargas y reproducciones por capítulo"
 msgstr "Total de descàrregues i reproduccions per capítol"
