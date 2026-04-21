@@ -65,7 +65,7 @@ extract($data); // cacheEnabled, error, notice
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="cache_action" value="clear_cache">
           <div class="actions">
-            <button class="btn back" type="submit"><?= __('Borrar caché') ?></button>
+            <button class="btn back" type="submit"><?= __('Borrar caché web') ?></button>
           </div>
         </form>
       </section>

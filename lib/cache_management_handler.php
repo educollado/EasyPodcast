@@ -81,12 +81,11 @@ function loadCacheManagementData(string $dbPath): array
                 $notice = __('Configuración de caché guardada.');
 
             } elseif ($action === 'clear_cache') {
-                $webOk   = clearWebCache();
-                $imageOk = clearImageCache();
-                if ($webOk && $imageOk) {
-                    $notice = __('Caché borrada correctamente.');
+                $webOk = clearWebCache();
+                if ($webOk) {
+                    $notice = __('Caché web borrada correctamente.');
                 } else {
-                    $error = __('No se pudo borrar completamente la caché.');
+                    $error = __('No se pudo borrar la caché web.');
                 }
 
             } elseif ($action === 'regenerate_images') {
