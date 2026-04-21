@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -14,34 +14,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Get version from tag
-        id: version
-        run: |
-          TAG=${{ github.ref_name }}
-          VERSION=${TAG#v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Create source tarball
-        run: |
-          git archive --format=tar --prefix=EasyPodcast-${{ steps.version.outputs.version }}/ HEAD | gzip > EasyPodcast-${{ steps.version.outputs.version }}-source.tar.gz
-
-      - name: Create source zip
-        run: |
-          git archive --format=zip --prefix=EasyPodcast-${{ steps.version.outputs.version }}/ HEAD > EasyPodcast-${{ steps.version.outputs.version }}-source.zip
-
-      - name: Create Release
+      - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: EasyPodcast ${{ steps.version.outputs.version }}
+          name: EasyPodcast ${{ github.ref_name }}
           body: |
             Vea [CHANGELOG.md](https://github.com/educollado/easypodcast/blob/${{ github.ref_name }}/CHANGELOG.md) para detalles de esta versión.
           files: |
-            EasyPodcast-${{ steps.version.outputs.version }}-source.tar.gz
-            EasyPodcast-${{ steps.version.outputs.version }}-source.zip
+            docker-compose.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

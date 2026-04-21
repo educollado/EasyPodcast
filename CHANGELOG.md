@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.8
+
+- **Publicación**: corregido el workflow de release para que solo incluya `docker-compose.yml` en los assets de la release, eliminando los archivos redundantes `EasyPodcast-{version}-source.*`. Ahora las releases contienen solo: `docker-compose.yml`, `Source code (zip)` y `Source code (tar.gz)`.
+
 ## 1.8.7
 
 - **Corrección**: activado el workflow de GitHub Actions para construir y publicar automáticamente la imagen Docker en `ghcr.io/educollado/easypodcast` al crear tags y releases. Previamente el workflow solo se activaba al publicar una release manualmente en GitHub, ahora también se activa al hacer `git push` de tags con formato `v*` (ej: `v1.8.7`).
