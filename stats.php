@@ -209,10 +209,10 @@ if ($filterYear > 0) {
           <table class="stats-table">
             <thead>
               <tr>
-                <th><?= __('Fecha') ?></th>
-                <th><?= __('Capítulo') ?></th>
-                <th><?= __('Tipo') ?></th>
-                <th><?= __('IP') ?></th>
+                <th data-sort="date"><?= __('Fecha') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="type"><?= __('Tipo') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="ip"><?= __('IP') ?> <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody>
@@ -262,17 +262,17 @@ if ($filterYear > 0) {
           <table class="stats-table">
             <thead>
               <tr>
-                <th><?= __('Año/Mes') ?></th>
-                <th><?= __('Capítulo') ?></th>
-                <th style="text-align: right;"><?= __('Descargas') ?></th>
+                <th data-sort="period"><?= __('Año/Mes') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($monthlyStats as $stat): ?>
                 <tr>
-                  <td><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
+                  <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
                   <td><?= esc($stat['episode_title']) ?></td>
-                  <td style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -288,17 +288,17 @@ if ($filterYear > 0) {
           <table class="stats-table">
             <thead>
               <tr>
-                <th><?= __('Año') ?></th>
-                <th><?= __('Capítulo') ?></th>
-                <th style="text-align: right;"><?= __('Descargas') ?></th>
+                <th data-sort="year"><?= __('Año') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($yearlyStats as $stat): ?>
                 <tr>
-                  <td><?= esc((string)$stat['anio']) ?></td>
+                  <td data-sort-value="<?= (int)$stat['anio'] ?>"><?= esc((string)$stat['anio']) ?></td>
                   <td><?= esc($stat['episode_title']) ?></td>
-                  <td style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -316,8 +316,8 @@ if ($filterYear > 0) {
           <table class="stats-table">
             <thead>
               <tr>
-                <th><?= __('Capítulo') ?></th>
-                <th style="text-align: right;"><?= __('Total') ?></th>
+                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                <th data-sort="total" style="text-align: right;"><?= __('Total') ?> <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody>
@@ -325,7 +325,7 @@ if ($filterYear > 0) {
                 <?php if ((int)$stat['total_downloads'] > 0): ?>
                   <tr>
                     <td><?= esc($stat['episode_title']) ?></td>
-                    <td style="text-align: right;"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
+                    <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
                   </tr>
                 <?php endif; ?>
               <?php endforeach; ?>
@@ -421,6 +421,26 @@ if ($filterYear > 0) {
       padding: 2rem;
       color: var(--muted);
     }
+    .sort-icon {
+      font-size: .7rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .stats-table th {
+      cursor: pointer;
+      user-select: none;
+    }
+    .stats-table th:hover {
+      color: var(--fg);
+    }
+    .stats-table th[data-sort].asc::after {
+      content: ' ↑';
+      color: var(--accent);
+    }
+    .stats-table th[data-sort].desc::after {
+      content: ' ↓';
+      color: var(--accent);
+    }
   </style>
   
   <script>
@@ -431,6 +451,51 @@ if ($filterYear > 0) {
         document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Ordenamiento de tablas
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', (e) => {
+          const table = th.closest('table');
+          const tbody = table.querySelector('tbody');
+          const columnIndex = Array.from(th.parentNode.children).indexOf(th);
+          const sortKey = th.dataset.sort;
+          
+          // Determinar dirección: si ya tiene clase 'asc', pasamos a 'desc', y viceversa
+          const currentDir = th.classList.contains('asc') ? 'asc' : 
+                            (th.classList.contains('desc') ? 'desc' : null);
+          const nextDir = !currentDir ? 'asc' : (currentDir === 'asc' ? 'desc' : 'asc');
+          
+          // Remover clases de todos los th de esta tabla
+          table.querySelectorAll('th[data-sort]').forEach(h => {
+            h.classList.remove('asc', 'desc');
+          });
+          th.classList.add(nextDir);
+          
+          //get rows
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+          const isNumeric = sortKey === 'count' || sortKey === 'year' || sortKey === 'total';
+          
+          // Sort by data-sort-value or by the column index
+          const direction = nextDir === 'asc' ? 1 : -1;
+          rows.sort((a, b) => {
+            // Use data-sort-value if available, otherwise use text content
+            const aVal = a.children[columnIndex].dataset.sortValue ?? a.children[columnIndex].textContent.trim();
+            const bVal = b.children[columnIndex].dataset.sortValue ?? b.children[columnIndex].textContent.trim();
+            
+            if (isNumeric) {
+              const numA = parseFloat(aVal.replace(/[^0-9.-]/g, '')) || 0;
+              const numB = parseFloat(bVal.replace(/[^0-9.-]/g, '')) || 0;
+              return (numA - numB) * direction;
+            }
+            return aVal.localeCompare(bVal, undefined, {numeric: true}) * direction;
+          });
+          
+          // Reinsertar filas ordenadas
+          rows.forEach(row => tbody.appendChild(row));
+        });
       });
     });
   </script>
