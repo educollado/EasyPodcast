@@ -866,6 +866,15 @@ msgstr "Desar"
 msgid "Borrar caché"
 msgstr "Esborrar memòria cau"
 
+msgid "Borrar caché web"
+msgstr "Esborrar caché web"
+
+msgid "Caché web borrada correctamente."
+msgstr "Memòria cau web esborrada correctament."
+
+msgid "No se pudo borrar la caché web."
+msgstr "No s'ha pogut esborrar la caché web."
+
 msgid "Imágenes generadas"
 msgstr "Imatges generades"
 

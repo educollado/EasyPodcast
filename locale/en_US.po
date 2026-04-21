@@ -866,6 +866,15 @@ msgstr "Save"
 msgid "Borrar caché"
 msgstr "Clear cache"
 
+msgid "Borrar caché web"
+msgstr "Clear web cache"
+
+msgid "Caché web borrada correctamente."
+msgstr "Web cache cleared successfully."
+
+msgid "No se pudo borrar la caché web."
+msgstr "Could not clear web cache."
+
 msgid "Imágenes generadas"
 msgstr "Generated images"
 

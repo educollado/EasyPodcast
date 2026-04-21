@@ -866,6 +866,15 @@ msgstr "Gardar"
 msgid "Borrar caché"
 msgstr "Borrar caché"
 
+msgid "Borrar caché web"
+msgstr "Borrar caché web"
+
+msgid "Caché web borrada correctamente."
+msgstr "Caché web borrada correctamente."
+
+msgid "No se pudo borrar la caché web."
+msgstr "Non se puido borrar a caché web."
+
 msgid "Imágenes generadas"
 msgstr "Imaxes xeradas"
 

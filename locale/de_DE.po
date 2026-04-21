@@ -784,6 +784,15 @@ msgstr "Speichern"
 msgid "Borrar caché"
 msgstr "Cache leeren"
 
+msgid "Borrar caché web"
+msgstr "Web-Cache leeren"
+
+msgid "Caché web borrada correctamente."
+msgstr "Web-Cache erfolgreich gelöscht."
+
+msgid "No se pudo borrar la caché web."
+msgstr "Web-Cache konnte nicht gelöscht werden."
+
 msgid "Imágenes generadas"
 msgstr "Erzeugte Bilder"
 

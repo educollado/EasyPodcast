@@ -784,6 +784,15 @@ msgstr "Salva"
 msgid "Borrar caché"
 msgstr "Svuota cache"
 
+msgid "Borrar caché web"
+msgstr "Svuota cache web"
+
+msgid "Caché web borrada correctamente."
+msgstr "Cache web svuotata correttamente."
+
+msgid "No se pudo borrar la caché web."
+msgstr "Non è stato possibile svuotare la cache web."
+
 msgid "Imágenes generadas"
 msgstr "Immagini generate"
 
