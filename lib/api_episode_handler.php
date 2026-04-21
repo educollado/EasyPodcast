@@ -21,7 +21,7 @@ function episodeToApiResponse(array $episode): array
 /**
  * GET /api/v1/episodes
  * Lista paginada con filtro opcional de status.
- * Parámetros: page (int), limit (int, max 100), status (draft|published).
+ * Parámetros: page (int), limit (int, max 100), status (draft|scheduled|published).
  */
 function apiListEpisodes(PDO $pdo, array $params): void
 {
@@ -33,7 +33,7 @@ function apiListEpisodes(PDO $pdo, array $params): void
     $where  = '';
     $binds  = [];
 
-    if ($status !== '' && in_array($status, ['draft', 'published'], true)) {
+    if ($status !== '' && in_array($status, ['draft', 'scheduled', 'published'], true)) {
         $where          = 'WHERE status = :status';
         $binds[':status'] = $status;
     }

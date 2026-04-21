@@ -96,7 +96,7 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
             <tr><th><?= __('Parámetro') ?></th><th><?= __('Tipo') ?></th><th><?= __('Descripción') ?></th></tr>
             <tr><td>page</td><td>int</td><td><?= __('Página (defecto: 1)') ?></td></tr>
             <tr><td>limit</td><td>int</td><td><?= __('Resultados por página, máx. 100 (defecto: 20)') ?></td></tr>
-            <tr><td>status</td><td>string</td><td><code class="inline">draft</code> <?= __('o') ?> <code class="inline">published</code> (<?= __('opcional') ?>)</td></tr>
+            <tr><td>status</td><td>string</td><td><code class="inline">draft</code>, <code class="inline">scheduled</code> <?= __('o') ?> <code class="inline">published</code> (<?= __('opcional') ?>)</td></tr>
           </table>
           <pre>curl -s -H "Authorization: Bearer TOKEN" \
   "<?= esc($baseUrl) ?>/api/v1/episodes?status=published&amp;page=1"</pre>
@@ -129,8 +129,8 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
             <tr><td>audio_url</td><td>✓*</td><td><?= __('URL del audio (*o subir audio_file)') ?></td></tr>
             <tr><td>audio_size_bytes</td><td>✓*</td><td><?= __('Tamaño en bytes (*si no se sube fichero)') ?></td></tr>
             <tr><td>audio_mime_type</td><td></td><td><?= __('MIME del audio (defecto: audio/mpeg)') ?></td></tr>
-            <tr><td>status</td><td></td><td><code class="inline">draft</code> (<?= __('defecto') ?>) <?= __('o') ?> <code class="inline">published</code></td></tr>
-            <tr><td>pub_date</td><td></td><td><?= __('Fecha ISO 8601 (auto-asignada al publicar)') ?></td></tr>
+            <tr><td>status</td><td></td><td><code class="inline">draft</code> (<?= __('defecto') ?>), <code class="inline">scheduled</code> <?= __('o') ?> <code class="inline">published</code></td></tr>
+            <tr><td>pub_date</td><td></td><td><?= __('Fecha ISO 8601 (auto-asignada al publicar; obligatoria para scheduled)') ?></td></tr>
             <tr><td>audio_file</td><td></td><td><?= __('Fichero de audio (multipart)') ?></td></tr>
             <tr><td>image_file</td><td></td><td><?= __('Imagen del episodio (multipart)') ?></td></tr>
             <tr><td>image_url</td><td></td><td><?= __('URL de imagen alternativa') ?></td></tr>
