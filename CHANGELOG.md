@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.8.5
+
+- **Estadísticas de descargas y reproducciones**: nueva funcionalidad completa para tracking de descargas y plays de episodios. Incluye pestañas en `stats.php` (Diario, Mensual, Anual, Resumen) con tablas interactivas, filtrado por año y ordenación por columna al hacer clic en las cabeceras.
+- Tracking de reproducciones (play) además de descargas, con diferenciación visual en la interfaz.
+- Ordenación ascendente/descendente de tablas de estadísticas por cualquier columna (fecha, título, tipo, descargas, año, total).
+- Filtrado de estadísticas mensuales por año seleccionable desde dropdown.
+- Persistencia de pestaña activa al filtrar por año en estadísticas mensuales.
+- Compatibilidad retroactiva con bases de datos sin columna `action_type` en la tabla `download_stats`.
+- Corrección en consulta SQL para manejar valores nulos de `action_type` y verificación adecuada en `stats.php`.
+- Traducciones completas para todas las cadenas de estadísticas de descargas (diario, mensual, anual, resumen, headers de tabla, filtros, mensajes de vacío).
+- Traducciones para el botón "Borrar caché web".
+- Corrección: al borrar caché desde el panel, solo se eliminan ficheros `.cache` de la caché web, no las imágenes generadas.
+- Inclusión de `scheduledEpisodes` y `totalScheduled` en el return compact() de `episodes_management_handler.php`.
+- Eliminación de `PRAGMA user_version` duplicado en migraciones.
+- Actualización de documentación y manejador de episodios.
+
 ## 1.8.0
 
 - Publicación programada de episodios (sin cron): nuevo estado `scheduled` que permite fijar una fecha y hora futura de publicación. El episodio se publica automáticamente en la siguiente petición web cuando la fecha llega, sin necesidad de configurar cron en el servidor.

@@ -469,7 +469,6 @@ if ($filterYear > 0) {
         });
       });
     });
-=======
 
     // Ordenamiento de tablas
     document.addEventListener('DOMContentLoaded', () => {
