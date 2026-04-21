@@ -241,6 +241,7 @@ if ($filterYear > 0) {
         <?php if (!empty($availableYears)): ?>
           <div class="year-selector">
             <form method="get" style="display: inline;">
+              <input type="hidden" name="tab" value="mensual">
               <select name="year" onchange="this.form.submit()">
                 <option value=""><?= __('Todos los años') ?></option>
                 <?php foreach ($availableYears as $y): ?>
@@ -445,14 +446,30 @@ if ($filterYear > 0) {
   
   <script>
     // Pestañas
-    document.querySelectorAll('.stats-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+      // Activar pestaña desde URL hash o parámetro GET
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeTab = urlParams.get('tab') || 'diario';
+      
+      // Activar pestaña y panel correspondientes
+      const activeTabElement = document.querySelector(`.stats-tab[data-tab="${activeTab}"]`);
+      if (activeTabElement) {
         document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        activeTabElement.classList.add('active');
+        document.getElementById('tab-' + activeTab).classList.add('active');
+      }
+      
+      document.querySelectorAll('.stats-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
       });
     });
+=======
 
     // Ordenamiento de tablas
     document.addEventListener('DOMContentLoaded', () => {
