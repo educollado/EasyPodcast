@@ -107,3 +107,67 @@ CREATE TABLE IF NOT EXISTS management (
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
+
+-- Estadísticas: datos brutos de descargas (solo 7 días)
+CREATE TABLE IF NOT EXISTS estadisticas (
+  id INTEGER PRIMARY KEY,
+  episode_id INTEGER NOT NULL,
+  episode_guid TEXT NOT NULL,
+  episode_title TEXT NOT NULL,
+  ip_address TEXT NOT NULL,
+  user_agent TEXT,
+  referer TEXT,
+  download_date TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_estadisticas_date ON estadisticas(download_date);
+CREATE INDEX IF NOT EXISTS idx_estadisticas_episode ON estadisticas(episode_id);
+
+-- Estadísticas: resumen mensual (histórico)
+CREATE TABLE IF NOT EXISTS estadisticas_mensuales (
+  id INTEGER PRIMARY KEY,
+  episode_id INTEGER NOT NULL,
+  episode_title TEXT NOT NULL,
+  anio INTEGER NOT NULL,
+  mes INTEGER NOT NULL,
+  descargas INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(episode_id, anio, mes)
+);
+
+-- Estadísticas: resumen anual (histórico)
+CREATE TABLE IF NOT EXISTS estadisticas_anuales (
+  id INTEGER PRIMARY KEY,
+  episode_id INTEGER NOT NULL,
+  episode_title TEXT NOT NULL,
+  anio INTEGER NOT NULL,
+  descargas INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(episode_id, anio)
+);
+
+-- Triggers para actualizar resúmenes automáticamente
+CREATE TRIGGER IF NOT EXISTS trg_mensual_after_insert 
+AFTER INSERT ON estadisticas
+FOR EACH ROW
+BEGIN
+  INSERT INTO estadisticas_mensuales (episode_id, episode_title, anio, mes, descargas)
+  VALUES (
+    NEW.episode_id, NEW.episode_title,
+    CAST(STRFTIME('%Y', NEW.download_date) AS INTEGER),
+    CAST(STRFTIME('%m', NEW.download_date) AS INTEGER), 1
+  )
+  ON CONFLICT(episode_id, anio, mes) DO UPDATE SET descargas = descargas + 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_anual_after_insert 
+AFTER INSERT ON estadisticas
+FOR EACH ROW
+BEGIN
+  INSERT INTO estadisticas_anuales (episode_id, episode_title, anio, descargas)
+  VALUES (
+    NEW.episode_id, NEW.episode_title,
+    CAST(STRFTIME('%Y', NEW.download_date) AS INTEGER), 1
+  )
+  ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
+END;
+
+PRAGMA user_version = 14;

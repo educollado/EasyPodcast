@@ -127,7 +127,7 @@ if ($error !== '') {
                 $metaParens = $metaParts ? ' (' . implode(' — ', $metaParts) . ')' : '';
               ?>
               <p class="audio-meta">
-                <a class="download" href="<?= esc((string) $episode['audio_url']) ?>" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
+                <a class="download" href="/download.php?episode_id=<?= (int)($episode['id'] ?? 0) ?>" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['content'])): ?>
