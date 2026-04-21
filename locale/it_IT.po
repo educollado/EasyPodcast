@@ -943,6 +943,18 @@ msgstr "Filtra"
 msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
 msgstr "Episodi, bozze, dimensione audio e download/riproduzioni"
 
+msgid "Diario (7 días)"
+msgstr "Giornaliero (7 giorni)"
+
+msgid "Mensual"
+msgstr "Mensile"
+
+msgid "Anual"
+msgstr "Annuale"
+
+msgid "Resumen"
+msgstr "Riepilogo"
+
 msgid "Páginas"
 msgstr "Pagine"
 

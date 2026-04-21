@@ -1036,6 +1036,18 @@ msgstr "Filtrer"
 msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
 msgstr "Épisodes, brouillons, taille des fichiers audio et téléchargements/lectures"
 
+msgid "Diario (7 días)"
+msgstr "Quotidien (7 jours)"
+
+msgid "Mensual"
+msgstr "Mensuel"
+
+msgid "Anual"
+msgstr "Annuel"
+
+msgid "Resumen"
+msgstr "Résumé"
+
 # ---------------------------------------------------------------------------
 # Vistas — pages_management.php
 # ---------------------------------------------------------------------------
