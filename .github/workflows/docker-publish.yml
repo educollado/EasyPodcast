@@ -1,6 +1,9 @@
 name: Publicar imagen Docker
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types: [published]
 

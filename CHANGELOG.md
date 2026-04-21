@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.7
+
+- **Corrección**: activado el workflow de GitHub Actions para construir y publicar automáticamente la imagen Docker en `ghcr.io/educollado/easypodcast` al crear tags y releases. Previamente el workflow solo se activaba al publicar una release manualmente en GitHub, ahora también se activa al hacer `git push` de tags con formato `v*` (ej: `v1.8.7`).
+
 ## 1.8.6
 
 - **Estadísticas de descargas y reproducciones**: nueva funcionalidad completa para tracking de descargas y plays de episodios. Incluye pestañas en `stats.php` (Diario, Mensual, Anual, Resumen) con tablas interactivas, filtrado por año y ordenación por columna al hacer clic en las cabeceras.

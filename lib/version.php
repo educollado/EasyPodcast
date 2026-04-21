@@ -2,4 +2,4 @@
 
 declare(strict_types=1);
 
-define('APP_VERSION', '1.8.6');
+define('APP_VERSION', '1.8.7');
