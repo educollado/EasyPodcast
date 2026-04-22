@@ -86,19 +86,21 @@ function getYearlyStats(PDO $pdo): array
  * Obtiene el total de descargas por episodio.
  *
  * @param PDO $pdo Conexión a la base de datos
- * @return array Array con episode_id, episode_title y total de descargas
+ * @return array Array con episode_id, episode_title, episode_guid y total de descargas
  */
 function getTotalDownloadsByEpisode(PDO $pdo): array
 {
     try {
         $stmt = $pdo->query(
             "SELECT 
-                episode_id, 
-                episode_title,
-                episode_guid,
-                COALESCE((SELECT SUM(descargas) FROM estadisticas_mensuales WHERE episode_id = e.episode_id), 0) as total_downloads
+                e.episode_id,
+                e.episode_title,
+                e.episode_guid,
+                COALESCE(SUM(em.descargas), 0) as total_downloads
              FROM episodes e
-             ORDER BY total_downloads DESC, episode_title ASC"
+             LEFT JOIN estadisticas_mensuales em ON em.episode_id = e.episode_id
+             GROUP BY e.episode_id, e.episode_title, e.episode_guid
+             ORDER BY total_downloads DESC, e.episode_title ASC"
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
@@ -157,4 +159,15 @@ function formatMonthYear(int $year, int $month): string
     ];
     $monthName = $months[$month] ?? 'Mes ' . $month;
     return $monthName . ' ' . $year;
+}
+
+/**
+ * Obtiene la etiqueta localizada para el tipo de acción (descarga/reproducción).
+ *
+ * @param string $actionType Tipo de acción ('play' o 'download')
+ * @return string Etiqueta localizada
+ */
+function getActionTypeLabel(string $actionType): string
+{
+    return $actionType === 'play' ? __('Reproducción') : __('Descarga');
 }

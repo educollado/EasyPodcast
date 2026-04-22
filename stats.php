@@ -24,18 +24,19 @@ $data = loadStatsData($dbPath);
 extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBytes, cacheEnabled, cacheFiles, cacheSizeBytes, error
 
 // Datos de descargas
+$filterYear = isset($_GET['year']) ? (int) $_GET['year'] : null;
+$downloadsError = '';
+
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     $dailyStats = getDailyStats($pdo);
-    $monthlyStats = getMonthlyStats($pdo);
+    $monthlyStats = getMonthlyStats($pdo, $filterYear > 0 ? $filterYear : null);
     $yearlyStats = getYearlyStats($pdo);
     $totalByEpisode = getTotalDownloadsByEpisode($pdo);
     $availableYears = getAvailableYears($pdo);
-
-    $downloadsError = '';
 } catch (Throwable $e) {
     $dailyStats = [];
     $monthlyStats = [];
@@ -43,18 +44,6 @@ try {
     $totalByEpisode = [];
     $availableYears = [];
     $downloadsError = $e->getMessage();
-}
-
-// Filtrar estadísticas mensuales por año si se especifica
-$filterYear = isset($_GET['year']) ? (int) $_GET['year'] : null;
-if ($filterYear > 0) {
-    try {
-        $pdo = new PDO('sqlite:' . $dbPath);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $monthlyStats = getMonthlyStats($pdo, $filterYear);
-    } catch (Throwable $e) {
-        $monthlyStats = [];
-    }
 }
 ?>
 <!doctype html>
@@ -143,7 +132,7 @@ if ($filterYear > 0) {
         <?php if ($lastTitle !== ''): ?>
         <div class="stat-card stat-wide">
           <span class="stat-label"><?= __('Último publicado') ?></span>
-          <span class="stat-value" style="font-size:1.1rem; font-weight:600;"><?= esc($lastTitle) ?></span>
+          <span class="stat-value stat-last-title"><?= esc($lastTitle) ?></span>
           <?php if ($lastPubDate !== ''): ?>
             <span class="stat-sub"><?= esc($lastPubDate) ?></span>
           <?php endif; ?>
@@ -152,19 +141,19 @@ if ($filterYear > 0) {
 
       </div>
 
-      <h2 style="margin-top:2rem; font-size:1.05rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;">Caché</h2>
+      <h2 class="section-subtitle"><?= __('Caché') ?></h2>
       <div class="stats-grid">
 
         <div class="stat-card">
           <span class="stat-label"><?= __('Estado') ?></span>
           <span class="stat-value" style="font-size:1.2rem;">
             <?php if ($cacheEnabled): ?>
-              <span style="color:#059669;"><?= __('Activa') ?></span>
+              <span class="status-active"><?= __('Activa') ?></span>
             <?php else: ?>
-              <span style="color:var(--muted);"><?= __('Inactiva') ?></span>
+              <span class="status-inactive"><?= __('Inactiva') ?></span>
             <?php endif; ?>
           </span>
-          <span class="stat-sub"><a href="cache_management.php" style="color:var(--accent);"><?= __('Gestionar caché') ?></a></span>
+          <span class="stat-sub"><a href="cache_management.php" class="accent-link"><?= __('Gestionar caché') ?></a></span>
         </div>
 
         <div class="stat-card">
@@ -181,7 +170,7 @@ if ($filterYear > 0) {
 
       </div>
 
-      <h2 style="margin-top:2rem; font-size:1.05rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;"><?= __('Estadísticas de descargas') ?></h2>
+      <h2 class="section-subtitle"><?= __('Estadísticas de descargas') ?></h2>
       
       <?php if ($downloadsError !== ''): ?>
         <div class="error"><?= esc($downloadsError) ?></div>
@@ -196,7 +185,7 @@ if ($filterYear > 0) {
 
       <!-- Pestaña Diario -->
       <div id="tab-diario" class="stats-panel active">
-        <p style="color: var(--muted); font-size: .9rem; margin-bottom: 1rem;">
+        <p class="stats-note">
           <?php
             $count = count($dailyStats);
             echo esc(__('Últimas %d descargas y reproducciones (hasta 7 días)', $count));
@@ -222,11 +211,8 @@ if ($filterYear > 0) {
                     <td><?= esc(formatStatsDate($stat['download_date'])) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
                     <td>
-                      <span style="font-size:.8rem; padding:.2rem .4rem; border-radius:var(--radius); background:var(--bg); color:var(--fg);">
-                        <?php
-                          $type = isset($stat['action_type']) && $stat['action_type'] === 'play' ? 'play' : 'download';
-                          echo esc($type === 'play' ? __('Reproducción') : __('Descarga'));
-                        ?>
+                      <span class="action-type-badge">
+                        <?= esc(getActionTypeLabel($stat['action_type'] ?? 'download')) ?? esc(__('Descarga')) ?>
                       </span>
                     </td>
                     <td class="ip-tag"><?= esc($stat['ip_address']) ?></td>
@@ -242,7 +228,7 @@ if ($filterYear > 0) {
       <div id="tab-mensual" class="stats-panel">
         <?php if (!empty($availableYears)): ?>
           <div class="year-selector">
-            <form method="get" style="display: inline;">
+            <form method="get" class="inline-form">
               <input type="hidden" name="tab" value="mensual">
               <select name="year" onchange="this.form.submit()">
                 <option value=""><?= __('Todos los años') ?></option>
@@ -268,7 +254,7 @@ if ($filterYear > 0) {
                 <tr>
                   <th data-sort="period"><?= __('Año/Mes') ?> <span class="sort-icon">↕</span></th>
                   <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                  <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="count" class="text-right"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -276,7 +262,7 @@ if ($filterYear > 0) {
                   <tr>
                     <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
-                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
@@ -296,7 +282,7 @@ if ($filterYear > 0) {
                 <tr>
                   <th data-sort="year"><?= __('Año') ?> <span class="sort-icon">↕</span></th>
                   <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                  <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="count" class="text-right"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -304,7 +290,7 @@ if ($filterYear > 0) {
                   <tr>
                     <td data-sort-value="<?= (int)$stat['anio'] ?>"><?= esc((string)$stat['anio']) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
-                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
@@ -315,7 +301,7 @@ if ($filterYear > 0) {
 
       <!-- Pestaña Resumen -->
       <div id="tab-resumen" class="stats-panel">
-        <h3 style="margin-top: 0;"><?= __('Total de descargas y reproducciones por capítulo') ?></h3>
+        <h3 class="section-subtitle" style="margin-top: 0;"><?= __('Total de descargas y reproducciones por capítulo') ?></h3>
         
         <?php if (empty($totalByEpisode)): ?>
           <div class="empty-state"><?= __('Aún no hay descargas ni reproducciones registradas') ?></div>
@@ -325,7 +311,7 @@ if ($filterYear > 0) {
               <thead>
                 <tr>
                   <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                  <th data-sort="total" style="text-align: right;"><?= __('Total') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="total" class="text-right"><?= __('Total') ?> <span class="sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -333,7 +319,7 @@ if ($filterYear > 0) {
                   <?php if ((int)$stat['total_downloads'] > 0): ?>
                     <tr>
                       <td><?= esc($stat['episode_title']) ?></td>
-                      <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
+                      <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
                     </tr>
                   <?php endif; ?>
                 <?php endforeach; ?>
@@ -426,6 +412,32 @@ if ($filterYear > 0) {
       font-size: .8rem;
       color: var(--muted);
     }
+    .action-type-badge {
+      font-size: .8rem;
+      padding: .2rem .4rem;
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--fg);
+    }
+    .text-right { text-align: right; }
+    .section-subtitle {
+      margin-top: 2rem;
+      font-size: 1.05rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .stat-title { font-size: 1.1rem; font-weight: 600; }
+    .status-active { color: #059669; }
+    .status-inactive { color: var(--muted); }
+    .stats-note {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 1rem;
+    }
+    .inline-form { display: inline; }
+    .accent-link { color: var(--accent); }
+    .stat-last-title { font-size: 1.1rem; font-weight: 600; }
     .empty-state {
       text-align: center;
       padding: 2rem;
@@ -454,8 +466,9 @@ if ($filterYear > 0) {
   </style>
   
   <script>
-    // Pestañas
+    // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', () => {
+      // ==================== PESTAÑAS ====================
       // Activar pestaña desde URL hash o parámetro GET
       const urlParams = new URLSearchParams(window.location.search);
       const activeTab = urlParams.get('tab') || 'diario';
@@ -477,10 +490,8 @@ if ($filterYear > 0) {
           document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
         });
       });
-    });
 
-    // Ordenamiento de tablas
-    document.addEventListener('DOMContentLoaded', () => {
+      // ==================== ORDENAMIENTO DE TABLAS ====================
       document.querySelectorAll('th[data-sort]').forEach(th => {
         th.addEventListener('click', (e) => {
           const table = th.closest('table');
@@ -499,14 +510,14 @@ if ($filterYear > 0) {
           });
           th.classList.add(nextDir);
           
-          //get rows
+          // Obtener filas
           const rows = Array.from(tbody.querySelectorAll('tr'));
           const isNumeric = sortKey === 'count' || sortKey === 'year' || sortKey === 'total';
           
-          // Sort by data-sort-value or by the column index
+          // Ordenar por data-sort-value o por el contenido de texto
           const direction = nextDir === 'asc' ? 1 : -1;
           rows.sort((a, b) => {
-            // Use data-sort-value if available, otherwise use text content
+            // Usar data-sort-value si está disponible, de lo contrario usar contenido de texto
             const aVal = a.children[columnIndex].dataset.sortValue ?? a.children[columnIndex].textContent.trim();
             const bVal = b.children[columnIndex].dataset.sortValue ?? b.children[columnIndex].textContent.trim();
             
