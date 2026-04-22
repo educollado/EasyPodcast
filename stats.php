@@ -206,33 +206,35 @@ if ($filterYear > 0) {
         <?php if (empty($dailyStats)): ?>
           <div class="empty-state"><?= __('Aún no hay datos de descargas o reproducciones') ?></div>
         <?php else: ?>
-          <table class="stats-table">
-            <thead>
-              <tr>
-                <th data-sort="date"><?= __('Fecha') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="type"><?= __('Tipo') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="ip"><?= __('IP') ?> <span class="sort-icon">↕</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($dailyStats as $stat): ?>
+          <div class="table-wrap">
+            <table class="stats-table">
+              <thead>
                 <tr>
-                  <td><?= esc(formatStatsDate($stat['download_date'])) ?></td>
-                  <td><?= esc($stat['episode_title']) ?></td>
-                  <td>
-                    <span style="font-size:.8rem; padding:.2rem .4rem; border-radius:var(--radius); background:var(--bg); color:var(--fg);">
-                      <?php
-                        $type = isset($stat['action_type']) && $stat['action_type'] === 'play' ? 'play' : 'download';
-                        echo esc($type === 'play' ? __('Reproducción') : __('Descarga'));
-                      ?>
-                    </span>
-                  </td>
-                  <td class="ip-tag"><?= esc($stat['ip_address']) ?></td>
+                  <th data-sort="date"><?= __('Fecha') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="type"><?= __('Tipo') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="ip"><?= __('IP') ?> <span class="sort-icon">↕</span></th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach ($dailyStats as $stat): ?>
+                  <tr>
+                    <td><?= esc(formatStatsDate($stat['download_date'])) ?></td>
+                    <td><?= esc($stat['episode_title']) ?></td>
+                    <td>
+                      <span style="font-size:.8rem; padding:.2rem .4rem; border-radius:var(--radius); background:var(--bg); color:var(--fg);">
+                        <?php
+                          $type = isset($stat['action_type']) && $stat['action_type'] === 'play' ? 'play' : 'download';
+                          echo esc($type === 'play' ? __('Reproducción') : __('Descarga'));
+                        ?>
+                      </span>
+                    </td>
+                    <td class="ip-tag"><?= esc($stat['ip_address']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
       </div>
 
@@ -260,24 +262,26 @@ if ($filterYear > 0) {
         <?php if (empty($monthlyStats)): ?>
           <div class="empty-state"><?= __('Aún no hay datos mensuales') ?></div>
         <?php else: ?>
-          <table class="stats-table">
-            <thead>
-              <tr>
-                <th data-sort="period"><?= __('Año/Mes') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($monthlyStats as $stat): ?>
+          <div class="table-wrap">
+            <table class="stats-table">
+              <thead>
                 <tr>
-                  <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
-                  <td><?= esc($stat['episode_title']) ?></td>
-                  <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  <th data-sort="period"><?= __('Año/Mes') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach ($monthlyStats as $stat): ?>
+                  <tr>
+                    <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
+                    <td><?= esc($stat['episode_title']) ?></td>
+                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
       </div>
 
@@ -286,24 +290,26 @@ if ($filterYear > 0) {
         <?php if (empty($yearlyStats)): ?>
           <div class="empty-state"><?= __('Aún no hay datos anuales') ?></div>
         <?php else: ?>
-          <table class="stats-table">
-            <thead>
-              <tr>
-                <th data-sort="year"><?= __('Año') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($yearlyStats as $stat): ?>
+          <div class="table-wrap">
+            <table class="stats-table">
+              <thead>
                 <tr>
-                  <td data-sort-value="<?= (int)$stat['anio'] ?>"><?= esc((string)$stat['anio']) ?></td>
-                  <td><?= esc($stat['episode_title']) ?></td>
-                  <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  <th data-sort="year"><?= __('Año') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="count" style="text-align: right;"><?= __('Descargas') ?> <span class="sort-icon">↕</span></th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach ($yearlyStats as $stat): ?>
+                  <tr>
+                    <td data-sort-value="<?= (int)$stat['anio'] ?>"><?= esc((string)$stat['anio']) ?></td>
+                    <td><?= esc($stat['episode_title']) ?></td>
+                    <td data-sort-value="<?= (int)$stat['descargas'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
       </div>
 
@@ -314,24 +320,26 @@ if ($filterYear > 0) {
         <?php if (empty($totalByEpisode)): ?>
           <div class="empty-state"><?= __('Aún no hay descargas ni reproducciones registradas') ?></div>
         <?php else: ?>
-          <table class="stats-table">
-            <thead>
-              <tr>
-                <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
-                <th data-sort="total" style="text-align: right;"><?= __('Total') ?> <span class="sort-icon">↕</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($totalByEpisode as $stat): ?>
-                <?php if ((int)$stat['total_downloads'] > 0): ?>
-                  <tr>
-                    <td><?= esc($stat['episode_title']) ?></td>
-                    <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
-                  </tr>
-                <?php endif; ?>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th data-sort="title"><?= __('Capítulo') ?> <span class="sort-icon">↕</span></th>
+                  <th data-sort="total" style="text-align: right;"><?= __('Total') ?> <span class="sort-icon">↕</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($totalByEpisode as $stat): ?>
+                  <?php if ((int)$stat['total_downloads'] > 0): ?>
+                    <tr>
+                      <td><?= esc($stat['episode_title']) ?></td>
+                      <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" style="text-align: right;"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
+                    </tr>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
       </div>
     </main>
@@ -375,6 +383,7 @@ if ($filterYear > 0) {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
+      min-width: 600px;
     }
     .stats-table th,
     .stats-table td {
