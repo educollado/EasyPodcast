@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @param string $episodeGuid GUID del episodio
  * @param string $episodeTitle Título del episodio
  * @param string $ipAddress IP del visitante
- * @param string $actionType Tipo de accion: 'download' o 'play'
+ * @param string $actionType Tipo de accion: 'download', 'play' o 'feed'
  * @param string|null $userAgent User-Agent del cliente
  * @param string|null $referer URL de referencia
  * @return bool True si se registró correctamente
@@ -49,6 +49,28 @@ function registerDownload(
         error_log("Error al registrar accion: " . $e->getMessage());
         return false;
     }
+}
+
+/**
+ * Indica si una acción de tracking debe acabar en redirección al audio real.
+ * Se usa para descargas web y descargas iniciadas desde lectores RSS.
+ */
+function isRedirectTrackingAction(string $actionType, bool $isAjax): bool
+{
+    if ($isAjax) {
+        return false;
+    }
+
+    return in_array($actionType, ['download', 'feed'], true);
+}
+
+/**
+ * Indica si la request debe registrarse en estadísticas.
+ * Las peticiones HEAD no se cuentan para evitar inflar métricas por validaciones previas.
+ */
+function shouldRegisterTrackingRequest(string $requestMethod): bool
+{
+    return strtoupper($requestMethod) !== 'HEAD';
 }
 
 /**

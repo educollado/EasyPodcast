@@ -19,6 +19,7 @@ if ($episodeId <= 0) {
 
 // Determinar si es AJAX (para play) o no (para download con redirect)
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+$requestMethod = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -39,23 +40,25 @@ try {
     $referer = $_SERVER['HTTP_REFERER'] ?? null;
 
     // Validar action
-    if (!in_array($action, ['download', 'play'], true)) {
+    if (!in_array($action, ['download', 'play', 'feed'], true)) {
         $action = 'download';
     }
 
-    registerDownload(
-        $pdo,
-        $episodeInfo['id'],
-        $episodeInfo['guid'],
-        $episodeInfo['title'],
-        $ipAddress,
-        $action,
-        $userAgent,
-        $referer
-    );
+    if (shouldRegisterTrackingRequest($requestMethod)) {
+        registerDownload(
+            $pdo,
+            $episodeInfo['id'],
+            $episodeInfo['guid'],
+            $episodeInfo['title'],
+            $ipAddress,
+            $action,
+            $userAgent,
+            $referer
+        );
+    }
 
-    // Si es descarga y no es AJAX, redirigir al audio
-    if ($action === 'download' && !$isAjax) {
+    // Si es descarga o feed y no es AJAX, redirigir al audio real.
+    if (isRedirectTrackingAction($action, $isAjax)) {
         $audioUrl = getEpisodeAudioUrl($pdo, $episodeId);
         if ($audioUrl !== null && $audioUrl !== '') {
             header("Location: " . $audioUrl);

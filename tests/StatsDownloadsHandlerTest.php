@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/stats_downloads_handler.php';
+require_once __DIR__ . '/../lib/i18n.php';
+
+i18n_load('es_ES');
 
 // =============================================================================
 // formatStatsDate
@@ -57,4 +60,23 @@ test('formatMonthYear: maneja mes inválido', function () {
 test('formatMonthYear: maneja mes 0', function () {
     $result = formatMonthYear(2024, 0);
     assert_eq('Mes 0 2024', $result);
+});
+
+// =============================================================================
+// getActionTypeLabel
+// =============================================================================
+
+test('getActionTypeLabel: play se muestra como Reproducción', function () {
+    $result = getActionTypeLabel('play');
+    assert_eq('Reproducción', $result);
+});
+
+test('getActionTypeLabel: feed se muestra como Feed', function () {
+    $result = getActionTypeLabel('feed');
+    assert_eq('Feed', $result);
+});
+
+test('getActionTypeLabel: download se muestra como Descarga', function () {
+    $result = getActionTypeLabel('download');
+    assert_eq('Descarga', $result);
 });

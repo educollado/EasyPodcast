@@ -164,10 +164,18 @@ function formatMonthYear(int $year, int $month): string
 /**
  * Obtiene la etiqueta localizada para el tipo de acción (descarga/reproducción).
  *
- * @param string $actionType Tipo de acción ('play' o 'download')
+ * @param string $actionType Tipo de acción ('play', 'download' o 'feed')
  * @return string Etiqueta localizada
  */
 function getActionTypeLabel(string $actionType): string
 {
-    return $actionType === 'play' ? __('Reproducción') : __('Descarga');
+    if ($actionType === 'play') {
+        return __('Reproducción');
+    }
+
+    if ($actionType === 'feed') {
+        return __('Feed');
+    }
+
+    return __('Descarga');
 }

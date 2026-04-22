@@ -155,6 +155,27 @@ function resolveFeedSelfHref(PDO $pdo): string
 }
 
 /**
+ * Construye la URL de tracking para descargas iniciadas desde el feed RSS.
+ * El endpoint redirige al audio real y permite registrar la acción como "feed".
+ */
+function buildFeedTrackingUrl(string $baseUrl, int $episodeId): string
+{
+    return rtrim($baseUrl, '/') . '/track.php?' . http_build_query([
+        'episode_id' => $episodeId,
+        'action' => 'feed',
+    ]);
+}
+
+/**
+ * Devuelve la URL de tracking para descargas iniciadas desde el feed RSS.
+ * Usa la base canónica del podcast y delega en un helper puro.
+ */
+function resolveFeedTrackingUrl(PDO $pdo, int $episodeId): string
+{
+    return buildFeedTrackingUrl(resolveBaseUrl($pdo), $episodeId);
+}
+
+/**
  * Construye un documento XML RSS 2.0 + iTunes completo desde la BD actual.
  * Respeta rss_item_limit (0 = sin límite). Lanza RuntimeException si no hay datos de podcast.
  *
@@ -291,8 +312,8 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
 
         $xml->writeElement('pubDate', toRssDate($episode['pub_date'] ?? null));
 
-        $audioUrl = (string) $episode['audio_url'];
-        $enclosureMime = normalizeEnclosureMime($episode['audio_mime_type'] ?? null, $audioUrl);
+        $audioUrl = resolveFeedTrackingUrl($pdo, (int) ($episode['id'] ?? 0));
+        $enclosureMime = normalizeEnclosureMime($episode['audio_mime_type'] ?? null, (string) $episode['audio_url']);
 
         $xml->startElement('enclosure');
         $xml->writeAttribute('url', $audioUrl);
