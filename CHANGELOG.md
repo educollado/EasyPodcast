@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.9
+
+- **RSS y estadísticas**: las descargas iniciadas desde lectores RSS ahora pasan por `track.php`, se contabilizan en estadísticas como tipo `Feed` y el `enclosure` del feed redirige correctamente al MP3 real.
+- Corrección de compatibilidad con lectores de feeds: el endpoint de tracking del RSS ya no devuelve JSON como destino del `enclosure`, evitando errores de "archivo multimedia no válido".
+- Ajuste de métricas: las peticiones `HEAD` usadas por algunos agregadores para validar el audio ya no incrementan las estadísticas.
+
 ## 1.8.8
 
 - **Publicación**: corregido el workflow de release para que solo incluya `docker-compose.yml` en los assets de la release, eliminando los archivos redundantes `EasyPodcast-{version}-source.*`. Ahora las releases contienen solo: `docker-compose.yml`, `Source code (zip)` y `Source code (tar.gz)`.
