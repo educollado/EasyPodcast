@@ -1800,6 +1800,42 @@ msgstr "Flux"
 msgid "Estadísticas del podcast"
 msgstr "Statistiques du podcast"
 
+msgid "Resumen general, caché y estadísticas de descargas"
+msgstr "Vue d'ensemble, cache et statistiques de téléchargements"
+
+msgid "Incluye estas claves principales:"
+msgstr "Il inclut ces clés principales :"
+
+msgid "resumen general de episodios y tamaño total de audio."
+msgstr "vue d'ensemble des épisodes et taille totale de l'audio."
+
+msgid "estado de la caché, número de ficheros y tamaño total."
+msgstr "état du cache, nombre de fichiers et taille totale."
+
+msgid "últimos registros diarios con tipo de acción, IP, user agent y referer."
+msgstr "derniers enregistrements quotidiens avec type d'action, IP, user agent et referer."
+
+msgid "agregados mensuales por episodio; admite el filtro opcional year."
+msgstr "agrégats mensuels par épisode ; accepte le filtre facultatif year."
+
+msgid "agregados anuales por episodio."
+msgstr "agrégats annuels par épisode."
+
+msgid "totales acumulados por episodio con descargas o reproducciones."
+msgstr "totaux cumulés par épisode avec téléchargements ou lectures."
+
+msgid "También se incluyen campos auxiliares de presentación como audio_size_human, size_human, display_date, action_type_label y period_label."
+msgstr "Des champs auxiliaires de présentation sont aussi inclus, comme audio_size_human, size_human, display_date, action_type_label et period_label."
+
+msgid "Se mantienen las claves anteriores de episodes y cache por compatibilidad."
+msgstr "Les clés précédentes de episodes et cache sont conservées pour compatibilité."
+
+msgid "El parámetro opcional"
+msgstr "Le paramètre facultatif"
+
+msgid "filtra solo la colección mensual; el resto de bloques se devuelve completo."
+msgstr "filtre uniquement la collection mensuelle ; les autres blocs sont renvoyés en entier."
+
 msgid "Regenerar feed.xml y sitemap.xml"
 msgstr "Régénérer feed.xml et sitemap.xml"
 

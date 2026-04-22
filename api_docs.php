@@ -278,8 +278,63 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
         <h2><?= __('Estadísticas') ?></h2>
 
         <div class="endpoint-block">
-          <p><span class="method method-get">GET</span> <code class="inline">/api/v1/stats</code> — <?= __('Estadísticas del podcast') ?></p>
-          <pre>curl -s -H "Authorization: Bearer TOKEN" "<?= esc($baseUrl) ?>/api/v1/stats"</pre>
+          <p><span class="method method-get">GET</span> <code class="inline">/api/v1/stats</code> — <?= __('Resumen general, caché y estadísticas de descargas') ?></p>
+          <pre>curl -s -H "Authorization: Bearer TOKEN" "<?= esc($baseUrl) ?>/api/v1/stats"
+curl -s -H "Authorization: Bearer TOKEN" "<?= esc($baseUrl) ?>/api/v1/stats?year=2026"</pre>
+          <pre>{
+  "success": true,
+  "data": {
+    "episodes": {
+      "published": 12,
+      "drafts": 3,
+      "total": 15,
+      "last_title": "Episodio 12",
+      "last_pub_date": "2026-04-20 09:30:00",
+      "audio_size_bytes": 123456789,
+      "audio_size_human": "117.7 MB"
+    },
+    "cache": {
+      "enabled": true,
+      "files": 24,
+      "size_bytes": 34567,
+      "size_human": "33.8 KB"
+    },
+    "downloads": {
+      "filter_year": 2026,
+      "available_years": [2026, 2025],
+      "daily": {
+        "items": [
+          {
+            "episode_title": "Episodio 12",
+            "action_type": "feed",
+            "action_type_label": "Feed",
+            "ip_address": "203.0.113.10",
+            "display_date": "22/04/2026 11:00:00"
+          }
+        ],
+        "total": 1
+      },
+      "monthly": {
+        "items": [{ "period_label": "Abr 2026", "descargas": 10 }],
+        "total": 1
+      },
+      "yearly": { "items": [], "total": 0 },
+      "summary": { "items": [], "total": 0 }
+    }
+  }
+}</pre>
+          <p><?= __('Incluye estas claves principales:') ?></p>
+          <ul>
+            <li><code class="inline">episodes</code>: <?= __('resumen general de episodios y tamaño total de audio.') ?></li>
+            <li><code class="inline">cache</code>: <?= __('estado de la caché, número de ficheros y tamaño total.') ?></li>
+            <li><code class="inline">downloads.daily</code>: <?= __('últimos registros diarios con tipo de acción, IP, user agent y referer.') ?></li>
+            <li><code class="inline">downloads.monthly</code>: <?= __('agregados mensuales por episodio; admite el filtro opcional year.') ?></li>
+            <li><code class="inline">downloads.yearly</code>: <?= __('agregados anuales por episodio.') ?></li>
+            <li><code class="inline">downloads.summary</code>: <?= __('totales acumulados por episodio con descargas o reproducciones.') ?></li>
+          </ul>
+          <p><?= __('También se incluyen campos auxiliares de presentación como audio_size_human, size_human, display_date, action_type_label y period_label.') ?></p>
+          <p><?= __('Se mantienen las claves anteriores de episodes y cache por compatibilidad.') ?></p>
+          <p><?= __('El parámetro opcional') ?> <code class="inline">year</code> <?= __('filtra solo la colección mensual; el resto de bloques se devuelve completo.') ?></p>
         </div>
       </div>
 

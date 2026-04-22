@@ -1800,6 +1800,42 @@ msgstr "Feed"
 msgid "Estadísticas del podcast"
 msgstr "Estatísticas do podcast"
 
+msgid "Resumen general, caché y estadísticas de descargas"
+msgstr "Resumo geral, cache e estatísticas de downloads"
+
+msgid "Incluye estas claves principales:"
+msgstr "Inclui estas chaves principais:"
+
+msgid "resumen general de episodios y tamaño total de audio."
+msgstr "resumo geral dos episódios e tamanho total de áudio."
+
+msgid "estado de la caché, número de ficheros y tamaño total."
+msgstr "estado da cache, número de ficheiros e tamanho total."
+
+msgid "últimos registros diarios con tipo de acción, IP, user agent y referer."
+msgstr "últimos registos diários com tipo de ação, IP, user agent e referer."
+
+msgid "agregados mensuales por episodio; admite el filtro opcional year."
+msgstr "agregados mensais por episódio; aceita o filtro opcional year."
+
+msgid "agregados anuales por episodio."
+msgstr "agregados anuais por episódio."
+
+msgid "totales acumulados por episodio con descargas o reproducciones."
+msgstr "totais acumulados por episódio com downloads ou reproduções."
+
+msgid "También se incluyen campos auxiliares de presentación como audio_size_human, size_human, display_date, action_type_label y period_label."
+msgstr "Também inclui campos auxiliares de apresentação como audio_size_human, size_human, display_date, action_type_label e period_label."
+
+msgid "Se mantienen las claves anteriores de episodes y cache por compatibilidad."
+msgstr "As chaves anteriores de episodes e cache são mantidas por compatibilidade."
+
+msgid "El parámetro opcional"
+msgstr "O parâmetro opcional"
+
+msgid "filtra solo la colección mensual; el resto de bloques se devuelve completo."
+msgstr "filtra apenas a coleção mensal; os restantes blocos são devolvidos completos."
+
 msgid "Regenerar feed.xml y sitemap.xml"
 msgstr "Regenerar feed.xml e sitemap.xml"
 

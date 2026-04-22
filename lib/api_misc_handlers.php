@@ -5,80 +5,45 @@ declare(strict_types=1);
 require_once __DIR__ . '/api_helpers.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/cache_management_handler.php';
+require_once __DIR__ . '/stats_handler.php';
+require_once __DIR__ . '/stats_downloads_handler.php';
 
 /**
  * GET /api/v1/stats
- * Estadísticas básicas del podcast: episodios, caché y tamaño de audio.
+ * Estadísticas del podcast: resumen general, caché y descargas.
  */
 function apiGetStats(PDO $pdo, string $dbPath): void
 {
-    $published      = 0;
-    $drafts         = 0;
-    $total          = 0;
-    $lastTitle      = '';
-    $lastPubDate    = '';
-    $audioSizeBytes = 0;
-
-    $rows = $pdo->query(
-        "SELECT status, COUNT(*) AS cnt FROM episodes GROUP BY status"
-    )->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($rows as $row) {
-        $cnt = (int) $row['cnt'];
-        if ($row['status'] === 'published') {
-            $published = $cnt;
-        } else {
-            $drafts += $cnt;
-        }
-        $total += $cnt;
-    }
-
-    $last = $pdo->query(
-        "SELECT title, pub_date FROM episodes WHERE status = 'published'
-         ORDER BY pub_date DESC LIMIT 1"
-    )->fetch(PDO::FETCH_ASSOC);
-    if ($last) {
-        $lastTitle   = (string) $last['title'];
-        $lastPubDate = (string) $last['pub_date'];
-    }
-
-    $sizeRow        = $pdo->query("SELECT COALESCE(SUM(audio_size_bytes), 0) AS total FROM episodes")->fetch(PDO::FETCH_ASSOC);
-    $audioSizeBytes = (int) ($sizeRow['total'] ?? 0);
-
-    $cacheEnabled  = isWebCacheEnabled($dbPath);
-    $cacheFiles    = 0;
-    $cacheSizeBytes = 0;
-    $cacheDir      = cacheDirectoryPath();
-
-    if (is_dir($cacheDir)) {
-        $entries = @scandir($cacheDir) ?: [];
-        foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            $path = $cacheDir . '/' . $entry;
-            if (is_file($path)) {
-                $cacheFiles++;
-                $cacheSizeBytes += (int) @filesize($path);
-            }
-        }
-    }
+    $filterYear = isset($_GET['year']) ? (int) $_GET['year'] : null;
+    $overview = getStatsOverview($pdo);
+    $cache = getCacheStatsData($dbPath);
+    $downloads = getDownloadsStatsData($pdo, $filterYear);
 
     apiJsonResponse([
         'success' => true,
         'data'    => [
             'episodes' => [
-                'published'       => $published,
-                'drafts'          => $drafts,
-                'total'           => $total,
-                'last_title'      => $lastTitle,
-                'last_pub_date'   => $lastPubDate,
-                'audio_size_bytes' => $audioSizeBytes,
+                'published' => (int) $overview['published'],
+                'drafts' => (int) $overview['drafts'],
+                'total' => (int) $overview['total'],
+                'last_title' => (string) $overview['lastTitle'],
+                'last_pub_date' => (string) $overview['lastPubDate'],
+                'audio_size_bytes' => (int) $overview['audioSizeBytes'],
+                'audio_size_human' => statsFormatBytes((int) $overview['audioSizeBytes']),
             ],
             'cache' => [
-                'enabled'    => $cacheEnabled,
-                'files'      => $cacheFiles,
-                'size_bytes' => $cacheSizeBytes,
+                'enabled' => (bool) $cache['cacheEnabled'],
+                'files' => (int) $cache['cacheFiles'],
+                'size_bytes' => (int) $cache['cacheSizeBytes'],
+                'size_human' => statsFormatBytes((int) $cache['cacheSizeBytes']),
+            ],
+            'downloads' => [
+                'filter_year' => $downloads['filter_year'],
+                'available_years' => $downloads['available_years'],
+                'daily' => $downloads['daily'],
+                'monthly' => $downloads['monthly'],
+                'yearly' => $downloads['yearly'],
+                'summary' => $downloads['summary'],
             ],
         ],
     ]);

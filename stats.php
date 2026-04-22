@@ -151,11 +151,13 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    $dailyStats = getDailyStats($pdo);
-    $monthlyStats = getMonthlyStats($pdo, $filterYear > 0 ? $filterYear : null);
-    $yearlyStats = getYearlyStats($pdo);
-    $totalByEpisode = getTotalDownloadsByEpisode($pdo);
-    $availableYears = getAvailableYears($pdo);
+    $downloadsData = getDownloadsStatsData($pdo, $filterYear);
+    $filterYear = $downloadsData['filter_year'];
+    $dailyStats = $downloadsData['daily']['items'];
+    $monthlyStats = $downloadsData['monthly']['items'];
+    $yearlyStats = $downloadsData['yearly']['items'];
+    $totalByEpisode = $downloadsData['summary']['items'];
+    $availableYears = $downloadsData['available_years'];
 } catch (Throwable $e) {
     $dailyStats = [];
     $monthlyStats = [];
@@ -164,10 +166,6 @@ try {
     $availableYears = [];
     $downloadsError = $e->getMessage();
 }
-
-$totalByEpisode = array_values(array_filter($totalByEpisode, static function (array $stat): bool {
-    return (int) ($stat['total_downloads'] ?? 0) > 0;
-}));
 
 $dailyPagination = paginateStatsRows($dailyStats, getStatsPageNumber('diario_page', $_GET), STATS_ROWS_PER_PAGE);
 $monthlyPagination = paginateStatsRows($monthlyStats, getStatsPageNumber('mensual_page', $_GET), STATS_ROWS_PER_PAGE);
@@ -336,11 +334,11 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
               <tbody>
                 <?php foreach ($dailyPagination['rows'] as $stat): ?>
                   <tr>
-                    <td><?= esc(formatStatsDate($stat['download_date'])) ?></td>
+                    <td><?= esc((string) ($stat['display_date'] ?? formatStatsDate((string) ($stat['download_date'] ?? '')))) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
                     <td>
                       <span class="action-type-badge">
-                        <?= esc(getActionTypeLabel($stat['action_type'] ?? 'download')) ?? esc(__('Descarga')) ?>
+                        <?= esc((string) ($stat['action_type_label'] ?? getActionTypeLabel((string) ($stat['action_type'] ?? 'download')))) ?>
                       </span>
                     </td>
                     <td class="ip-tag"><?= esc($stat['ip_address']) ?></td>
@@ -389,7 +387,7 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
               <tbody>
                 <?php foreach ($monthlyPagination['rows'] as $stat): ?>
                   <tr>
-                    <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
+                    <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc((string) ($stat['period_label'] ?? formatMonthYear((int) $stat['anio'], (int) $stat['mes']))) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
                     <td data-sort-value="<?= (int)$stat['descargas'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['descargas'] ?></span></td>
                   </tr>

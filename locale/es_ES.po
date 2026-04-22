@@ -1809,6 +1809,42 @@ msgstr ""
 msgid "Estadísticas del podcast"
 msgstr ""
 
+msgid "Resumen general, caché y estadísticas de descargas"
+msgstr ""
+
+msgid "Incluye estas claves principales:"
+msgstr ""
+
+msgid "resumen general de episodios y tamaño total de audio."
+msgstr ""
+
+msgid "estado de la caché, número de ficheros y tamaño total."
+msgstr ""
+
+msgid "últimos registros diarios con tipo de acción, IP, user agent y referer."
+msgstr ""
+
+msgid "agregados mensuales por episodio; admite el filtro opcional year."
+msgstr ""
+
+msgid "agregados anuales por episodio."
+msgstr ""
+
+msgid "totales acumulados por episodio con descargas o reproducciones."
+msgstr ""
+
+msgid "También se incluyen campos auxiliares de presentación como audio_size_human, size_human, display_date, action_type_label y period_label."
+msgstr ""
+
+msgid "Se mantienen las claves anteriores de episodes y cache por compatibilidad."
+msgstr ""
+
+msgid "El parámetro opcional"
+msgstr ""
+
+msgid "filtra solo la colección mensual; el resto de bloques se devuelve completo."
+msgstr ""
+
 msgid "Regenerar feed.xml y sitemap.xml"
 msgstr ""
 

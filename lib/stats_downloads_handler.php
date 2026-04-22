@@ -93,14 +93,14 @@ function getTotalDownloadsByEpisode(PDO $pdo): array
     try {
         $stmt = $pdo->query(
             "SELECT 
-                e.episode_id,
-                e.episode_title,
-                e.episode_guid,
+                e.id AS episode_id,
+                e.title AS episode_title,
+                e.guid AS episode_guid,
                 COALESCE(SUM(em.descargas), 0) as total_downloads
              FROM episodes e
-             LEFT JOIN estadisticas_mensuales em ON em.episode_id = e.episode_id
-             GROUP BY e.episode_id, e.episode_title, e.episode_guid
-             ORDER BY total_downloads DESC, e.episode_title ASC"
+             LEFT JOIN estadisticas_mensuales em ON em.episode_id = e.id
+             GROUP BY e.id, e.title, e.guid
+             ORDER BY total_downloads DESC, e.title ASC"
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
@@ -127,6 +127,69 @@ function getAvailableYears(PDO $pdo): array
         error_log("Error al obtener años disponibles: " . $e->getMessage());
         return [];
     }
+}
+
+/**
+ * Devuelve todas las colecciones de estadísticas de descargas tal como las usa stats.php.
+ *
+ * @return array{
+ *   filter_year: int|null,
+ *   available_years: array<int, int>,
+ *   daily: array{items: array<int, array<string, mixed>>, total: int},
+ *   monthly: array{items: array<int, array<string, mixed>>, total: int},
+ *   yearly: array{items: array<int, array<string, mixed>>, total: int},
+ *   summary: array{items: array<int, array<string, mixed>>, total: int}
+ * }
+ */
+function getDownloadsStatsData(PDO $pdo, ?int $filterYear = null): array
+{
+    $normalizedFilterYear = ($filterYear !== null && $filterYear > 0) ? $filterYear : null;
+
+    $dailyStats = array_map(static function (array $stat): array {
+        $downloadDate = (string) ($stat['download_date'] ?? '');
+        $actionType = (string) ($stat['action_type'] ?? 'download');
+        $stat['display_date'] = formatStatsDate($downloadDate);
+        $stat['action_type'] = $actionType;
+        $stat['action_type_label'] = getActionTypeLabel($actionType);
+        return $stat;
+    }, getDailyStats($pdo));
+
+    $monthlyStats = array_map(static function (array $stat): array {
+        $stat['period_label'] = formatMonthYear((int) ($stat['anio'] ?? 0), (int) ($stat['mes'] ?? 0));
+        return $stat;
+    }, getMonthlyStats($pdo, $normalizedFilterYear));
+
+    $yearlyStats = getYearlyStats($pdo);
+
+    $summaryStats = array_values(array_filter(
+        getTotalDownloadsByEpisode($pdo),
+        static function (array $stat): bool {
+            return (int) ($stat['total_downloads'] ?? 0) > 0;
+        }
+    ));
+
+    $availableYears = getAvailableYears($pdo);
+
+    return [
+        'filter_year' => $normalizedFilterYear,
+        'available_years' => $availableYears,
+        'daily' => [
+            'items' => $dailyStats,
+            'total' => count($dailyStats),
+        ],
+        'monthly' => [
+            'items' => $monthlyStats,
+            'total' => count($monthlyStats),
+        ],
+        'yearly' => [
+            'items' => $yearlyStats,
+            'total' => count($yearlyStats),
+        ],
+        'summary' => [
+            'items' => $summaryStats,
+            'total' => count($summaryStats),
+        ],
+    ];
 }
 
 /**

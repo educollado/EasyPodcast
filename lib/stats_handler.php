@@ -6,6 +6,98 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/i18n.php';
 
 /**
+ * Devuelve el resumen general de episodios para la pantalla de estadísticas.
+ *
+ * @return array{
+ *   published: int,
+ *   drafts: int,
+ *   total: int,
+ *   lastTitle: string,
+ *   lastPubDate: string,
+ *   audioSizeBytes: int
+ * }
+ */
+function getStatsOverview(PDO $pdo): array
+{
+    $published = 0;
+    $drafts = 0;
+    $total = 0;
+    $lastTitle = '';
+    $lastPubDate = '';
+    $audioSizeBytes = 0;
+
+    $rows = $pdo->query(
+        "SELECT status, COUNT(*) AS cnt FROM episodes GROUP BY status"
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($rows as $row) {
+        $cnt = (int) $row['cnt'];
+        if (($row['status'] ?? '') === 'published') {
+            $published = $cnt;
+        } else {
+            $drafts += $cnt;
+        }
+        $total += $cnt;
+    }
+
+    $last = $pdo->query(
+        "SELECT title, pub_date FROM episodes WHERE status = 'published'
+         ORDER BY pub_date DESC LIMIT 1"
+    )->fetch(PDO::FETCH_ASSOC);
+    if ($last) {
+        $lastTitle = (string) ($last['title'] ?? '');
+        $lastPubDate = (string) ($last['pub_date'] ?? '');
+    }
+
+    $sizeRow = $pdo->query(
+        "SELECT COALESCE(SUM(audio_size_bytes), 0) AS total FROM episodes"
+    )->fetch(PDO::FETCH_ASSOC);
+    $audioSizeBytes = (int) ($sizeRow['total'] ?? 0);
+
+    return compact(
+        'published',
+        'drafts',
+        'total',
+        'lastTitle',
+        'lastPubDate',
+        'audioSizeBytes'
+    );
+}
+
+/**
+ * Devuelve el estado actual de la caché web.
+ *
+ * @return array{
+ *   cacheEnabled: bool,
+ *   cacheFiles: int,
+ *   cacheSizeBytes: int
+ * }
+ */
+function getCacheStatsData(string $dbPath, ?string $cacheDir = null): array
+{
+    $cacheEnabled = isWebCacheEnabled($dbPath);
+    $cacheFiles = 0;
+    $cacheSizeBytes = 0;
+    $cacheDir = $cacheDir ?? cacheDirectoryPath();
+
+    if (is_dir($cacheDir)) {
+        $entries = @scandir($cacheDir) ?: [];
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $cacheDir . '/' . $entry;
+            if (is_file($path)) {
+                $cacheFiles++;
+                $cacheSizeBytes += (int) @filesize($path);
+            }
+        }
+    }
+
+    return compact('cacheEnabled', 'cacheFiles', 'cacheSizeBytes');
+}
+
+/**
  * Devuelve las estadísticas básicas del podcast a partir de la BD y del sistema de caché.
  *
  * @return array{
@@ -23,72 +115,27 @@ require_once __DIR__ . '/i18n.php';
  */
 function loadStatsData(string $dbPath): array
 {
-    $published       = 0;
-    $drafts          = 0;
-    $total           = 0;
-    $lastTitle       = '';
-    $lastPubDate     = '';
-    $audioSizeBytes  = 0;
-    $cacheEnabled    = false;
-    $cacheFiles      = 0;
-    $cacheSizeBytes  = 0;
-    $error           = '';
+    $published = 0;
+    $drafts = 0;
+    $total = 0;
+    $lastTitle = '';
+    $lastPubDate = '';
+    $audioSizeBytes = 0;
+    $cacheEnabled = false;
+    $cacheFiles = 0;
+    $cacheSizeBytes = 0;
+    $error = '';
 
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-        // Contadores por estado.
-        $rows = $pdo->query(
-            "SELECT status, COUNT(*) AS cnt FROM episodes GROUP BY status"
-        )->fetchAll();
-        foreach ($rows as $row) {
-            $cnt = (int) $row['cnt'];
-            if ($row['status'] === 'published') {
-                $published = $cnt;
-            } else {
-                $drafts += $cnt;
-            }
-            $total += $cnt;
-        }
-
-        // Último episodio publicado.
-        $last = $pdo->query(
-            "SELECT title, pub_date FROM episodes WHERE status = 'published'
-             ORDER BY pub_date DESC LIMIT 1"
-        )->fetch();
-        if ($last) {
-            $lastTitle   = (string) $last['title'];
-            $lastPubDate = (string) $last['pub_date'];
-        }
-
-        // Tamaño total de audios almacenado en BD.
-        $sizeRow = $pdo->query(
-            "SELECT COALESCE(SUM(audio_size_bytes), 0) AS total FROM episodes"
-        )->fetch();
-        $audioSizeBytes = (int) ($sizeRow['total'] ?? 0);
-
+        extract(getStatsOverview($pdo), EXTR_OVERWRITE);
     } catch (Throwable $e) {
         $error = __('Error al cargar estadísticas: %s', $e->getMessage());
     }
 
-    // Estado de la caché web.
-    $cacheEnabled = isWebCacheEnabled($dbPath);
-    $cacheDir = cacheDirectoryPath();
-    if (is_dir($cacheDir)) {
-        $entries = @scandir($cacheDir) ?: [];
-        foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            $path = $cacheDir . '/' . $entry;
-            if (is_file($path)) {
-                $cacheFiles++;
-                $cacheSizeBytes += (int) @filesize($path);
-            }
-        }
-    }
+    extract(getCacheStatsData($dbPath), EXTR_OVERWRITE);
 
     return compact(
         'published', 'drafts', 'total',
