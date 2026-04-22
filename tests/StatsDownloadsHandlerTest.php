@@ -80,3 +80,85 @@ test('getActionTypeLabel: download se muestra como Descarga', function () {
     $result = getActionTypeLabel('download');
     assert_eq('Descarga', $result);
 });
+
+// =============================================================================
+// getStatsPageNumber
+// =============================================================================
+
+test('getStatsPageNumber: devuelve el entero válido indicado', function () {
+    $result = getStatsPageNumber('diario_page', ['diario_page' => '3']);
+    assert_eq(3, $result);
+});
+
+test('getStatsPageNumber: corrige valores menores que 1', function () {
+    $result = getStatsPageNumber('diario_page', ['diario_page' => '0']);
+    assert_eq(1, $result);
+});
+
+test('getStatsPageNumber: ignora valores no numéricos', function () {
+    $result = getStatsPageNumber('diario_page', ['diario_page' => 'abc']);
+    assert_eq(1, $result);
+});
+
+// =============================================================================
+// paginateStatsRows
+// =============================================================================
+
+test('paginateStatsRows: pagina correctamente la primera página', function () {
+    $rows = [];
+    foreach (range(1, 250) as $n) {
+        $rows[] = ['id' => $n];
+    }
+
+    $page = paginateStatsRows($rows, 1, 100);
+
+    assert_eq(100, count($page['rows']));
+    assert_eq(1, $page['page']);
+    assert_eq(3, $page['total_pages']);
+    assert_eq(250, $page['total_rows']);
+    assert_eq(1, $page['from']);
+    assert_eq(100, $page['to']);
+    assert_eq(1, $page['rows'][0]['id']);
+    assert_eq(100, $page['rows'][99]['id']);
+});
+
+test('paginateStatsRows: pagina correctamente una página intermedia', function () {
+    $rows = [];
+    foreach (range(1, 250) as $n) {
+        $rows[] = ['id' => $n];
+    }
+
+    $page = paginateStatsRows($rows, 2, 100);
+
+    assert_eq(100, count($page['rows']));
+    assert_eq(2, $page['page']);
+    assert_eq(101, $page['from']);
+    assert_eq(200, $page['to']);
+    assert_eq(101, $page['rows'][0]['id']);
+    assert_eq(200, $page['rows'][99]['id']);
+});
+
+test('paginateStatsRows: ajusta páginas fuera de rango al máximo disponible', function () {
+    $rows = [];
+    foreach (range(1, 250) as $n) {
+        $rows[] = ['id' => $n];
+    }
+
+    $page = paginateStatsRows($rows, 9, 100);
+
+    assert_eq(3, $page['page']);
+    assert_eq(201, $page['from']);
+    assert_eq(250, $page['to']);
+    assert_eq(50, count($page['rows']));
+});
+
+test('paginateStatsRows: devuelve metadatos vacíos si no hay filas', function () {
+    $page = paginateStatsRows([], 1, 100);
+
+    assert_eq([], $page['rows']);
+    assert_eq(1, $page['page']);
+    assert_eq(0, $page['total_pages']);
+    assert_eq(0, $page['total_rows']);
+    assert_eq(0, $page['from']);
+    assert_eq(0, $page['to']);
+});

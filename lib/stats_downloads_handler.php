@@ -130,6 +130,77 @@ function getAvailableYears(PDO $pdo): array
 }
 
 /**
+ * Devuelve un número de página válido a partir de parámetros GET/POST.
+ *
+ * @param string $param Nombre del parámetro
+ * @param array<string, mixed> $source Origen de parámetros
+ * @return int Página normalizada (mínimo 1)
+ */
+function getStatsPageNumber(string $param, array $source): int
+{
+    $raw = $source[$param] ?? 1;
+
+    if (is_int($raw)) {
+        return max(1, $raw);
+    }
+
+    if (is_string($raw) && preg_match('/^\d+$/', $raw) === 1) {
+        return max(1, (int) $raw);
+    }
+
+    return 1;
+}
+
+/**
+ * Pagina un conjunto de filas y devuelve metadatos listos para la vista.
+ *
+ * @param array<int, array<string, mixed>> $rows Filas completas
+ * @param int $page Página solicitada (1-based)
+ * @param int $perPage Filas por página
+ * @return array{
+ *   rows: array<int, array<string, mixed>>,
+ *   page: int,
+ *   per_page: int,
+ *   total_rows: int,
+ *   total_pages: int,
+ *   from: int,
+ *   to: int
+ * }
+ */
+function paginateStatsRows(array $rows, int $page, int $perPage = 100): array
+{
+    $perPage = max(1, $perPage);
+    $totalRows = count($rows);
+
+    if ($totalRows === 0) {
+        return [
+            'rows' => [],
+            'page' => 1,
+            'per_page' => $perPage,
+            'total_rows' => 0,
+            'total_pages' => 0,
+            'from' => 0,
+            'to' => 0,
+        ];
+    }
+
+    $totalPages = (int) ceil($totalRows / $perPage);
+    $page = max(1, min($page, $totalPages));
+    $offset = ($page - 1) * $perPage;
+    $pageRows = array_slice($rows, $offset, $perPage);
+
+    return [
+        'rows' => $pageRows,
+        'page' => $page,
+        'per_page' => $perPage,
+        'total_rows' => $totalRows,
+        'total_pages' => $totalPages,
+        'from' => $offset + 1,
+        'to' => $offset + count($pageRows),
+    ];
+}
+
+/**
  * Formatea una fecha para mostrar en la interfaz.
  *
  * @param string $dateString Fecha en formato ISO

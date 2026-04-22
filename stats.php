@@ -23,6 +23,125 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 $data = loadStatsData($dbPath);
 extract($data); // published, drafts, total, lastTitle, lastPubDate, audioSizeBytes, cacheEnabled, cacheFiles, cacheSizeBytes, error
 
+const STATS_ROWS_PER_PAGE = 100;
+
+/**
+ * Construye una URL de stats.php preservando los filtros actuales.
+ *
+ * @param array<string, int|string|null> $overrides
+ */
+function buildStatsUrl(array $overrides = []): string
+{
+    $params = $_GET;
+
+    foreach ($overrides as $key => $value) {
+        if ($value === null || $value === '') {
+            unset($params[$key]);
+            continue;
+        }
+
+        if (str_ends_with($key, '_page') && (int) $value <= 1) {
+            unset($params[$key]);
+            continue;
+        }
+
+        $params[$key] = (string) $value;
+    }
+
+    $query = http_build_query($params);
+    return 'stats.php' . ($query !== '' ? '?' . $query : '');
+}
+
+/**
+ * Calcula una ventana compacta de páginas para la paginación.
+ *
+ * @return array<int|null>
+ */
+function getStatsPaginationPages(int $currentPage, int $totalPages): array
+{
+    if ($totalPages <= 7) {
+        return range(1, $totalPages);
+    }
+
+    $pages = [1, $currentPage - 1, $currentPage, $currentPage + 1, $totalPages];
+    $pages = array_values(array_unique(array_filter($pages, static function (int $page) use ($totalPages): bool {
+        return $page >= 1 && $page <= $totalPages;
+    })));
+    sort($pages);
+
+    $window = [];
+    $previous = null;
+    foreach ($pages as $page) {
+        if ($previous !== null && $page > $previous + 1) {
+            $window[] = null;
+        }
+        $window[] = $page;
+        $previous = $page;
+    }
+
+    return $window;
+}
+
+/**
+ * Renderiza la paginación de una tabla de estadísticas.
+ *
+ * @param array{
+ *   rows: array<int, array<string, mixed>>,
+ *   page: int,
+ *   per_page: int,
+ *   total_rows: int,
+ *   total_pages: int,
+ *   from: int,
+ *   to: int
+ * } $pagination
+ */
+function renderStatsPagination(string $tab, string $pageParam, array $pagination): void
+{
+    if (($pagination['total_rows'] ?? 0) === 0) {
+        return;
+    }
+
+    $currentPage = (int) $pagination['page'];
+    $totalPages = (int) $pagination['total_pages'];
+    $hrefBase = '#tab-' . $tab;
+
+    echo '<div class="stats-pagination">';
+    echo '<div class="stats-pagination-info">' . esc(__('Mostrando %d-%d de %d', (int) $pagination['from'], (int) $pagination['to'], (int) $pagination['total_rows'])) . '</div>';
+
+    if ($totalPages > 1) {
+        echo '<div class="stats-pagination-links">';
+
+        if ($currentPage > 1) {
+            $prevUrl = buildStatsUrl(['tab' => $tab, $pageParam => $currentPage - 1]) . $hrefBase;
+            echo '<a class="stats-page-link" href="' . esc($prevUrl) . '">' . esc(__('Anterior')) . '</a>';
+        }
+
+        foreach (getStatsPaginationPages($currentPage, $totalPages) as $page) {
+            if ($page === null) {
+                echo '<span class="stats-page-gap">…</span>';
+                continue;
+            }
+
+            if ($page === $currentPage) {
+                echo '<span class="stats-page-current">' . esc((string) $page) . '</span>';
+                continue;
+            }
+
+            $pageUrl = buildStatsUrl(['tab' => $tab, $pageParam => $page]) . $hrefBase;
+            echo '<a class="stats-page-link" href="' . esc($pageUrl) . '">' . esc((string) $page) . '</a>';
+        }
+
+        if ($currentPage < $totalPages) {
+            $nextUrl = buildStatsUrl(['tab' => $tab, $pageParam => $currentPage + 1]) . $hrefBase;
+            echo '<a class="stats-page-link" href="' . esc($nextUrl) . '">' . esc(__('Siguiente')) . '</a>';
+        }
+
+        echo '</div>';
+    }
+
+    echo '</div>';
+}
+
 // Datos de descargas
 $filterYear = isset($_GET['year']) ? (int) $_GET['year'] : null;
 $downloadsError = '';
@@ -45,6 +164,15 @@ try {
     $availableYears = [];
     $downloadsError = $e->getMessage();
 }
+
+$totalByEpisode = array_values(array_filter($totalByEpisode, static function (array $stat): bool {
+    return (int) ($stat['total_downloads'] ?? 0) > 0;
+}));
+
+$dailyPagination = paginateStatsRows($dailyStats, getStatsPageNumber('diario_page', $_GET), STATS_ROWS_PER_PAGE);
+$monthlyPagination = paginateStatsRows($monthlyStats, getStatsPageNumber('mensual_page', $_GET), STATS_ROWS_PER_PAGE);
+$yearlyPagination = paginateStatsRows($yearlyStats, getStatsPageNumber('anual_page', $_GET), STATS_ROWS_PER_PAGE);
+$summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resumen_page', $_GET), STATS_ROWS_PER_PAGE);
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -187,12 +315,12 @@ try {
       <div id="tab-diario" class="stats-panel active">
         <p class="stats-note">
           <?php
-            $count = count($dailyStats);
+            $count = (int) $dailyPagination['total_rows'];
             echo esc(__('Últimas %d descargas y reproducciones (hasta 7 días)', $count));
           ?>
         </p>
         
-        <?php if (empty($dailyStats)): ?>
+        <?php if ((int) $dailyPagination['total_rows'] === 0): ?>
           <div class="empty-state"><?= __('Aún no hay datos de descargas o reproducciones') ?></div>
         <?php else: ?>
           <div class="table-wrap">
@@ -206,7 +334,7 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($dailyStats as $stat): ?>
+                <?php foreach ($dailyPagination['rows'] as $stat): ?>
                   <tr>
                     <td><?= esc(formatStatsDate($stat['download_date'])) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
@@ -221,6 +349,7 @@ try {
               </tbody>
             </table>
           </div>
+          <?php renderStatsPagination('diario', 'diario_page', $dailyPagination); ?>
         <?php endif; ?>
       </div>
 
@@ -245,7 +374,7 @@ try {
           </div>
         <?php endif; ?>
 
-        <?php if (empty($monthlyStats)): ?>
+        <?php if ((int) $monthlyPagination['total_rows'] === 0): ?>
           <div class="empty-state"><?= __('Aún no hay datos mensuales') ?></div>
         <?php else: ?>
           <div class="table-wrap">
@@ -258,7 +387,7 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($monthlyStats as $stat): ?>
+                <?php foreach ($monthlyPagination['rows'] as $stat): ?>
                   <tr>
                     <td data-sort-value="<?= (int)$stat['anio'] * 12 + (int)$stat['mes'] ?>"><?= esc(formatMonthYear((int)$stat['anio'], (int)$stat['mes'])) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
@@ -268,12 +397,13 @@ try {
               </tbody>
             </table>
           </div>
+          <?php renderStatsPagination('mensual', 'mensual_page', $monthlyPagination); ?>
         <?php endif; ?>
       </div>
 
       <!-- Pestaña Anual -->
       <div id="tab-anual" class="stats-panel">
-        <?php if (empty($yearlyStats)): ?>
+        <?php if ((int) $yearlyPagination['total_rows'] === 0): ?>
           <div class="empty-state"><?= __('Aún no hay datos anuales') ?></div>
         <?php else: ?>
           <div class="table-wrap">
@@ -286,7 +416,7 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($yearlyStats as $stat): ?>
+                <?php foreach ($yearlyPagination['rows'] as $stat): ?>
                   <tr>
                     <td data-sort-value="<?= (int)$stat['anio'] ?>"><?= esc((string)$stat['anio']) ?></td>
                     <td><?= esc($stat['episode_title']) ?></td>
@@ -296,6 +426,7 @@ try {
               </tbody>
             </table>
           </div>
+          <?php renderStatsPagination('anual', 'anual_page', $yearlyPagination); ?>
         <?php endif; ?>
       </div>
 
@@ -303,7 +434,7 @@ try {
       <div id="tab-resumen" class="stats-panel">
         <h3 class="section-subtitle" style="margin-top: 0;"><?= __('Total de descargas y reproducciones por capítulo') ?></h3>
         
-        <?php if (empty($totalByEpisode)): ?>
+        <?php if ((int) $summaryPagination['total_rows'] === 0): ?>
           <div class="empty-state"><?= __('Aún no hay descargas ni reproducciones registradas') ?></div>
         <?php else: ?>
           <div class="table-wrap">
@@ -315,17 +446,16 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($totalByEpisode as $stat): ?>
-                  <?php if ((int)$stat['total_downloads'] > 0): ?>
-                    <tr>
-                      <td><?= esc($stat['episode_title']) ?></td>
-                      <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
-                    </tr>
-                  <?php endif; ?>
+                <?php foreach ($summaryPagination['rows'] as $stat): ?>
+                  <tr>
+                    <td><?= esc($stat['episode_title']) ?></td>
+                    <td data-sort-value="<?= (int)$stat['total_downloads'] ?>" class="text-right"><span class="total-badge"><?= (int)$stat['total_downloads'] ?></span></td>
+                  </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
           </div>
+          <?php renderStatsPagination('resumen', 'resumen_page', $summaryPagination); ?>
         <?php endif; ?>
       </div>
     </main>
@@ -463,6 +593,54 @@ try {
       content: ' ↓';
       color: var(--accent);
     }
+    .stats-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .stats-pagination-info {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .stats-pagination-links {
+      display: flex;
+      gap: .4rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stats-page-link,
+    .stats-page-current,
+    .stats-page-gap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 .75rem;
+      border-radius: var(--radius);
+      font-size: .9rem;
+    }
+    .stats-page-link {
+      border: 1px solid var(--border);
+      color: var(--fg);
+      background: var(--bg);
+      text-decoration: none;
+    }
+    .stats-page-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .stats-page-current {
+      background: var(--accent);
+      color: var(--accent-contrast, #fff);
+      font-weight: 600;
+    }
+    .stats-page-gap {
+      color: var(--muted);
+    }
   </style>
   
   <script>
@@ -488,6 +666,10 @@ try {
           document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
           tab.classList.add('active');
           document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.set('tab', tab.dataset.tab);
+          window.history.replaceState({}, '', nextUrl);
         });
       });
 
