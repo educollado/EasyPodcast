@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.10
+
+- **Estadísticas**: las pestañas `Diario`, `Mensual`, `Anual` y `Resumen` ahora paginan los resultados de 100 en 100 filas para evitar tablas demasiado largas en el panel.
+- Se añadieron controles de paginación con contador de rango visible y conservación de filtros/pestaña activa al navegar entre páginas.
+- Validación automática de números de página y tests específicos para la lógica de paginación de estadísticas.
+
 ## 1.8.9
 
 - **RSS y estadísticas**: las descargas iniciadas desde lectores RSS ahora pasan por `track.php`, se contabilizan en estadísticas como tipo `Feed` y el `enclosure` del feed redirige correctamente al MP3 real.
