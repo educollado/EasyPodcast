@@ -20,6 +20,100 @@ const ADMIN_THEMES = [
     'monocromo'    => 'Silver Void',
 ];
 
+const PUBLIC_THEME_MODE_COOKIE = 'easypodcast_theme_mode';
+
+const PUBLIC_THEME_MODES = [
+    'normal' => 'Normal',
+    'auto'   => 'Automático',
+];
+
+/**
+ * Normaliza el modo de tema público.
+ */
+function normalizePublicThemeMode(?string $mode): string
+{
+    $mode = is_string($mode) ? trim(strtolower($mode)) : '';
+    return isset(PUBLIC_THEME_MODES[$mode]) ? $mode : 'normal';
+}
+
+/**
+ * Construye una URL sobre la request actual cambiando solo theme_mode.
+ */
+function buildPublicThemeModeUrl(string $mode, ?string $requestUri = null): string
+{
+    $requestUri = $requestUri !== null && $requestUri !== ''
+        ? $requestUri
+        : (string) ($_SERVER['REQUEST_URI'] ?? '/');
+
+    $path = (string) (parse_url($requestUri, PHP_URL_PATH) ?? '/');
+    $path = $path !== '' ? $path : '/';
+
+    $queryString = (string) (parse_url($requestUri, PHP_URL_QUERY) ?? '');
+    $params = [];
+    if ($queryString !== '') {
+        parse_str($queryString, $params);
+    }
+
+    $params['theme_mode'] = normalizePublicThemeMode($mode);
+
+    $query = http_build_query($params);
+    return $path . ($query !== '' ? '?' . $query : '');
+}
+
+/**
+ * Si llega theme_mode por query string, lo persiste en cookie y redirige
+ * a la misma URL sin ese parámetro para no ensuciar la navegación.
+ */
+function handlePublicThemeModePreference(): void
+{
+    if (PHP_SAPI === 'cli' || headers_sent() || !isset($_GET['theme_mode'])) {
+        return;
+    }
+
+    $rawMode = (string) $_GET['theme_mode'];
+    $mode = normalizePublicThemeMode($rawMode);
+    if (!isset(PUBLIC_THEME_MODES[$rawMode])) {
+        return;
+    }
+
+    setcookie(PUBLIC_THEME_MODE_COOKIE, $mode, [
+        'expires' => time() + 31536000,
+        'path' => '/',
+        'samesite' => 'Lax',
+    ]);
+
+    $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+    $path = (string) (parse_url($requestUri, PHP_URL_PATH) ?? '/');
+    $path = $path !== '' ? $path : '/';
+
+    $queryString = (string) (parse_url($requestUri, PHP_URL_QUERY) ?? '');
+    $params = [];
+    if ($queryString !== '') {
+        parse_str($queryString, $params);
+    }
+    unset($params['theme_mode']);
+
+    $location = $path;
+    if ($params !== []) {
+        $location .= '?' . http_build_query($params);
+    }
+
+    header('Location: ' . $location, true, 302);
+    exit;
+}
+
+/**
+ * Script mínimo para aplicar data-theme-mode antes de cargar estilos.
+ */
+function publicThemeModeBootstrapScript(): string
+{
+    $cookieName = PUBLIC_THEME_MODE_COOKIE;
+    $cookiePrefix = $cookieName . '=';
+    $cookiePrefixLength = strlen($cookiePrefix);
+
+    return '<script>(function(){var value="normal";var parts=document.cookie?document.cookie.split("; "):[];for(var i=0;i<parts.length;i++){if(parts[i].indexOf("' . $cookiePrefix . '")===0){value=decodeURIComponent(parts[i].slice(' . $cookiePrefixLength . '));break;}}if(value!=="auto"){value="normal";}document.documentElement.setAttribute("data-theme-mode",value);}());</script>';
+}
+
 /**
  * Lee el tema activo desde BD y lo guarda en $GLOBALS['_admin_theme'].
  * Silencioso ante errores: usa 'default' como fallback.

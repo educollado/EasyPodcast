@@ -57,11 +57,12 @@ if ($error !== '') {
 }
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>" data-theme-mode="normal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($pageTitle) ?></title>
+  <?= publicThemeModeBootstrapScript() ?>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
   <?php if ($_fediverseCreator !== ''): ?>

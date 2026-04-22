@@ -3,12 +3,15 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/lib/page_helpers.php';
+require_once __DIR__ . '/lib/admin_theme.php';
 
 $podcastTitle = isset($podcastTitle) ? (string) $podcastTitle : 'Podcast';
 $podcastAuthor = isset($podcastAuthor) ? (string) $podcastAuthor : '';
 $podcastDescription = isset($podcastDescription) ? (string) $podcastDescription : '';
 $podcastImage = isset($podcastImage) ? (string) $podcastImage : '';
 $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
+$normalThemeModeUrl = buildPublicThemeModeUrl('normal');
+$autoThemeModeUrl = buildPublicThemeModeUrl('auto');
 // Variantes 80px (normal) y 144px (retina) para la miniatura de cabecera.
 $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($podcastImage, [80, 144]) : ['src' => '', 'srcset' => ''];
 ?>
@@ -36,7 +39,13 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
       </div>
     </div>
     <div class="podcast-header-right header-box">
-      <div style="display:flex;align-items:center;gap:.4rem;justify-content:flex-end;">
+      <div class="header-controls">
+        <nav class="theme-mode-switch" aria-label="<?= esc(__('Modo de visualización')) ?>">
+          <span class="theme-mode-link"><?= __('Tema:') ?></span>
+          <a class="theme-mode-link theme-mode-link-normal" href="<?= esc($normalThemeModeUrl) ?>"><?= __('Normal') ?></a>
+          <span class="theme-mode-separator"> | </span>
+          <a class="theme-mode-link theme-mode-link-auto" href="<?= esc($autoThemeModeUrl) ?>"><?= __('Según sistema') ?></a>
+        </nav>
         <a class="rss-link" href="/feed.xml" aria-label="<?= esc(__('Feed RSS')) ?>">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             <circle cx="5" cy="19" r="3"/>

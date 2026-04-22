@@ -56,6 +56,7 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
         runMigrations($dbPath);
         loadAppLocale($dbPath);
         loadAdminTheme($dbPath);
+        handlePublicThemeModePreference();
         require_once __DIR__ . '/lib/scheduler.php';
         publishScheduledEpisodes($dbPath);
     }
@@ -125,4 +126,3 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
         return;
     }
 }
-

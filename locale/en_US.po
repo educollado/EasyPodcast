@@ -2040,7 +2040,6 @@ msgstr "Appearance"
 msgid "Tema por defecto"
 msgstr "Default theme"
 
-
 # ---------------------------------------------------------------------------
 # lib/scheduler.php + estado scheduled
 # ---------------------------------------------------------------------------
@@ -2059,3 +2058,18 @@ msgstr "Scheduled publication"
 
 msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
 msgstr "If left empty, the current date is assigned when publishing. Required for scheduled episodes."
+
+msgid "Modo de visualización"
+msgstr "Display mode"
+
+msgid "Automático"
+msgstr "Automatic"
+
+msgid "Normal"
+msgstr "Default"
+
+msgid "Según sistema"
+msgstr "According to system"
+
+msgid "Tema:"
+msgstr "Theme:"

@@ -4,7 +4,8 @@ docker/.disable_https_redirect
 AGENTS.md
 CLAUDE.md
 .claude
-*.zip
+*.zippuede
 deploy.sh
 tools/
 .insyncdl
+.codex

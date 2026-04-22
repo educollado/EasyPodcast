@@ -5,6 +5,118 @@
    ========================================================== */
 
 /* ----------------------------------------------------------
+   default + sistema en oscuro
+   Si el usuario no ha elegido un tema explícito y su sistema
+   prefiere oscuro, aplica el antiguo darkmode automáticamente.
+   ---------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  html[data-theme-mode="auto"][data-theme] {
+    color-scheme: dark;
+    --bg:          #161310;
+    --card:        #201c18;
+    --text:        #f4ede3;
+    --fg:          #f4ede3;
+    --muted:       #9e9088;
+    --accent:      #e06c35;
+    --accent-dark: #c85a25;
+    --border:      #2e2a25;
+    --danger:      #e05555;
+    --ok:          #5aad6a;
+    --hover-bg:    #2a2420;
+    --shadow:      0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.28);
+  }
+
+  html[data-theme-mode="auto"][data-theme] body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(224,108,53,.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 100%, rgba(224,108,53,.04) 0%, transparent 50%);
+  }
+
+  html[data-theme-mode="auto"][data-theme] input,
+  html[data-theme-mode="auto"][data-theme] textarea,
+  html[data-theme-mode="auto"][data-theme] select,
+  html[data-theme-mode="auto"][data-theme] .small-btn {
+    background: #2a2420;
+    color: #f4ede3;
+    border-color: #2e2a25;
+  }
+
+  html[data-theme-mode="auto"][data-theme] input::placeholder,
+  html[data-theme-mode="auto"][data-theme] textarea::placeholder {
+    color: #9e9088;
+  }
+
+  html[data-theme-mode="auto"][data-theme] .error {
+    background: #2a1510;
+    color: #e07060;
+    border-color: #5a2a20;
+  }
+
+  html[data-theme-mode="auto"][data-theme] .notice {
+    background: #1a2010;
+    color: #a0c070;
+    border-color: #3a4820;
+  }
+
+  html[data-theme-mode="auto"][data-theme] .search-form input[type="search"] {
+    background: #2a2420;
+    color: var(--text);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .page-link,
+  html[data-theme-mode="auto"][data-theme] .pagination,
+  html[data-theme-mode="auto"][data-theme] .admin-card {
+    background: var(--card);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .page-link:hover,
+  html[data-theme-mode="auto"][data-theme] .rss-link:hover,
+  html[data-theme-mode="auto"][data-theme] .theme-toggle:hover,
+  html[data-theme-mode="auto"][data-theme] .social-link:hover,
+  html[data-theme-mode="auto"][data-theme] .footer-social-link:hover,
+  html[data-theme-mode="auto"][data-theme] .small-btn:hover,
+  html[data-theme-mode="auto"][data-theme] .theme-mode-link:hover {
+    background: #2a2420;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .admin-nav-link:hover,
+  html[data-theme-mode="auto"][data-theme] .admin-nav-link.active {
+    background: rgba(224,108,53,.12);
+    color: var(--accent);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .admin-nav-logout:hover,
+  html[data-theme-mode="auto"][data-theme] .btn.logout:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: #2a1510;
+  }
+
+  html[data-theme-mode="auto"][data-theme] .btn.back:hover {
+    background: #2a2420;
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .episode .meta,
+  html[data-theme-mode="auto"][data-theme] .detail .meta {
+    background: rgba(224,108,53,.09);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .download {
+    background: rgba(224,108,53,.08);
+    border-color: rgba(224,108,53,.2);
+  }
+
+  html[data-theme-mode="auto"][data-theme] .episode:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
+  }
+}
+
+/* ----------------------------------------------------------
    oscuro — modo oscuro original (el que antes era dark.css)
    ---------------------------------------------------------- */
 html[data-theme="oscuro"] {

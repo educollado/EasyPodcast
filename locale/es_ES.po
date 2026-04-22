@@ -2049,7 +2049,6 @@ msgstr ""
 msgid "Tema por defecto"
 msgstr ""
 
-
 # ---------------------------------------------------------------------------
 # lib/scheduler.php + estado scheduled
 # ---------------------------------------------------------------------------
@@ -2067,4 +2066,19 @@ msgid "Publicación programada"
 msgstr ""
 
 msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
+msgstr ""
+
+msgid "Modo de visualización"
+msgstr ""
+
+msgid "Automático"
+msgstr ""
+
+msgid "Normal"
+msgstr ""
+
+msgid "Según sistema"
+msgstr ""
+
+msgid "Tema:"
 msgstr ""

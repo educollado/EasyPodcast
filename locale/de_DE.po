@@ -1904,7 +1904,6 @@ msgstr "Erscheinungsbild"
 msgid "Tema por defecto"
 msgstr "Standarddesign"
 
-
 # ---------------------------------------------------------------------------
 # lib/scheduler.php + Status scheduled
 # ---------------------------------------------------------------------------
@@ -1923,3 +1922,18 @@ msgstr "Geplante Veröffentlichung"
 
 msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
 msgstr "Wenn leer, wird beim Veröffentlichen das aktuelle Datum zugewiesen. Für geplante Episoden ist es Pflicht."
+
+msgid "Modo de visualización"
+msgstr "Anzeigemodus"
+
+msgid "Automático"
+msgstr "Gemäß System"
+
+msgid "Normal"
+msgstr "Standard"
+
+msgid "Según sistema"
+msgstr "Gemäß System"
+
+msgid "Tema:"
+msgstr "Thema:"

@@ -10,6 +10,7 @@ require_once __DIR__ . '/lib/view_helpers.php';
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 loadAppLocale($dbPath);
 loadAdminTheme($dbPath);
+handlePublicThemeModePreference();
 $podcast = null;
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -26,11 +27,12 @@ $podcastImage       = (string) ($podcast['image_url']   ?? '');
 $searchQuery        = '';
 
 ?><!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>" data-theme-mode="normal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Acceso prohibido') ?> – <?= esc($podcastTitle) ?></title>
+  <?= publicThemeModeBootstrapScript() ?>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/favicon.ico">
