@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.11
+
+- **API de estadísticas**: ampliados los datos devueltos para estadísticas diarias, mensuales, anuales y resumen, con soporte de paginación y filtros coherente con el panel.
+- **Apariencia**: el tema automático se muestra como `Normal | Según sistema` y se aplica de forma consistente en páginas públicas y de error.
+- **Mantenimiento**: actualización de traducciones, documentación de API y limpieza de reglas de `.gitignore`.
+
 ## 1.8.10
 
 - **Estadísticas**: las pestañas `Diario`, `Mensual`, `Anual` y `Resumen` ahora paginan los resultados de 100 en 100 filas para evitar tablas demasiado largas en el panel.
