@@ -29,6 +29,78 @@ extract($data); // tokens, error, notice, newToken
   <title><?= esc(__('Tokens API')) ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <link rel="stylesheet" href="/assets/css/themes.css">
+  <style>
+    .tokens-table-wrap {
+      margin-top: 1rem;
+    }
+    .tokens-table {
+      width: 100%;
+    }
+    .tokens-table code {
+      font-size: .88rem;
+      white-space: nowrap;
+    }
+    .token-empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+    @media (max-width: 760px) {
+      .tokens-table {
+        min-width: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      .tokens-table thead {
+        display: none;
+      }
+      .tokens-table,
+      .tokens-table tbody,
+      .tokens-table tr,
+      .tokens-table td {
+        display: block;
+        width: 100%;
+      }
+      .tokens-table tr {
+        margin-bottom: .9rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--card);
+      }
+      .tokens-table td {
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(112px, 38%) 1fr;
+        gap: .65rem;
+        padding: .7rem .85rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .tokens-table td:last-child {
+        border-bottom: 0;
+      }
+      .tokens-table td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+      }
+      .tokens-table td form {
+        margin: 0;
+      }
+      .tokens-table td .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    @media (max-width: 420px) {
+      .tokens-table td {
+        grid-template-columns: 1fr;
+        gap: .35rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <?php $currentAdminPage = 'api_tokens'; require __DIR__ . '/admin_nav.php'; ?>
@@ -78,38 +150,44 @@ extract($data); // tokens, error, notice, newToken
         <?php if (empty($tokens)): ?>
           <p><?= __('No hay tokens creados.') ?></p>
         <?php else: ?>
-          <table class="table">
-            <thead>
-              <tr>
-                <th><?= __('Nombre') ?></th>
-                <th><?= __('Token (últimos 8 chars)') ?></th>
-                <th><?= __('Creado') ?></th>
-                <th><?= __('Expira') ?></th>
-                <th><?= __('Último uso') ?></th>
-                <th><?= __('Acción') ?></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($tokens as $t): ?>
+          <div class="table-wrap tokens-table-wrap">
+            <table class="table tokens-table">
+              <thead>
                 <tr>
-                  <td><?= esc($t['name'] ?? '') ?></td>
-                  <td><code>...<?= esc(substr((string) $t['token'], -8)) ?></code></td>
-                  <td><?= esc((string) ($t['created_at'] ?? '')) ?></td>
-                  <td><?= $t['expires_at'] ? esc((string) $t['expires_at']) : '<em>' . __('Sin expiración') . '</em>' ?></td>
-                  <td><?= $t['last_used_at'] ? esc((string) $t['last_used_at']) : '<em>' . __('Nunca') . '</em>' ?></td>
-                  <td>
-                    <form method="post" action="api_tokens.php" style="display:inline"
-                          onsubmit="return confirm('<?= esc(__('¿Revocar este token?')) ?>')">
-                      <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
-                      <input type="hidden" name="action"   value="revoke">
-                      <input type="hidden" name="token_id" value="<?= (int) $t['id'] ?>">
-                      <button type="submit" class="btn btn-danger btn-sm"><?= __('Revocar') ?></button>
-                    </form>
-                  </td>
+                  <th><?= __('Nombre') ?></th>
+                  <th><?= __('Token (últimos 8 chars)') ?></th>
+                  <th><?= __('Creado') ?></th>
+                  <th><?= __('Expira') ?></th>
+                  <th><?= __('Último uso') ?></th>
+                  <th><?= __('Acción') ?></th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach ($tokens as $t): ?>
+                  <tr>
+                    <td data-label="<?= esc(__('Nombre')) ?>"><?= esc($t['name'] ?? '') ?></td>
+                    <td data-label="<?= esc(__('Token (últimos 8 chars)')) ?>"><code>...<?= esc(substr((string) $t['token'], -8)) ?></code></td>
+                    <td data-label="<?= esc(__('Creado')) ?>"><?= esc((string) ($t['created_at'] ?? '')) ?></td>
+                    <td data-label="<?= esc(__('Expira')) ?>">
+                      <?= $t['expires_at'] ? esc((string) $t['expires_at']) : '<span class="token-empty">' . esc(__('Sin expiración')) . '</span>' ?>
+                    </td>
+                    <td data-label="<?= esc(__('Último uso')) ?>">
+                      <?= $t['last_used_at'] ? esc((string) $t['last_used_at']) : '<span class="token-empty">' . esc(__('Nunca')) . '</span>' ?>
+                    </td>
+                    <td data-label="<?= esc(__('Acción')) ?>">
+                      <form method="post" action="api_tokens.php" style="display:inline"
+                            onsubmit="return confirm('<?= esc(__('¿Revocar este token?')) ?>')">
+                        <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+                        <input type="hidden" name="action"   value="revoke">
+                        <input type="hidden" name="token_id" value="<?= (int) $t['id'] ?>">
+                        <button type="submit" class="btn btn-danger btn-sm"><?= __('Revocar') ?></button>
+                      </form>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         <?php endif; ?>
       </section>
 
