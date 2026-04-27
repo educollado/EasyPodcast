@@ -41,7 +41,7 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     <div class="podcast-header-right header-box">
       <div class="header-controls">
         <nav class="theme-mode-switch" aria-label="<?= esc(__('Modo de visualización')) ?>">
-          <span class="theme-mode-link"><?= __('Tema:') ?></span>
+          <span class="theme-mode-label"><?= __('Tema:') ?></span>
           <a class="theme-mode-link theme-mode-link-normal" href="<?= esc($normalThemeModeUrl) ?>"><?= __('Normal') ?></a>
           <span class="theme-mode-separator"> | </span>
           <a class="theme-mode-link theme-mode-link-auto" href="<?= esc($autoThemeModeUrl) ?>"><?= __('Según sistema') ?></a>

@@ -42,6 +42,18 @@
   transition: background .12s ease, color .12s ease, border-color .12s ease, transform .15s ease;
 }
 
+.theme-mode-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 31px;
+  padding: .34rem .38rem .34rem .62rem;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .theme-mode-link:hover {
   background: rgba(181, 71, 14, .08);
   color: var(--accent);
