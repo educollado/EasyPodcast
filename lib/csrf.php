@@ -15,15 +15,23 @@ function csrf_token(): string
 }
 
 /**
+ * Devuelve true si el token CSRF enviado coincide con el de la sesión.
+ */
+function csrf_is_valid(?string $submitted = null): bool
+{
+    $submitted = $submitted ?? (string) ($_POST['csrf_token'] ?? '');
+    $expected  = (string) ($_SESSION['csrf_token'] ?? '');
+
+    return $submitted !== '' && $expected !== '' && hash_equals($expected, $submitted);
+}
+
+/**
  * Verifica el token CSRF enviado en POST contra el almacenado en sesión.
  * Termina la ejecución con HTTP 403 si la verificación falla.
  */
 function csrf_verify(): void
 {
-    $submitted = (string) ($_POST['csrf_token'] ?? '');
-    $expected  = (string) ($_SESSION['csrf_token'] ?? '');
-
-    if ($submitted === '' || $expected === '' || !hash_equals($expected, $submitted)) {
+    if (!csrf_is_valid()) {
         http_response_code(403);
         exit('Token de seguridad inválido. Vuelve atrás e inténtalo de nuevo.');
     }

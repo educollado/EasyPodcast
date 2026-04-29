@@ -14,6 +14,7 @@ require_once __DIR__ . '/lib/cache_service.php';
 
 startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
+handleAdminLogoutRequest();
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
@@ -226,7 +227,11 @@ if ($isLoggedIn) {
         </div>
 
         <div class="actions section-gap-lg justify-end">
-          <a class="btn logout" href="admin.php?logout=1"><?= __('Cerrar sesión') ?></a>
+          <form method="post" action="admin.php" class="inline-display">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+            <input type="hidden" name="action" value="logout">
+            <button class="btn logout" type="submit"><?= __('Cerrar sesión') ?></button>
+          </form>
         </div>
       </main>
     </div>
@@ -253,7 +258,11 @@ if ($isLoggedIn) {
         <button class="btn" type="submit"><?= __('Verificar') ?></button>
       </form>
       <div class="section-gap-sm text-right">
-        <a href="admin.php?logout=1" class="link-muted"><?= __('Cancelar y volver al login') ?></a>
+        <form method="post" action="admin.php" class="inline-display">
+          <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+          <input type="hidden" name="action" value="logout">
+          <button type="submit" class="link-muted"><?= __('Cancelar y volver al login') ?></button>
+        </form>
       </div>
     </main>
   <?php else: ?>

@@ -23,6 +23,23 @@ function authThrottleErrorMessage(int $retryAfter): string
 }
 
 /**
+ * Atiende el cierre de sesión del panel por POST protegido con CSRF.
+ */
+function handleAdminLogoutRequest(): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || (string) ($_POST['action'] ?? '') !== 'logout') {
+        return;
+    }
+
+    csrf_verify();
+    $_SESSION = [];
+    session_destroy();
+    clearTrustedDeviceCookie();
+    header('Location: admin.php');
+    exit;
+}
+
+/**
  * Procesa la sesión de administración (login, setup, logout) y retorna
  * los datos necesarios para renderizar la vista.
  *
@@ -53,15 +70,6 @@ function loadAdminData(string $dbPath): array
         );
 
         $adminCount = (int) $pdo->query('SELECT COUNT(*) FROM management')->fetchColumn();
-
-        // Acción explícita de logout.
-        if (isset($_GET['logout'])) {
-            $_SESSION = [];
-            session_destroy();
-            clearTrustedDeviceCookie();
-            header('Location: admin.php');
-            exit;
-        }
 
         // Un único formulario maneja:
         // - setup inicial (no existe usuario admin)

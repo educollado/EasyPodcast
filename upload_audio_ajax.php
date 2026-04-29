@@ -22,9 +22,7 @@ if (!isset($_SESSION['admin_user'])) {
     exit;
 }
 
-try {
-    csrf_verify();
-} catch (Throwable $e) {
+if (!csrf_is_valid()) {
     http_response_code(403);
     echo json_encode(['error' => 'Token CSRF inválido']);
     exit;

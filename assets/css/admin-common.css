@@ -111,8 +111,12 @@ body.login-page .card {
   font-weight: 600;
 }
 
-.admin-nav-logout {
+.admin-nav-logout-form {
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+.admin-nav-logout {
   padding-left: .5rem;
   flex-shrink: 0;
   color: var(--muted);
@@ -121,6 +125,10 @@ body.login-page .card {
   font-weight: 500;
   padding: .38rem .6rem;
   border-radius: 7px;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
   transition: color .12s, background .12s;
 }
 
@@ -740,6 +748,11 @@ th {
   font-size: .85rem;
   color: var(--muted);
   text-decoration: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .link-muted:hover {

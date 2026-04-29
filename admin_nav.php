@@ -16,6 +16,10 @@ $_navPage = $currentAdminPage ?? '';
     <a class="admin-nav-link <?= $_navPage === 'stats' ? 'active' : '' ?>" href="stats.php"><?= __('Estadísticas') ?></a>
     <a class="admin-nav-link" href="/" target="_blank" rel="noopener"><?= __('Ver web ↗') ?></a>
   </div>
-  <a class="admin-nav-logout" href="admin.php?logout=1"><?= __('Salir') ?></a>
+  <form method="post" action="admin.php" class="admin-nav-logout-form">
+    <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+    <input type="hidden" name="action" value="logout">
+    <button type="submit" class="admin-nav-logout"><?= __('Salir') ?></button>
+  </form>
 </nav>
 <script src="/assets/js/admin.js"></script>
