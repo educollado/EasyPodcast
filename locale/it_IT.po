@@ -883,6 +883,9 @@ msgstr "secondo i metadati del DB"
 msgid "Último publicado"
 msgstr "Ultimo pubblicato"
 
+msgid "Estado"
+msgstr "Stato"
+
 msgid "Páginas en caché"
 msgstr "Pagine in cache"
 
@@ -1149,6 +1152,9 @@ msgstr "2FA"
 
 msgid "Redes"
 msgstr "Reti"
+
+msgid "Páginas"
+msgstr "Pagine"
 
 msgid "Stats"
 msgstr "Statistiche"
@@ -1565,8 +1571,14 @@ msgstr "URL immagine alternativa"
 msgid "Número de temporada"
 msgstr "Numero di stagione"
 
+msgid "Número de episodio"
+msgstr "Numero episodio"
+
 msgid "hereda del podcast"
 msgstr "eredita dal podcast"
+
+msgid "Duración (HH:MM:SS)"
+msgstr "Durata (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Autore dell'episodio"
@@ -1624,6 +1636,9 @@ msgstr "Ordine di visualizzazione (predefinito: 0)"
 
 msgid "Sobre nosotros"
 msgstr "Chi siamo"
+
+msgid "Actualizar página"
+msgstr "Aggiorna pagina"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Per cambiare lo slug, invia anche"

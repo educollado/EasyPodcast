@@ -1701,8 +1701,14 @@ msgstr "URL d'imatge alternativa"
 msgid "Número de temporada"
 msgstr "Número de temporada"
 
+msgid "Número de episodio"
+msgstr ""
+
 msgid "hereda del podcast"
 msgstr "hereta del pòdcast"
+
+msgid "Duración (HH:MM:SS)"
+msgstr ""
 
 msgid "Autor del episodio"
 msgstr "Autor de l'episodi"
@@ -1760,6 +1766,9 @@ msgstr "Ordre d'aparició (per defecte: 0)"
 
 msgid "Sobre nosotros"
 msgstr "Sobre nosaltres"
+
+msgid "Actualizar página"
+msgstr ""
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Per canviar l'slug, envia també"

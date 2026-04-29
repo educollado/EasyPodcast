@@ -1701,8 +1701,14 @@ msgstr "Alternative image URL"
 msgid "Número de temporada"
 msgstr "Season number"
 
+msgid "Número de episodio"
+msgstr ""
+
 msgid "hereda del podcast"
 msgstr "inherits from podcast"
+
+msgid "Duración (HH:MM:SS)"
+msgstr ""
 
 msgid "Autor del episodio"
 msgstr "Episode author"
@@ -1760,6 +1766,9 @@ msgstr "Display order (default: 0)"
 
 msgid "Sobre nosotros"
 msgstr "About us"
+
+msgid "Actualizar página"
+msgstr ""
 
 msgid "Para cambiar el slug, envía también"
 msgstr "To change the slug, also send"
