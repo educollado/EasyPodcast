@@ -973,8 +973,6 @@ msgstr "segons metadades de la BD"
 msgid "Último publicado"
 msgstr "Últim publicat"
 
-msgid "Estado"
-msgstr "Estat"
 
 msgid "Páginas en caché"
 msgstr "Pàgines en memòria cau"
@@ -1033,8 +1031,6 @@ msgstr "Capítol"
 msgid "Descargas"
 msgstr "Descàrregues"
 
-msgid "Total"
-msgstr "Total"
 
 msgid "Todos los años"
 msgstr "Tots els anys"
@@ -1275,8 +1271,6 @@ msgstr "2FA"
 msgid "Redes"
 msgstr "Xarxes"
 
-msgid "Páginas"
-msgstr "Pàgines"
 
 msgid "Stats"
 msgstr "Estadístiques"
@@ -1635,8 +1629,6 @@ msgstr "Llista paginada"
 msgid "Parámetro"
 msgstr "Paràmetre"
 
-msgid "Tipo"
-msgstr "Tipus"
 
 msgid "Página (defecto: 1)"
 msgstr "Pàgina (per defecte: 1)"
@@ -1701,14 +1693,10 @@ msgstr "URL d'imatge alternativa"
 msgid "Número de temporada"
 msgstr "Número de temporada"
 
-msgid "Número de episodio"
-msgstr "Número d'episodi"
 
 msgid "hereda del podcast"
 msgstr "hereta del pòdcast"
 
-msgid "Duración (HH:MM:SS)"
-msgstr "Durada (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Autor de l'episodi"
@@ -1767,8 +1755,6 @@ msgstr "Ordre d'aparició (per defecte: 0)"
 msgid "Sobre nosotros"
 msgstr "Sobre nosaltres"
 
-msgid "Actualizar página"
-msgstr "Actualitzar pàgina"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Per canviar l'slug, envia també"
@@ -2003,8 +1989,6 @@ msgstr "Capítols en esborrany"
 msgid "Capítulos Publicados"
 msgstr "Capítols publicats"
 
-msgid "Todavía no hay capítulos publicados."
-msgstr "Encara no hi ha capítols publicats."
 
 msgid "Limpiar búsqueda"
 msgstr "Esborrar cerca"
@@ -2082,3 +2066,4 @@ msgstr "Segons el sistema"
 
 msgid "Tema:"
 msgstr "Tema:"
+

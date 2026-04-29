@@ -883,8 +883,6 @@ msgstr "secondo i metadati del DB"
 msgid "Último publicado"
 msgstr "Ultimo pubblicato"
 
-msgid "Estado"
-msgstr "Stato"
 
 msgid "Páginas en caché"
 msgstr "Pagine in cache"
@@ -943,8 +941,6 @@ msgstr "Episodio"
 msgid "Descargas"
 msgstr "Download"
 
-msgid "Total"
-msgstr "Totale"
 
 msgid "Todos los años"
 msgstr "Tutti gli anni"
@@ -1153,8 +1149,6 @@ msgstr "2FA"
 msgid "Redes"
 msgstr "Reti"
 
-msgid "Páginas"
-msgstr "Pagine"
 
 msgid "Stats"
 msgstr "Statistiche"
@@ -1505,8 +1499,6 @@ msgstr "Elenco paginato"
 msgid "Parámetro"
 msgstr "Parametro"
 
-msgid "Tipo"
-msgstr "Tipo"
 
 msgid "Página (defecto: 1)"
 msgstr "Pagina (predefinito: 1)"
@@ -1571,14 +1563,10 @@ msgstr "URL immagine alternativa"
 msgid "Número de temporada"
 msgstr "Numero di stagione"
 
-msgid "Número de episodio"
-msgstr "Numero episodio"
 
 msgid "hereda del podcast"
 msgstr "eredita dal podcast"
 
-msgid "Duración (HH:MM:SS)"
-msgstr "Durata (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Autore dell'episodio"
@@ -1637,8 +1625,6 @@ msgstr "Ordine di visualizzazione (predefinito: 0)"
 msgid "Sobre nosotros"
 msgstr "Chi siamo"
 
-msgid "Actualizar página"
-msgstr "Aggiorna pagina"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Per cambiare lo slug, invia anche"
@@ -1873,8 +1859,6 @@ msgstr "Episodi bozza"
 msgid "Capítulos Publicados"
 msgstr "Episodi pubblicati"
 
-msgid "Todavía no hay capítulos publicados."
-msgstr "Ancora nessun episodio pubblicato."
 
 msgid "Limpiar búsqueda"
 msgstr "Cancella ricerca"
@@ -1952,3 +1936,4 @@ msgstr "Secondo il sistema"
 
 msgid "Tema:"
 msgstr "Tema:"
+

@@ -973,8 +973,6 @@ msgstr "according to DB metadata"
 msgid "Último publicado"
 msgstr "Last published"
 
-msgid "Estado"
-msgstr "Status"
 
 msgid "Páginas en caché"
 msgstr "Cached pages"
@@ -1033,8 +1031,6 @@ msgstr "Episode"
 msgid "Descargas"
 msgstr "Downloads"
 
-msgid "Total"
-msgstr "Total"
 
 msgid "Todos los años"
 msgstr "All years"
@@ -1275,8 +1271,6 @@ msgstr "2FA"
 msgid "Redes"
 msgstr "Social"
 
-msgid "Páginas"
-msgstr "Pages"
 
 msgid "Stats"
 msgstr "Stats"
@@ -1635,8 +1629,6 @@ msgstr "Paginated list"
 msgid "Parámetro"
 msgstr "Parameter"
 
-msgid "Tipo"
-msgstr "Type"
 
 msgid "Página (defecto: 1)"
 msgstr "Page (default: 1)"
@@ -1701,14 +1693,10 @@ msgstr "Alternative image URL"
 msgid "Número de temporada"
 msgstr "Season number"
 
-msgid "Número de episodio"
-msgstr "Episode number"
 
 msgid "hereda del podcast"
 msgstr "inherits from podcast"
 
-msgid "Duración (HH:MM:SS)"
-msgstr "Duration (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Episode author"
@@ -1767,8 +1755,6 @@ msgstr "Display order (default: 0)"
 msgid "Sobre nosotros"
 msgstr "About us"
 
-msgid "Actualizar página"
-msgstr "Update page"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "To change the slug, also send"
@@ -2003,8 +1989,6 @@ msgstr "Draft Episodes"
 msgid "Capítulos Publicados"
 msgstr "Published Episodes"
 
-msgid "Todavía no hay capítulos publicados."
-msgstr "No published episodes yet."
 
 msgid "Limpiar búsqueda"
 msgstr "Clear search"
@@ -2082,3 +2066,4 @@ msgstr "According to system"
 
 msgid "Tema:"
 msgstr "Theme:"
+

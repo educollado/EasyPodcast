@@ -973,8 +973,6 @@ msgstr "selon les métadonnées de la BD"
 msgid "Último publicado"
 msgstr "Dernier publié"
 
-msgid "Estado"
-msgstr "État"
 
 msgid "Páginas en caché"
 msgstr "Pages en cache"
@@ -1033,8 +1031,6 @@ msgstr "Épisode"
 msgid "Descargas"
 msgstr "Téléchargements"
 
-msgid "Total"
-msgstr "Total"
 
 msgid "Todos los años"
 msgstr "Toutes les années"
@@ -1275,8 +1271,6 @@ msgstr "2FA"
 msgid "Redes"
 msgstr "Réseaux"
 
-msgid "Páginas"
-msgstr "Pages"
 
 msgid "Stats"
 msgstr "Stats"
@@ -1635,8 +1629,6 @@ msgstr "Liste paginée"
 msgid "Parámetro"
 msgstr "Paramètre"
 
-msgid "Tipo"
-msgstr "Type"
 
 msgid "Página (defecto: 1)"
 msgstr "Page (par défaut : 1)"
@@ -1701,14 +1693,10 @@ msgstr "URL d'image alternative"
 msgid "Número de temporada"
 msgstr "Numéro de saison"
 
-msgid "Número de episodio"
-msgstr "Numéro d'épisode"
 
 msgid "hereda del podcast"
 msgstr "hérite du podcast"
 
-msgid "Duración (HH:MM:SS)"
-msgstr "Durée (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Auteur de l'épisode"
@@ -1767,8 +1755,6 @@ msgstr "Ordre d'affichage (par défaut : 0)"
 msgid "Sobre nosotros"
 msgstr "À propos de nous"
 
-msgid "Actualizar página"
-msgstr "Mettre à jour la page"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Pour changer le slug, envoyez aussi"
@@ -2003,8 +1989,6 @@ msgstr "Épisodes brouillons"
 msgid "Capítulos Publicados"
 msgstr "Épisodes publiés"
 
-msgid "Todavía no hay capítulos publicados."
-msgstr "Pas encore d'épisodes publiés."
 
 msgid "Limpiar búsqueda"
 msgstr "Effacer la recherche"
@@ -2082,3 +2066,4 @@ msgstr "Selon le système"
 
 msgid "Tema:"
 msgstr "Thème :"
+

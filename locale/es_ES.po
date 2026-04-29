@@ -973,8 +973,6 @@ msgstr ""
 msgid "Último publicado"
 msgstr ""
 
-msgid "Estado"
-msgstr ""
 
 msgid "Páginas en caché"
 msgstr ""
@@ -1033,8 +1031,6 @@ msgstr ""
 msgid "Descargas"
 msgstr ""
 
-msgid "Total"
-msgstr ""
 
 msgid "Todos los años"
 msgstr ""
@@ -1275,8 +1271,6 @@ msgstr ""
 msgid "Redes"
 msgstr ""
 
-msgid "Páginas"
-msgstr ""
 
 msgid "Stats"
 msgstr ""
@@ -1635,8 +1629,6 @@ msgstr ""
 msgid "Parámetro"
 msgstr ""
 
-msgid "Tipo"
-msgstr ""
 
 msgid "Página (defecto: 1)"
 msgstr ""
@@ -1701,14 +1693,10 @@ msgstr ""
 msgid "Número de temporada"
 msgstr ""
 
-msgid "Número de episodio"
-msgstr ""
 
 msgid "hereda del podcast"
 msgstr ""
 
-msgid "Duración (HH:MM:SS)"
-msgstr ""
 
 msgid "Autor del episodio"
 msgstr ""
@@ -1767,8 +1755,6 @@ msgstr ""
 msgid "Sobre nosotros"
 msgstr ""
 
-msgid "Actualizar página"
-msgstr ""
 
 msgid "Para cambiar el slug, envía también"
 msgstr ""
@@ -2003,8 +1989,6 @@ msgstr ""
 msgid "Capítulos Publicados"
 msgstr ""
 
-msgid "Todavía no hay capítulos publicados."
-msgstr ""
 
 msgid "Limpiar búsqueda"
 msgstr ""
@@ -2082,3 +2066,4 @@ msgstr ""
 
 msgid "Tema:"
 msgstr ""
+
