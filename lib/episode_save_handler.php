@@ -253,6 +253,8 @@ function saveEpisode(
         return ['error' => __('El tamaño del audio debe ser un entero mayor que 0.'), 'notice' => '', 'form' => $form];
     }
 
+    $form['duration'] = resolveEpisodeDuration((string) ($form['duration'] ?? ''), $form['audio_url']);
+
     // 5. Fallbacks de defaults del podcast.
     // Si el usuario dejó imagen o autor en blanco, heredamos los del podcast.
     if ($form['image_url'] === '' && ($podcastDefaults['image_url'] ?? '') !== '') {

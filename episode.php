@@ -8,6 +8,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/episode_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
@@ -120,7 +121,7 @@ if ($error !== '') {
               </audio>
               <?php // Metadatos de audio: enlace de descarga con duración y tamaño entre paréntesis. ?>
               <?php
-                $duration    = trim((string) ($episode['duration'] ?? ''));
+                $duration    = resolveEpisodeDuration((string) ($episode['duration'] ?? ''), (string) ($episode['audio_url'] ?? ''));
                 $readableSize = formatBytes($episode['audio_size_bytes'] ?? 0);
                 // Construye la parte entre paréntesis solo con los datos disponibles.
                 $metaParts = [];

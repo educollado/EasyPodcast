@@ -155,6 +155,55 @@ test('buildSafeFileName: nombre con sólo caracteres especiales usa fallback', f
 });
 
 // =============================================================================
+// probeLocalAudioDuration
+// =============================================================================
+
+test('probeLocalAudioDuration: calcula duración aproximada de un MP3 CBR local', function () {
+    $tmpBase = tempnam(sys_get_temp_dir(), 'ep-mp3-');
+    if ($tmpBase === false) {
+        throw new RuntimeException('No se pudo crear el MP3 temporal');
+    }
+    $filePath = $tmpBase . '.mp3';
+    @rename($tmpBase, $filePath);
+
+    try {
+        $frameHeader = "\xFF\xFB\x90\x64"; // MPEG1 Layer III, 128 kbps, 44100 Hz, stereo
+        $frameSize = 417;
+        $frameCount = 231; // ~6,02 s
+        $frameBody = str_repeat("\0", $frameSize - 4);
+        $bytes = str_repeat($frameHeader . $frameBody, $frameCount);
+        file_put_contents($filePath, $bytes);
+
+        assert_eq('00:00:06', probeLocalAudioDuration($filePath));
+    } finally {
+        @unlink($filePath);
+    }
+});
+
+test('probeLocalAudioDuration: ignora el tag ID3v2 inicial al calcular un MP3', function () {
+    $tmpBase = tempnam(sys_get_temp_dir(), 'ep-mp3-id3-');
+    if ($tmpBase === false) {
+        throw new RuntimeException('No se pudo crear el MP3 temporal con ID3');
+    }
+    $filePath = $tmpBase . '.mp3';
+    @rename($tmpBase, $filePath);
+
+    try {
+        $id3Header = 'ID3' . "\x03\x00\x00" . "\x00\x00\x00\x14" . str_repeat("\0", 20);
+        $frameHeader = "\xFF\xFB\x90\x64";
+        $frameSize = 417;
+        $frameCount = 231; // ~6,02 s
+        $frameBody = str_repeat("\0", $frameSize - 4);
+        $bytes = $id3Header . str_repeat($frameHeader . $frameBody, $frameCount);
+        file_put_contents($filePath, $bytes);
+
+        assert_eq('00:00:06', probeLocalAudioDuration($filePath));
+    } finally {
+        @unlink($filePath);
+    }
+});
+
+// =============================================================================
 // generateGuid
 // =============================================================================
 

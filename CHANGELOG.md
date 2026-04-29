@@ -3,6 +3,7 @@
 ## 1.9.0
 
 - **Seguridad**: CSP con nonce por petición, endurecimiento de cabeceras base, cookies de sesión más seguras, limitación de intentos de login/TOTP y cierre de sesión del panel protegido por CSRF.
+- **Audio y feed**: si la duración del MP3 no llega desde el navegador al guardar un episodio, el backend ahora la calcula desde el audio local para mostrarla en la ficha pública y reutilizarla al regenerar `feed.xml`.
 - **API y tokens**: los tokens API dejan de guardarse en claro; la migración `v16` los convierte a `token_hash` + sufijo visible y añade alcances `content` y `admin`.
 - **Panel y frontend**: scripts de administración y frontend extraídos a ficheros JS dedicados, mejor soporte responsive en la tabla de tokens API y selector público de tema `Normal | Según sistema` más consistente.
 - **Documentación y calidad**: documentación de API/README actualizada, traducciones revisadas y nuevos tests para CSP, CSRF, helpers API y migración de tokens.

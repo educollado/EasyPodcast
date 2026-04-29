@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/lib/view_helpers.php';
+require_once __DIR__ . '/lib/episode_helpers.php';
 
 // Generador RSS compartido usado por:
 // - feed.php para salida dinámica
@@ -321,7 +322,8 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
         $xml->writeAttribute('type', $enclosureMime);
         $xml->endElement();
 
-        writeTextIfNotEmpty($xml, 'itunes:duration', $episode['duration'] ?? null);
+        $duration = resolveEpisodeDuration((string) ($episode['duration'] ?? ''), (string) ($episode['audio_url'] ?? ''));
+        writeTextIfNotEmpty($xml, 'itunes:duration', $duration !== '' ? $duration : null);
         writeTextIfNotEmpty($xml, 'itunes:author', $episode['author'] ?? null);
         $xml->writeElement('itunes:explicit', boolToItunesExplicit(
             isset($episode['explicit']) ? (int) $episode['explicit'] : null,
