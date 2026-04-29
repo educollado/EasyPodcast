@@ -1702,13 +1702,13 @@ msgid "Número de temporada"
 msgstr "Número de tempada"
 
 msgid "Número de episodio"
-msgstr ""
+msgstr "Número de episodio"
 
 msgid "hereda del podcast"
 msgstr "herda do podcast"
 
 msgid "Duración (HH:MM:SS)"
-msgstr ""
+msgstr "Duración (HH:MM:SS)"
 
 msgid "Autor del episodio"
 msgstr "Autor do episodio"
@@ -1768,7 +1768,7 @@ msgid "Sobre nosotros"
 msgstr "Sobre nós"
 
 msgid "Actualizar página"
-msgstr ""
+msgstr "Actualizar páxina"
 
 msgid "Para cambiar el slug, envía también"
 msgstr "Para cambiar o slug, envía tamén"
