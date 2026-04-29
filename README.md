@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.8.11-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -109,7 +109,7 @@ docker run -d \
 | Página | Descripción |
 |---|---|
 | Portada (`index.php`) | Episodios publicados con paginación, reproductor inline y buscador |
-| Episodio (`episode.php`) | URL amigable `/YYYY/MM/slug`, reproductor, descripción Markdown y descarga |
+| Episodio (`episode.php`) | URL amigable `/YYYY/MM/slug`, reproductor, descripción HTML saneada y descarga |
 | Búsqueda (`search.php`) | Búsqueda por título y descripción con paginación |
 
 ### Feed RSS
@@ -127,6 +127,14 @@ docker run -d \
 - `robots.txt` dinámico con URL del sitemap calculada desde `podcast.link`.
 - `sitemap.xml` estático regenerado automáticamente.
 
+### Seguridad
+
+- Formularios de administración protegidos con CSRF.
+- CSP con nonce por petición para scripts inline permitidos y bloqueo de atributos `on*`.
+- Cookies de sesión con `HttpOnly`, `SameSite` y `Secure` cuando la petición usa HTTPS.
+- Limitación de intentos de login y verificación TOTP.
+- Tokens API almacenados como hash SHA-256 en vez de en claro.
+
 ### Panel de administración
 
 | Página | Función |
@@ -134,15 +142,17 @@ docker run -d \
 | `admin.php` | Login/logout y acceso al panel |
 | `podcast_management.php` | Metadatos del canal |
 | `episodes_management.php` | CRUD de episodios |
-| `add_episode.php` | Alta/edición con editor Markdown y subida de audio/imagen |
+| `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación y subida de audio/imagen |
 | `import_feed.php` | Importación de episodios desde feed RSS externo |
 | `backups.php` | Exportar/importar base de datos y ficheros |
 | `cache_management.php` | Habilitar/deshabilitar caché y regenerar imágenes |
 | `twofa_management.php` | 2FA TOTP con códigos de recuperación |
 | `social_management.php` | Gestión de enlaces a redes sociales |
 | `change_password.php` | Cambio de contraseña |
-| `stats.php` | Estadísticas de episodios y caché |
+| `stats.php` | Estadísticas de episodios, descargas/reproducciones y caché |
 | `pages_management.php` / `add_page.php` | Páginas estáticas con jerarquía padre/hijo |
+| `api_tokens.php` | Generación y revocación de tokens para la API REST |
+| `api_docs.php` | Documentación interactiva de la API REST |
 | `update.php` | Actualizaciones desde GitHub Releases |
 
 ---
@@ -180,19 +190,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 14) {
-    migration_v14($pdo);
-    $pdo->exec('PRAGMA user_version = 14');
+if ($version < 17) {
+    migration_v17($pdo);
+    $pdo->exec('PRAGMA user_version = 17');
 }
 
 // 2. Función de migración
-function migration_v14(PDO $pdo): void
+function migration_v17(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 14`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 17`.
 
 #### Historial de versiones
 
@@ -211,6 +221,9 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 14`.
 | 11 | Renombra columna `description` → `content` en `episodes` |
 | 12 | Añade `admin_theme` a `podcast` (tema visual del sitio) |
 | 13 | Reparación idempotente: añade `admin_theme` si falta pese a `user_version = 12` |
+| 14 | Añade tablas e índices de estadísticas agregadas |
+| 15 | Añade `action_type` a `estadisticas` para diferenciar descargas y reproducciones |
+| 16 | Migra `api_tokens` a hash + sufijo visible y añade alcance explícito |
 
 ---
 
@@ -232,11 +245,15 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 14`.
 │   ├── upload_service.php           # Subida de audio/imagen e ID3
 │   ├── id3_service.php              # Metadatos ID3 para MP3
 │   ├── seo_helpers.php              # Canonical, URLs, meta description
-│   ├── view_helpers.php             # esc(), slugify(), Markdown, imágenes
+│   ├── view_helpers.php             # esc(), HTML saneado, slugs e imágenes
 │   ├── public_episode_helpers.php   # Rutas y slugs públicos
 │   ├── cache_service.php            # Caché (lectura/escritura/limpieza)
 │   ├── csrf.php                     # Protección CSRF
+│   ├── csp.php                      # Content-Security-Policy y nonces
+│   ├── session.php                  # Arranque seguro de sesión
+│   ├── auth_security.php            # Throttling de autenticación
 │   ├── admin_theme.php              # Temas visuales (carga y selección)
+│   ├── api_helpers.php              # Autenticación y utilidades de API
 │   ├── import_feed_handler.php      # Parser de feed externo
 │   └── backup_handler.php           # Exportación/importación de datos
 ├── assets/css/                      # Hojas de estilo por página

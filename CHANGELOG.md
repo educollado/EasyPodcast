@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0
+
+- **Seguridad**: CSP con nonce por petición, endurecimiento de cabeceras base, cookies de sesión más seguras, limitación de intentos de login/TOTP y cierre de sesión del panel protegido por CSRF.
+- **API y tokens**: los tokens API dejan de guardarse en claro; la migración `v16` los convierte a `token_hash` + sufijo visible y añade alcances `content` y `admin`.
+- **Panel y frontend**: scripts de administración y frontend extraídos a ficheros JS dedicados, mejor soporte responsive en la tabla de tokens API y selector público de tema `Normal | Según sistema` más consistente.
+- **Documentación y calidad**: documentación de API/README actualizada, traducciones revisadas y nuevos tests para CSP, CSRF, helpers API y migración de tokens.
+
 ## 1.8.11
 
 - **API de estadísticas**: ampliados los datos devueltos para estadísticas diarias, mensuales, anuales y resumen, con soporte de paginación y filtros coherente con el panel.
