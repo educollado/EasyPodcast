@@ -8,7 +8,9 @@ declare(strict_types=1);
 //
 // Devuelve JSON: { url, mime, size } en éxito, o { error } en fallo.
 
-session_start();
+require_once __DIR__ . '/lib/session.php';
+
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 header('Content-Type: application/json; charset=UTF-8');

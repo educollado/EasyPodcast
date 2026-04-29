@@ -6,6 +6,7 @@ declare(strict_types=1);
 // /slug y /padre/hijo
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/page_helpers.php';
@@ -16,7 +17,7 @@ $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 
 // Detecta sesión de admin para previsualización de borradores.
-session_start();
+startSecureSession();
 $isAdminPreview = isset($_SESSION['admin_user']);
 
 // No sirve caché si hay sesión de admin.
@@ -88,8 +89,8 @@ if ($error !== '') {
     <?php require __DIR__ . '/header.php'; ?>
 
     <?php if ($isDraft): ?>
-    <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600;color:#664d03;">
-      <span aria-hidden="true">✏️</span> Borrador — Esta página no está publicada y solo es visible para administradores.
+    <div class="draft-banner">
+      <span aria-hidden="true">✏️</span> <?= __('Borrador — Esta página no está publicada y solo es visible para administradores.') ?>
     </div>
     <?php endif; ?>
 
@@ -107,7 +108,7 @@ if ($error !== '') {
             <h1><?= esc((string) ($page['title'] ?? 'Sin título')) ?></h1>
 
             <?php if (!empty($page['content'])): ?>
-              <div class="desc"><?= $page['content'] ?></div>
+              <div class="desc"><?= sanitizeRichHtml((string) $page['content']) ?></div>
             <?php endif; ?>
 
             <?php if ($children): ?>

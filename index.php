@@ -74,7 +74,7 @@ if ($error !== '') {
   <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/index.css">
   <link rel="stylesheet" href="/assets/css/themes.css">
-  <script type="application/ld+json"><?= $seriesJsonLd ?></script>
+  <script type="application/ld+json"<?= cspNonceAttr() ?>><?= $seriesJsonLd ?></script>
 </head>
 <body>
   <div class="container">
@@ -147,45 +147,6 @@ if ($error !== '') {
     </main>
     <?php require __DIR__ . '/footer.php'; ?>
   </div>
-  <script>
-    // Trackear reproducciones
-    document.querySelectorAll('audio.player').forEach(audio => {
-      let tracked = false;
-      audio.addEventListener('play', function() {
-        if (tracked) return;
-        tracked = true;
-        const episodeId = this.dataset.episodeId;
-        if (episodeId && parseInt(episodeId) > 0) {
-          fetch('/track.php?episode_id=' + episodeId + '&action=play', {
-            method: 'GET',
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          }).catch(() => {});
-        }
-      });
-      audio.addEventListener('loadedmetadata', () => { tracked = false; });
-    });
-
-  (function () {
-    if (!('IntersectionObserver' in window)) return;
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-          obs.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.06 });
-    document.querySelectorAll('.reveal').forEach(function (el) {
-      el.style.transition = 'opacity .55s ease, transform .55s ease';
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(24px)';
-      obs.observe(el);
-    });
-  }());
-  </script>
 </body>
 </html>
 <?php

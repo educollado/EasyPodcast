@@ -18,3 +18,4 @@ $_navPage = $currentAdminPage ?? '';
   </div>
   <a class="admin-nav-logout" href="admin.php?logout=1"><?= __('Salir') ?></a>
 </nav>
+<script src="/assets/js/admin.js"></script>

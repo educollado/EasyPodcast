@@ -5,10 +5,11 @@ declare(strict_types=1);
 // Panel de gestión de metadatos del podcast (una sola fila de canal).
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/podcast_management_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -60,14 +61,14 @@ extract($data);  // form, error, notice
           </label>
         </div>
 
-        <div class="grid" style="margin-top: .8rem;">
+        <div class="grid grid-section">
           <label>
             <?= __('Descripción *') ?>
             <textarea name="description" required><?= esc($form['description']) ?></textarea>
           </label>
         </div>
 
-        <div class="grid two" style="margin-top: .8rem;">
+        <div class="grid two grid-section">
           <label>
             <?= __('Idioma') ?>
             <input type="text" name="language" value="<?= esc($form['language']) ?>" placeholder="es-ES">
@@ -272,7 +273,7 @@ extract($data);  // form, error, notice
               <input type="hidden" name="category" id="category-hidden" value="<?= esc($form['category']) ?>">
             </div>
           </div>
-          <label style="align-self: start">
+          <label class="align-start">
             Explícito
             <select name="explicit">
               <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>>No</option>
@@ -287,7 +288,7 @@ extract($data);  // form, error, notice
             <?= __('O subir imagen del podcast') ?>
             <input type="file" name="image_file" accept="image/*">
           </label>
-          <label style="align-self: start">
+          <label class="align-start">
             <?= __('Tipo iTunes') ?>
             <select name="itunes_type">
               <option value="episodic" <?= $form['itunes_type'] === 'episodic' ? 'selected' : '' ?>>episodic</option>
@@ -311,7 +312,7 @@ extract($data);  // form, error, notice
           </label>
         </div>
 
-        <div class="grid" style="margin-top: .8rem;">
+        <div class="grid grid-section">
           <label>
             <?= __('Copyright') ?>
             <input type="text" name="copyright" value="<?= esc($form['copyright']) ?>">
@@ -324,54 +325,6 @@ extract($data);  // form, error, notice
       </form>
     </main>
   </div>
-  <script>
-  // Selector de categorías Apple Podcasts — máx. 3, almacenadas en hidden input.
-  (function () {
-    var MAX = 3;
-    var hidden = document.getElementById('category-hidden');
-    var chipsEl = document.getElementById('category-chips');
-    var sel = document.getElementById('category-select');
-
-    // Carga valores ya guardados (el hidden viene con el valor de BD).
-    var selected = hidden.value
-      ? hidden.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
-      : [];
-
-    function render() {
-      chipsEl.innerHTML = '';
-      selected.forEach(function (cat) {
-        var chip = document.createElement('span');
-        chip.className = 'chip';
-        var text = document.createTextNode(cat + ' ');
-        chip.appendChild(text);
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip-remove';
-        btn.textContent = '×';
-        btn.setAttribute('aria-label', 'Eliminar ' + cat);
-        btn.onclick = function () { remove(cat); };
-        chip.appendChild(btn);
-        chipsEl.appendChild(chip);
-      });
-      hidden.value = selected.join(', ');
-      sel.disabled = selected.length >= MAX;
-      sel.value = '';
-    }
-
-    function remove(cat) {
-      selected = selected.filter(function (c) { return c !== cat; });
-      render();
-    }
-
-    sel.addEventListener('change', function () {
-      var val = this.value;
-      if (!val || selected.length >= MAX) { this.value = ''; return; }
-      if (selected.indexOf(val) === -1) { selected.push(val); }
-      render();
-    });
-
-    render();
-  })();
-  </script>
+  <script src="/assets/js/podcast_management.js"></script>
 </body>
 </html>

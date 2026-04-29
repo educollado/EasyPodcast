@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/media_cleanup_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -52,7 +53,9 @@ $totalImageBytes = array_sum($orphanImages);
     <?php if ($totalOrphans === 0): ?>
       <p class="notice"><?= __('No se encontraron archivos sin usar.') ?></p>
     <?php else: ?>
-      <form method="post" action="media_cleanup.php" id="cleanup-form">
+      <form method="post" action="media_cleanup.php" id="cleanup-form"
+            data-empty-selection-message="<?= esc(__('Selecciona al menos un archivo.')) ?>"
+            data-confirm-message="<?= esc(__('¿Borrar los archivos seleccionados? Esta acción no se puede deshacer.')) ?>">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
 
         <?php if (count($orphanAudios) > 0): ?>
@@ -64,7 +67,7 @@ $totalImageBytes = array_sum($orphanImages);
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:2rem;"></th>
+                <th class="narrow-col"></th>
                 <th><?= __('Archivo') ?></th>
                 <th><?= __('Tamaño') ?></th>
               </tr>
@@ -82,7 +85,7 @@ $totalImageBytes = array_sum($orphanImages);
         <?php endif; ?>
 
         <?php if (count($orphanImages) > 0): ?>
-          <h2 style="margin-top:1.5rem;">
+          <h2 class="section-gap-lg">
             <?= __('Imágenes sin usar') ?>
             (<?= count($orphanImages) ?>,
             <?= esc(mediaCleanupFormatBytes((int) $totalImageBytes)) ?>)
@@ -90,7 +93,7 @@ $totalImageBytes = array_sum($orphanImages);
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:2rem;"></th>
+                <th class="narrow-col"></th>
                 <th><?= __('Archivo') ?></th>
                 <th><?= __('Tamaño') ?></th>
               </tr>
@@ -107,8 +110,10 @@ $totalImageBytes = array_sum($orphanImages);
           </table>
         <?php endif; ?>
 
-        <div class="actions" style="margin-top:1.5rem;">
-          <button type="button" id="btn-select-all" class="btn btn-secondary">
+        <div class="actions section-gap-lg">
+          <button type="button" id="btn-select-all" class="btn btn-secondary"
+                  data-select-label="<?= esc(__('Seleccionar todo')) ?>"
+                  data-deselect-label="<?= esc(__('Deseleccionar todo')) ?>">
             <?= __('Seleccionar todo') ?>
           </button>
           <button type="submit" class="btn">
@@ -120,36 +125,6 @@ $totalImageBytes = array_sum($orphanImages);
   </main>
   </div>
 
-  <script>
-    (function () {
-      var btnAll  = document.getElementById('btn-select-all');
-      var form    = document.getElementById('cleanup-form');
-      if (!btnAll || !form) return;
-
-      var allSelected = false;
-
-      btnAll.addEventListener('click', function () {
-        allSelected = !allSelected;
-        form.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
-          cb.checked = allSelected;
-        });
-        btnAll.textContent = allSelected
-          ? <?= json_encode(__('Deseleccionar todo')) ?>
-          : <?= json_encode(__('Seleccionar todo')) ?>;
-      });
-
-      form.addEventListener('submit', function (e) {
-        var checked = form.querySelectorAll('input[type="checkbox"]:checked');
-        if (checked.length === 0) {
-          e.preventDefault();
-          alert(<?= json_encode(__('Selecciona al menos un archivo.')) ?>);
-          return;
-        }
-        if (!confirm(<?= json_encode(__('¿Borrar los archivos seleccionados? Esta acción no se puede deshacer.')) ?>)) {
-          e.preventDefault();
-        }
-      });
-    }());
-  </script>
+  <script src="/assets/js/media_cleanup.js"></script>
 </body>
 </html>

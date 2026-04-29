@@ -103,6 +103,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 15');
         $version = 15;
     }
+
+    if ($version < 16) {
+        migration_v16($pdo);
+        $pdo->exec('PRAGMA user_version = 16');
+        $version = 16;
+    }
 }
 
 /**
@@ -494,4 +500,102 @@ function migration_v15(PDO $pdo): void
     if (!in_array('action_type', $existingColumns, true)) {
         $pdo->exec("ALTER TABLE estadisticas ADD COLUMN action_type TEXT NOT NULL DEFAULT 'download'");
     }
+}
+
+/**
+ * Migración v16: deja de guardar tokens API en claro y añade alcance explícito.
+ */
+function migration_v16(PDO $pdo): void
+{
+    $tableExists = (bool) $pdo
+        ->query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='api_tokens' LIMIT 1")
+        ->fetchColumn();
+
+    if (!$tableExists) {
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS api_tokens (
+              id INTEGER PRIMARY KEY,
+              token TEXT NOT NULL DEFAULT '',
+              token_hash TEXT NOT NULL DEFAULT '',
+              token_suffix TEXT NOT NULL DEFAULT '',
+              scope TEXT NOT NULL DEFAULT 'content',
+              name TEXT NOT NULL DEFAULT '',
+              user_id INTEGER NOT NULL,
+              expires_at TEXT,
+              last_used_at TEXT,
+              created_at TEXT DEFAULT (datetime('now'))
+            )"
+        );
+        $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_api_tokens_hash ON api_tokens(token_hash) WHERE token_hash != ''");
+        return;
+    }
+
+    $legacyRows = $pdo->query('SELECT * FROM api_tokens')->fetchAll(PDO::FETCH_ASSOC);
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->exec('DROP TABLE IF EXISTS api_tokens_v16_new');
+        $pdo->exec(
+            "CREATE TABLE api_tokens_v16_new (
+              id INTEGER PRIMARY KEY,
+              token TEXT NOT NULL DEFAULT '',
+              token_hash TEXT NOT NULL DEFAULT '',
+              token_suffix TEXT NOT NULL DEFAULT '',
+              scope TEXT NOT NULL DEFAULT 'content',
+              name TEXT NOT NULL DEFAULT '',
+              user_id INTEGER NOT NULL,
+              expires_at TEXT,
+              last_used_at TEXT,
+              created_at TEXT DEFAULT (datetime('now'))
+            )"
+        );
+
+        $insert = $pdo->prepare(
+            'INSERT INTO api_tokens_v16_new (
+                id, token, token_hash, token_suffix, scope, name, user_id, expires_at, last_used_at, created_at
+            ) VALUES (
+                :id, :token, :token_hash, :token_suffix, :scope, :name, :user_id, :expires_at, :last_used_at, :created_at
+            )'
+        );
+
+        foreach ($legacyRows as $row) {
+            $token = (string) ($row['token'] ?? '');
+            $tokenHash = trim((string) ($row['token_hash'] ?? ''));
+            $tokenSuffix = trim((string) ($row['token_suffix'] ?? ''));
+            $scope = (string) ($row['scope'] ?? 'content');
+            $normalizedScope = $scope === 'admin' ? 'admin' : 'content';
+
+            if ($tokenHash === '' && $token !== '') {
+                $tokenHash = hash('sha256', $token);
+            }
+            if ($tokenSuffix === '' && $token !== '') {
+                $tokenSuffix = substr($token, -8);
+            }
+
+            $insert->execute([
+                ':id' => (int) ($row['id'] ?? 0),
+                ':token' => '',
+                ':token_hash' => $tokenHash,
+                ':token_suffix' => $tokenSuffix,
+                ':scope' => $normalizedScope,
+                ':name' => (string) ($row['name'] ?? ''),
+                ':user_id' => (int) ($row['user_id'] ?? 1),
+                ':expires_at' => $row['expires_at'] ?? null,
+                ':last_used_at' => $row['last_used_at'] ?? null,
+                ':created_at' => $row['created_at'] ?? null,
+            ]);
+        }
+
+        $pdo->exec('DROP TABLE api_tokens');
+        $pdo->exec('ALTER TABLE api_tokens_v16_new RENAME TO api_tokens');
+        $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_api_tokens_hash ON api_tokens(token_hash) WHERE token_hash != ''");
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
+
+    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_api_tokens_hash ON api_tokens(token_hash) WHERE token_hash != ''");
 }

@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/social_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -60,7 +61,7 @@ $labels = [
       <form method="post" action="social_management.php" autocomplete="off">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
 
-        <div class="grid two" style="margin-top:.5rem;">
+        <div class="grid two section-gap-sm">
           <?php foreach ($labels as $key => [$label, $placeholder]): ?>
             <label>
               <?= esc($label) ?>
@@ -71,7 +72,7 @@ $labels = [
           <?php endforeach; ?>
         </div>
 
-        <div class="actions" style="margin-top:1rem;">
+        <div class="actions">
           <button class="btn" type="submit"><?= __('Guardar redes sociales') ?></button>
         </div>
       </form>

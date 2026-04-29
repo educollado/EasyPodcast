@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/update_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -57,9 +58,9 @@ $updatingLabel        = __('Actualizando…');
       <?php if ($updated): ?>
         <div class="notice"><?= __('EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado.') ?></div>
         <?php if ($changelogNotes !== ''): ?>
-          <div style="margin-top: .85rem; padding: 1rem 1.15rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card);">
-            <strong style="font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);"><?= __('Novedades v%s', $currentVersion) ?></strong>
-            <ul style="margin: .6rem 0 0; padding-left: 1.4rem; font-size: .91rem; line-height: 1.65;">
+          <div class="update-changelog">
+            <strong class="update-changelog-title"><?= __('Novedades v%s', $currentVersion) ?></strong>
+            <ul class="update-changelog-list">
               <?php foreach (explode("\n", $changelogNotes) as $line): ?>
                 <?php $line = trim($line); if ($line === '') { continue; } ?>
                 <?php $line = ltrim($line, '- '); ?>
@@ -75,18 +76,18 @@ $updatingLabel        = __('Actualizando…');
         <div class="error"><?= esc($updateResult['message']) ?></div>
       <?php endif; ?>
 
-      <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+      <div class="update-stack">
 
         <!-- Versiones -->
-        <div style="display: flex; gap: 2.5rem; flex-wrap: wrap;">
+        <div class="update-version-row">
           <div>
-            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;"><?= __('Instalada') ?></span>
-            <strong style="font-size: 1.5rem; font-family: var(--font-display);"><?= esc($currentVersion) ?></strong>
+            <span class="update-version-label"><?= __('Instalada') ?></span>
+            <strong class="update-version-value"><?= esc($currentVersion) ?></strong>
           </div>
           <?php if ($fetchError === '' && $latestVersion !== ''): ?>
           <div>
-            <span style="color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: .25rem;"><?= __('Última disponible') ?></span>
-            <strong style="font-size: 1.5rem; font-family: var(--font-display); color: <?= $updateAvailable ? 'var(--accent)' : 'var(--ok)' ?>;"><?= esc($latestVersion) ?></strong>
+            <span class="update-version-label"><?= __('Última disponible') ?></span>
+            <strong class="update-version-value <?= $updateAvailable ? 'is-available' : 'is-current' ?>"><?= esc($latestVersion) ?></strong>
           </div>
           <?php endif; ?>
         </div>
@@ -96,11 +97,14 @@ $updatingLabel        = __('Actualizando…');
           <div class="error"><?= esc($fetchError) ?></div>
 
         <?php elseif ($updateAvailable): ?>
-          <div style="background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12; padding: .75rem 1rem; border-radius: 8px; font-size: .91rem;">
+          <div class="update-status-warning">
             <?= __('Hay una nueva versión disponible:') ?> <strong>v<?= esc($latestVersion) ?></strong>
           </div>
           <form method="post" action="update.php"
-                onsubmit='if (!confirm(<?= json_encode($confirmUpdateMessage, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP) ?>)) return false; this.querySelector(".btn-update").textContent = <?= json_encode($updatingLabel, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP) ?>; this.querySelector(".btn-update").disabled = true;'>
+                data-confirm-message="<?= esc($confirmUpdateMessage) ?>"
+                data-submit-lock="1"
+                data-submit-lock-button=".btn-update"
+                data-submit-lock-text="<?= esc($updatingLabel) ?>">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="tar_url" value="<?= esc($tarUrl) ?>">
@@ -114,9 +118,9 @@ $updatingLabel        = __('Actualizando…');
 
       </div>
 
-      <p style="margin-top: 1.5rem; font-size: .83rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+      <p class="update-footer-note">
         <?= __('La actualización descarga el paquete desde') ?>
-        <a href="https://github.com/educollado/EasyPodcast/releases/latest" target="_blank" rel="noopener" style="color: var(--accent);"><?= __('GitHub Releases') ?></a>
+        <a href="https://github.com/educollado/EasyPodcast/releases/latest" target="_blank" rel="noopener" class="update-footer-link"><?= __('GitHub Releases') ?></a>
         <?= __('y extrae los archivos sobre la instalación actual.') ?>
         <?= __('La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan.') ?>
       </p>

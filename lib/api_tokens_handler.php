@@ -2,8 +2,29 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/api_helpers.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/i18n.php';
+
+/**
+ * @return array<string, string>
+ */
+function apiTokenScopeOptions(): array
+{
+    return [
+        'content' => __('Contenido'),
+        'admin' => __('Administración total'),
+    ];
+}
+
+/**
+ * Devuelve una etiqueta legible para el alcance del token.
+ */
+function apiTokenScopeLabel(string $scope): string
+{
+    $options = apiTokenScopeOptions();
+    return $options[normalizeApiTokenScope($scope)] ?? $options['content'];
+}
 
 /**
  * Carga la lista de tokens y procesa acciones POST (generar/revocar).
@@ -29,7 +50,7 @@ function loadApiTokensData(string $dbPath): array
 
         if ($tableExists) {
             $tokens = $pdo
-                ->query("SELECT id, name, token, expires_at, created_at, last_used_at FROM api_tokens ORDER BY created_at DESC")
+                ->query("SELECT id, name, token_suffix, scope, expires_at, created_at, last_used_at FROM api_tokens ORDER BY created_at DESC")
                 ->fetchAll();
         }
 
@@ -52,6 +73,7 @@ function loadApiTokensData(string $dbPath): array
             if ($action === 'generate') {
                 $name      = trim((string) ($_POST['token_name'] ?? ''));
                 $expiresAt = trim((string) ($_POST['expires_at'] ?? ''));
+                $scope     = normalizeApiTokenScope((string) ($_POST['token_scope'] ?? 'content'));
 
                 if ($name === '') {
                     $error = __('El nombre del token es obligatorio.');
@@ -59,7 +81,8 @@ function loadApiTokensData(string $dbPath): array
                     $newToken = generateApiToken(
                         $pdo,
                         $name,
-                        $expiresAt !== '' ? $expiresAt : null
+                        $expiresAt !== '' ? $expiresAt : null,
+                        $scope
                     );
                     // PRG: guardar token en sesión y redirigir para evitar reenvío del formulario.
                     $_SESSION['api_token_flash'] = $newToken;
@@ -86,16 +109,22 @@ function loadApiTokensData(string $dbPath): array
  * Genera un token aleatorio de 64 caracteres hex, lo almacena en BD y devuelve su valor en claro.
  * El token nunca se puede recuperar después; solo se muestra una vez al generarlo.
  */
-function generateApiToken(PDO $pdo, string $name, ?string $expiresAt): string
+function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $scope): string
 {
     $token = bin2hex(random_bytes(32));
+    $tokenHash = hashApiTokenValue($token);
+    $tokenSuffix = substr($token, -8);
+    $scope = normalizeApiTokenScope($scope);
 
     $stmt = $pdo->prepare(
-        "INSERT INTO api_tokens (token, name, user_id, expires_at, created_at)
-         VALUES (:token, :name, 1, :expires_at, datetime('now'))"
+        "INSERT INTO api_tokens (token, token_hash, token_suffix, scope, name, user_id, expires_at, created_at)
+         VALUES (:token, :token_hash, :token_suffix, :scope, :name, 1, :expires_at, datetime('now'))"
     );
     $stmt->execute([
-        ':token'      => $token,
+        ':token'      => '',
+        ':token_hash' => $tokenHash,
+        ':token_suffix' => $tokenSuffix,
+        ':scope'      => $scope,
         ':name'       => $name,
         ':expires_at' => $expiresAt,
     ]);

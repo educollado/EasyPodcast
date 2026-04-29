@@ -7,11 +7,12 @@ declare(strict_types=1);
 // - siguientes ejecuciones: login/logout y acceso a gestión
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/admin_query.php';
 require_once __DIR__ . '/lib/cache_service.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
@@ -196,12 +197,12 @@ if ($isLoggedIn) {
             $localeFiles = glob(__DIR__ . '/locale/*.po') ?: [];
             sort($localeFiles);
           ?>
-          <form method="post" action="admin.php" class="admin-card" style="cursor:default; text-align:left;">
+          <form method="post" action="admin.php" class="admin-card admin-card-form">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="set_language">
             <div class="admin-card-icon">🌐</div>
             <h2><?= __('Idioma') ?></h2>
-            <select name="app_language" onchange="this.form.submit()" style="width:100%; margin-top:.3rem;">
+            <select name="app_language" data-submit-on-change="1">
               <?php foreach ($localeFiles as $f):
                 $lc = basename($f, '.po');
                 $label = $localeLabels[$lc] ?? $lc;
@@ -211,12 +212,12 @@ if ($isLoggedIn) {
             </select>
           </form>
 
-          <form method="post" action="admin.php" class="admin-card" style="cursor:default; text-align:left;">
+          <form method="post" action="admin.php" class="admin-card admin-card-form">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="set_theme">
             <div class="admin-card-icon">🎨</div>
             <h2><?= __('Apariencia') ?></h2>
-            <select name="app_theme" onchange="this.form.submit()" style="width:100%; margin-top:.3rem;">
+            <select name="app_theme" data-submit-on-change="1">
               <?php foreach (ADMIN_THEMES as $slug => $themeLabel): ?>
                 <option value="<?= esc($slug) ?>" <?= $currentAdminTheme === $slug ? 'selected' : '' ?>><?= esc($themeLabel) ?></option>
               <?php endforeach; ?>
@@ -224,7 +225,7 @@ if ($isLoggedIn) {
           </form>
         </div>
 
-        <div class="actions" style="margin-top:1.5rem; justify-content:flex-end;">
+        <div class="actions section-gap-lg justify-end">
           <a class="btn logout" href="admin.php?logout=1"><?= __('Cerrar sesión') ?></a>
         </div>
       </main>
@@ -238,22 +239,21 @@ if ($isLoggedIn) {
         <div class="error"><?= esc($totpError) ?></div>
       <?php endif; ?>
 
-      <form method="post" action="admin.php" autocomplete="off" style="display:grid;gap:.75rem;">
+      <form method="post" action="admin.php" autocomplete="off" class="form-stack">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
           <?= __('Código') ?>
-          <input type="text" name="totp_code" inputmode="numeric" maxlength="9"
-                 autocomplete="one-time-code" autofocus placeholder="000000"
-                 style="letter-spacing:.15em; font-size:1.25rem;">
+            <input type="text" name="totp_code" inputmode="numeric" maxlength="9"
+                 autocomplete="one-time-code" autofocus placeholder="000000" class="totp-code-input">
         </label>
-        <label style="display:flex; flex-direction:row; align-items:center; gap:.5rem; font-size:.9rem;">
+        <label class="inline-option-row">
           <input type="checkbox" name="remember_device" value="1">
           <?= __('Recordar este dispositivo durante 7 días') ?>
         </label>
         <button class="btn" type="submit"><?= __('Verificar') ?></button>
       </form>
-      <div style="margin-top:.75rem; text-align:right;">
-        <a href="admin.php?logout=1" style="font-size:.85rem; color:var(--muted);"><?= __('Cancelar y volver al login') ?></a>
+      <div class="section-gap-sm text-right">
+        <a href="admin.php?logout=1" class="link-muted"><?= __('Cancelar y volver al login') ?></a>
       </div>
     </main>
   <?php else: ?>
@@ -273,7 +273,7 @@ if ($isLoggedIn) {
         <div class="notice"><?= esc($notice) ?></div>
       <?php endif; ?>
 
-      <form method="post" action="admin.php" autocomplete="off" style="display:grid;gap:.75rem;">
+      <form method="post" action="admin.php" autocomplete="off" class="form-stack">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
           <?= __('Usuario') ?>

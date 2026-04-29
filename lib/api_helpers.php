@@ -21,11 +21,54 @@ function apiError(string $msg, int $status = 400): never
 }
 
 /**
+ * Hash estable del token API para no persistirlo en claro.
+ */
+function hashApiTokenValue(string $token): string
+{
+    return hash('sha256', $token);
+}
+
+/**
+ * Normaliza el alcance de un token API.
+ */
+function normalizeApiTokenScope(?string $scope): string
+{
+    return $scope === 'admin' ? 'admin' : 'content';
+}
+
+/**
+ * Comprueba si el token autenticado cubre el alcance solicitado.
+ *
+ * @param array{id:int,scope:string} $auth
+ */
+function apiTokenHasScope(array $auth, string $requiredScope): bool
+{
+    $scope = normalizeApiTokenScope($auth['scope'] ?? '');
+    if ($requiredScope === 'admin') {
+        return $scope === 'admin';
+    }
+
+    return in_array($scope, ['content', 'admin'], true);
+}
+
+/**
+ * Exige un alcance concreto para continuar.
+ *
+ * @param array{id:int,scope:string} $auth
+ */
+function apiRequireScope(array $auth, string $requiredScope): void
+{
+    if (!apiTokenHasScope($auth, $requiredScope)) {
+        apiError('El token autenticado no tiene permisos suficientes para esta operación.', 403);
+    }
+}
+
+/**
  * Valida el Bearer token de Authorization contra api_tokens.
  * Actualiza last_used_at si el token es válido.
- * Devuelve true si el token es válido y no ha expirado.
+ * Devuelve sus metadatos si el token es válido y no ha expirado.
  */
-function apiAuth(PDO $pdo): bool
+function apiAuth(PDO $pdo): array|false
 {
     $authHeader = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? '');
     if ($authHeader === '') {
@@ -42,14 +85,44 @@ function apiAuth(PDO $pdo): bool
         return false;
     }
 
+    $tokenHash = hashApiTokenValue($token);
     $stmt = $pdo->prepare(
-        "SELECT id FROM api_tokens
-         WHERE token = :token
+        "SELECT id, scope FROM api_tokens
+         WHERE token_hash = :token_hash
            AND (expires_at IS NULL OR expires_at > datetime('now'))
          LIMIT 1"
     );
-    $stmt->execute([':token' => $token]);
+    $stmt->execute([':token_hash' => $tokenHash]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        $legacyStmt = $pdo->prepare(
+            "SELECT id, token, scope FROM api_tokens
+             WHERE token = :token
+               AND (expires_at IS NULL OR expires_at > datetime('now'))
+             LIMIT 1"
+        );
+        $legacyStmt->execute([':token' => $token]);
+        $row = $legacyStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $migrate = $pdo->prepare(
+                'UPDATE api_tokens
+                    SET token = :empty_token,
+                        token_hash = :token_hash,
+                        token_suffix = :token_suffix,
+                        scope = :scope
+                  WHERE id = :id'
+            );
+            $migrate->execute([
+                ':empty_token' => '',
+                ':token_hash' => $tokenHash,
+                ':token_suffix' => substr($token, -8),
+                ':scope' => normalizeApiTokenScope((string) ($row['scope'] ?? '')),
+                ':id' => (int) $row['id'],
+            ]);
+        }
+    }
 
     if (!$row) {
         return false;
@@ -59,7 +132,10 @@ function apiAuth(PDO $pdo): bool
     $upd = $pdo->prepare("UPDATE api_tokens SET last_used_at = datetime('now') WHERE id = :id");
     $upd->execute([':id' => (int) $row['id']]);
 
-    return true;
+    return [
+        'id' => (int) $row['id'],
+        'scope' => normalizeApiTokenScope((string) ($row['scope'] ?? '')),
+    ];
 }
 
 /**

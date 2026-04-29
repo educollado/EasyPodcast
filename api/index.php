@@ -18,6 +18,7 @@ require_once dirname(__DIR__) . '/lib/api_pages_handler.php';
 require_once dirname(__DIR__) . '/lib/api_social_handler.php';
 require_once dirname(__DIR__) . '/lib/api_misc_handlers.php';
 require_once dirname(__DIR__) . '/lib/api_system_handler.php';
+require_once dirname(__DIR__) . '/lib/migration_runner.php';
 
 // Cabeceras de respuesta.
 header('Content-Type: application/json; charset=UTF-8');
@@ -36,6 +37,7 @@ if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 
 // Abrir base de datos.
 $dbPath = getenv('PODCAST_DB_PATH') ?: dirname(__DIR__) . '/podcast.sqlite';
+runMigrations($dbPath);
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -46,7 +48,8 @@ try {
 }
 
 // Autenticación via Bearer token.
-if (!apiAuth($pdo)) {
+$apiToken = apiAuth($pdo);
+if ($apiToken === false) {
     apiError('Token de autenticación inválido o ausente.', 401);
 }
 
@@ -132,7 +135,7 @@ switch ($resource) {
     // --- Sistema ---
     case 'system':
         if ($method === 'GET'  && $subpath === 'version') { apiGetSystemVersion(); }
-        elseif ($method === 'POST' && $subpath === 'update')  { apiSystemUpdate(); }
+        elseif ($method === 'POST' && $subpath === 'update')  { apiRequireScope($apiToken, 'admin'); apiSystemUpdate(); }
         else { apiError('Ruta de sistema no encontrada.', 404); }
         break;
 

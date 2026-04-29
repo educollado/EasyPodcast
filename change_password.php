@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/change_password_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -44,7 +45,7 @@ extract($data); // error, notice
         <div class="notice"><?= esc($notice) ?></div>
       <?php endif; ?>
 
-      <form method="post" action="change_password.php" autocomplete="off" style="display:grid;gap:.75rem;max-width:420px;">
+      <form method="post" action="change_password.php" autocomplete="off" class="form-stack form-narrow">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
           <?= __('Contraseña actual') ?>

@@ -299,7 +299,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
         }
 
         $xml->startElement('content:encoded');
-        $xml->writeCdata((string) $episode['content']);
+        $xml->writeCdata(sanitizeRichHtml((string) ($episode['content'] ?? '')));
         $xml->endElement();
 
         $episodeLink = $episode['link'] ?: $episode['audio_url'];

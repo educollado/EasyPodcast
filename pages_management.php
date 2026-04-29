@@ -5,10 +5,11 @@ declare(strict_types=1);
 // Listado administrativo de páginas estáticas.
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/page_save_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -86,7 +87,7 @@ if (!empty($deleteError)) {
                 <tr>
                   <td>
                     <?php if ((int) ($p['level'] ?? 0) === 1): ?>
-                      <span style="margin-left:1.5rem;color:var(--muted);">↳ </span>
+                      <span class="table-indent-marker">↳ </span>
                     <?php endif; ?>
                     <?= esc((string) ($p['title'] ?? '')) ?>
                   </td>
@@ -101,7 +102,7 @@ if (!empty($deleteError)) {
                     <div class="row-actions">
                       <a class="edit-link" href="add_page.php?page_id=<?= (int) ($p['id'] ?? 0) ?>"><?= __('Editar') ?></a>
                       <form class="inline-form" method="post" action="pages_management.php"
-                            onsubmit="return confirm('¿Borrar la página «<?= esc(addslashes((string) ($p['title'] ?? ''))) ?>»?');">
+                            data-confirm-message="<?= esc(__('¿Borrar la página «%s»?', (string) ($p['title'] ?? ''))) ?>">
                         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                         <input type="hidden" name="delete_page_id" value="<?= (int) ($p['id'] ?? 0) ?>">
                         <button class="delete-text" type="submit"><?= __('Borrar') ?></button>

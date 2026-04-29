@@ -8,11 +8,12 @@ declare(strict_types=1);
 // - regeneración de feed tras borrado
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/episodes_management_query.php';
 require_once __DIR__ . '/lib/public_episode_helpers.php';
 
-session_start();
+startSecureSession();
 
 if (!isset($_SESSION['admin_user'])) {
     header('Location: admin.php');
@@ -26,6 +27,7 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 $requestedPage      = max(1, (int) ($_GET['page'] ?? 1));
 $requestedDraftPage = max(1, (int) ($_GET['draft_page'] ?? 1));
 $searchQuery        = trim((string) ($_GET['q'] ?? ''));
+$deleteConfirmMessage = __('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?');
 
 $data = loadEpisodesManagementData($dbPath, $requestedPage, $requestedDraftPage, $searchQuery);
 extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes, publishedEpisodes, draftCurrentPage, draftTotalPages, totalDrafts, totalScheduled, currentPage, totalPublished, totalPages, error, notice
@@ -93,7 +95,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
                         <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
-                        <form class="inline-form" method="post" action="episodes_management.php?q=<?= esc(urlencode($searchQuery)) ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
+                        <form class="inline-form" method="post" action="episodes_management.php?q=<?= esc(urlencode($searchQuery)) ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                           <input type="hidden" name="return_page" value="1">
@@ -140,7 +142,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                         <?php if ($draftPreviewHref !== ''): ?>
                           <a class="edit-link" href="<?= esc($draftPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <?php endif; ?>
-                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
+                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                           <input type="hidden" name="return_page" value="<?= $currentPage ?>">
@@ -198,7 +200,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                         <?php if ($scheduledPreviewHref !== ''): ?>
                           <a class="edit-link" href="<?= esc($scheduledPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <?php endif; ?>
-                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
+                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                           <input type="hidden" name="return_page" value="<?= $currentPage ?>">
@@ -240,7 +242,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
                         <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
-                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" onsubmit="return confirm('<?= esc(__('Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?')) ?>');">
+                        <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
                           <input type="hidden" name="return_page" value="<?= $currentPage ?>">

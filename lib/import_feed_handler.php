@@ -14,45 +14,249 @@ require_once __DIR__ . '/i18n.php';
 // ---------------------------------------------------------------------------
 
 /**
+ * Opciones de cURL para limitar protocolos a HTTP/HTTPS.
+ *
+ * @return array<int, int>
+ */
+function remoteCurlProtocolOptions(): array
+{
+    $options = [];
+    if (defined('CURLOPT_PROTOCOLS') && defined('CURLPROTO_HTTP') && defined('CURLPROTO_HTTPS')) {
+        $options[CURLOPT_PROTOCOLS] = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+    }
+    if (defined('CURLOPT_REDIR_PROTOCOLS') && defined('CURLPROTO_HTTP') && defined('CURLPROTO_HTTPS')) {
+        $options[CURLOPT_REDIR_PROTOCOLS] = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+    }
+    return $options;
+}
+
+/**
+ * Resuelve las IPs asociadas a un host.
+ *
+ * @return array<int, string>
+ */
+function resolveHostIpAddresses(string $host): array
+{
+    if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+        return [$host];
+    }
+
+    $ips = gethostbynamel($host) ?: [];
+
+    if (function_exists('dns_get_record') && defined('DNS_AAAA')) {
+        $aaaaRecords = dns_get_record($host, DNS_AAAA);
+        if (is_array($aaaaRecords)) {
+            foreach ($aaaaRecords as $record) {
+                $ipv6 = trim((string) ($record['ipv6'] ?? ''));
+                if ($ipv6 !== '') {
+                    $ips[] = $ipv6;
+                }
+            }
+        }
+    }
+
+    $ips = array_values(array_unique(array_filter(
+        array_map('trim', $ips),
+        static fn(string $ip): bool => $ip !== ''
+    )));
+
+    return $ips;
+}
+
+/**
+ * Valida que una URL remota no apunte a redes privadas o reservadas.
+ *
+ * @return array{ok:bool,error:string}
+ */
+function validateRemoteFetchUrl(string $url): array
+{
+    $parts = parse_url($url);
+    if (!is_array($parts)) {
+        return ['ok' => false, 'error' => __('La URL remota no es válida.')];
+    }
+
+    $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+    if (!in_array($scheme, ['http', 'https'], true)) {
+        return ['ok' => false, 'error' => __('La URL debe usar http o https.')];
+    }
+
+    if (isset($parts['user']) || isset($parts['pass'])) {
+        return ['ok' => false, 'error' => __('La URL remota no puede incluir credenciales.')];
+    }
+
+    $host = strtolower(trim((string) ($parts['host'] ?? '')));
+    if ($host === '' || $host === 'localhost' || str_ends_with($host, '.local')) {
+        return ['ok' => false, 'error' => __('La URL remota apunta a un host no permitido.')];
+    }
+
+    $ips = resolveHostIpAddresses($host);
+    if ($ips === []) {
+        return ['ok' => false, 'error' => __('No se pudo resolver el host remoto.')];
+    }
+
+    foreach ($ips as $ip) {
+        if (isPrivateOrReservedIp($ip)) {
+            return ['ok' => false, 'error' => __('La URL remota apunta a una red privada o reservada y ha sido bloqueada.')];
+        }
+    }
+
+    return ['ok' => true, 'error' => ''];
+}
+
+/**
+ * Resuelve una cabecera Location relativa contra la URL actual.
+ */
+function resolveRedirectUrl(string $currentUrl, string $location): ?string
+{
+    $location = trim($location);
+    if ($location === '') {
+        return null;
+    }
+
+    if (filter_var($location, FILTER_VALIDATE_URL) !== false) {
+        return $location;
+    }
+
+    $parts = parse_url($currentUrl);
+    if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+        return null;
+    }
+
+    $scheme = (string) $parts['scheme'];
+    $host = (string) $parts['host'];
+    $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+
+    if (str_starts_with($location, '//')) {
+        return $scheme . ':' . $location;
+    }
+
+    if (str_starts_with($location, '/')) {
+        return $scheme . '://' . $host . $port . $location;
+    }
+
+    $path = (string) ($parts['path'] ?? '/');
+    if (str_starts_with($location, '?')) {
+        return $scheme . '://' . $host . $port . $path . $location;
+    }
+
+    $baseDir = preg_replace('#/[^/]*$#', '/', $path) ?: '/';
+    $combined = $baseDir . $location;
+    $segments = [];
+    foreach (explode('/', $combined) as $segment) {
+        if ($segment === '' || $segment === '.') {
+            continue;
+        }
+        if ($segment === '..') {
+            array_pop($segments);
+            continue;
+        }
+        $segments[] = $segment;
+    }
+
+    return $scheme . '://' . $host . $port . '/' . implode('/', $segments);
+}
+
+/**
+ * Devuelve true si el código HTTP es una redirección.
+ */
+function isRedirectStatusCode(int $httpCode): bool
+{
+    return in_array($httpCode, [301, 302, 303, 307, 308], true);
+}
+
+/**
+ * Extrae el valor de Location de un conjunto de cabeceras.
+ *
+ * @param array<int, string> $headers
+ */
+function findRedirectLocation(array $headers): string
+{
+    foreach ($headers as $header) {
+        if (stripos($header, 'Location:') === 0) {
+            return trim(substr($header, 9));
+        }
+    }
+
+    return '';
+}
+
+/**
+ * Descarga una respuesta de texto siguiendo redirecciones seguras.
+ *
+ * @return array{body:?string,error:string}
+ */
+function fetchRemoteTextResponse(string $url, int $timeout): array
+{
+    $currentUrl = $url;
+
+    for ($redirects = 0; $redirects <= 5; $redirects++) {
+        $validation = validateRemoteFetchUrl($currentUrl);
+        if (!$validation['ok']) {
+            return ['body' => null, 'error' => $validation['error']];
+        }
+
+        $headers = [];
+        $ch = curl_init();
+        $options = [
+            CURLOPT_URL => $currentUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_MAXREDIRS => 0,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_USERAGENT => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
+            CURLOPT_ENCODING => '',
+            CURLOPT_HEADERFUNCTION => static function ($ch, string $headerLine) use (&$headers): int {
+                $trimmed = trim($headerLine);
+                if ($trimmed !== '') {
+                    $headers[] = $trimmed;
+                }
+                return strlen($headerLine);
+            },
+        ] + remoteCurlProtocolOptions();
+        curl_setopt_array($ch, $options);
+
+        $body = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($body === false || $curlError !== '') {
+            return ['body' => null, 'error' => __('Error al descargar el feed: %s', $curlError)];
+        }
+
+        if (isRedirectStatusCode($httpCode)) {
+            $location = findRedirectLocation($headers);
+            $resolved = resolveRedirectUrl($currentUrl, $location);
+            if ($resolved === null) {
+                return ['body' => null, 'error' => __('La respuesta remota devolvió una redirección inválida.')];
+            }
+            $currentUrl = $resolved;
+            continue;
+        }
+
+        if ($httpCode >= 400) {
+            return ['body' => null, 'error' => __('El servidor devolvió HTTP %d.', $httpCode)];
+        }
+
+        if (!is_string($body) || trim($body) === '') {
+            return ['body' => null, 'error' => __('El feed está vacío.')];
+        }
+
+        return ['body' => $body, 'error' => ''];
+    }
+
+    return ['body' => null, 'error' => __('La URL remota superó el número máximo de redirecciones permitidas.')];
+}
+
+/**
  * Descarga el XML de un feed RSS mediante cURL.
  * Devuelve ['xml' => string|null, 'error' => string].
  */
 function fetchFeedXml(string $url): array
 {
-    $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-    if (!in_array($scheme, ['http', 'https'], true)) {
-        return ['xml' => null, 'error' => __('La URL debe usar http o https.')];
-    }
-
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL            => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_MAXREDIRS      => 5,
-        CURLOPT_TIMEOUT        => 15,
-        CURLOPT_USERAGENT      => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
-        CURLOPT_ENCODING       => '',
-    ]);
-
-    $body      = curl_exec($ch);
-    $curlError = curl_error($ch);
-    $httpCode  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($body === false || $curlError !== '') {
-        return ['xml' => null, 'error' => __('Error al descargar el feed: %s', $curlError)];
-    }
-
-    if ($httpCode >= 400) {
-        return ['xml' => null, 'error' => __('El servidor devolvió HTTP %d.', $httpCode)];
-    }
-
-    if (!is_string($body) || trim($body) === '') {
-        return ['xml' => null, 'error' => __('El feed está vacío.')];
-    }
-
-    return ['xml' => $body, 'error' => ''];
+    $result = fetchRemoteTextResponse($url, 15);
+    return ['xml' => $result['body'], 'error' => $result['error']];
 }
 
 // ---------------------------------------------------------------------------
@@ -168,6 +372,7 @@ function parseFeedItem(SimpleXMLElement $item): array
     } else {
         $episodeContent = trim((string) ($item->description ?? ''));
     }
+    $episodeContent = sanitizeRichHtml($episodeContent);
 
     // Enclosure
     $audioUrl  = '';
@@ -250,9 +455,14 @@ function loadFeedPreview(string $feedUrl): array
         return array_merge($empty, ['error' => $fetchResult['error']]);
     }
 
-    libxml_use_internal_errors(true);
-    $xml = simplexml_load_string((string) $fetchResult['xml']);
+    $previousUseInternalErrors = libxml_use_internal_errors(true);
+    $xml = simplexml_load_string(
+        (string) $fetchResult['xml'],
+        'SimpleXMLElement',
+        LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING
+    );
     libxml_clear_errors();
+    libxml_use_internal_errors($previousUseInternalErrors);
 
     if ($xml === false) {
         return array_merge($empty, ['error' => __('No se pudo parsear el XML del feed.')]);
@@ -287,12 +497,6 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
 {
     $errorResult = ['localPath' => '', 'localUrl' => '', 'mime' => '', 'size' => 0, 'error' => ''];
 
-    $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-    if (!in_array($scheme, ['http', 'https'], true)) {
-        $errorResult['error'] = __('URL no válida (debe ser http/https).');
-        return $errorResult;
-    }
-
     // Extensión desde la URL para el nombre del fichero destino
     $urlPath = (string) parse_url($url, PHP_URL_PATH);
     $ext     = strtolower((string) pathinfo($urlPath, PATHINFO_EXTENSION));
@@ -304,64 +508,98 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
     $fileName     = buildSafeFileName($originalName, $fallbackBase, $ext);
     $localPath    = rtrim($destDir, '/') . '/' . $fileName;
 
-    $fh = @fopen($localPath, 'wb');
-    if ($fh === false) {
-        $errorResult['error'] = __('No se pudo crear el fichero destino.');
-        return $errorResult;
+    $currentUrl = $url;
+    for ($redirects = 0; $redirects <= 10; $redirects++) {
+        $validation = validateRemoteFetchUrl($currentUrl);
+        if (!$validation['ok']) {
+            $errorResult['error'] = $validation['error'];
+            return $errorResult;
+        }
+
+        $fh = @fopen($localPath, 'wb');
+        if ($fh === false) {
+            $errorResult['error'] = __('No se pudo crear el fichero destino.');
+            return $errorResult;
+        }
+
+        $headers = [];
+        $ch = curl_init();
+        $options = [
+            CURLOPT_URL => $currentUrl,
+            CURLOPT_FILE => $fh,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_MAXREDIRS => 0,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_USERAGENT => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
+            CURLOPT_FAILONERROR => false,
+            CURLOPT_HEADERFUNCTION => static function ($ch, string $headerLine) use (&$headers): int {
+                $trimmed = trim($headerLine);
+                if ($trimmed !== '') {
+                    $headers[] = $trimmed;
+                }
+                return strlen($headerLine);
+            },
+        ] + remoteCurlProtocolOptions();
+        curl_setopt_array($ch, $options);
+
+        $ok = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        fclose($fh);
+
+        if ($ok === false || $curlError !== '') {
+            @unlink($localPath);
+            $errorResult['error'] = __('Error cURL: %s', $curlError);
+            return $errorResult;
+        }
+
+        if (isRedirectStatusCode($httpCode)) {
+            @unlink($localPath);
+            $location = findRedirectLocation($headers);
+            $resolved = resolveRedirectUrl($currentUrl, $location);
+            if ($resolved === null) {
+                $errorResult['error'] = __('La respuesta remota devolvió una redirección inválida.');
+                return $errorResult;
+            }
+            $currentUrl = $resolved;
+            continue;
+        }
+
+        if ($httpCode >= 400) {
+            @unlink($localPath);
+            $errorResult['error'] = __('El servidor devolvió HTTP %d.', $httpCode);
+            return $errorResult;
+        }
+
+        if (!is_file($localPath) || filesize($localPath) === 0) {
+            @unlink($localPath);
+            $errorResult['error'] = __('El fichero descargado está vacío.');
+            return $errorResult;
+        }
+
+        // MIME real del fichero descargado
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime  = (string) $finfo->file($localPath);
+        $size  = (int) filesize($localPath);
+
+        // URL pública local: base + ruta relativa desde la raíz del proyecto
+        $projectRoot = dirname(__DIR__);
+        $relativePath = str_replace($projectRoot, '', $localPath);
+        $localUrl = rtrim($baseUrl, '/') . '/' . ltrim(str_replace('\\', '/', $relativePath), '/');
+
+        return [
+            'localPath' => $localPath,
+            'localUrl'  => $localUrl,
+            'mime'      => $mime,
+            'size'      => $size,
+            'error'     => null,
+        ];
     }
 
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL            => $url,
-        CURLOPT_FILE           => $fh,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_MAXREDIRS      => 10,
-        CURLOPT_TIMEOUT        => $timeout,
-        CURLOPT_USERAGENT      => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
-        CURLOPT_FAILONERROR    => false,
-    ]);
-
-    $ok        = curl_exec($ch);
-    $curlError = curl_error($ch);
-    $httpCode  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    fclose($fh);
-
-    if ($ok === false || $curlError !== '') {
-        @unlink($localPath);
-        $errorResult['error'] = __('Error cURL: %s', $curlError);
-        return $errorResult;
-    }
-
-    if ($httpCode >= 400) {
-        @unlink($localPath);
-        $errorResult['error'] = __('El servidor devolvió HTTP %d.', $httpCode);
-        return $errorResult;
-    }
-
-    if (!is_file($localPath) || filesize($localPath) === 0) {
-        @unlink($localPath);
-        $errorResult['error'] = __('El fichero descargado está vacío.');
-        return $errorResult;
-    }
-
-    // MIME real del fichero descargado
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mime  = (string) $finfo->file($localPath);
-    $size  = (int) filesize($localPath);
-
-    // URL pública local: base + ruta relativa desde la raíz del proyecto
-    $projectRoot = dirname(__DIR__);
-    $relativePath = str_replace($projectRoot, '', $localPath);
-    $localUrl = rtrim($baseUrl, '/') . '/' . ltrim(str_replace('\\', '/', $relativePath), '/');
-
-    return [
-        'localPath' => $localPath,
-        'localUrl'  => $localUrl,
-        'mime'      => $mime,
-        'size'      => $size,
-        'error'     => null,
-    ];
+    $errorResult['error'] = __('La URL remota superó el número máximo de redirecciones permitidas.');
+    return $errorResult;
 }
 
 /**
@@ -596,7 +834,7 @@ function runFeedImport(
     );
 
     streamLine('<hr><h2>' . __('Episodios') . '</h2>');
-    streamLine('<ul style="list-style:none;padding:0;margin:0">');
+    streamLine('<ul class="import-stream-list">');
 
     foreach ($episodes as $i => $ep) {
         $num      = $i + 1;
@@ -608,7 +846,7 @@ function runFeedImport(
             $checkGuidStmt->execute([':guid' => $ep['guid']]);
             if ((int) $checkGuidStmt->fetchColumn() > 0) {
                 $skipped++;
-                streamLine('<li style="padding:.2rem 0">⏭ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('saltado (GUID ya existe)') . '</em></li>');
+                streamLine('<li class="import-stream-item">⏭ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('saltado (GUID ya existe)') . '</em></li>');
                 continue;
             }
         }
@@ -616,7 +854,7 @@ function runFeedImport(
         // Sin enclosure de audio: saltar
         if ($ep['audio_url'] === '') {
             $errors++;
-            streamLine('<li style="padding:.2rem 0;color:var(--error,#c00)">✗ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('sin enclosure de audio') . '</em></li>');
+            streamLine('<li class="import-stream-item import-stream-item-error">✗ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('sin enclosure de audio') . '</em></li>');
             continue;
         }
 
@@ -630,11 +868,11 @@ function runFeedImport(
         }
 
         // Descargar audio (fallo salta el episodio)
-        streamLine('<li style="padding:.2rem 0">⬇ [' . $num . '/' . $total . '] ' . $titleEsc . ' — ' . __('descargando audio…'));
+        streamLine('<li class="import-stream-item">⬇ [' . $num . '/' . $total . '] ' . $titleEsc . ' — ' . __('descargando audio…'));
         $audioResult = downloadAudio($ep['audio_url'], $audiosDir, $baseUrl, 'audio-ep-' . $num);
         if ($audioResult['error'] !== null) {
             $errors++;
-            echo ' <strong style="color:var(--error,#c00)">' . __('Error: %s', esc($audioResult['error'])) . '</strong></li>' . "\n";
+            echo ' <strong class="import-stream-error">' . __('Error: %s', esc($audioResult['error'])) . '</strong></li>' . "\n";
             echo str_repeat(' ', 1024) . "\n";
             if (ob_get_level() > 0) {
                 ob_flush();
@@ -682,7 +920,7 @@ function runFeedImport(
             flush();
         } catch (Throwable $e) {
             $errors++;
-            echo ' <strong style="color:var(--error,#c00)">' . __('Error BD: %s', esc($e->getMessage())) . '</strong></li>' . "\n";
+            echo ' <strong class="import-stream-error">' . __('Error BD: %s', esc($e->getMessage())) . '</strong></li>' . "\n";
             echo str_repeat(' ', 1024) . "\n";
             if (ob_get_level() > 0) {
                 ob_flush();
@@ -710,7 +948,7 @@ function runFeedImport(
     streamLine('<div class="notice"><strong>' . __('Importación completada:') . '</strong> '
         . __('%d importados, %d saltados, %d errores.', $imported, $skipped, $errors) . '</div>');
 
-    streamLine('<div class="actions" style="margin-top:1rem">');
+    streamLine('<div class="actions">');
     streamLine('<a class="btn" href="episodes_management.php">' . __('Ver episodios') . '</a>');
     streamLine('<a class="btn" href="import_feed.php">' . __('Importar otro feed') . '</a>');
     streamLine('</div>');

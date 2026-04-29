@@ -44,11 +44,11 @@ $searchQuery        = '';
   <div class="container">
     <?php require __DIR__ . '/header.php'; ?>
 
-    <main class="card" style="text-align:center;padding:3.5rem 2rem;">
-      <p style="font-family:var(--font-display);font-size:clamp(4rem,15vw,7rem);font-weight:700;line-height:1;margin:0;color:var(--accent);letter-spacing:-0.03em;">403</p>
-      <h2 style="font-family:var(--font-display);font-size:clamp(1.2rem,4vw,1.6rem);margin:.75rem 0 .6rem;"><?= __('Acceso prohibido') ?></h2>
-      <p style="color:var(--muted);margin:0 auto;max-width:38ch;"><?= __('El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo.') ?></p>
-      <a href="/" style="display:inline-block;margin-top:2rem;padding:.5rem 1.4rem;border-radius:20px;background:var(--accent);color:#fff;font-weight:600;font-size:.9rem;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='var(--accent-dark)'" onmouseout="this.style.background='var(--accent)'"><?= __('Volver al inicio') ?></a>
+    <main class="card error-page-card">
+      <p class="error-page-code">403</p>
+      <h2 class="error-page-title"><?= __('Acceso prohibido') ?></h2>
+      <p class="error-page-copy"><?= __('El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo.') ?></p>
+      <a href="/" class="error-cta-link"><?= __('Volver al inicio') ?></a>
     </main>
 
     <?php require __DIR__ . '/footer.php'; ?>

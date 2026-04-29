@@ -7,11 +7,12 @@ declare(strict_types=1);
 // - importar una base de datos con backup previo
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/backup_handler.php';
 
 // El acceso a esta pantalla exige sesión de administrador activa.
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {

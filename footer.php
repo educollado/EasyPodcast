@@ -29,3 +29,4 @@ $_footerIcons  = getSocialIcons();
     '<a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>'
   ) ?></p>
 </footer>
+<script src="/assets/js/public.js"></script>

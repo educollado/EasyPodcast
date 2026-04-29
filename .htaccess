@@ -45,11 +45,11 @@ php_value max_file_uploads 50
 # Cabeceras para Strict Transport y Permision Policy
 <IfModule mod_headers.c>
 Header set Strict-Transport-Security "max-age=31536000; preload" env=HTTPS
-Header always set Content-Security-Policy "upgrade-insecure-requests"
+# El CSP se emite desde PHP para poder adjuntar nonces por request.
 Header always set X-Content-Type-Options "nosniff"
 Header always set X-XSS-Protection "1; mode=block"
 Header always set Expect-CT "max-age=7776000, enforce"
-Header always set Referrer-Policy "no-referrer-when-downgrade"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
 Header always set Permissions-Policy "geolocation=(); midi=();notifications=();push=();sync-xhr=();accelerometer=(); gyroscope=(); magnetometer=(); payment=(); camera=(); microphone=();usb=(); xr=();speaker=(self);vibrate=();fullscreen=(self);"
 Header always append X-Frame-Options SAMEORIGIN
 </IfModule>

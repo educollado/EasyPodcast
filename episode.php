@@ -6,6 +6,7 @@ declare(strict_types=1);
 // /YYYY/MM/episode-title-slug
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/cache_service.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
@@ -18,7 +19,7 @@ $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 
 // Detecta sesión de admin para permitir previsualización de borradores.
-session_start();
+startSecureSession();
 $isAdminPreview = isset($_SESSION['admin_user']);
 
 // No sirve caché si hay sesión de admin (podría haber drafts o cambios recientes).
@@ -88,14 +89,14 @@ if ($error !== '') {
   <link rel="stylesheet" href="/assets/css/header.css">
   <link rel="stylesheet" href="/assets/css/episode.css">
   <link rel="stylesheet" href="/assets/css/themes.css">
-  <script type="application/ld+json"><?= $episodeJsonLd ?></script>
+  <script type="application/ld+json"<?= cspNonceAttr() ?>><?= $episodeJsonLd ?></script>
 </head>
 <body>
   <div class="container">
     <?php require __DIR__ . '/header.php'; ?>
 
     <?php if ($isDraft): ?>
-    <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600;color:#664d03;">
+    <div class="draft-banner">
       <span aria-hidden="true">✏️</span> <?= __('Borrador — Esta página no está publicada y solo es visible para administradores.') ?>
     </div>
     <?php endif; ?>
@@ -114,7 +115,7 @@ if ($error !== '') {
             <h1><?= esc(($episode['title'] ?? '') !== '' ? (string) $episode['title'] : __('Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['audio_url'])): ?>
-              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>">
+              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int) ($episode['id'] ?? 0) ?>">
                 <?= __('Tu navegador no soporta audio HTML5.') ?>
               </audio>
               <?php // Metadatos de audio: enlace de descarga con duración y tamaño entre paréntesis. ?>
@@ -132,7 +133,7 @@ if ($error !== '') {
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['content'])): ?>
-              <div class="desc"><?= $episode['content'] ?></div>
+              <div class="desc"><?= sanitizeRichHtml((string) $episode['content']) ?></div>
             <?php endif; ?>
           </div>
         </article>
@@ -140,27 +141,6 @@ if ($error !== '') {
     </main>
     <?php require __DIR__ . '/footer.php'; ?>
   </div>
-  <script>
-    // Trackear reproducciones
-    document.querySelectorAll('audio.player').forEach(audio => {
-      let tracked = false;
-      audio.addEventListener('play', function() {
-        if (tracked) return;
-        tracked = true;
-        const episodeId = <?= json_encode((int)($episode['id'] ?? 0)) ?>;
-        if (episodeId > 0) {
-          fetch('/track.php?episode_id=' + episodeId + '&action=play', {
-            method: 'GET',
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          }).catch(() => {});
-        }
-      });
-      // Reiniciar tracked al cambiar de src (por si el audio se recarga)
-      audio.addEventListener('loadedmetadata', () => { tracked = false; });
-    });
-  </script>
 </body>
 </html>
 <?php

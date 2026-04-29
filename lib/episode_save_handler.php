@@ -152,6 +152,11 @@ function saveEpisode(
     array $files,
     bool $rewriteAudioMetadata
 ): array {
+    $form['content'] = sanitizeRichHtml((string) ($form['content'] ?? ''));
+    $form['short_description'] = trim(
+        preg_replace('/\s+/u', ' ', strip_tags((string) ($form['short_description'] ?? ''))) ?? ''
+    );
+
     // 0. Estado previo del episodio (solo en edición).
     // Necesitamos saber si el episodio estaba en draft para detectar la primera publicación
     // y asignar la fecha real de publicación en ese momento.

@@ -86,13 +86,18 @@ CREATE INDEX IF NOT EXISTS idx_pages_status ON pages(status, parent_id, sort_ord
 -- api_tokens: tokens de autenticación para la API REST.
 CREATE TABLE IF NOT EXISTS api_tokens (
   id INTEGER PRIMARY KEY,
-  token TEXT NOT NULL,
+  token TEXT NOT NULL DEFAULT '',
+  token_hash TEXT NOT NULL DEFAULT '',
+  token_suffix TEXT NOT NULL DEFAULT '',
+  scope TEXT NOT NULL DEFAULT 'content',
   name TEXT NOT NULL DEFAULT '',
   user_id INTEGER NOT NULL,
   expires_at TEXT,
   last_used_at TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_api_tokens_hash ON api_tokens(token_hash) WHERE token_hash != '';
 
 -- management: credenciales del panel de administración.
 CREATE TABLE IF NOT EXISTS management (
@@ -169,4 +174,4 @@ BEGIN
   ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 15;
+PRAGMA user_version = 16;

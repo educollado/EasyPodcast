@@ -16,6 +16,415 @@ function esc(string $value): string
 }
 
 /**
+ * Etiquetas HTML permitidas en contenido enriquecido.
+ *
+ * @return array<string, array<int, string>>
+ */
+function richHtmlAllowedTags(): array
+{
+    return [
+        'a' => ['href', 'title', 'target', 'rel'],
+        'audio' => ['src', 'controls', 'preload'],
+        'blockquote' => [],
+        'br' => [],
+        'code' => [],
+        'del' => [],
+        'div' => [],
+        'em' => [],
+        'figcaption' => [],
+        'figure' => [],
+        'h1' => [],
+        'h2' => [],
+        'h3' => [],
+        'h4' => [],
+        'h5' => [],
+        'h6' => [],
+        'hr' => [],
+        'i' => [],
+        'img' => ['src', 'alt', 'title', 'width', 'height'],
+        'li' => [],
+        'mark' => [],
+        'ol' => ['start'],
+        'p' => [],
+        'pre' => [],
+        's' => [],
+        'source' => ['src', 'type'],
+        'span' => [],
+        'strong' => [],
+        'sub' => [],
+        'sup' => [],
+        'strike' => [],
+        'table' => [],
+        'tbody' => [],
+        'td' => ['colspan', 'rowspan'],
+        'th' => ['colspan', 'rowspan', 'scope'],
+        'thead' => [],
+        'tr' => [],
+        'u' => [],
+        'ul' => [],
+        'video' => ['src', 'controls', 'preload', 'poster', 'width', 'height', 'muted', 'loop'],
+    ];
+}
+
+/**
+ * Etiquetas cuyo contenido completo debe descartarse.
+ *
+ * @return array<int, string>
+ */
+function richHtmlDropContentTags(): array
+{
+    return [
+        'applet',
+        'base',
+        'button',
+        'embed',
+        'form',
+        'head',
+        'html',
+        'iframe',
+        'input',
+        'link',
+        'meta',
+        'noscript',
+        'object',
+        'option',
+        'script',
+        'select',
+        'style',
+        'textarea',
+    ];
+}
+
+/**
+ * Devuelve true si la IP cae en un rango privado, loopback o reservado.
+ */
+function isPrivateOrReservedIp(string $ip): bool
+{
+    $packedIp = @inet_pton($ip);
+    if ($packedIp === false) {
+        return true;
+    }
+
+    $blockedCidrs = [
+        '0.0.0.0/8',
+        '10.0.0.0/8',
+        '100.64.0.0/10',
+        '127.0.0.0/8',
+        '169.254.0.0/16',
+        '172.16.0.0/12',
+        '192.0.0.0/24',
+        '192.0.2.0/24',
+        '192.168.0.0/16',
+        '198.18.0.0/15',
+        '198.51.100.0/24',
+        '203.0.113.0/24',
+        '224.0.0.0/4',
+        '240.0.0.0/4',
+        '255.255.255.255/32',
+        '::/128',
+        '::1/128',
+        '::ffff:0:0/96',
+        '2001:db8::/32',
+        'fc00::/7',
+        'fe80::/10',
+        'ff00::/8',
+    ];
+
+    foreach ($blockedCidrs as $cidr) {
+        if (ipMatchesCidr($ip, $cidr)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Comprueba si una IP pertenece a un CIDR concreto.
+ */
+function ipMatchesCidr(string $ip, string $cidr): bool
+{
+    [$subnet, $bits] = explode('/', $cidr, 2);
+    $packedIp = @inet_pton($ip);
+    $packedSubnet = @inet_pton($subnet);
+    if ($packedIp === false || $packedSubnet === false || strlen($packedIp) !== strlen($packedSubnet)) {
+        return false;
+    }
+
+    $prefixLength = (int) $bits;
+    $fullBytes = intdiv($prefixLength, 8);
+    $remainingBits = $prefixLength % 8;
+
+    if ($fullBytes > 0 && substr($packedIp, 0, $fullBytes) !== substr($packedSubnet, 0, $fullBytes)) {
+        return false;
+    }
+
+    if ($remainingBits === 0) {
+        return true;
+    }
+
+    $mask = (0xFF << (8 - $remainingBits)) & 0xFF;
+    return (ord($packedIp[$fullBytes]) & $mask) === (ord($packedSubnet[$fullBytes]) & $mask);
+}
+
+/**
+ * Limpia una URL embebida en HTML y devuelve null si usa esquemas inseguros.
+ *
+ * @param array<int, string> $allowedSchemes
+ */
+function sanitizeRichHtmlUrl(string $url, array $allowedSchemes, bool $allowRelative = true): ?string
+{
+    $decoded = html_entity_decode(trim($url), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $decoded = preg_replace('/[\x00-\x1F\x7F\s]+/u', '', $decoded) ?? '';
+    if ($decoded === '' || str_starts_with($decoded, '//')) {
+        return null;
+    }
+
+    if (
+        $allowRelative
+        && (
+            str_starts_with($decoded, '#')
+            || str_starts_with($decoded, '/')
+            || str_starts_with($decoded, './')
+            || str_starts_with($decoded, '../')
+            || str_starts_with($decoded, '?')
+        )
+    ) {
+        return $decoded;
+    }
+
+    $scheme = strtolower((string) parse_url($decoded, PHP_URL_SCHEME));
+    if ($scheme === '' || !in_array($scheme, $allowedSchemes, true)) {
+        return null;
+    }
+
+    if (in_array($scheme, ['http', 'https'], true) && filter_var($decoded, FILTER_VALIDATE_URL) === false) {
+        return null;
+    }
+
+    return $decoded;
+}
+
+/**
+ * Devuelve la versión saneada del contenido HTML enriquecido.
+ */
+function sanitizeRichHtml(string $value): string
+{
+    $html = trim($value);
+    if ($html === '') {
+        return '';
+    }
+
+    if (!class_exists('DOMDocument')) {
+        return nl2br(esc(strip_tags($html)));
+    }
+
+    $previousUseInternalErrors = libxml_use_internal_errors(true);
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $wrapperId = 'easypodcast-sanitize-root';
+    $flags = LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET;
+    $loaded = $document->loadHTML(
+        '<?xml encoding="utf-8" ?><div id="' . $wrapperId . '">' . $html . '</div>',
+        $flags
+    );
+    libxml_clear_errors();
+    libxml_use_internal_errors($previousUseInternalErrors);
+
+    if ($loaded === false) {
+        return nl2br(esc(strip_tags($html)));
+    }
+
+    $root = $document->getElementById($wrapperId);
+    if (!$root instanceof DOMElement) {
+        return nl2br(esc(strip_tags($html)));
+    }
+
+    sanitizeRichHtmlNodeTree($root);
+
+    $result = '';
+    foreach ($root->childNodes as $child) {
+        $result .= $document->saveHTML($child);
+    }
+
+    return trim($result);
+}
+
+/**
+ * Sanea recursivamente un árbol DOM de contenido enriquecido.
+ */
+function sanitizeRichHtmlNodeTree(DOMNode $parent): void
+{
+    $allowedTags = richHtmlAllowedTags();
+    $dropTags = richHtmlDropContentTags();
+
+    for ($node = $parent->firstChild; $node !== null; $node = $nextNode) {
+        $nextNode = $node->nextSibling;
+
+        if ($node instanceof DOMComment) {
+            $parent->removeChild($node);
+            continue;
+        }
+
+        if ($node instanceof DOMText) {
+            continue;
+        }
+
+        if (!$node instanceof DOMElement) {
+            $parent->removeChild($node);
+            continue;
+        }
+
+        $tagName = strtolower($node->tagName);
+        if (in_array($tagName, $dropTags, true)) {
+            $parent->removeChild($node);
+            continue;
+        }
+
+        sanitizeRichHtmlNodeTree($node);
+
+        if (!isset($allowedTags[$tagName])) {
+            unwrapDomElement($node);
+            continue;
+        }
+
+        sanitizeRichHtmlAttributes($node, $allowedTags[$tagName]);
+    }
+}
+
+/**
+ * Reemplaza un elemento por sus hijos ya saneados.
+ */
+function unwrapDomElement(DOMElement $element): void
+{
+    $parent = $element->parentNode;
+    if (!$parent instanceof DOMNode) {
+        return;
+    }
+
+    while ($element->firstChild !== null) {
+        $parent->insertBefore($element->firstChild, $element);
+    }
+
+    $parent->removeChild($element);
+}
+
+/**
+ * Aplica la whitelist de atributos de un elemento HTML permitido.
+ *
+ * @param array<int, string> $allowedAttributes
+ */
+function sanitizeRichHtmlAttributes(DOMElement $element, array $allowedAttributes): void
+{
+    $tagName = strtolower($element->tagName);
+    $attributes = [];
+    foreach ($element->attributes as $attribute) {
+        $attributes[] = $attribute->name;
+    }
+
+    foreach ($attributes as $name) {
+        $lowerName = strtolower($name);
+        if (
+            str_starts_with($lowerName, 'on')
+            || $lowerName === 'style'
+            || !in_array($lowerName, $allowedAttributes, true)
+        ) {
+            $element->removeAttribute($name);
+            continue;
+        }
+
+        $value = trim($element->getAttribute($name));
+        if ($value === '' && !in_array($lowerName, ['controls', 'muted', 'loop'], true)) {
+            $element->removeAttribute($name);
+            continue;
+        }
+
+        if ($lowerName === 'href') {
+            $safeUrl = sanitizeRichHtmlUrl($value, ['http', 'https', 'mailto', 'tel']);
+            if ($safeUrl === null) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, $safeUrl);
+            }
+            continue;
+        }
+
+        if (in_array($lowerName, ['src', 'poster'], true)) {
+            $safeUrl = sanitizeRichHtmlUrl($value, ['http', 'https']);
+            if ($safeUrl === null) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, $safeUrl);
+            }
+            continue;
+        }
+
+        if ($lowerName === 'target') {
+            if ($value !== '_blank') {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, '_blank');
+            }
+            continue;
+        }
+
+        if ($lowerName === 'rel') {
+            continue;
+        }
+
+        if (in_array($lowerName, ['width', 'height', 'colspan', 'rowspan', 'start'], true)) {
+            if (!ctype_digit($value)) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, (string) (int) $value);
+            }
+            continue;
+        }
+
+        if ($lowerName === 'scope') {
+            $safeScope = strtolower($value);
+            if (!in_array($safeScope, ['row', 'col', 'rowgroup', 'colgroup'], true)) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, $safeScope);
+            }
+            continue;
+        }
+
+        if ($lowerName === 'preload') {
+            $safePreload = strtolower($value);
+            if (!in_array($safePreload, ['auto', 'metadata', 'none'], true)) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, $safePreload);
+            }
+            continue;
+        }
+
+        if ($lowerName === 'type') {
+            if (!preg_match('/^[a-z0-9.+-]+\/[a-z0-9.+-]+$/i', $value)) {
+                $element->removeAttribute($name);
+            }
+            continue;
+        }
+
+        if (in_array($lowerName, ['controls', 'muted', 'loop'], true)) {
+            $element->setAttribute($name, $lowerName);
+            continue;
+        }
+
+        $element->setAttribute($name, $value);
+    }
+
+    if ($tagName === 'a' && $element->getAttribute('target') === '_blank') {
+        $element->setAttribute('rel', 'noopener noreferrer');
+    }
+
+    if (in_array($tagName, ['audio', 'video'], true) && !$element->hasAttribute('controls')) {
+        $element->setAttribute('controls', 'controls');
+    }
+}
+
+/**
  * Convierte URLs en texto a elementos <a> seguros, escapando todo lo demás.
  * Las partes sin URL se escapan con esc(); no se permite HTML arbitrario.
  */

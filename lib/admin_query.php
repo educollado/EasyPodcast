@@ -10,6 +10,17 @@ declare(strict_types=1);
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/totp.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/auth_security.php';
+require_once __DIR__ . '/session.php';
+
+/**
+ * Construye un mensaje uniforme de espera tras bloqueo temporal.
+ */
+function authThrottleErrorMessage(int $retryAfter): string
+{
+    $minutes = max(1, (int) ceil($retryAfter / 60));
+    return __('Demasiados intentos fallidos. Espera %d minuto(s) antes de volver a intentarlo.', $minutes);
+}
 
 /**
  * Procesa la sesión de administración (login, setup, logout) y retorna
@@ -59,6 +70,12 @@ function loadAdminData(string $dbPath): array
             csrf_verify();
             $username = trim((string) ($_POST['username'] ?? ''));
             $password = (string) ($_POST['password'] ?? '');
+            $throttleState = authGetThrottleState('login', $username);
+
+            if ($throttleState['blocked']) {
+                $error = authThrottleErrorMessage($throttleState['retry_after']);
+                return compact('adminCount', 'error', 'notice') + ['isSetupMode' => ($adminCount === 0)];
+            }
 
             if ($adminCount === 0) {
                 // Modo setup: crea la primera cuenta administradora.
@@ -78,6 +95,7 @@ function loadAdminData(string $dbPath): array
                         ':password' => $hash,
                     ]);
 
+                    session_regenerate_id(true);
                     $_SESSION['admin_user'] = $username;
                     $notice = __('Usuario administrador creado correctamente.');
                     $adminCount = 1;
@@ -92,6 +110,7 @@ function loadAdminData(string $dbPath): array
                     $row = $stmt->fetch();
 
                     if (!$row) {
+                        authRegisterFailure('login', $username);
                         $error = __('Credenciales inválidas.');
                     } else {
                         $stored = (string) $row['password'];
@@ -99,8 +118,14 @@ function loadAdminData(string $dbPath): array
                         $valid = password_verify($password, $stored) || hash_equals($stored, $password);
 
                         if (!$valid) {
-                            $error = __('Credenciales inválidas.');
+                            $retryAfter = authRegisterFailure('login', $username);
+                            if ($retryAfter > 0) {
+                                $error = authThrottleErrorMessage($retryAfter);
+                            } else {
+                                $error = __('Credenciales inválidas.');
+                            }
                         } else {
+                            authClearThrottle('login', $username);
                             // Si una contraseña legacy coincide por fallback, se rehashea de forma transparente.
                             if (!password_verify($password, $stored)) {
                                 $rehashStmt = $pdo->prepare(
@@ -115,17 +140,22 @@ function loadAdminData(string $dbPath): array
                             if ((int) ($row['totp_enabled'] ?? 0) === 1 && (string) ($row['totp_secret'] ?? '') !== '') {
                                 // 2FA activo: comprobar si el dispositivo ya fue marcado como confiado.
                                 if (isTrustedDevice((string) $row['username'], (string) $row['totp_secret'])) {
+                                    session_regenerate_id(true);
+                                    unset($_SESSION['totp_pending_user']);
                                     $_SESSION['admin_user'] = (string) $row['username'];
                                     header('Location: admin.php');
                                     exit;
                                 }
                                 // Sesión pendiente hasta verificar el código TOTP.
                                 session_regenerate_id(true);
+                                unset($_SESSION['admin_user']);
                                 $_SESSION['totp_pending_user'] = (string) $row['username'];
                                 header('Location: admin.php');
                                 exit;
                             }
 
+                            session_regenerate_id(true);
+                            unset($_SESSION['totp_pending_user']);
                             $_SESSION['admin_user'] = (string) $row['username'];
                             header('Location: admin.php');
                             exit;
@@ -166,6 +196,11 @@ function verifyTotpLogin(string $dbPath): string
 
     csrf_verify();
 
+    $throttleState = authGetThrottleState('totp', $pendingUser);
+    if ($throttleState['blocked']) {
+        return authThrottleErrorMessage($throttleState['retry_after']);
+    }
+
     $code = trim((string) ($_POST['totp_code'] ?? ''));
     if ($code === '') {
         return __('Introduce el código de verificación.');
@@ -183,6 +218,7 @@ function verifyTotpLogin(string $dbPath): string
         if (!$row || (string) ($row['totp_secret'] ?? '') === '') {
             // Situación anómala: el usuario ya no tiene 2FA configurado.
             unset($_SESSION['totp_pending_user']);
+            session_regenerate_id(true);
             $_SESSION['admin_user'] = $pendingUser;
             header('Location: admin.php');
             exit;
@@ -192,6 +228,7 @@ function verifyTotpLogin(string $dbPath): string
 
         // Intento 1: código TOTP de 6 dígitos.
         if (totpVerify($secret, $code)) {
+            authClearThrottle('totp', $pendingUser);
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
             $_SESSION['admin_user'] = $pendingUser;
@@ -206,6 +243,7 @@ function verifyTotpLogin(string $dbPath): string
         $storedJson = (string) ($row['totp_recovery_codes'] ?? '[]');
         $updatedJson = totpVerifyRecoveryCode($code, $storedJson);
         if ($updatedJson !== null) {
+            authClearThrottle('totp', $pendingUser);
             $upd = $pdo->prepare('UPDATE management SET totp_recovery_codes = :rc WHERE id = :id');
             $upd->execute([':rc' => $updatedJson, ':id' => (int) $row['id']]);
             unset($_SESSION['totp_pending_user']);
@@ -216,6 +254,11 @@ function verifyTotpLogin(string $dbPath): string
             }
             header('Location: admin.php');
             exit;
+        }
+
+        $retryAfter = authRegisterFailure('totp', $pendingUser);
+        if ($retryAfter > 0) {
+            return authThrottleErrorMessage($retryAfter);
         }
 
         return __('Código incorrecto. Inténtalo de nuevo.');
@@ -262,12 +305,13 @@ function setTrustedDeviceCookie(string $username, string $totpSecret): void
     $expires = time() + 604800; // 7 días
     $hmac    = hash_hmac('sha256', "{$token}|{$expires}|{$username}", $totpSecret);
     $value   = "{$token}|{$expires}|{$hmac}";
+    $secure  = isSecureHttpRequest();
 
     setcookie('easypodcast_trusted', $value, [
         'expires'  => $expires,
         'path'     => '/',
         'httponly' => true,
-        'secure'   => true,
+        'secure'   => $secure,
         'samesite' => 'Strict',
     ]);
 }
@@ -278,7 +322,10 @@ function setTrustedDeviceCookie(string $username, string $totpSecret): void
 function clearTrustedDeviceCookie(): void
 {
     setcookie('easypodcast_trusted', '', [
-        'expires' => 1,
-        'path'    => '/',
+        'expires'  => 1,
+        'path'     => '/',
+        'httponly' => true,
+        'secure'   => isSecureHttpRequest(),
+        'samesite' => 'Strict',
     ]);
 }

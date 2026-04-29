@@ -5,7 +5,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/lib/migration_runner.php';
 require_once __DIR__ . '/lib/i18n.php';
 require_once __DIR__ . '/lib/admin_theme.php';
+require_once __DIR__ . '/lib/csp.php';
 i18n_load('es_ES');
+sendContentSecurityPolicyHeaders();
 
 /**
  * Determina si la petición actual llega por HTTPS.

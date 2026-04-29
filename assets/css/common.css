@@ -149,6 +149,63 @@ body {
 
 .search-form button:hover { background: var(--accent-dark); }
 
+.error-cta-link:hover {
+  background: var(--accent-dark) !important;
+}
+
+.error-page-card {
+  text-align: center;
+  padding: 3.5rem 2rem;
+}
+
+.error-page-code {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 15vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+}
+
+.error-page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  margin: .75rem 0 .6rem;
+}
+
+.error-page-copy {
+  color: var(--muted);
+  margin: 0 auto;
+  max-width: 38ch;
+}
+
+.error-cta-link {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: .5rem 1.4rem;
+  border-radius: 20px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: background .15s;
+}
+
+.draft-banner {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: var(--radius);
+  padding: .75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .9rem;
+  font-weight: 600;
+  color: #664d03;
+}
+
 /* =========================================================
    Botones de cabecera
    ========================================================= */

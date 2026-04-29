@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/i18n.php';
 require_once __DIR__ . '/lib/stats_handler.php';
 require_once __DIR__ . '/lib/stats_downloads_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -180,44 +181,6 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
   <title><?= __('Estadísticas') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <link rel="stylesheet" href="/assets/css/themes.css">
-  <style>
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-top: 1.25rem;
-    }
-    .stat-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: .3rem;
-    }
-    .stat-label {
-      font-size: .8rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.1;
-      color: var(--fg);
-    }
-    .stat-value.accent { color: var(--accent); }
-    .stat-sub {
-      font-size: .85rem;
-      color: var(--muted);
-      margin-top: .1rem;
-    }
-    .stat-wide {
-      grid-column: 1 / -1;
-    }
-  </style>
 </head>
 <body>
   <?php $currentAdminPage = 'stats'; require __DIR__ . '/admin_nav.php'; ?>
@@ -272,7 +235,7 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
 
         <div class="stat-card">
           <span class="stat-label"><?= __('Estado') ?></span>
-          <span class="stat-value" style="font-size:1.2rem;">
+          <span class="stat-value stat-compact">
             <?php if ($cacheEnabled): ?>
               <span class="status-active"><?= __('Activa') ?></span>
             <?php else: ?>
@@ -357,7 +320,7 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
           <div class="year-selector">
             <form method="get" class="inline-form">
               <input type="hidden" name="tab" value="mensual">
-              <select name="year" onchange="this.form.submit()">
+              <select name="year" data-submit-on-change="1">
                 <option value=""><?= __('Todos los años') ?></option>
                 <?php foreach ($availableYears as $y): ?>
                   <option value="<?= (int)$y ?>" <?= $filterYear === $y ? 'selected' : '' ?>>
@@ -430,7 +393,7 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
 
       <!-- Pestaña Resumen -->
       <div id="tab-resumen" class="stats-panel">
-        <h3 class="section-subtitle" style="margin-top: 0;"><?= __('Total de descargas y reproducciones por capítulo') ?></h3>
+        <h3 class="section-subtitle no-top"><?= __('Total de descargas y reproducciones por capítulo') ?></h3>
         
         <?php if ((int) $summaryPagination['total_rows'] === 0): ?>
           <div class="empty-state"><?= __('Aún no hay descargas ni reproducciones registradas') ?></div>
@@ -458,262 +421,6 @@ $summaryPagination = paginateStatsRows($totalByEpisode, getStatsPageNumber('resu
       </div>
     </main>
   </div>
-
-  <style>
-    .stats-tabs {
-      display: flex;
-      gap: .5rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 1.25rem;
-    }
-    .stats-tab {
-      padding: .75rem 1.25rem;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      font-size: .95rem;
-      font-weight: 500;
-      color: var(--muted);
-    }
-    .stats-tab:hover {
-      color: var(--fg);
-    }
-    .stats-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-    .stats-tab a {
-      color: inherit;
-      text-decoration: none;
-    }
-    .stats-panel {
-      display: none;
-    }
-    .stats-panel.active {
-      display: block;
-    }
-    .stats-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      min-width: 600px;
-    }
-    .stats-table th,
-    .stats-table td {
-      padding: .75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .stats-table th {
-      background: var(--bg);
-      font-weight: 600;
-      color: var(--muted);
-      font-size: .85rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .stats-table tr:hover {
-      background: var(--hover-bg);
-    }
-    .year-selector {
-      margin-bottom: 1rem;
-    }
-    .year-selector select {
-      padding: .5rem .75rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--fg);
-    }
-    .total-badge {
-      display: inline-block;
-      padding: .2rem .5rem;
-      border-radius: var(--radius);
-      background: var(--accent-bg);
-      color: var(--accent-fg);
-      font-size: .8rem;
-      font-weight: 600;
-    }
-    .ip-tag {
-      font-family: monospace;
-      font-size: .8rem;
-      color: var(--muted);
-    }
-    .action-type-badge {
-      font-size: .8rem;
-      padding: .2rem .4rem;
-      border-radius: var(--radius);
-      background: var(--bg);
-      color: var(--fg);
-    }
-    .text-right { text-align: right; }
-    .section-subtitle {
-      margin-top: 2rem;
-      font-size: 1.05rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-    .stat-title { font-size: 1.1rem; font-weight: 600; }
-    .status-active { color: #059669; }
-    .status-inactive { color: var(--muted); }
-    .stats-note {
-      color: var(--muted);
-      font-size: .9rem;
-      margin-bottom: 1rem;
-    }
-    .inline-form { display: inline; }
-    .accent-link { color: var(--accent); }
-    .stat-last-title { font-size: 1.1rem; font-weight: 600; }
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: var(--muted);
-    }
-    .sort-icon {
-      font-size: .7rem;
-      color: var(--muted);
-      cursor: pointer;
-    }
-    .stats-table th {
-      cursor: pointer;
-      user-select: none;
-    }
-    .stats-table th:hover {
-      color: var(--fg);
-    }
-    .stats-table th[data-sort].asc::after {
-      content: ' ↑';
-      color: var(--accent);
-    }
-    .stats-table th[data-sort].desc::after {
-      content: ' ↓';
-      color: var(--accent);
-    }
-    .stats-pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-    .stats-pagination-info {
-      color: var(--muted);
-      font-size: .9rem;
-    }
-    .stats-pagination-links {
-      display: flex;
-      gap: .4rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .stats-page-link,
-    .stats-page-current,
-    .stats-page-gap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 2.25rem;
-      height: 2.25rem;
-      padding: 0 .75rem;
-      border-radius: var(--radius);
-      font-size: .9rem;
-    }
-    .stats-page-link {
-      border: 1px solid var(--border);
-      color: var(--fg);
-      background: var(--bg);
-      text-decoration: none;
-    }
-    .stats-page-link:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .stats-page-current {
-      background: var(--accent);
-      color: var(--accent-contrast, #fff);
-      font-weight: 600;
-    }
-    .stats-page-gap {
-      color: var(--muted);
-    }
-  </style>
-  
-  <script>
-    // Inicialización al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-      // ==================== PESTAÑAS ====================
-      // Activar pestaña desde URL hash o parámetro GET
-      const urlParams = new URLSearchParams(window.location.search);
-      const activeTab = urlParams.get('tab') || 'diario';
-      
-      // Activar pestaña y panel correspondientes
-      const activeTabElement = document.querySelector(`.stats-tab[data-tab="${activeTab}"]`);
-      if (activeTabElement) {
-        document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
-        activeTabElement.classList.add('active');
-        document.getElementById('tab-' + activeTab).classList.add('active');
-      }
-      
-      document.querySelectorAll('.stats-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
-          tab.classList.add('active');
-          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
-
-          const nextUrl = new URL(window.location.href);
-          nextUrl.searchParams.set('tab', tab.dataset.tab);
-          window.history.replaceState({}, '', nextUrl);
-        });
-      });
-
-      // ==================== ORDENAMIENTO DE TABLAS ====================
-      document.querySelectorAll('th[data-sort]').forEach(th => {
-        th.addEventListener('click', (e) => {
-          const table = th.closest('table');
-          const tbody = table.querySelector('tbody');
-          const columnIndex = Array.from(th.parentNode.children).indexOf(th);
-          const sortKey = th.dataset.sort;
-          
-          // Determinar dirección: si ya tiene clase 'asc', pasamos a 'desc', y viceversa
-          const currentDir = th.classList.contains('asc') ? 'asc' : 
-                            (th.classList.contains('desc') ? 'desc' : null);
-          const nextDir = !currentDir ? 'asc' : (currentDir === 'asc' ? 'desc' : 'asc');
-          
-          // Remover clases de todos los th de esta tabla
-          table.querySelectorAll('th[data-sort]').forEach(h => {
-            h.classList.remove('asc', 'desc');
-          });
-          th.classList.add(nextDir);
-          
-          // Obtener filas
-          const rows = Array.from(tbody.querySelectorAll('tr'));
-          const isNumeric = sortKey === 'count' || sortKey === 'year' || sortKey === 'total';
-          
-          // Ordenar por data-sort-value o por el contenido de texto
-          const direction = nextDir === 'asc' ? 1 : -1;
-          rows.sort((a, b) => {
-            // Usar data-sort-value si está disponible, de lo contrario usar contenido de texto
-            const aVal = a.children[columnIndex].dataset.sortValue ?? a.children[columnIndex].textContent.trim();
-            const bVal = b.children[columnIndex].dataset.sortValue ?? b.children[columnIndex].textContent.trim();
-            
-            if (isNumeric) {
-              const numA = parseFloat(aVal.replace(/[^0-9.-]/g, '')) || 0;
-              const numB = parseFloat(bVal.replace(/[^0-9.-]/g, '')) || 0;
-              return (numA - numB) * direction;
-            }
-            return aVal.localeCompare(bVal, undefined, {numeric: true}) * direction;
-          });
-          
-          // Reinsertar filas ordenadas
-          rows.forEach(row => tbody.appendChild(row));
-        });
-      });
-    });
-  </script>
+  <script src="/assets/js/stats.js"></script>
 </body>
 </html>

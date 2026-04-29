@@ -133,6 +133,47 @@ test('renderTextWithLinks: múltiples URLs generan múltiples enlaces', function
 });
 
 // =============================================================================
+// sanitizeRichHtml
+// =============================================================================
+
+test('sanitizeRichHtml: elimina script y manejadores inline', function () {
+    $html = '<p onclick="alert(1)">Hola<script>alert(2)</script><img src="/images/a.jpg" onerror="alert(3)"></p>';
+    $result = sanitizeRichHtml($html);
+    assert_true(!str_contains($result, '<script'));
+    assert_true(!str_contains($result, 'onclick='));
+    assert_true(!str_contains($result, 'onerror='));
+    assert_contains('<img src="/images/a.jpg"', $result);
+});
+
+test('sanitizeRichHtml: elimina enlaces javascript', function () {
+    $html = '<p><a href="javascript:alert(1)">clic</a></p>';
+    $result = sanitizeRichHtml($html);
+    assert_true(!str_contains($result, 'javascript:'));
+    assert_contains('<a>clic</a>', $result);
+});
+
+test('sanitizeRichHtml: conserva marcado seguro y fuerza rel en target blank', function () {
+    $html = '<p><strong>Hola</strong> <a href="https://example.com" target="_blank">mundo</a></p>';
+    $result = sanitizeRichHtml($html);
+    assert_contains('<strong>Hola</strong>', $result);
+    assert_contains('href="https://example.com"', $result);
+    assert_contains('target="_blank"', $result);
+    assert_contains('rel="noopener noreferrer"', $result);
+});
+
+// =============================================================================
+// isPrivateOrReservedIp
+// =============================================================================
+
+test('isPrivateOrReservedIp: bloquea loopback IPv4', function () {
+    assert_true(isPrivateOrReservedIp('127.0.0.1'));
+});
+
+test('isPrivateOrReservedIp: permite IP pública IPv4', function () {
+    assert_true(!isPrivateOrReservedIp('8.8.8.8'));
+});
+
+// =============================================================================
 // firstChars
 // =============================================================================
 

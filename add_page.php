@@ -5,10 +5,11 @@ declare(strict_types=1);
 // Panel CRUD de páginas estáticas.
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/page_save_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -71,7 +72,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
           </label>
         </div>
 
-        <div class="grid two" style="margin-top:.8rem;">
+        <div class="grid two grid-section">
           <label>
             <?= __('Slug *') ?>
             <input id="page_slug" type="text" name="slug" value="<?= esc($form['slug']) ?>"
@@ -98,21 +99,21 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
           </label>
         </div>
 
-        <div class="grid two" style="margin-top:.8rem;">
+        <div class="grid two grid-section">
           <label>
             <?= __('Orden (numérico, menor = antes)') ?>
             <input type="number" name="sort_order" min="0" step="1" value="<?= (int) $form['sort_order'] ?>">
           </label>
         </div>
 
-        <div class="grid" style="margin-top:.8rem;">
+        <div class="grid grid-section">
           <label>
             <?= __('Contenido') ?>
             <textarea id="page_content" name="content"><?= esc($form['content']) ?></textarea>
           </label>
         </div>
 
-        <div class="actions" style="margin-top:1rem;">
+        <div class="actions">
           <?php if ($isEditing): ?>
             <a class="btn" href="<?= esc(buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener"><?= __('Vista previa') ?></a>
           <?php endif; ?>
@@ -123,43 +124,6 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
     </main>
   </div>
   <script src="/assets/js/jodit.min.js"></script>
-  <script>
-    (function () {
-      var contentArea = document.getElementById('page_content');
-      if (contentArea) {
-        Jodit.make(contentArea, {
-          language: 'es',
-          toolbar: true,
-          buttons: 'paragraph,fontsize,|,bold,italic,underline,strikethrough,superscript,subscript,|,copyformat,eraser,clean,|,ul,ol,|,indent,outdent,|,left,center,right,justify,|,link,image,video,table,hr,|,undo,redo,|,find,preview,fullsize,source',
-          toolbarAdaptive: false,
-          height: 300,
-          enter: 'p',
-          cleanHTML: { fillEmptyParagraph: false }
-        });
-      }
-
-      // Auto-genera slug desde el título (solo si el slug está vacío o no ha sido editado manualmente).
-      var titleInput = document.getElementById('page_title');
-      var slugInput  = document.getElementById('page_slug');
-      var slugDirty  = slugInput && slugInput.value !== '';
-
-      function slugify(value) {
-        return value
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '') || '';
-      }
-
-      if (titleInput && slugInput) {
-        slugInput.addEventListener('input', function () { slugDirty = true; });
-        titleInput.addEventListener('input', function () {
-          if (!slugDirty) {
-            slugInput.value = slugify(titleInput.value);
-          }
-        });
-      }
-    }());
-  </script>
+  <script src="/assets/js/add_page.js"></script>
 </body>
 </html>

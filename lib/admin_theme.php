@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/session.php';
+
 /**
  * Gestión del tema visual del sitio.
  * El tema se almacena en podcast.admin_theme y se aplica server-side
@@ -79,6 +81,7 @@ function handlePublicThemeModePreference(): void
     setcookie(PUBLIC_THEME_MODE_COOKIE, $mode, [
         'expires' => time() + 31536000,
         'path' => '/',
+        'secure' => isSecureHttpRequest(),
         'samesite' => 'Lax',
     ]);
 
@@ -107,11 +110,7 @@ function handlePublicThemeModePreference(): void
  */
 function publicThemeModeBootstrapScript(): string
 {
-    $cookieName = PUBLIC_THEME_MODE_COOKIE;
-    $cookiePrefix = $cookieName . '=';
-    $cookiePrefixLength = strlen($cookiePrefix);
-
-    return '<script>(function(){var value="normal";var parts=document.cookie?document.cookie.split("; "):[];for(var i=0;i<parts.length;i++){if(parts[i].indexOf("' . $cookiePrefix . '")===0){value=decodeURIComponent(parts[i].slice(' . $cookiePrefixLength . '));break;}}if(value!=="auto"){value="normal";}document.documentElement.setAttribute("data-theme-mode",value);}());</script>';
+    return '<script src="/assets/js/theme-mode.js"></script>';
 }
 
 /**

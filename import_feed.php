@@ -6,10 +6,11 @@ declare(strict_types=1);
 // Flujo: GET → formulario | POST action=preview → previsualización | POST action=import → streaming.
 
 require_once __DIR__ . '/canonical_redirect.php';
+require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/import_feed_handler.php';
 
-session_start();
+startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
 
 if (!isset($_SESSION['admin_user'])) {
@@ -91,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
             <input type="url" name="feed_url" value="<?= esc($feedUrl) ?>"
                    placeholder="https://ejemplo.com/feed.xml" required autofocus>
           </label>
-          <div class="actions" style="margin-top:1rem">
+          <div class="actions section-gap-md">
             <button class="btn" type="submit"><?= __('Vista previa') ?></button>
           </div>
         </form>
@@ -132,26 +133,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
         ?>
 
         <!-- Formulario unificado: metadatos + episodios + opciones -->
-        <form method="post" action="import_feed.php" autocomplete="off" id="import-form">
+        <form method="post" action="import_feed.php" autocomplete="off" id="import-form"
+              data-empty-selection-message="<?= esc(__('Selecciona al menos un episodio para importar.')) ?>"
+              data-importing-label="<?= esc(__('Importando…')) ?>">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="action" value="import">
           <input type="hidden" name="feed_url" value="<?= esc($feedUrl) ?>">
 
           <!-- Tabla de comparación de metadatos -->
-          <h2 style="margin-top:1.5rem"><?= __('Metadatos del podcast') ?></h2>
-          <p style="margin-bottom:.75rem;font-size:.9rem">
+          <h2 class="import-preview-title"><?= __('Metadatos del podcast') ?></h2>
+          <p class="import-preview-note">
             <?= __('Marca los campos que quieres sobreescribir con los valores del feed.') ?>
           </p>
-          <div style="overflow-x:auto;margin-bottom:1.5rem">
-            <table style="width:100%;border-collapse:collapse;font-size:.9rem">
+          <div class="import-preview-wrap">
+            <table class="import-preview-table">
               <thead>
                 <tr>
-                  <th style="padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:2rem">
+                  <th class="import-cell-check">
                     <input type="checkbox" id="select-all-meta" checked title="<?= esc(__('Seleccionar todos los campos')) ?>">
                   </th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:14%"><?= __('Campo') ?></th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Valor actual') ?></th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Valor del feed') ?></th>
+                  <th class="import-cell-label text-left"><?= __('Campo') ?></th>
+                  <th class="text-left"><?= __('Valor actual') ?></th>
+                  <th class="text-left"><?= __('Valor del feed') ?></th>
                 </tr>
               </thead>
               <tbody>
@@ -162,16 +165,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
                   $hasValue   = $feedRaw !== '' && $feedRaw !== '0';
                 ?>
                   <tr>
-                    <td style="padding:.3rem .5rem;text-align:center;vertical-align:top">
+                    <td class="import-cell-check">
                       <input type="checkbox" name="overwrite_fields[]" value="<?= esc($field) ?>"
                              <?= $hasValue ? 'checked' : '' ?>>
                     </td>
-                    <td style="padding:.3rem .5rem;font-weight:600;vertical-align:top;white-space:nowrap"><?= esc($label) ?></td>
-                    <td style="padding:.3rem .5rem;vertical-align:top;word-break:break-word;color:var(--muted,#666)">
+                    <td class="import-cell-label"><?= esc($label) ?></td>
+                    <td class="import-cell-value import-cell-muted">
                       <?= $currentVal !== '' ? esc($currentVal) : '<em>—</em>' ?>
                     </td>
-                    <td style="padding:.3rem .5rem;vertical-align:top;word-break:break-word">
-                      <?= $hasValue ? esc($feedVal) : '<span style="color:var(--muted,#999)">' . esc($feedVal ?: '—') . '</span>' ?>
+                    <td class="import-cell-value">
+                      <?= $hasValue ? esc($feedVal) : '<span class="import-empty-value">' . esc($feedVal ?: '—') . '</span>' ?>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -181,50 +184,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
 
           <!-- Tabla de episodios -->
           <h2><?= __('Episodios encontrados (%d)', count($episodes)) ?></h2>
-          <div style="overflow-x:auto;margin-bottom:1.5rem">
-            <table style="width:100%;border-collapse:collapse;font-size:.9rem">
+          <div class="import-preview-wrap">
+            <table class="import-preview-table">
               <thead>
                 <tr>
-                  <th style="padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd);width:2rem">
+                  <th class="import-cell-check">
                     <input type="checkbox" id="select-all-eps" checked title="<?= esc(__('Seleccionar todos los episodios')) ?>">
                   </th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)">#</th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Título') ?></th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Fecha') ?></th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Duración') ?></th>
-                  <th style="text-align:center;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Imagen') ?></th>
-                  <th style="text-align:left;padding:.3rem .5rem;border-bottom:2px solid var(--border,#ddd)"><?= __('Estado') ?></th>
+                  <th class="text-left">#</th>
+                  <th class="text-left"><?= __('Título') ?></th>
+                  <th class="text-left"><?= __('Fecha') ?></th>
+                  <th class="text-left"><?= __('Duración') ?></th>
+                  <th class="import-cell-center"><?= __('Imagen') ?></th>
+                  <th class="text-left"><?= __('Estado') ?></th>
                 </tr>
               </thead>
               <tbody>
                 <?php foreach ($episodes as $i => $ep): ?>
                   <tr>
-                    <td style="padding:.3rem .5rem;text-align:center">
+                    <td class="import-cell-check">
                       <input type="checkbox" name="selected_guids[]" value="<?= esc($ep['guid']) ?>" checked>
                     </td>
-                    <td style="padding:.3rem .5rem"><?= $i + 1 ?></td>
-                    <td style="padding:.3rem .5rem"><?= esc($ep['title'] !== '' ? $ep['title'] : __('(sin título)')) ?></td>
-                    <td style="padding:.3rem .5rem"><?= esc($ep['pub_date'] ?? '') ?></td>
-                    <td style="padding:.3rem .5rem"><?= esc($ep['duration']) ?></td>
-                    <td style="padding:.3rem .5rem;text-align:center" title="<?= $ep['image_url'] !== '' ? esc($ep['image_url']) : esc(__('Sin imagen')) ?>">
-                      <?= $ep['image_url'] !== '' ? '✓' : '<span style="color:var(--muted,#999)">—</span>' ?>
+                    <td><?= $i + 1 ?></td>
+                    <td><?= esc($ep['title'] !== '' ? $ep['title'] : __('(sin título)')) ?></td>
+                    <td><?= esc($ep['pub_date'] ?? '') ?></td>
+                    <td><?= esc($ep['duration']) ?></td>
+                    <td class="import-cell-center" title="<?= $ep['image_url'] !== '' ? esc($ep['image_url']) : esc(__('Sin imagen')) ?>">
+                      <?= $ep['image_url'] !== '' ? '✓' : '<span class="import-empty-value">—</span>' ?>
                     </td>
-                    <td style="padding:.3rem .5rem"><?= esc($ep['status']) ?></td>
+                    <td><?= esc($ep['status']) ?></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
           </div>
 
-          <fieldset style="border:1px solid var(--border,#ddd);padding:1rem;margin-bottom:1rem;border-radius:4px">
-            <legend style="padding:0 .5rem;font-weight:600"><?= __('Opciones de importación') ?></legend>
-            <label style="display:flex;align-items:center;gap:.5rem;font-weight:400">
+          <fieldset class="import-options">
+            <legend><?= __('Opciones de importación') ?></legend>
+            <label class="import-options-row">
               <input type="checkbox" name="import_duplicates">
               <?= __('Importar episodios aunque su GUID ya exista en la base de datos') ?>
             </label>
           </fieldset>
 
-          <div class="notice" style="margin-bottom:1rem">
+          <div class="notice">
             <?= __('⚠ La importación puede tardar varios minutos dependiendo del número de episodios y el tamaño de los audios. No cierres esta página hasta que finalice.') ?>
           </div>
 
@@ -234,60 +237,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
           </div>
         </form>
 
-        <script>
-          (function () {
-            var form = document.getElementById('import-form');
-            var btn  = document.getElementById('import-btn');
-
-            // Fábrica de lógica "seleccionar todos" para un grupo de checkboxes
-            function bindSelectAll(selectAllId, childName) {
-              var master = document.getElementById(selectAllId);
-              if (!master) { return; }
-
-              // Sincronizar estado inicial del maestro con el estado real de los hijos
-              function syncMaster() {
-                var all     = form.querySelectorAll('input[name="' + childName + '"]');
-                var checked = form.querySelectorAll('input[name="' + childName + '"]:checked');
-                master.checked       = checked.length === all.length;
-                master.indeterminate = checked.length > 0 && checked.length < all.length;
-              }
-              syncMaster();
-
-              master.addEventListener('change', function () {
-                form.querySelectorAll('input[name="' + childName + '"]').forEach(function (cb) {
-                  cb.checked = master.checked;
-                });
-              });
-
-              form.addEventListener('change', function (e) {
-                if (e.target.name !== childName) { return; }
-                syncMaster();
-              });
-            }
-
-            bindSelectAll('select-all-meta', 'overwrite_fields[]');
-            bindSelectAll('select-all-eps',  'selected_guids[]');
-
-            // Validar y deshabilitar botón al enviar
-            if (form && btn) {
-              form.addEventListener('submit', function (e) {
-                var checked = form.querySelectorAll('input[name="selected_guids[]"]:checked');
-                if (checked.length === 0) {
-                  e.preventDefault();
-                  alert('Selecciona al menos un episodio para importar.');
-                  return;
-                }
-                btn.disabled    = true;
-                btn.textContent = 'Importando…';
-              });
-            }
-          }());
-        </script>
       <?php endif; ?>
 
       <?php endif; // curl disponible ?>
 
     </main>
   </div>
+  <script src="/assets/js/import_feed.js"></script>
 </body>
 </html>

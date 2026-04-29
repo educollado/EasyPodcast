@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/view_helpers.php';
 
 /** Slugs reservados que no pueden usarse como ruta de primer nivel. */
 const PAGE_RESERVED_SLUGS = ['admin', 'feed', 'search', 'cache', 'audios', 'images', 'assets', 'backups', 'robots'];
@@ -48,7 +49,7 @@ function validatePageForm(array $post): array
     $form = [
         'title'      => trim((string) ($post['title'] ?? '')),
         'slug'       => trim(strtolower((string) ($post['slug'] ?? ''))),
-        'content'    => (string) ($post['content'] ?? ''),
+        'content'    => sanitizeRichHtml((string) ($post['content'] ?? '')),
         'parent_id'  => $parentIdRaw !== '' ? (int) $parentIdRaw : null,
         'full_path'  => trim((string) ($post['current_full_path'] ?? '')),
         'sort_order' => (int) ($post['sort_order'] ?? 0),
