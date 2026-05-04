@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.1
+
+- **Publicación programada**: corregida la comparación horaria del scheduler para usar la hora local de PHP en lugar del UTC de SQLite, evitando retrasos al publicar episodios programados.
+- **Vista previa**: los administradores ya pueden abrir la vista previa de episodios `scheduled` desde `episodes_management.php` sin error 404.
+- **Calidad**: añadidos tests específicos para la vista previa admin de episodios programados y para la publicación automática según hora local.
+
 ## 1.9.0
 
 - **Seguridad**: CSP con nonce por petición, endurecimiento de cabeceras base, cookies de sesión más seguras, limitación de intentos de login/TOTP y cierre de sesión del panel protegido por CSRF.

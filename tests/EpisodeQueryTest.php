@@ -4,6 +4,47 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/episode_query.php';
 
+function episodeQueryTestHasSqliteDriver(): bool
+{
+    return in_array('sqlite', PDO::getAvailableDrivers(), true);
+}
+
+function createEpisodeQueryTestDb(): string
+{
+    $dbPath = tempnam(sys_get_temp_dir(), 'easypodcast-episode-query-');
+    if ($dbPath === false) {
+        throw new RuntimeException('No se pudo crear la BD temporal de EpisodeQueryTest');
+    }
+
+    $pdo = new PDO('sqlite:' . $dbPath);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $pdo->exec(
+        "CREATE TABLE podcast (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            link TEXT
+        )"
+    );
+    $pdo->exec(
+        "CREATE TABLE episodes (
+            id INTEGER PRIMARY KEY,
+            guid TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            link TEXT,
+            pub_date TEXT,
+            audio_url TEXT NOT NULL,
+            audio_mime_type TEXT NOT NULL,
+            audio_size_bytes INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft'
+        )"
+    );
+    $pdo->exec("INSERT INTO podcast (id, title, link) VALUES (1, 'Podcast test', 'https://example.com')");
+
+    return $dbPath;
+}
+
 // =============================================================================
 // extractEpisodeRouteFromLink
 // =============================================================================
@@ -62,3 +103,78 @@ test('episodeMatchesRoute: sin link válido y sin pub_date parseable devuelve fa
     assert_true(!episodeMatchesRoute($row, '2026', '03', 'mi-episodio'));
 });
 
+// =============================================================================
+// loadEpisodeData
+// =============================================================================
+
+test('loadEpisodeData: admin puede previsualizar episodios scheduled', function () {
+    if (!episodeQueryTestHasSqliteDriver()) {
+        return;
+    }
+
+    $dbPath = createEpisodeQueryTestDb();
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare(
+            "INSERT INTO episodes
+             (guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, status)
+             VALUES (:guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes, :status)"
+        );
+        $stmt->execute([
+            ':guid' => 'ep-scheduled-preview',
+            ':title' => 'Capítulo programado',
+            ':content' => 'Contenido',
+            ':link' => '/2026/05/capitulo-programado',
+            ':pub_date' => '2026-05-04 10:00:00',
+            ':audio_url' => 'https://example.com/audio.mp3',
+            ':audio_mime_type' => 'audio/mpeg',
+            ':audio_size_bytes' => 1234,
+            ':status' => 'scheduled',
+        ]);
+
+        $result = loadEpisodeData($dbPath, '2026', '05', 'capitulo-programado', true);
+
+        assert_eq(200, $result['httpStatus']);
+        assert_eq('scheduled', $result['episode']['status'] ?? null);
+    } finally {
+        @unlink($dbPath);
+    }
+});
+
+test('loadEpisodeData: público no puede acceder a episodios scheduled', function () {
+    if (!episodeQueryTestHasSqliteDriver()) {
+        return;
+    }
+
+    $dbPath = createEpisodeQueryTestDb();
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare(
+            "INSERT INTO episodes
+             (guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, status)
+             VALUES (:guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes, :status)"
+        );
+        $stmt->execute([
+            ':guid' => 'ep-scheduled-public',
+            ':title' => 'Capítulo programado',
+            ':content' => 'Contenido',
+            ':link' => '/2026/05/capitulo-programado',
+            ':pub_date' => '2026-05-04 10:00:00',
+            ':audio_url' => 'https://example.com/audio.mp3',
+            ':audio_mime_type' => 'audio/mpeg',
+            ':audio_size_bytes' => 1234,
+            ':status' => 'scheduled',
+        ]);
+
+        $result = loadEpisodeData($dbPath, '2026', '05', 'capitulo-programado', false);
+
+        assert_eq(404, $result['httpStatus']);
+        assert_null($result['episode']);
+    } finally {
+        @unlink($dbPath);
+    }
+});

@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -117,6 +117,7 @@ docker run -d \
 - `feed.php` genera el RSS en tiempo real; `feed.xml` se regenera automáticamente tras cada cambio.
 - `rss_item_limit`: número máximo de episodios en el feed (`0` = sin límite).
 - `home_items_per_page`: episodios por página en portada y búsqueda (mínimo 1, por defecto 20).
+- La publicación programada usa la hora local configurada en PHP y se activa en la siguiente petición web; los administradores pueden previsualizar episodios `scheduled` antes de su publicación.
 
 ### SEO
 

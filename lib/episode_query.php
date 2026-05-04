@@ -71,11 +71,11 @@ function episodeMatchesRoute(array $row, string $year, string $month, string $sl
  * Carga el podcast y el episodio resolviendo la URL amigable /YYYY/MM/slug.
  * Devuelve httpStatus 404 si el episodio no existe o los parámetros son inválidos,
  * y 500 en caso de error de BD. El dispatcher debe llamar a http_response_code().
- * Si $allowDraft es true también busca entre episodios en estado 'draft' (solo para admin).
+ * Si $allowUnpublished es true también busca entre episodios no publicados (solo para admin).
  *
  * @return array{podcast:?array, episode:?array, error:string, httpStatus:int}
  */
-function loadEpisodeData(string $dbPath, string $year, string $month, string $slug, bool $allowDraft = false): array
+function loadEpisodeData(string $dbPath, string $year, string $month, string $slug, bool $allowUnpublished = false): array
 {
     $podcast = null;
     $episode = null;
@@ -94,8 +94,8 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
 
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 
-        $statusClause = $allowDraft
-            ? "status IN ('published', 'draft')"
+        $statusClause = $allowUnpublished
+            ? "status IN ('published', 'draft', 'scheduled')"
             : "status = 'published'";
 
         // Fast path: búsqueda por link indexado (O(log n)).
