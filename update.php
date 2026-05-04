@@ -54,6 +54,10 @@ $updatingLabel        = __('Actualizando…');
     <main class="card">
       <h1><?= __('Actualizar EasyPodcast') ?></h1>
       <p><?= __('Comprueba si hay una nueva versión disponible y aplícala sin perder datos.') ?></p>
+      <p>
+        <?= __('Se recomienda hacer una copia de seguridad, al menos de la base de datos, antes de actualizar.') ?>
+        <a href="backups.php" class="update-footer-link"><?= __('Ir a Copias de seguridad') ?></a>
+      </p>
 
       <?php if ($updated): ?>
         <div class="notice"><?= __('EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado.') ?></div>

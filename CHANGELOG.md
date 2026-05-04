@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.2
+
+- **Actualizador**: `update.php` recomienda hacer una copia de seguridad antes de actualizar y añade acceso directo a `backups.php`.
+- **Traducciones**: añadidas las nuevas cadenas del actualizador en catalán, alemán, inglés, español, francés, gallego, italiano y portugués.
+
 ## 1.9.1
 
 - **Publicación programada**: corregida la comparación horaria del scheduler para usar la hora local de PHP en lugar del UTC de SQLite, evitando retrasos al publicar episodios programados.

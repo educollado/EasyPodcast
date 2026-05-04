@@ -1135,6 +1135,12 @@ msgstr "Atualizar EasyPodcast"
 msgid "Comprueba si hay una nueva versión disponible y aplícala sin perder datos."
 msgstr "Verifique se existe uma nova versão disponível e aplique-a sem perder dados."
 
+msgid "Se recomienda hacer una copia de seguridad, al menos de la base de datos, antes de actualizar."
+msgstr "Recomenda-se fazer uma cópia de segurança, pelo menos da base de dados, antes de atualizar."
+
+msgid "Ir a Copias de seguridad"
+msgstr "Ir para Cópias de segurança"
+
 msgid "EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado."
 msgstr "EasyPodcast foi atualizado com sucesso. A base de dados, os áudios e as imagens não foram modificados."
 
@@ -2066,5 +2072,4 @@ msgstr "Segundo o sistema"
 
 msgid "Tema:"
 msgstr "Tema:"
-
 
