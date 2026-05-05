@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.2-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.3-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -191,19 +191,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 17) {
-    migration_v17($pdo);
-    $pdo->exec('PRAGMA user_version = 17');
+if ($version < 18) {
+    migration_v18($pdo);
+    $pdo->exec('PRAGMA user_version = 18');
 }
 
 // 2. Función de migración
-function migration_v17(PDO $pdo): void
+function migration_v18(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 17`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 18`.
 
 #### Historial de versiones
 
@@ -225,6 +225,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 17`.
 | 14 | Añade tablas e índices de estadísticas agregadas |
 | 15 | Añade `action_type` a `estadisticas` para diferenciar descargas y reproducciones |
 | 16 | Migra `api_tokens` a hash + sufijo visible y añade alcance explícito |
+| 17 | Añade `public_theme_mode_auto` a `podcast` para guardar el modo público `Según sistema` como ajuste global |
 
 ---
 
@@ -268,7 +269,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 17`.
 
 ## Temas visuales
 
-El administrador elige el tema desde el panel (`admin.php` → tarjeta **Apariencia**). El slug se guarda en `podcast.admin_theme` y se aplica server-side mediante el atributo `data-theme` en `<html>`, sin JavaScript ni parpadeo.
+El administrador elige el tema desde el panel (`admin.php` → tarjeta **Apariencia**). El slug se guarda en `podcast.admin_theme` y se aplica server-side mediante el atributo `data-theme` en `<html>`, sin JavaScript ni parpadeo. Desde esa misma tarjeta también puede activar `Según sistema` como ajuste global para las páginas públicas; ese estado se guarda en `podcast.public_theme_mode_auto` y se refleja en `data-theme-mode`.
 
 | Slug | Nombre | Estilo |
 |---|---|---|

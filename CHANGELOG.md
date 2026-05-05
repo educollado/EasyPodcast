@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.3
+
+- **Publicación programada**: reforzada la publicación automática en modo lazy para que los episodios `scheduled` vencidos pasen a `published` también al cargar portada, búsqueda, ficha pública y listado admin, con tests de regresión específicos.
+- **Apariencia**: el modo `Según sistema` pasa a ser una preferencia global gestionada por el administrador desde la tarjeta **Apariencia**; se elimina el selector público de la cabecera y se añade la migración `v17` para guardar el ajuste en base de datos.
+- **Documentación**: README y changelog actualizados para reflejar la nueva configuración global de apariencia y la nueva migración de esquema.
+
 ## 1.9.2
 
 - **Actualizador**: `update.php` recomienda hacer una copia de seguridad antes de actualizar y añade acceso directo a `backups.php`.
