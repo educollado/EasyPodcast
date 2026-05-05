@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/scheduler.php';
+
 /**
  * Escapa los caracteres especiales de LIKE en SQLite (\, %, _).
  * Necesario para búsquedas de texto libre sin inyección de wildcards.
@@ -31,6 +33,12 @@ function loadSearchData(string $dbPath, string $query, int $requestedPage): arra
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        try {
+            publishScheduledEpisodesAndRefresh($pdo);
+        } catch (Throwable $e) {
+            // Silencioso: la búsqueda debe seguir funcionando aunque falle el scheduler.
+        }
 
         // La app está diseñada alrededor de una única fila de podcast.
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;

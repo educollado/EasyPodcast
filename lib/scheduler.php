@@ -54,6 +54,31 @@ function publishScheduledEpisodesInDatabase(PDO $pdo, ?string $cutoff = null): i
 }
 
 /**
+ * Publica episodios programados vencidos y ejecuta los efectos secundarios asociados.
+ *
+ * Usa el mismo PDO del caller para evitar aperturas extra de conexión en flujos
+ * que ya están consultando la base de datos.
+ */
+function publishScheduledEpisodesAndRefresh(PDO $pdo): int
+{
+    $count = publishScheduledEpisodesInDatabase($pdo);
+
+    if ($count === 0) {
+        return 0;
+    }
+
+    try {
+        writePodcastFeedFile($pdo, dirname(__DIR__) . '/feed.xml', resolveFeedSelfHref($pdo));
+        writePodcastSitemapFile($pdo, dirname(__DIR__) . '/sitemap.xml');
+    } catch (Throwable $e) {
+        // Silencioso: el episodio ya está publicado en BD.
+    }
+    clearWebCache();
+
+    return $count;
+}
+
+/**
  * Publica automáticamente los episodios programados cuya fecha ya ha llegado.
  *
  * Se ejecuta en cada petición web (lazy scheduling, sin cron).
@@ -64,20 +89,7 @@ function publishScheduledEpisodes(string $dbPath): void
 {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
-        $count = publishScheduledEpisodesInDatabase($pdo);
-
-        if ($count === 0) {
-            return;
-        }
-
-        // Regenerar feed.xml, sitemap.xml y limpiar caché tras publicar.
-        try {
-            writePodcastFeedFile($pdo, dirname(__DIR__) . '/feed.xml', resolveFeedSelfHref($pdo));
-            writePodcastSitemapFile($pdo, dirname(__DIR__) . '/sitemap.xml');
-        } catch (Throwable $e) {
-            // Silencioso: el episodio ya está publicado en BD.
-        }
-        clearWebCache();
+        publishScheduledEpisodesAndRefresh($pdo);
     } catch (Throwable $e) {
         // Silencioso: no bloquear la petición.
     }

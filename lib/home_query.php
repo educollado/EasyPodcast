@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/scheduler.php';
+
 /**
  * Carga los datos de la portada: podcast, episodios publicados paginados y metadatos de paginación.
  * Si hay error de BD devuelve la clave 'error' con el mensaje; el resto de claves quedan en sus valores por defecto.
@@ -22,6 +24,12 @@ function loadHomeData(string $dbPath, int $requestedPage): array
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        try {
+            publishScheduledEpisodesAndRefresh($pdo);
+        } catch (Throwable $e) {
+            // Silencioso: la portada debe seguir cargando aunque falle el scheduler.
+        }
 
         // La app está diseñada alrededor de una única fila de podcast.
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;

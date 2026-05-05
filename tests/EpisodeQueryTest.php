@@ -127,7 +127,7 @@ test('loadEpisodeData: admin puede previsualizar episodios scheduled', function 
             ':title' => 'Capítulo programado',
             ':content' => 'Contenido',
             ':link' => '/2026/05/capitulo-programado',
-            ':pub_date' => '2026-05-04 10:00:00',
+            ':pub_date' => '2999-05-04 10:00:00',
             ':audio_url' => 'https://example.com/audio.mp3',
             ':audio_mime_type' => 'audio/mpeg',
             ':audio_size_bytes' => 1234,
@@ -163,7 +163,7 @@ test('loadEpisodeData: público no puede acceder a episodios scheduled', functio
             ':title' => 'Capítulo programado',
             ':content' => 'Contenido',
             ':link' => '/2026/05/capitulo-programado',
-            ':pub_date' => '2026-05-04 10:00:00',
+            ':pub_date' => '2999-05-04 10:00:00',
             ':audio_url' => 'https://example.com/audio.mp3',
             ':audio_mime_type' => 'audio/mpeg',
             ':audio_size_bytes' => 1234,
@@ -174,6 +174,43 @@ test('loadEpisodeData: público no puede acceder a episodios scheduled', functio
 
         assert_eq(404, $result['httpStatus']);
         assert_null($result['episode']);
+    } finally {
+        @unlink($dbPath);
+    }
+});
+
+test('loadEpisodeData: publica automáticamente episodios scheduled vencidos', function () {
+    if (!episodeQueryTestHasSqliteDriver()) {
+        return;
+    }
+
+    $dbPath = createEpisodeQueryTestDb();
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare(
+            "INSERT INTO episodes
+             (guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, status)
+             VALUES (:guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes, :status)"
+        );
+        $stmt->execute([
+            ':guid' => 'ep-scheduled-due',
+            ':title' => 'Capítulo vencido',
+            ':content' => 'Contenido',
+            ':link' => '/2000/05/capitulo-vencido',
+            ':pub_date' => '2000-05-04 10:00:00',
+            ':audio_url' => 'https://example.com/audio.mp3',
+            ':audio_mime_type' => 'audio/mpeg',
+            ':audio_size_bytes' => 1234,
+            ':status' => 'scheduled',
+        ]);
+
+        $result = loadEpisodeData($dbPath, '2000', '05', 'capitulo-vencido', false);
+
+        assert_eq(200, $result['httpStatus']);
+        assert_eq('published', $result['episode']['status'] ?? null);
+        assert_eq('published', $pdo->query("SELECT status FROM episodes WHERE guid = 'ep-scheduled-due'")->fetchColumn());
     } finally {
         @unlink($dbPath);
     }

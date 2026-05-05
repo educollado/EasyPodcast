@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/view_helpers.php';
 require_once __DIR__ . '/public_episode_helpers.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/scheduler.php';
 
 /**
  * Intenta extraer {year, month, slug} de un enlace en formato /YYYY/MM/slug.
@@ -91,6 +92,12 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        try {
+            publishScheduledEpisodesAndRefresh($pdo);
+        } catch (Throwable $e) {
+            // Silencioso: el detalle debe seguir cargando aunque falle el scheduler.
+        }
 
         $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 

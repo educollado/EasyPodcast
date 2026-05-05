@@ -7,6 +7,7 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/episode_helpers.php';
+require_once __DIR__ . '/scheduler.php';
 
 /**
  * Carga los datos del listado de episodios para el panel administrativo.
@@ -48,6 +49,12 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        try {
+            publishScheduledEpisodesAndRefresh($pdo);
+        } catch (Throwable $e) {
+            // Silencioso: el panel debe seguir cargando aunque falle el scheduler.
+        }
 
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS episodes (
