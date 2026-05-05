@@ -209,7 +209,10 @@ function loadPodcastManagementData(string $dbPath): array
               rss_item_limit INTEGER NOT NULL DEFAULT 0,
               home_items_per_page INTEGER NOT NULL DEFAULT 20,
               write_audio_metadata INTEGER NOT NULL DEFAULT 0,
-              cache_enabled INTEGER NOT NULL DEFAULT 0
+              cache_enabled INTEGER NOT NULL DEFAULT 0,
+              app_language TEXT NOT NULL DEFAULT 'es_ES',
+              admin_theme TEXT NOT NULL DEFAULT 'default',
+              public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
             )"
         );
 

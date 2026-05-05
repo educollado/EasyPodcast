@@ -41,12 +41,11 @@ if ($error !== '') {
 }
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>" data-theme-mode="normal">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>" data-theme-mode="<?= esc(publicThemeMode()) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($podcastTitle) ?></title>
-  <?= publicThemeModeBootstrapScript() ?>
   <meta name="robots" content="<?= esc($robotsContent) ?>">
   <meta name="description" content="<?= esc($metaDescription) ?>">
   <?php if ($_fediverseCreator !== ''): ?>

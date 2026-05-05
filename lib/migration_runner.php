@@ -109,6 +109,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 16');
         $version = 16;
     }
+
+    if ($version < 17) {
+        migration_v17($pdo);
+        $pdo->exec('PRAGMA user_version = 17');
+        $version = 17;
+    }
 }
 
 /**
@@ -598,4 +604,19 @@ function migration_v16(PDO $pdo): void
     }
 
     $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_api_tokens_hash ON api_tokens(token_hash) WHERE token_hash != ''");
+}
+
+/**
+ * Migración v17: añade public_theme_mode_auto a podcast para aplicar el modo público
+ * "según sistema" como preferencia global gestionada por el administrador.
+ */
+function migration_v17(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('public_theme_mode_auto', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN public_theme_mode_auto INTEGER NOT NULL DEFAULT 0");
+    }
 }

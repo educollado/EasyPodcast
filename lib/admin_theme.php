@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/session.php';
-
 /**
  * Gestión del tema visual del sitio.
  * El tema se almacena en podcast.admin_theme y se aplica server-side
@@ -22,96 +20,10 @@ const ADMIN_THEMES = [
     'monocromo'    => 'Silver Void',
 ];
 
-const PUBLIC_THEME_MODE_COOKIE = 'easypodcast_theme_mode';
-
 const PUBLIC_THEME_MODES = [
     'normal' => 'Normal',
     'auto'   => 'Automático',
 ];
-
-/**
- * Normaliza el modo de tema público.
- */
-function normalizePublicThemeMode(?string $mode): string
-{
-    $mode = is_string($mode) ? trim(strtolower($mode)) : '';
-    return isset(PUBLIC_THEME_MODES[$mode]) ? $mode : 'normal';
-}
-
-/**
- * Construye una URL sobre la request actual cambiando solo theme_mode.
- */
-function buildPublicThemeModeUrl(string $mode, ?string $requestUri = null): string
-{
-    $requestUri = $requestUri !== null && $requestUri !== ''
-        ? $requestUri
-        : (string) ($_SERVER['REQUEST_URI'] ?? '/');
-
-    $path = (string) (parse_url($requestUri, PHP_URL_PATH) ?? '/');
-    $path = $path !== '' ? $path : '/';
-
-    $queryString = (string) (parse_url($requestUri, PHP_URL_QUERY) ?? '');
-    $params = [];
-    if ($queryString !== '') {
-        parse_str($queryString, $params);
-    }
-
-    $params['theme_mode'] = normalizePublicThemeMode($mode);
-
-    $query = http_build_query($params);
-    return $path . ($query !== '' ? '?' . $query : '');
-}
-
-/**
- * Si llega theme_mode por query string, lo persiste en cookie y redirige
- * a la misma URL sin ese parámetro para no ensuciar la navegación.
- */
-function handlePublicThemeModePreference(): void
-{
-    if (PHP_SAPI === 'cli' || headers_sent() || !isset($_GET['theme_mode'])) {
-        return;
-    }
-
-    $rawMode = (string) $_GET['theme_mode'];
-    $mode = normalizePublicThemeMode($rawMode);
-    if (!isset(PUBLIC_THEME_MODES[$rawMode])) {
-        return;
-    }
-
-    setcookie(PUBLIC_THEME_MODE_COOKIE, $mode, [
-        'expires' => time() + 31536000,
-        'path' => '/',
-        'secure' => isSecureHttpRequest(),
-        'samesite' => 'Lax',
-    ]);
-
-    $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
-    $path = (string) (parse_url($requestUri, PHP_URL_PATH) ?? '/');
-    $path = $path !== '' ? $path : '/';
-
-    $queryString = (string) (parse_url($requestUri, PHP_URL_QUERY) ?? '');
-    $params = [];
-    if ($queryString !== '') {
-        parse_str($queryString, $params);
-    }
-    unset($params['theme_mode']);
-
-    $location = $path;
-    if ($params !== []) {
-        $location .= '?' . http_build_query($params);
-    }
-
-    header('Location: ' . $location, true, 302);
-    exit;
-}
-
-/**
- * Script mínimo para aplicar data-theme-mode antes de cargar estilos.
- */
-function publicThemeModeBootstrapScript(): string
-{
-    return '<script src="/assets/js/theme-mode.js"></script>';
-}
 
 /**
  * Lee el tema activo desde BD y lo guarda en $GLOBALS['_admin_theme'].
@@ -119,17 +31,35 @@ function publicThemeModeBootstrapScript(): string
  */
 function loadAdminTheme(string $dbPath): void
 {
+    $GLOBALS['_admin_theme'] = 'default';
+    $GLOBALS['_public_theme_mode'] = 'normal';
+
     try {
-        $pdo   = new PDO('sqlite:' . $dbPath);
-        $theme = $pdo->query('SELECT admin_theme FROM podcast LIMIT 1')->fetchColumn();
-        if (is_string($theme) && $theme !== '' && isset(ADMIN_THEMES[$theme])) {
-            $GLOBALS['_admin_theme'] = $theme;
-            return;
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $columns = array_column(
+            $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+            'name'
+        );
+
+        if (in_array('admin_theme', $columns, true)) {
+            $theme = $pdo->query('SELECT admin_theme FROM podcast LIMIT 1')->fetchColumn();
+            if (is_string($theme) && $theme !== '' && isset(ADMIN_THEMES[$theme])) {
+                $GLOBALS['_admin_theme'] = $theme;
+            }
+        }
+
+        if (in_array('public_theme_mode_auto', $columns, true)) {
+            $modeAuto = $pdo->query('SELECT public_theme_mode_auto FROM podcast LIMIT 1')->fetchColumn();
+            if ((int) $modeAuto === 1) {
+                $GLOBALS['_public_theme_mode'] = 'auto';
+            }
         }
     } catch (Throwable $e) {
-        // Silencioso: fallback al tema por defecto.
+        // Silencioso: fallback a tema y modo por defecto.
     }
-    $GLOBALS['_admin_theme'] = 'default';
 }
 
 /**
@@ -138,4 +68,13 @@ function loadAdminTheme(string $dbPath): void
 function adminTheme(): string
 {
     return isset($GLOBALS['_admin_theme']) ? (string) $GLOBALS['_admin_theme'] : 'default';
+}
+
+/**
+ * Devuelve el modo de tema público activo ('normal' o 'auto').
+ */
+function publicThemeMode(): string
+{
+    $mode = isset($GLOBALS['_public_theme_mode']) ? (string) $GLOBALS['_public_theme_mode'] : 'normal';
+    return isset(PUBLIC_THEME_MODES[$mode]) ? $mode : 'normal';
 }

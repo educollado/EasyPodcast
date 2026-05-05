@@ -28,10 +28,14 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ??
     csrf_verify();
     $theme = trim((string) ($_POST['app_theme'] ?? 'default'));
     if (isset(ADMIN_THEMES[$theme])) {
+        $publicThemeModeAuto = isset($_POST['public_theme_mode_auto']) ? 1 : 0;
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->prepare('UPDATE podcast SET admin_theme = :theme');
-        $stmt->execute([':theme' => $theme]);
+        $stmt = $pdo->prepare('UPDATE podcast SET admin_theme = :theme, public_theme_mode_auto = :public_theme_mode_auto');
+        $stmt->execute([
+            ':theme' => $theme,
+            ':public_theme_mode_auto' => $publicThemeModeAuto,
+        ]);
         clearWebCache();
     }
     header('Location: admin.php');
@@ -66,10 +70,11 @@ extract($data); // adminCount, isSetupMode, error, notice
 $currentAppLanguage = 'es_ES';
 // Tema activo para mostrar el selector.
 $currentAdminTheme  = 'default';
+$currentPublicThemeModeAuto = false;
 if ($isLoggedIn) {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
-        $row = $pdo->query('SELECT app_language, admin_theme FROM podcast LIMIT 1')->fetch();
+        $row = $pdo->query('SELECT app_language, admin_theme, public_theme_mode_auto FROM podcast LIMIT 1')->fetch();
         if (is_array($row)) {
             if (is_string($row['app_language'] ?? null) && $row['app_language'] !== '') {
                 $currentAppLanguage = $row['app_language'];
@@ -77,6 +82,7 @@ if ($isLoggedIn) {
             if (is_string($row['admin_theme'] ?? null) && isset(ADMIN_THEMES[$row['admin_theme']])) {
                 $currentAdminTheme = $row['admin_theme'];
             }
+            $currentPublicThemeModeAuto = ((int) ($row['public_theme_mode_auto'] ?? 0)) === 1;
         }
     } catch (Throwable $e) {
         // Usa el fallback.
@@ -223,6 +229,10 @@ if ($isLoggedIn) {
                 <option value="<?= esc($slug) ?>" <?= $currentAdminTheme === $slug ? 'selected' : '' ?>><?= esc($themeLabel) ?></option>
               <?php endforeach; ?>
             </select>
+            <label class="inline-checkbox">
+              <input type="checkbox" name="public_theme_mode_auto" value="1" data-submit-on-change="1" <?= $currentPublicThemeModeAuto ? 'checked' : '' ?>>
+              <span><?= __('Según sistema') ?></span>
+            </label>
           </form>
         </div>
 

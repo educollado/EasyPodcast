@@ -75,8 +75,7 @@
   html[data-theme-mode="auto"][data-theme] .theme-toggle:hover,
   html[data-theme-mode="auto"][data-theme] .social-link:hover,
   html[data-theme-mode="auto"][data-theme] .footer-social-link:hover,
-  html[data-theme-mode="auto"][data-theme] .small-btn:hover,
-  html[data-theme-mode="auto"][data-theme] .theme-mode-link:hover {
+  html[data-theme-mode="auto"][data-theme] .small-btn:hover {
     background: #2a2420;
     border-color: var(--accent);
     color: var(--accent);

@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS podcast (
   write_audio_metadata INTEGER NOT NULL DEFAULT 0,
   cache_enabled INTEGER NOT NULL DEFAULT 0,
   app_language TEXT NOT NULL DEFAULT 'es_ES',
-  admin_theme TEXT NOT NULL DEFAULT 'default'
+  admin_theme TEXT NOT NULL DEFAULT 'default',
+  public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
 );
 
 -- episodes: una fila por episodio.
@@ -174,4 +175,4 @@ BEGIN
   ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 16;
+PRAGMA user_version = 17;

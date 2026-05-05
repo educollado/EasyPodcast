@@ -4,29 +4,49 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/admin_theme.php';
 
-test('normalizePublicThemeMode: acepta auto', function () {
-    assert_eq('auto', normalizePublicThemeMode('auto'));
+function adminThemeTestHasSqliteDriver(): bool
+{
+    return in_array('sqlite', PDO::getAvailableDrivers(), true);
+}
+
+test('publicThemeMode: por defecto usa normal', function () {
+    unset($GLOBALS['_public_theme_mode']);
+    assert_eq('normal', publicThemeMode());
 });
 
-test('normalizePublicThemeMode: cualquier valor inválido vuelve a normal', function () {
-    assert_eq('normal', normalizePublicThemeMode('otro'));
-    assert_eq('normal', normalizePublicThemeMode(null));
+test('publicThemeMode: devuelve auto cuando está cargado en globals', function () {
+    $GLOBALS['_public_theme_mode'] = 'auto';
+    assert_eq('auto', publicThemeMode());
 });
 
-test('buildPublicThemeModeUrl: añade theme_mode a una ruta simple', function () {
-    assert_eq('/?theme_mode=auto', buildPublicThemeModeUrl('auto', '/'));
-});
+test('loadAdminTheme: carga tema visual y modo público desde la BD', function () {
+    if (!adminThemeTestHasSqliteDriver()) {
+        return;
+    }
 
-test('buildPublicThemeModeUrl: preserva query existente', function () {
-    assert_eq(
-        '/search.php?q=podcast&page=2&theme_mode=auto',
-        buildPublicThemeModeUrl('auto', '/search.php?q=podcast&page=2')
-    );
-});
+    $dbPath = tempnam(sys_get_temp_dir(), 'easypodcast-admin-theme-');
+    if ($dbPath === false) {
+        throw new RuntimeException('No se pudo crear la BD temporal de AdminThemeTest');
+    }
 
-test('buildPublicThemeModeUrl: reemplaza theme_mode anterior', function () {
-    assert_eq(
-        '/search.php?q=podcast&page=2&theme_mode=normal',
-        buildPublicThemeModeUrl('normal', '/search.php?q=podcast&page=2&theme_mode=auto')
-    );
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec(
+            "CREATE TABLE podcast (
+                id INTEGER PRIMARY KEY,
+                admin_theme TEXT NOT NULL DEFAULT 'default',
+                public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
+            )"
+        );
+        $pdo->exec("INSERT INTO podcast (id, admin_theme, public_theme_mode_auto) VALUES (1, 'agua', 1)");
+
+        loadAdminTheme($dbPath);
+
+        assert_eq('agua', adminTheme());
+        assert_eq('auto', publicThemeMode());
+    } finally {
+        unset($GLOBALS['_admin_theme'], $GLOBALS['_public_theme_mode']);
+        @unlink($dbPath);
+    }
 });
