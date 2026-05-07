@@ -391,6 +391,8 @@ Los temas se definen en `assets/css/themes.css` mediante variables CSS con selec
 | `admin.css` | Login/panel |
 | `podcast_management.css` | Gestión del podcast |
 | `episodes_management.css` | Gestión de episodios |
+| `dark.css` | Tema oscuro base |
+| `jodit.min.css` | Editor HTML Jodit |
 
 ---
 
