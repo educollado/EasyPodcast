@@ -19,7 +19,8 @@ La forma más sencilla de instalar EasyPodcast: un único archivo PHP que descar
 | Componente | Mínimo |
 |---|---|
 | PHP | 8.0+ |
-| Extensiones PHP | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd` |
+| Extensiones PHP | `pdo_sqlite`, `sqlite3`, `fileinfo`, `xmlwriter`, `zip`, `gd`, `curl` |
+| Servidor | Apache con `mod_rewrite` |
 | Directorio de instalación | Escribible por el servidor web |
 
 **Pasos**
@@ -180,6 +181,9 @@ docker run -d \
 | `social` | Enlaces a redes sociales (una fila) |
 | `pages` | Páginas estáticas con jerarquía padre/hijo |
 | `api_tokens` | Tokens de API (reservada) |
+| `estadisticas` | Datos brutos de descargas/reproducciones (7 días) |
+| `estadisticas_mensuales` | Resumen mensual histórico |
+| `estadisticas_anuales` | Resumen anual histórico |
 
 ### Migraciones de esquema
 
@@ -235,31 +239,120 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 18`.
 ├── index.php                        # Portada pública
 ├── episode.php                      # Página de episodio
 ├── search.php                       # Búsqueda
-├── feed.php / feed.xml              # RSS dinámico y generado
-├── robots.php / sitemap.xml         # SEO
-├── admin.php                        # Panel de administración
+├── page.php                         # Página estática
+├── feed.php                         # Feed RSS dinámico
+├── feed.xml                         # Feed RSS generado
+├── feed_builder.php                 # Constructor de feed
+├── robots.php                       # robots.txt dinámico
+├── sitemap.xml                      # Sitemap estático
+├── track.php                        # Seguimiento de descargas
+├── admin.php                        # Login/logout admin
 ├── canonical_redirect.php           # Redirección canónica 301
-├── schema.sql / podcast.sqlite      # Esquema y base de datos
+├── .htaccess                        # Reglas Apache
+├── schema.sql                       # Esquema de base de datos
+├── podcast.sqlite                   # Base de datos SQLite
+├── favicon.ico                      # Icono del sitio
+├── 403.php                          # Error 403
+├── 404.php                          # Error 404
+├── header.php                       # Cabecera pública compartida
+├── footer.php                       # Pie público compartido
+├── admin_nav.php                    # Navegación del panel admin
+├── add_episode.php                  # Formulario de episodio
+├── add_page.php                     # Formulario de página estática
+├── episodes_management.php          # Lista de episodios
+├── pages_management.php             # Lista de páginas estáticas
+├── podcast_management.php          # Configuración del podcast
+├── social_management.php           # Gestión de redes sociales
+├── backups.php                      # Exportar/importar datos
+├── cache_management.php            # Configuración de caché
+├── change_password.php              # Cambio de contraseña
+├── import_feed.php                  # Importar desde feed externo
+├── media_cleanup.php                # Limpieza de archivos huérfanos
+├── stats.php                        # Estadísticas
+├── twofa_management.php             # Configuración 2FA TOTP
+├── update.php                       # Actualizaciones automáticas
+├── upload_audio_ajax.php             # Subida de audio por AJAX
+├── api_docs.php                     # Documentación API
+├── api_tokens.php                   # Gestión de tokens API
+├── api/                             # API REST
+│   └── index.php
 ├── lib/
 │   ├── migration_runner.php         # Sistema de migraciones BD
 │   ├── episode_helpers.php          # Slugs, fechas, MIME, rutas
 │   ├── episode_save_handler.php     # Validación y guardado de episodios
+│   ├── episode_query.php            # Consultas de episodios
+│   ├── episode_seo.php               # SEO de episodios
 │   ├── upload_service.php           # Subida de audio/imagen e ID3
 │   ├── id3_service.php              # Metadatos ID3 para MP3
 │   ├── seo_helpers.php              # Canonical, URLs, meta description
 │   ├── view_helpers.php             # esc(), HTML saneado, slugs e imágenes
 │   ├── public_episode_helpers.php   # Rutas y slugs públicos
+│   ├── page_helpers.php              # Utilidades para páginas estáticas
+│   ├── page_save_handler.php        # Guardado de páginas
 │   ├── cache_service.php            # Caché (lectura/escritura/limpieza)
 │   ├── csrf.php                     # Protección CSRF
 │   ├── csp.php                      # Content-Security-Policy y nonces
 │   ├── session.php                  # Arranque seguro de sesión
 │   ├── auth_security.php            # Throttling de autenticación
 │   ├── admin_theme.php              # Temas visuales (carga y selección)
+│   ├── totp.php                     # Lógica TOTP
+│   ├── twofa_handler.php            # Gestor de 2FA
 │   ├── api_helpers.php              # Autenticación y utilidades de API
+│   ├── api_episode_handler.php      # Handler API de episodios
+│   ├── api_misc_handlers.php        # Handlers API varios
+│   ├── api_pages_handler.php        # Handler API de páginas
+│   ├── api_podcast_handler.php      # Handler API del podcast
+│   ├── api_social_handler.php       # Handler API de redes sociales
+│   ├── api_system_handler.php       # Handler API del sistema
+│   ├── api_tokens_handler.php       # Handler API de tokens
 │   ├── import_feed_handler.php      # Parser de feed externo
-│   └── backup_handler.php           # Exportación/importación de datos
-├── assets/css/                      # Hojas de estilo por página
-│   ├── themes.css                   # Temas visuales (aplicados via data-theme)
+│   ├── backup_handler.php           # Exportación/importación de datos
+│   ├── cache_management_handler.php # Gestor de configuración de caché
+│   ├── change_password_handler.php  # Gestor de cambio de contraseña
+│   ├── download_handler.php         # Gestor de descargas
+│   ├── media_cleanup_handler.php    # Limpieza de archivos
+│   ├── podcast_management_handler.php # Gestor de configuración podcast
+│   ├── scheduler.php                 # Programación de episodios
+│   ├── search_query.php              # Consultas de búsqueda
+│   ├── search_seo.php                # SEO de búsqueda
+│   ├── social_handler.php           # Gestor de redes sociales
+│   ├── stats_downloads_handler.php  # Gestor de estadísticas de descargas
+│   ├── stats_handler.php            # Gestor de estadísticas
+│   ├── update_handler.php            # Gestor de actualizaciones
+│   ├── version.php                   # Versión de la aplicación
+│   ├── i18n.php                      # Internacionalización
+│   ├── home_query.php                # Consultas de portada
+│   ├── home_seo.php                  # SEO de portada
+│   ├── sitemap_builder.php           # Constructor de sitemap
+│   ├── add_episode_query.php         # Consultas formulario episodio
+│   └── admin_query.php               # Consultas del panel admin
+├── assets/
+│   ├── css/
+│   │   ├── common.css                # Estilos base públicos
+│   │   ├── index.css                 # Portada
+│   │   ├── episode.css               # Página de episodio
+│   │   ├── header.css                # Cabecera compartida
+│   │   ├── themes.css                # Temas visuales (aplicados via data-theme)
+│   │   ├── dark.css                  # Tema oscuro base
+│   │   ├── admin-common.css          # Estilos base del panel admin
+│   │   ├── admin.css                 # Login/panel
+│   │   ├── podcast_management.css    # Gestión del podcast
+│   │   ├── episodes_management.css   # Gestión de episodios
+│   │   └── jodit.min.css             # Editor HTML Jodit
+│   └── js/
+│       ├── public.js                 # JS público
+│       ├── admin.js                  # JS del panel admin
+│       ├── add_episode.js            # JS formulario episodio
+│       ├── add_page.js               # JS formulario página
+│       ├── podcast_management.js     # JS gestión podcast
+│       ├── import_feed.js             # JS importación feed
+│       ├── media_cleanup.js          # JS limpieza archivos
+│       ├── stats.js                  # JS estadísticas
+│       ├── twofa_management.js       # JS 2FA
+│       ├── theme-mode.js             # JS modo tema
+│       ├── jodit.min.js              # Editor HTML Jodit
+│       ├── lame.min.js               # Codificador MP3
+│       └── qrcode.min.js             # Generador de QR
 ├── audios/                          # Audios subidos
 ├── images/                          # Imágenes subidas
 └── cache/                           # Caché pública en runtime
