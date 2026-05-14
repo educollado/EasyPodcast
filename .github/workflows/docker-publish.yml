@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Autenticación en GitHub Container Registry
         uses: docker/login-action@v3
