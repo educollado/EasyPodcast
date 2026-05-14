@@ -105,7 +105,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
           <label>
             <?= __('Contenido *') ?>
             <span class="help"><?= __('Máx. 10000 caracteres (incluyendo etiquetas HTML).') ?></span>
-            <textarea id="content" name="content" maxlength="10000" required><?= esc($form['content']) ?></textarea>
+            <textarea id="content" name="content" maxlength="10000"<?= $form['status'] !== 'draft' ? ' required' : '' ?>><?= esc($form['content']) ?></textarea>
           </label>
         </div>
 

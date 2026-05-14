@@ -37,11 +37,27 @@ test('validateEpisodeForm: formulario válido → null', function () {
 test('validateEpisodeForm: título vacío → error de obligatorio', function () {
     $form = makeValidForm();
     $form['title'] = '';
-    assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
+    assert_eq('El título es obligatorio.', validateEpisodeForm($form));
 });
 
 test('validateEpisodeForm: descripción vacía → error de obligatorio', function () {
     $form = makeValidForm();
+    $form['status'] = 'published';
+    $form['content'] = '';
+    assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
+});
+
+test('validateEpisodeForm: draft con solo título → válido', function () {
+    $form = makeValidForm();
+    $form['content'] = '';
+    $form['audio_url'] = '';
+    $form['audio_size_bytes'] = '';
+    assert_null(validateEpisodeForm($form));
+});
+
+test('validateEpisodeForm: published sin contenido → error', function () {
+    $form = makeValidForm();
+    $form['status'] = 'published';
     $form['content'] = '';
     assert_eq('Título y descripción son obligatorios.', validateEpisodeForm($form));
 });

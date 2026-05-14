@@ -19,16 +19,18 @@ require_once __DIR__ . '/i18n.php';
  */
 function validateEpisodeForm(array $form): ?string
 {
+    $status = (string) ($form['status'] ?? '');
+
     // explicit admite tres estados: heredar del podcast (''), no ('0') o sí ('1').
     if (!in_array($form['explicit'] ?? '', ['', '0', '1'], true)) {
         return __('El valor de explícito no es válido.');
     }
 
-    if (!in_array($form['status'] ?? '', ['draft', 'published', 'scheduled'], true)) {
+    if (!in_array($status, ['draft', 'published', 'scheduled'], true)) {
         return __('El estado debe ser draft, published o scheduled.');
     }
 
-    if ($form['status'] === 'scheduled' && trim($form['pub_date'] ?? '') === '') {
+    if ($status === 'scheduled' && trim($form['pub_date'] ?? '') === '') {
         return __('La fecha de publicación es obligatoria para programar un capítulo.');
     }
 
@@ -37,7 +39,11 @@ function validateEpisodeForm(array $form): ?string
         return __('El tipo de episodio debe ser full, trailer o bonus.');
     }
 
-    if (($form['title'] ?? '') === '' || ($form['content'] ?? '') === '') {
+    if (($form['title'] ?? '') === '') {
+        return __('El título es obligatorio.');
+    }
+
+    if ($status !== 'draft' && ($form['content'] ?? '') === '') {
         return __('Título y descripción son obligatorios.');
     }
 
@@ -243,14 +249,16 @@ function saveEpisode(
     // 4. Validación de audio post-subida.
     // Se comprueba aquí (y no en validateEpisodeForm) porque la URL y el tamaño
     // pueden provenir del fichero recién subido y no existir aún en el formulario inicial.
-    if ($form['audio_url'] === '') {
-        return ['error' => __('Debes indicar la URL de audio o subir un fichero de audio.'), 'notice' => '', 'form' => $form];
-    }
-    if ($form['audio_mime_type'] === '') {
-        return ['error' => __('El MIME del audio es obligatorio.'), 'notice' => '', 'form' => $form];
-    }
-    if ($form['audio_size_bytes'] === '' || !ctype_digit($form['audio_size_bytes']) || (int) $form['audio_size_bytes'] <= 0) {
-        return ['error' => __('El tamaño del audio debe ser un entero mayor que 0.'), 'notice' => '', 'form' => $form];
+    if ($form['status'] !== 'draft') {
+        if ($form['audio_url'] === '') {
+            return ['error' => __('Debes indicar la URL de audio o subir un fichero de audio.'), 'notice' => '', 'form' => $form];
+        }
+        if ($form['audio_mime_type'] === '') {
+            return ['error' => __('El MIME del audio es obligatorio.'), 'notice' => '', 'form' => $form];
+        }
+        if ($form['audio_size_bytes'] === '' || !ctype_digit($form['audio_size_bytes']) || (int) $form['audio_size_bytes'] <= 0) {
+            return ['error' => __('El tamaño del audio debe ser un entero mayor que 0.'), 'notice' => '', 'form' => $form];
+        }
     }
 
     $form['duration'] = resolveEpisodeDuration((string) ($form['duration'] ?? ''), $form['audio_url']);

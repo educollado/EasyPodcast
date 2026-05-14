@@ -110,15 +110,20 @@
   function initPublishDateToggle() {
     var statusSelect = document.getElementById('status_select');
     var pubDateRow = document.getElementById('pub_date_row');
+    var contentInput = document.getElementById('content');
 
-    if (!statusSelect || !pubDateRow) {
+    if (!statusSelect || !pubDateRow || !contentInput) {
       return;
     }
 
-    statusSelect.addEventListener('change', function () {
+    function syncStatusFields() {
       var visible = statusSelect.value === 'published' || statusSelect.value === 'scheduled';
       pubDateRow.classList.toggle('is-hidden', !visible);
-    });
+      contentInput.required = statusSelect.value !== 'draft';
+    }
+
+    statusSelect.addEventListener('change', syncStatusFields);
+    syncStatusFields();
   }
 
   function initRecorder() {
