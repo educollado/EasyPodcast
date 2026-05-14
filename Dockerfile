@@ -1,4 +1,7 @@
-FROM php:8.4-apache
+FROM php:8.4.20-apache-trixie
+
+# Imagen base fijada a una versión concreta para evitar deriva silenciosa entre builds.
+# Las actualizaciones de seguridad deben entrar mediante una subida explícita de esta versión.
 
 # Activar módulos Apache necesarios para .htaccess y cabeceras
 RUN a2enmod rewrite headers setenvif

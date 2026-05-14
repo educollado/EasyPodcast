@@ -101,6 +101,8 @@ docker run -d \
   ghcr.io/educollado/easypodcast:latest
 ```
 
+La imagen del proyecto se construye sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
+
 ---
 
 ## Funcionalidades
