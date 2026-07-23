@@ -37,7 +37,8 @@ function createEpisodeQueryTestDb(): string
             audio_url TEXT NOT NULL,
             audio_mime_type TEXT NOT NULL,
             audio_size_bytes INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT 'draft'
+            status TEXT NOT NULL DEFAULT 'draft',
+            updated_at TEXT
         )"
     );
     $pdo->exec("INSERT INTO podcast (id, title, link) VALUES (1, 'Podcast test', 'https://example.com')");

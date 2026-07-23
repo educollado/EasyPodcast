@@ -24,8 +24,11 @@ $updateResult = null;
 // Procesar la acción de actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
     csrf_verify();
-    $tarUrl       = (string) ($_POST['tar_url'] ?? '');
-    $updateResult = performUpdate($tarUrl, __DIR__);
+    // No confiar en URLs enviadas por el navegador: volver a consultar GitHub.
+    $latestInfo = getLatestReleaseInfo();
+    $updateResult = $latestInfo['error'] !== ''
+        ? ['ok' => false, 'message' => $latestInfo['error']]
+        : performUpdate($latestInfo['tar_url'], $latestInfo['checksum_url'], __DIR__);
     if ($updateResult['ok']) {
         header('Location: update.php?updated=1');
         exit;
@@ -34,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 
 $updated = isset($_GET['updated']);
 $data    = loadUpdateData(__DIR__);
-extract($data); // currentVersion, latestVersion, tarUrl, updateAvailable, fetchError, changelogNotes
+extract($data); // currentVersion, latestVersion, updateAvailable, fetchError, changelogNotes
 
 $confirmUpdateMessage = __('¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican.', $latestVersion);
 $updatingLabel        = __('Actualizando…');
@@ -111,7 +114,6 @@ $updatingLabel        = __('Actualizando…');
                 data-submit-lock-text="<?= esc($updatingLabel) ?>">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="update">
-            <input type="hidden" name="tar_url" value="<?= esc($tarUrl) ?>">
             <button class="btn btn-update" type="submit"><?= __('Actualizar a v%s', $latestVersion) ?></button>
           </form>
 

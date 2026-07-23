@@ -41,6 +41,7 @@ function apiSystemUpdate(): void
 
     $latestVersion  = $info['version'];
     $tarUrl         = $info['tar_url'];
+    $checksumUrl    = $info['checksum_url'];
     $currentVersion = APP_VERSION;
 
     if (!version_compare($latestVersion, $currentVersion, '>')) {
@@ -48,7 +49,7 @@ function apiSystemUpdate(): void
     }
 
     $appDir = dirname(__DIR__);
-    $result = performUpdate($tarUrl, $appDir);
+    $result = performUpdate($tarUrl, $checksumUrl, $appDir);
 
     if ($result['ok'] === false) {
         apiError($result['message'], 500);

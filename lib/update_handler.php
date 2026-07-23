@@ -9,7 +9,7 @@ require_once __DIR__ . '/i18n.php';
  * Consulta la API de GitHub para obtener la información de la última release.
  * Usa cURL si está disponible, file_get_contents como alternativa.
  *
- * @return array{version: string, tar_url: string, error: string}
+ * @return array{version: string, tar_url: string, checksum_url: string, error: string}
  */
 function getLatestReleaseInfo(): array
 {
@@ -31,7 +31,12 @@ function getLatestReleaseInfo(): array
         curl_close($ch);
 
         if ($json === false || $httpCode !== 200) {
-            return ['version' => '', 'tar_url' => '', 'error' => __('No se pudo conectar con GitHub (HTTP %d).', $httpCode)];
+            return [
+                'version' => '',
+                'tar_url' => '',
+                'checksum_url' => '',
+                'error' => __('No se pudo conectar con GitHub (HTTP %d).', $httpCode),
+            ];
         }
     } else {
         $ctx  = stream_context_create([
@@ -43,51 +48,172 @@ function getLatestReleaseInfo(): array
         ]);
         $json = @file_get_contents($apiUrl, false, $ctx);
         if ($json === false) {
-            return ['version' => '', 'tar_url' => '', 'error' => __('No se pudo conectar con GitHub.')];
+            return [
+                'version' => '',
+                'tar_url' => '',
+                'checksum_url' => '',
+                'error' => __('No se pudo conectar con GitHub.'),
+            ];
         }
     }
 
     $data = json_decode((string) $json, true);
-    if (!is_array($data) || !isset($data['tag_name'])) {
-        return ['version' => '', 'tar_url' => '', 'error' => __('Respuesta inesperada de GitHub.')];
+    if (!is_array($data)) {
+        return [
+            'version' => '',
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => __('Respuesta inesperada de GitHub.'),
+        ];
     }
 
-    // tag_name es "v0.9" → extraemos "0.9"
+    return parseLatestReleaseData($data);
+}
+
+/**
+ * Valida la respuesta de GitHub y localiza el paquete junto a su checksum.
+ *
+ * @return array{version: string, tar_url: string, checksum_url: string, error: string}
+ */
+function parseLatestReleaseData(array $data): array
+{
+    if (!isset($data['tag_name'])) {
+        return [
+            'version' => '',
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => __('Respuesta inesperada de GitHub.'),
+        ];
+    }
+
+    // tag_name es "v1.9.4" → extraemos "1.9.4".
     $tagName = (string) $data['tag_name'];
-    $version = ltrim($tagName, 'v');
+    $version = str_starts_with($tagName, 'v') ? substr($tagName, 1) : $tagName;
 
-    if (!preg_match('/^\d+\.\d+/', $version)) {
-        return ['version' => '', 'tar_url' => '', 'error' => __('Versión no reconocida: %s.', $tagName)];
+    if (!preg_match('/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/', $version)) {
+        return [
+            'version' => '',
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => __('Versión no reconocida: %s.', $tagName),
+        ];
     }
 
-    // Buscar el asset .tar.gz subido manualmente a la release
+    $archiveName = 'EasyPodcast-' . $version . '.tar.gz';
+    $checksumName = $archiveName . '.sha256';
     $tarUrl = '';
+    $checksumUrl = '';
+
     foreach ($data['assets'] ?? [] as $asset) {
         $name = (string) ($asset['name'] ?? '');
-        if (str_ends_with($name, '.tar.gz')) {
+        if ($name === $archiveName) {
             $tarUrl = (string) ($asset['browser_download_url'] ?? '');
-            break;
+        } elseif ($name === $checksumName) {
+            $checksumUrl = (string) ($asset['browser_download_url'] ?? '');
         }
     }
 
-    // Fallback: archivo fuente generado automáticamente por GitHub
     if ($tarUrl === '') {
-        $tarUrl = (string) ($data['tarball_url'] ?? '');
+        return [
+            'version' => $version,
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => __('La release no contiene el paquete verificable %s.', $archiveName),
+        ];
     }
 
-    if ($tarUrl === '') {
-        return ['version' => $version, 'tar_url' => '', 'error' => __('No se encontró el archivo .tar.gz en la release.')];
+    if ($checksumUrl === '') {
+        return [
+            'version' => $version,
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => __('La release no contiene el checksum SHA-256 de %s.', $archiveName),
+        ];
     }
 
-    return ['version' => $version, 'tar_url' => $tarUrl, 'error' => ''];
+    return [
+        'version' => $version,
+        'tar_url' => $tarUrl,
+        'checksum_url' => $checksumUrl,
+        'error' => '',
+    ];
+}
+
+/**
+ * Comprueba que una URL HTTPS apunta a un host de descarga de GitHub.
+ */
+function isAllowedGithubDownloadUrl(string $url): bool
+{
+    $parts = parse_url($url);
+    if (!is_array($parts)
+        || ($parts['scheme'] ?? '') !== 'https'
+        || isset($parts['user'])
+        || isset($parts['pass'])
+        || (isset($parts['port']) && (int) $parts['port'] !== 443)
+    ) {
+        return false;
+    }
+
+    return in_array(strtolower((string) ($parts['host'] ?? '')), [
+        'github.com',
+        'objects.githubusercontent.com',
+        'codeload.github.com',
+        'api.github.com',
+    ], true);
+}
+
+/**
+ * Comprueba que el checksum corresponde al mismo asset que el paquete.
+ */
+function checksumMatchesArchiveUrl(string $tarUrl, string $checksumUrl): bool
+{
+    if (!isAllowedGithubDownloadUrl($tarUrl) || !isAllowedGithubDownloadUrl($checksumUrl)) {
+        return false;
+    }
+
+    $tarPath = (string) parse_url($tarUrl, PHP_URL_PATH);
+    $checksumPath = (string) parse_url($checksumUrl, PHP_URL_PATH);
+
+    return dirname($tarPath) === dirname($checksumPath)
+        && basename($checksumPath) === basename($tarPath) . '.sha256';
+}
+
+/**
+ * Extrae y valida un checksum SHA-256 en formato sha256sum.
+ */
+function parseSha256Checksum(string $content, string $archiveName): ?string
+{
+    if (!preg_match('/\A([a-fA-F0-9]{64})(?:[ \t]+\*?([^\r\n]+))?\s*\z/', $content, $matches)) {
+        return null;
+    }
+
+    if (isset($matches[2]) && basename(trim($matches[2])) !== $archiveName) {
+        return null;
+    }
+
+    return strtolower($matches[1]);
+}
+
+/**
+ * Compara el SHA-256 de un archivo descargado en tiempo constante.
+ */
+function archiveMatchesSha256(string $path, string $expectedHash): bool
+{
+    $actualHash = @hash_file('sha256', $path);
+
+    return is_string($actualHash) && hash_equals(strtolower($expectedHash), strtolower($actualHash));
 }
 
 /**
  * Descarga una URL a un fichero local.
  * Usa cURL si está disponible, file_get_contents como alternativa.
  */
-function _epDownloadTar(string $url, string $dest): bool
+function _epDownloadFile(string $url, string $dest, int $minBytes = 1): bool
 {
+    if (!isAllowedGithubDownloadUrl($url)) {
+        return false;
+    }
+
     if (function_exists('curl_init')) {
         $fp = @fopen($dest, 'wb');
         if ($fp === false) {
@@ -102,11 +228,18 @@ function _epDownloadTar(string $url, string $dest): bool
             CURLOPT_USERAGENT      => 'EasyPodcast-Updater/' . APP_VERSION,
             CURLOPT_SSL_VERIFYPEER => true,
         ]);
-        curl_exec($ch);
+        if (defined('CURLOPT_PROTOCOLS') && defined('CURLPROTO_HTTPS')) {
+            curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+        }
+        if (defined('CURLOPT_REDIR_PROTOCOLS') && defined('CURLPROTO_HTTPS')) {
+            curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
+        }
+        $downloaded = curl_exec($ch);
         $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         fclose($fp);
-        return $httpCode === 200 && filesize($dest) > 100;
+        $size = @filesize($dest);
+        return $downloaded !== false && $httpCode === 200 && $size !== false && $size >= $minBytes;
     }
 
     $ctx  = stream_context_create([
@@ -118,7 +251,7 @@ function _epDownloadTar(string $url, string $dest): bool
         ],
     ]);
     $data = @file_get_contents($url, false, $ctx);
-    if ($data === false || strlen($data) < 100) {
+    if ($data === false || strlen($data) < $minBytes) {
         return false;
     }
     return file_put_contents($dest, $data) !== false;
@@ -159,31 +292,18 @@ function _epCopyDir(string $src, string $dst): void
 }
 
 /**
- * Descarga el paquete desde GitHub, lo extrae sobre el directorio de la app
- * con strip-components=1 mediante PharData y elimina el .tar.gz temporal.
+ * Descarga el paquete y su checksum desde GitHub, verifica SHA-256 y después
+ * lo extrae sobre el directorio de la app con strip-components=1.
  *
  * @param string $tarUrl URL del .tar.gz (debe provenir de GitHub)
+ * @param string $checksumUrl URL del checksum SHA-256 asociado
  * @param string $appDir Directorio raíz de la aplicación
  * @return array{ok: bool, message: string}
  */
-function performUpdate(string $tarUrl, string $appDir): array
+function performUpdate(string $tarUrl, string $checksumUrl, string $appDir): array
 {
-    // Validar que la URL provenga de GitHub
-    $allowed = [
-        'https://github.com/',
-        'https://objects.githubusercontent.com/',
-        'https://codeload.github.com/',
-        'https://api.github.com/',
-    ];
-    $ok = false;
-    foreach ($allowed as $prefix) {
-        if (str_starts_with($tarUrl, $prefix)) {
-            $ok = true;
-            break;
-        }
-    }
-    if (!$ok) {
-        return ['ok' => false, 'message' => __('URL de descarga no permitida.')];
+    if (!checksumMatchesArchiveUrl($tarUrl, $checksumUrl)) {
+        return ['ok' => false, 'message' => __('Las URLs del paquete y su checksum no son válidas.')];
     }
 
     if (!class_exists('PharData')) {
@@ -196,11 +316,34 @@ function performUpdate(string $tarUrl, string $appDir): array
         return ['ok' => false, 'message' => __('No se pudo crear el archivo temporal.')];
     }
     $tmpFile = $tmpBase . '.tar.gz';
+    $checksumFile = $tmpFile . '.sha256';
     @unlink($tmpBase); // tempnam crea el fichero base; lo renombramos con extensión
 
-    if (!_epDownloadTar($tarUrl, $tmpFile)) {
+    if (!_epDownloadFile($checksumUrl, $checksumFile, 64)) {
+        @unlink($checksumFile);
+        return ['ok' => false, 'message' => __('No se pudo descargar el checksum de la actualización.')];
+    }
+
+    $checksumContent = @file_get_contents($checksumFile);
+    $archiveName = basename((string) parse_url($tarUrl, PHP_URL_PATH));
+    $expectedHash = $checksumContent !== false && strlen($checksumContent) <= 4096
+        ? parseSha256Checksum($checksumContent, $archiveName)
+        : null;
+    if ($expectedHash === null) {
+        @unlink($checksumFile);
+        return ['ok' => false, 'message' => __('El checksum de la actualización no es válido.')];
+    }
+
+    if (!_epDownloadFile($tarUrl, $tmpFile, 100)) {
         @unlink($tmpFile);
+        @unlink($checksumFile);
         return ['ok' => false, 'message' => __('No se pudo descargar el archivo de actualización.')];
+    }
+
+    if (!archiveMatchesSha256($tmpFile, $expectedHash)) {
+        @unlink($tmpFile);
+        @unlink($checksumFile);
+        return ['ok' => false, 'message' => __('La verificación SHA-256 del paquete ha fallado. No se ha instalado ningún archivo.')];
     }
 
     // Extraer en directorio temporal y copiar sobre $appDir (equivalente a --strip-components=1)
@@ -221,12 +364,14 @@ function performUpdate(string $tarUrl, string $appDir): array
     } catch (Throwable $ex) {
         _epDeleteRecursive($tempDir);
         @unlink($tmpFile);
+        @unlink($checksumFile);
         return ['ok' => false, 'message' => __('Error al extraer el paquete: %s', $ex->getMessage())];
     }
 
     // Limpiar temporales siempre
     _epDeleteRecursive($tempDir);
     @unlink($tmpFile);
+    @unlink($checksumFile);
 
     // Si DISABLE_HTTPS_REDIRECT está activo (Docker sin terminación TLS directa),
     // asegurarse de que el fichero de señal existe para que .htaccess no active
@@ -273,7 +418,7 @@ function getChangelogForVersion(string $version, string $appDir): string
  * Carga todos los datos necesarios para la vista de actualización.
  *
  * @param string $appDir Directorio raíz de la aplicación (para leer CHANGELOG.md)
- * @return array{currentVersion: string, latestVersion: string, tarUrl: string, updateAvailable: bool, fetchError: string, changelogNotes: string}
+ * @return array{currentVersion: string, latestVersion: string, tarUrl: string, checksumUrl: string, updateAvailable: bool, fetchError: string, changelogNotes: string}
  */
 function loadUpdateData(string $appDir = ''): array
 {
@@ -281,6 +426,7 @@ function loadUpdateData(string $appDir = ''): array
     $info           = getLatestReleaseInfo();
     $latestVersion  = $info['version'];
     $tarUrl         = $info['tar_url'];
+    $checksumUrl    = $info['checksum_url'];
     $fetchError     = $info['error'];
 
     $updateAvailable = false;
@@ -291,5 +437,5 @@ function loadUpdateData(string $appDir = ''): array
     // Notas del CHANGELOG para la versión instalada actualmente (útil tras actualizar).
     $changelogNotes = $appDir !== '' ? getChangelogForVersion($currentVersion, $appDir) : '';
 
-    return compact('currentVersion', 'latestVersion', 'tarUrl', 'updateAvailable', 'fetchError', 'changelogNotes');
+    return compact('currentVersion', 'latestVersion', 'tarUrl', 'checksumUrl', 'updateAvailable', 'fetchError', 'changelogNotes');
 }

@@ -235,7 +235,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
     $xml->writeElement('title', (string) $podcast['title']);
     $xml->writeElement('link', (string) $podcast['link']);
     $xml->startElement('description');
-    $xml->writeCdata((string) $podcast['description']);
+    $xml->writeCdata((string) ($podcast['description'] ?? ''));
     $xml->endElement();
 
     writeTextIfNotEmpty($xml, 'language', $podcast['language'] ?? 'es-ES');

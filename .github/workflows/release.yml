@@ -15,6 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Construir paquete verificable
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          archive="EasyPodcast-${version}.tar.gz"
+          git archive \
+            --format=tar.gz \
+            --prefix="EasyPodcast-${version}/" \
+            --output="${archive}" \
+            HEAD
+          sha256sum "${archive}" > "${archive}.sha256"
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -24,5 +37,7 @@ jobs:
             Vea [CHANGELOG.md](https://github.com/educollado/easypodcast/blob/${{ github.ref_name }}/CHANGELOG.md) para detalles de esta versión.
           files: |
             docker-compose.yml
+            EasyPodcast-*.tar.gz
+            EasyPodcast-*.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

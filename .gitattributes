@@ -3,3 +3,8 @@
 # nunca sobreescribe la versión que el servidor ya tiene (y que el entrypoint
 # de Docker puede haber modificado para desactivar el redirect HTTPS).
 .htaccess export-ignore
+.github export-ignore
+tests export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+AGENTS.md export-ignore

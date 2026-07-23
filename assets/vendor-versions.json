@@ -1,0 +1,10 @@
+{
+  "jodit": {
+    "version": "4.13.8",
+    "source": "https://registry.npmjs.org/jodit/-/jodit-4.13.8.tgz",
+    "files": {
+      "css/jodit.min.css": "sha256:4fa0f793769ac7951c092d5b79eda4e20e1839e9db386885860e45d7fe6d360b",
+      "js/jodit.min.js": "sha256:4cb48b7b6e1011d34089f7137397eb34e5edb8d63d1de2dbf2e655b69192eed4"
+    }
+  }
+}
