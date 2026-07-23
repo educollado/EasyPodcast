@@ -130,13 +130,13 @@
     var details = document.getElementById('recorder-section');
     var btnRecord = document.getElementById('btn-record');
     var btnStop = document.getElementById('btn-stop');
+    var btnPreview = document.getElementById('btn-preview-recording');
     var btnUse = document.getElementById('btn-use-recording');
     var recTimer = document.getElementById('rec-timer');
     var recStatus = document.getElementById('rec-status');
-    var recPreview = document.getElementById('rec-preview');
     var audioFileInput = document.getElementById('audio_file');
 
-    if (!details || !btnRecord || !btnStop || !btnUse || !recTimer || !recStatus || !recPreview || !audioFileInput) {
+    if (!details || !btnRecord || !btnStop || !btnPreview || !btnUse || !recTimer || !recStatus || !audioFileInput) {
       return;
     }
 
@@ -147,6 +147,9 @@
     var startTime = 0;
     var mp3Blob = null;
     var audioDuration = 0;
+    var decodedAudioBuffer = null;
+    var playbackContext = null;
+    var playbackSource = null;
 
     var messages = {
       browserUnsupported: details.dataset.browserUnsupported || '',
@@ -154,6 +157,7 @@
       encoding: details.dataset.encodingMessage || '',
       encodingLong: details.dataset.encodingLongMessage || details.dataset.encodingMessage || '',
       decodeError: details.dataset.decodeErrorMessage || '',
+      playbackError: details.dataset.playbackErrorMessage || '',
       uploadErrorPrefix: details.dataset.uploadErrorPrefix || '',
       uploadSaved: details.dataset.uploadSavedMessage || '',
       uploadNetworkError: details.dataset.uploadNetworkErrorMessage || ''
@@ -163,6 +167,11 @@
       default: btnUse.dataset.labelDefault || btnUse.textContent,
       uploading: btnUse.dataset.labelUploading || btnUse.textContent,
       uploaded: btnUse.dataset.labelUploaded || btnUse.textContent
+    };
+
+    var previewButtonLabels = {
+      play: btnPreview.dataset.labelPlay || btnPreview.textContent,
+      stop: btnPreview.dataset.labelStop || btnPreview.textContent
     };
 
     function padTwo(value) {
@@ -202,14 +211,31 @@
       return output;
     }
 
+    function stopPreview() {
+      if (playbackSource) {
+        playbackSource.onended = null;
+        try {
+          playbackSource.stop();
+        } catch (error) {}
+        playbackSource.disconnect();
+        playbackSource = null;
+      }
+      btnPreview.textContent = previewButtonLabels.play;
+    }
+
     function encodeToMp3() {
-      var blob = new Blob(chunks, { type: 'audio/webm' });
+      var chunkMimeType = chunks.length > 0 ? chunks[0].type : '';
+      var recordedMimeType = mediaRecorder && mediaRecorder.mimeType
+        ? mediaRecorder.mimeType
+        : (chunkMimeType || 'audio/webm');
+      var blob = new Blob(chunks, { type: recordedMimeType });
 
       blob.arrayBuffer().then(function (buffer) {
         var AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
         var audioContext = new AudioContextConstructor();
 
         audioContext.decodeAudioData(buffer, function (audioBuffer) {
+          decodedAudioBuffer = audioBuffer;
           audioDuration = audioBuffer.duration;
 
           var channels = audioBuffer.numberOfChannels;
@@ -241,13 +267,16 @@
 
           mp3Blob = new Blob(mp3Parts, { type: 'audio/mpeg' });
 
-          recPreview.src = URL.createObjectURL(mp3Blob);
-          recPreview.hidden = false;
-          btnUse.hidden = false;
-          recStatus.textContent = '';
-          btnRecord.disabled = false;
+          var enablePreview = function () {
+            // La preescucha usa directamente el AudioBuffer decodificado para
+            // evitar los fallos de reproducción de Blob en Firefox.
+            btnPreview.hidden = false;
+            btnUse.hidden = false;
+            recStatus.textContent = '';
+            btnRecord.disabled = false;
+          };
 
-          audioContext.close().catch(function () {});
+          audioContext.close().then(enablePreview, enablePreview);
         }, function () {
           recStatus.textContent = messages.decodeError;
           btnRecord.disabled = false;
@@ -266,7 +295,9 @@
         chunks = [];
         mp3Blob = null;
         audioDuration = 0;
-        recPreview.hidden = true;
+        decodedAudioBuffer = null;
+        stopPreview();
+        btnPreview.hidden = true;
         btnUse.hidden = true;
         btnUse.disabled = false;
         btnUse.textContent = useButtonLabels.default;
@@ -308,6 +339,41 @@
       recTimer.classList.remove('is-running');
       recStatus.textContent = messages.encoding;
       btnStop.disabled = true;
+    });
+
+    btnPreview.addEventListener('click', function () {
+      if (!decodedAudioBuffer) {
+        return;
+      }
+
+      if (playbackSource) {
+        stopPreview();
+        return;
+      }
+
+      var AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+      if (!playbackContext || playbackContext.state === 'closed') {
+        playbackContext = new AudioContextConstructor();
+      }
+
+      playbackContext.resume().then(function () {
+        var source = playbackContext.createBufferSource();
+        source.buffer = decodedAudioBuffer;
+        source.connect(playbackContext.destination);
+        source.onended = function () {
+          if (playbackSource === source) {
+            playbackSource = null;
+            btnPreview.textContent = previewButtonLabels.play;
+          }
+        };
+        playbackSource = source;
+        btnPreview.textContent = previewButtonLabels.stop;
+        recStatus.textContent = '';
+        source.start();
+      }).catch(function () {
+        stopPreview();
+        recStatus.textContent = messages.playbackError;
+      });
     });
 
     btnUse.addEventListener('click', function () {

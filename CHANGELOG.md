@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.5
+
+- **Preescucha del grabador**: la grabación puede escucharse antes de usarla mediante Web Audio, evitando el fallo de reproducción de `Blob` de `MediaRecorder` observado en Firefox para Android y escritorio.
+- **Compatibilidad de formatos**: el grabador conserva el MIME real generado por cada navegador al decodificar el audio, en lugar de asumir siempre `audio/webm`.
+- **Caché de recursos**: `add_episode.js` incorpora versionado automático para que las correcciones del grabador se carguen inmediatamente después de actualizar.
+
 ## 1.9.4
 
 - **Borradores más flexibles**: los episodios en estado `draft` pueden guardarse únicamente con título; el contenido y los datos de audio siguen siendo obligatorios antes de publicar o programar.

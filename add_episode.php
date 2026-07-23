@@ -125,6 +125,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
                    data-encoding-message="<?= esc(__('Codificando MP3…')) ?>"
                    data-encoding-long-message="<?= esc(__('Codificando MP3 (grabación larga, puede tardar)…')) ?>"
                    data-decode-error-message="<?= esc(__('Error al decodificar el audio grabado.')) ?>"
+                   data-playback-error-message="<?= esc(__('No se pudo reproducir la grabación.')) ?>"
                    data-upload-error-prefix="<?= esc(__('Error al subir: ')) ?>"
                    data-upload-saved-message="<?= esc(__('Audio guardado correctamente.')) ?>"
                    data-upload-network-error-message="<?= esc(__('Error de red al subir el audio. Inténtalo de nuevo.')) ?>">
@@ -142,7 +143,9 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
                 <span id="rec-timer">00:00:00</span>
                 <span id="rec-status"></span>
               </div>
-              <audio id="rec-preview" controls hidden></audio>
+              <button type="button" id="btn-preview-recording" class="btn" hidden
+                      data-label-play="<?= esc(__('▶ Escuchar grabación')) ?>"
+                      data-label-stop="<?= esc(__('■ Parar escucha')) ?>">▶ <?= __('Escuchar grabación') ?></button>
               <button type="button" id="btn-use-recording" class="btn" hidden
                       data-label-default="<?= esc(__('✓ Usar esta grabación')) ?>"
                       data-label-uploading="<?= esc(__('⏳ Subiendo grabación…')) ?>"
@@ -213,6 +216,6 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
   </div>
   <script src="/assets/js/lame.min.js"></script>
   <script src="/assets/js/jodit.min.js"></script>
-  <script src="/assets/js/add_episode.js"></script>
+  <script src="/assets/js/add_episode.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/add_episode.js') ?>"></script>
 </body>
 </html>
