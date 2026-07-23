@@ -6,6 +6,97 @@ require_once __DIR__ . '/episode_helpers.php';
 require_once __DIR__ . '/id3_service.php';
 
 /**
+ * Devuelve las operaciones necesarias para aplicar una orientación EXIF.
+ *
+ * El ángulo usa la convención de GD: valores positivos giran en sentido
+ * antihorario. El volteo se aplica después de la rotación.
+ *
+ * @return array{angle: int, flip: ?string}
+ */
+function getExifOrientationTransform(int $orientation): array
+{
+    return match ($orientation) {
+        2 => ['angle' => 0, 'flip' => 'horizontal'],
+        3 => ['angle' => 180, 'flip' => null],
+        4 => ['angle' => 0, 'flip' => 'vertical'],
+        5 => ['angle' => -90, 'flip' => 'horizontal'],
+        6 => ['angle' => -90, 'flip' => null],
+        7 => ['angle' => 90, 'flip' => 'horizontal'],
+        8 => ['angle' => 90, 'flip' => null],
+        default => ['angle' => 0, 'flip' => null],
+    };
+}
+
+/**
+ * Aplica físicamente la orientación EXIF de un JPEG subido desde cámara.
+ *
+ * Al recodificar el JPEG se elimina la etiqueta Orientation, evitando que el
+ * navegador vuelva a girar una imagen cuyos píxeles ya están normalizados.
+ */
+function normalizeUploadedJpegOrientation(string $imagePath): bool
+{
+    if (
+        !function_exists('exif_read_data')
+        || !function_exists('imagecreatefromjpeg')
+        || !function_exists('imagerotate')
+        || !function_exists('imageflip')
+        || !function_exists('imagejpeg')
+    ) {
+        // La subida sigue siendo compatible con instalaciones sin EXIF/GD.
+        return true;
+    }
+
+    $exif = @exif_read_data($imagePath);
+    $orientation = is_array($exif) ? (int) ($exif['Orientation'] ?? 1) : 1;
+    $transform = getExifOrientationTransform($orientation);
+
+    if ($transform['angle'] === 0 && $transform['flip'] === null) {
+        return true;
+    }
+
+    $image = @imagecreatefromjpeg($imagePath);
+    if ($image === false) {
+        return false;
+    }
+
+    if ($transform['angle'] !== 0) {
+        $rotated = @imagerotate($image, $transform['angle'], 0);
+        imagedestroy($image);
+        if ($rotated === false) {
+            return false;
+        }
+        $image = $rotated;
+    }
+
+    if ($transform['flip'] !== null) {
+        $flipMode = $transform['flip'] === 'horizontal' ? IMG_FLIP_HORIZONTAL : IMG_FLIP_VERTICAL;
+        if (!@imageflip($image, $flipMode)) {
+            imagedestroy($image);
+            return false;
+        }
+    }
+
+    try {
+        $temporaryPath = $imagePath . '.orientation-' . bin2hex(random_bytes(4)) . '.tmp';
+    } catch (Throwable) {
+        imagedestroy($image);
+        return false;
+    }
+
+    $written = @imagejpeg($image, $temporaryPath, 90);
+    imagedestroy($image);
+
+    if (!$written || !@rename($temporaryPath, $imagePath)) {
+        if (is_file($temporaryPath)) {
+            @unlink($temporaryPath);
+        }
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Maneja la subida opcional de imagen de portada del episodio.
  *
  * @param array  $fileData   Entrada de $_FILES['image_file']
@@ -52,9 +143,16 @@ function handleImageUpload(array $fileData, string $baseUrl, string $imagesDir):
         return ['url' => null, 'error' => 'No se pudo crear la carpeta /images.'];
     }
 
+    $targetPath = $imagesDir . '/' . $fileName;
+
     // move_uploaded_file valida que el fichero proceda realmente de una subida HTTP.
-    if (!move_uploaded_file($tmpPath, $imagesDir . '/' . $fileName)) {
+    if (!move_uploaded_file($tmpPath, $targetPath)) {
         return ['url' => null, 'error' => 'No se pudo guardar la imagen subida.'];
+    }
+
+    if ($mimeType === 'image/jpeg' && !normalizeUploadedJpegOrientation($targetPath)) {
+        @unlink($targetPath);
+        return ['url' => null, 'error' => 'No se pudo corregir la orientación de la imagen subida.'];
     }
 
     return ['url' => rtrim($baseUrl, '/') . '/images/' . $fileName, 'error' => null];

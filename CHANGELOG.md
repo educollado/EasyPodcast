@@ -4,6 +4,7 @@
 
 - **Preescucha del grabador**: la grabación puede escucharse antes de usarla mediante Web Audio, evitando el fallo de reproducción de `Blob` de `MediaRecorder` observado en Firefox para Android y escritorio.
 - **Compatibilidad de formatos**: el grabador conserva el MIME real generado por cada navegador al decodificar el audio, en lugar de asumir siempre `audio/webm`.
+- **Fotos desde móvil**: las imágenes JPEG aplican físicamente su orientación EXIF al subirlas, evitando que las fotografías tomadas desde `add_episode.php` aparezcan giradas.
 - **Caché de recursos**: `add_episode.js` incorpora versionado automático para que las correcciones del grabador se carguen inmediatamente después de actualizar.
 
 ## 1.9.4

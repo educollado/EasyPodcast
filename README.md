@@ -148,7 +148,7 @@ La imagen del proyecto se construye sobre una base PHP/Apache fijada a una versi
 | `admin.php` | Login/logout y acceso al panel |
 | `podcast_management.php` | Metadatos del canal |
 | `episodes_management.php` | CRUD de episodios |
-| `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación con preescucha Web Audio y subida de audio/imagen |
+| `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación con preescucha Web Audio y subida de imágenes con orientación EXIF |
 | `import_feed.php` | Importación de episodios desde feed RSS externo |
 | `backups.php` | Exportar/importar base de datos y ficheros |
 | `cache_management.php` | Habilitar/deshabilitar caché y regenerar imágenes |
