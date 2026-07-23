@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.4
+
+- **Borradores más flexibles**: los episodios en estado `draft` pueden guardarse únicamente con título; el contenido y los datos de audio siguen siendo obligatorios antes de publicar o programar.
+- **Actualizador seguro**: las releases generan un paquete `EasyPodcast-{version}.tar.gz` y su checksum SHA-256; el actualizador web vuelve a consultar GitHub, valida estrictamente las URLs y comprueba la integridad antes de extraer cualquier archivo.
+- **Dependencias y contenedor**: imagen Docker actualizada a PHP 8.5.8 y Jodit actualizado de forma coordinada en JavaScript y CSS a 4.13.8, con checksums de los assets incluidos en el repositorio.
+- **Automatización de seguridad**: activadas las alertas y actualizaciones de seguridad de Dependabot, añadida revisión semanal de Docker y GitHub Actions, y actualizado `actions/checkout` a v7.
+- **Compatibilidad y calidad**: corregida la generación del feed cuando falta la descripción del podcast, reforzados los fixtures SQLite y añadidas pruebas específicas para el actualizador verificable.
+- **Documentación**: README ampliado con instalación, arquitectura, esquema de datos, requisitos y medidas de seguridad actualizadas.
+
 ## 1.9.3
 
 - **Publicación programada**: reforzada la publicación automática en modo lazy para que los episodios `scheduled` vencidos pasen a `published` también al cargar portada, búsqueda, ficha pública y listado admin, con tests de regresión específicos.

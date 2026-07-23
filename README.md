@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.3-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.4-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -138,6 +138,8 @@ La imagen del proyecto se construye sobre una base PHP/Apache fijada a una versi
 - Cookies de sesión con `HttpOnly`, `SameSite` y `Secure` cuando la petición usa HTTPS.
 - Limitación de intentos de login y verificación TOTP.
 - Tokens API almacenados como hash SHA-256 en vez de en claro.
+- El actualizador web verifica mediante SHA-256 cada paquete descargado antes de extraerlo.
+- Dependabot supervisa semanalmente la imagen Docker y las GitHub Actions.
 
 ### Panel de administración
 
