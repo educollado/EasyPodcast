@@ -1,8 +1,13 @@
 # Changelog
 
-## 1.9.5
+## 1.9.6
 
 - **Nueva identidad visual**: añadido el tema EasyPodcast, basado en la paleta azul marino, verde petróleo y ámbar de easypodcast.eu, y establecido como predeterminado mediante la migración `v18` sin alterar otros temas elegidos.
+- **Protección de imágenes**: al borrar un episodio desde el panel o la API, su imagen solo se elimina físicamente si ya no está referenciada por otros episodios ni como portada general del podcast.
+- **Calidad**: añadidos tests de regresión para cubrir imágenes compartidas, portadas y ficheros realmente huérfanos.
+
+## 1.9.5
+
 - **Preescucha del grabador**: la grabación puede escucharse antes de usarla mediante Web Audio, evitando el fallo de reproducción de `Blob` de `MediaRecorder` observado en Firefox para Android y escritorio.
 - **Compatibilidad de formatos**: el grabador conserva el MIME real generado por cada navegador al decodificar el audio, en lugar de asumir siempre `audio/webm`.
 - **Fotos desde móvil**: las imágenes JPEG aplican físicamente su orientación EXIF al subirlas, evitando que las fotografías tomadas desde `add_episode.php` aparezcan giradas.
