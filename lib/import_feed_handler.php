@@ -771,10 +771,10 @@ function runFeedImport(
         $pdo->prepare(
             'INSERT INTO podcast
              (title, description, link, language, author, owner_name, owner_email,
-              category, explicit, image_url, copyright, itunes_type)
+              category, explicit, image_url, copyright, itunes_type, admin_theme)
              VALUES
              (:title, :description, :link, :language, :author, :owner_name, :owner_email,
-              :category, :explicit, :image_url, :copyright, :itunes_type)'
+              :category, :explicit, :image_url, :copyright, :itunes_type, \'easypodcast\')'
         )->execute([
             ':title'       => $podcastMeta['title'],
             ':description' => $podcastMeta['description'],

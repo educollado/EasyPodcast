@@ -199,19 +199,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 18) {
-    migration_v18($pdo);
-    $pdo->exec('PRAGMA user_version = 18');
+if ($version < 19) {
+    migration_v19($pdo);
+    $pdo->exec('PRAGMA user_version = 19');
 }
 
 // 2. Función de migración
-function migration_v18(PDO $pdo): void
+function migration_v19(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 18`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 19`.
 
 #### Historial de versiones
 
@@ -234,6 +234,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 18`.
 | 15 | Añade `action_type` a `estadisticas` para diferenciar descargas y reproducciones |
 | 16 | Migra `api_tokens` a hash + sufijo visible y añade alcance explícito |
 | 17 | Añade `public_theme_mode_auto` a `podcast` para guardar el modo público `Según sistema` como ajuste global |
+| 18 | Activa EasyPodcast como tema predeterminado sin alterar otros temas elegidos |
 
 ---
 
@@ -370,6 +371,7 @@ El administrador elige el tema desde el panel (`admin.php` → tarjeta **Aparien
 
 | Slug | Nombre | Estilo |
 |---|---|---|
+| `easypodcast` | EasyPodcast | Predeterminado, azul marino y verde petróleo |
 | `default` | Amber Parchment | Claro cálido, acento terracota |
 | `oscuro` | Ember Noir | Oscuro cálido, acento naranja |
 | `agua` | Arctic Tide | Claro azul |

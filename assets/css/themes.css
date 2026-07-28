@@ -5,6 +5,83 @@
    ========================================================== */
 
 /* ----------------------------------------------------------
+   easypodcast — identidad visual de easypodcast.eu
+   ---------------------------------------------------------- */
+html[data-theme="easypodcast"] {
+  color-scheme: light;
+  --bg:          #f4f7fa;
+  --card:        #ffffff;
+  --text:        #102033;
+  --fg:          #102033;
+  --muted:       #607087;
+  --accent:      #0c7c72;
+  --accent-dark: #075f58;
+  --border:      #dce4ec;
+  --danger:      #b4232f;
+  --ok:          #0c7c72;
+  --hover-bg:    #dff6f1;
+  --shadow:      0 12px 36px rgba(16,32,51,.08);
+  --font-display: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html[data-theme="easypodcast"] body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 8%, rgba(12,124,114,.15), transparent 27%),
+    radial-gradient(circle at 90% 12%, rgba(58,116,193,.13), transparent 25%),
+    linear-gradient(180deg, #fbfdff 0%, #edf3f7 100%);
+}
+
+html[data-theme="easypodcast"] .search-form input[type="search"] {
+  background: rgba(255,255,255,.82);
+  color: var(--text);
+}
+
+html[data-theme="easypodcast"] .search-form input[type="search"]:focus,
+html[data-theme="easypodcast"] input:focus,
+html[data-theme="easypodcast"] textarea:focus,
+html[data-theme="easypodcast"] select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(12,124,114,.14);
+}
+
+html[data-theme="easypodcast"] .page-link:hover,
+html[data-theme="easypodcast"] .rss-link:hover,
+html[data-theme="easypodcast"] .theme-toggle:hover,
+html[data-theme="easypodcast"] .social-link:hover,
+html[data-theme="easypodcast"] .footer-social-link:hover,
+html[data-theme="easypodcast"] .small-btn:hover {
+  background: #dff6f1;
+  border-color: rgba(12,124,114,.35);
+  color: var(--accent-dark);
+}
+
+html[data-theme="easypodcast"] .admin-nav-link:hover,
+html[data-theme="easypodcast"] .admin-nav-link.active {
+  background: rgba(12,124,114,.1);
+  color: var(--accent-dark);
+}
+
+html[data-theme="easypodcast"] .episode .meta,
+html[data-theme="easypodcast"] .detail .meta {
+  background: rgba(12,124,114,.08);
+}
+
+html[data-theme="easypodcast"] .download {
+  background: rgba(12,124,114,.07);
+  border-color: rgba(12,124,114,.2);
+}
+
+html[data-theme="easypodcast"] .episode:hover {
+  box-shadow: 0 12px 36px rgba(16,32,51,.13);
+}
+
+html[data-theme="easypodcast"] .admin-card:hover {
+  border-color: rgba(12,124,114,.45);
+}
+
+/* ----------------------------------------------------------
    default + sistema en oscuro
    Si el usuario no ha elegido un tema explícito y su sistema
    prefiere oscuro, aplica el antiguo darkmode automáticamente.

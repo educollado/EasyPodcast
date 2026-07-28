@@ -115,6 +115,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 17');
         $version = 17;
     }
+
+    if ($version < 18) {
+        migration_v18($pdo);
+        $pdo->exec('PRAGMA user_version = 18');
+        $version = 18;
+    }
 }
 
 /**
@@ -619,4 +625,20 @@ function migration_v17(PDO $pdo): void
     if (!in_array('public_theme_mode_auto', $existing, true)) {
         $pdo->exec("ALTER TABLE podcast ADD COLUMN public_theme_mode_auto INTEGER NOT NULL DEFAULT 0");
     }
+}
+
+/**
+ * Migración v18: activa la nueva identidad visual de EasyPodcast en instalaciones
+ * que todavía conservan el tema predeterminado histórico. Los temas elegidos
+ * explícitamente por el administrador no se modifican.
+ */
+function migration_v18(PDO $pdo): void
+{
+    $stmt = $pdo->prepare(
+        'UPDATE podcast SET admin_theme = :new_theme WHERE admin_theme = :legacy_theme'
+    );
+    $stmt->execute([
+        ':new_theme' => 'easypodcast',
+        ':legacy_theme' => 'default',
+    ]);
 }
