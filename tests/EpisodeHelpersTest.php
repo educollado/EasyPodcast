@@ -4,6 +4,21 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/episode_helpers.php';
 
+function createImageUsageTestPdo(): PDO
+{
+    $pdo = new PDO('sqlite::memory:');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, image_url TEXT)');
+    $pdo->exec('CREATE TABLE episodes (id INTEGER PRIMARY KEY, image_url TEXT)');
+
+    return $pdo;
+}
+
+function episodeHelpersTestHasSqliteDriver(): bool
+{
+    return in_array('sqlite', PDO::getAvailableDrivers(), true);
+}
+
 // =============================================================================
 // resolveAudioExtension
 // =============================================================================
@@ -152,6 +167,42 @@ test('buildSafeFileName: nombre vacío usa fallback', function () {
 test('buildSafeFileName: nombre con sólo caracteres especiales usa fallback', function () {
     $result = buildSafeFileName('!!!', 'audio', 'mp3');
     assert_matches('/^audio-\d{14}-[0-9a-f]{8}\.mp3$/', $result);
+});
+
+// =============================================================================
+// isImageUrlInUse
+// =============================================================================
+
+test('isImageUrlInUse: protege la portada aunque ningún episodio la use', function () {
+    if (!episodeHelpersTestHasSqliteDriver()) {
+        return;
+    }
+
+    $pdo = createImageUsageTestPdo();
+    $pdo->exec("INSERT INTO podcast (id, image_url) VALUES (1, '/images/cover.png')");
+
+    assert_true(isImageUrlInUse($pdo, '/images/cover.png'));
+});
+
+test('isImageUrlInUse: detecta imágenes compartidas por otros episodios', function () {
+    if (!episodeHelpersTestHasSqliteDriver()) {
+        return;
+    }
+
+    $pdo = createImageUsageTestPdo();
+    $pdo->exec("INSERT INTO episodes (id, image_url) VALUES (1, '/images/shared.png')");
+
+    assert_true(isImageUrlInUse($pdo, '/images/shared.png'));
+});
+
+test('isImageUrlInUse: permite borrar una imagen sin referencias', function () {
+    if (!episodeHelpersTestHasSqliteDriver()) {
+        return;
+    }
+
+    $pdo = createImageUsageTestPdo();
+
+    assert_true(!isImageUrlInUse($pdo, '/images/orphan.png'));
 });
 
 // =============================================================================

@@ -596,3 +596,28 @@ function resolveLocalImagePathFromUrl(string $imageUrl): ?string
 
     return $real;
 }
+
+/**
+ * Indica si una imagen sigue referenciada por algún episodio o por la portada
+ * del podcast. Debe comprobarse antes de eliminar físicamente una imagen.
+ */
+function isImageUrlInUse(PDO $pdo, string $imageUrl): bool
+{
+    if (trim($imageUrl) === '') {
+        return false;
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT EXISTS (
+            SELECT 1 FROM episodes WHERE image_url = :episode_url
+            UNION ALL
+            SELECT 1 FROM podcast WHERE image_url = :podcast_url
+        )'
+    );
+    $stmt->execute([
+        ':episode_url' => $imageUrl,
+        ':podcast_url' => $imageUrl,
+    ]);
+
+    return (int) $stmt->fetchColumn() === 1;
+}
