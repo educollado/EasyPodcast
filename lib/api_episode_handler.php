@@ -179,14 +179,10 @@ function apiDeleteEpisode(PDO $pdo, int $id): void
         }
     }
     $imageUrl = (string) ($episodeFiles['image_url'] ?? '');
-    if ($imageUrl !== '') {
-        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE image_url = :url');
-        $cntStmt->execute([':url' => $imageUrl]);
-        if ((int) $cntStmt->fetchColumn() === 0) {
-            $localImage = resolveLocalImagePathFromUrl($imageUrl);
-            if ($localImage !== null) {
-                @unlink($localImage);
-            }
+    if ($imageUrl !== '' && !isImageUrlInUse($pdo, $imageUrl)) {
+        $localImage = resolveLocalImagePathFromUrl($imageUrl);
+        if ($localImage !== null) {
+            @unlink($localImage);
         }
     }
 
