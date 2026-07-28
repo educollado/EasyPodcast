@@ -30,6 +30,17 @@ function makeValidForm(): array
     ];
 }
 
+test('audioBytesToMegabytesForInput: convierte bytes a MB', function () {
+    assert_eq('10.00', audioBytesToMegabytesForInput('10485760'));
+    assert_eq('11.77', audioBytesToMegabytesForInput('12345678'));
+});
+
+test('audioMegabytesToBytes: convierte MB con punto o coma a bytes', function () {
+    assert_eq('10485760', audioMegabytesToBytes('10'));
+    assert_eq('1572864', audioMegabytesToBytes('1.5'));
+    assert_eq('1572864', audioMegabytesToBytes('1,5'));
+});
+
 test('validateEpisodeForm: formulario válido → null', function () {
     assert_null(validateEpisodeForm(makeValidForm()));
 });

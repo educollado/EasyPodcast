@@ -22,6 +22,14 @@
       .replace(/^-+|-+$/g, '') || 'capitulo';
   }
 
+  function formatMegabytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes < 0) {
+      return '';
+    }
+
+    return (bytes / 1048576).toFixed(2);
+  }
+
   function initEditor() {
     var descArea = document.getElementById('content');
     if (!descArea || typeof Jodit === 'undefined') {
@@ -42,13 +50,14 @@
   function initAudioHelpers() {
     var audioInput = document.getElementById('audio_file');
     var sizeInput = document.getElementById('audio_size_bytes');
+    var sizeMegabytesInput = document.getElementById('audio_size_mb');
     var durationInput = document.getElementById('duration');
     var mimeInput = document.getElementById('audio_mime_type');
     var titleInput = document.getElementById('title');
     var linkInput = document.getElementById('episode_link');
     var generateLinkButton = document.getElementById('generate_link_button');
 
-    if (!audioInput || !sizeInput || !durationInput) {
+    if (!audioInput || !sizeInput || !sizeMegabytesInput || !durationInput) {
       return;
     }
 
@@ -75,6 +84,7 @@
       }
 
       sizeInput.value = String(file.size || '');
+      sizeMegabytesInput.value = formatMegabytes(file.size);
       if (mimeInput && file.type) {
         mimeInput.value = file.type;
       }
@@ -411,6 +421,7 @@
           var audioUrlInput = document.querySelector('input[name="audio_url"]');
           var mimeInput = document.getElementById('audio_mime_type');
           var sizeInput = document.getElementById('audio_size_bytes');
+          var sizeMegabytesInput = document.getElementById('audio_size_mb');
           var durationInput = document.getElementById('duration');
 
           if (audioUrlInput) {
@@ -421,6 +432,9 @@
           }
           if (sizeInput) {
             sizeInput.value = String(data.size || '');
+          }
+          if (sizeMegabytesInput) {
+            sizeMegabytesInput.value = formatMegabytes(Number(data.size));
           }
           if (durationInput && audioDuration > 0) {
             durationInput.value = formatDuration(audioDuration);

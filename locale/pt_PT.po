@@ -630,8 +630,8 @@ msgstr "Ou enviar áudio do episódio"
 msgid "MIME audio *"
 msgstr "MIME do áudio *"
 
-msgid "Tamaño audio en bytes *"
-msgstr "Tamanho do áudio em bytes *"
+msgid "Tamaño audio en MB *"
+msgstr "Tamanho do áudio em MB *"
 
 msgid "Duración (HH:MM:SS)"
 msgstr "Duração (HH:MM:SS)"
@@ -2072,4 +2072,3 @@ msgstr "Segundo o sistema"
 
 msgid "Tema:"
 msgstr "Tema:"
-

@@ -568,8 +568,8 @@ msgstr "Oppure caricare l'audio dell'episodio"
 msgid "MIME audio *"
 msgstr "MIME audio *"
 
-msgid "Tamaño audio en bytes *"
-msgstr "Dimensione audio in byte *"
+msgid "Tamaño audio en MB *"
+msgstr "Dimensione audio in MB *"
 
 msgid "Duración (HH:MM:SS)"
 msgstr "Durata (HH:MM:SS)"
