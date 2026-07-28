@@ -9,6 +9,7 @@ declare(strict_types=1);
  */
 
 const ADMIN_THEMES = [
+    'easypodcast'  => 'EasyPodcast',
     'default'      => 'Amber Parchment',
     'oscuro'       => 'Ember Noir',
     'agua'         => 'Arctic Tide',
@@ -27,11 +28,11 @@ const PUBLIC_THEME_MODES = [
 
 /**
  * Lee el tema activo desde BD y lo guarda en $GLOBALS['_admin_theme'].
- * Silencioso ante errores: usa 'default' como fallback.
+ * Silencioso ante errores: usa 'easypodcast' como fallback.
  */
 function loadAdminTheme(string $dbPath): void
 {
-    $GLOBALS['_admin_theme'] = 'default';
+    $GLOBALS['_admin_theme'] = 'easypodcast';
     $GLOBALS['_public_theme_mode'] = 'normal';
 
     try {
@@ -63,11 +64,11 @@ function loadAdminTheme(string $dbPath): void
 }
 
 /**
- * Devuelve el slug del tema activo ('default' si no se ha cargado aún).
+ * Devuelve el slug del tema activo ('easypodcast' si no se ha cargado aún).
  */
 function adminTheme(): string
 {
-    return isset($GLOBALS['_admin_theme']) ? (string) $GLOBALS['_admin_theme'] : 'default';
+    return isset($GLOBALS['_admin_theme']) ? (string) $GLOBALS['_admin_theme'] : 'easypodcast';
 }
 
 /**

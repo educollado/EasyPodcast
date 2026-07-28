@@ -14,6 +14,11 @@ test('publicThemeMode: por defecto usa normal', function () {
     assert_eq('normal', publicThemeMode());
 });
 
+test('adminTheme: por defecto usa el tema EasyPodcast', function () {
+    unset($GLOBALS['_admin_theme']);
+    assert_eq('easypodcast', adminTheme());
+});
+
 test('publicThemeMode: devuelve auto cuando está cargado en globals', function () {
     $GLOBALS['_public_theme_mode'] = 'auto';
     assert_eq('auto', publicThemeMode());

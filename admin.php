@@ -26,7 +26,7 @@ $isTotpPending = !$isLoggedIn && isset($_SESSION['totp_pending_user']);
 // Cambio de tema visual desde el panel.
 if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'set_theme') {
     csrf_verify();
-    $theme = trim((string) ($_POST['app_theme'] ?? 'default'));
+    $theme = trim((string) ($_POST['app_theme'] ?? 'easypodcast'));
     if (isset(ADMIN_THEMES[$theme])) {
         $publicThemeModeAuto = isset($_POST['public_theme_mode_auto']) ? 1 : 0;
         $pdo = new PDO('sqlite:' . $dbPath);
@@ -69,7 +69,7 @@ extract($data); // adminCount, isSetupMode, error, notice
 // Idioma activo para mostrar el selector.
 $currentAppLanguage = 'es_ES';
 // Tema activo para mostrar el selector.
-$currentAdminTheme  = 'default';
+$currentAdminTheme  = 'easypodcast';
 $currentPublicThemeModeAuto = false;
 if ($isLoggedIn) {
     try {

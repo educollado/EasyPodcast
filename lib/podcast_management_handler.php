@@ -380,9 +380,9 @@ function loadPodcastManagementData(string $dbPath): array
                         // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                         $stmt = $pdo->prepare(
                             'INSERT INTO podcast
-                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language)
+                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language, admin_theme)
                              VALUES
-                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language)'
+                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language, \'easypodcast\')'
                         );
                         $stmt->execute($params);
                         $notice = __('Podcast guardado correctamente.');
