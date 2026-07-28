@@ -116,6 +116,13 @@ function loadAddEpisodeData(string $dbPath): array
             foreach ($form as $key => $_) {
                 $form[$key] = trim((string) ($_POST[$key] ?? ''));
             }
+            // El formulario presenta el tamaño en MB, pero la BD y el enclosure
+            // RSS deben conservarlo como un entero de bytes.
+            $postedMegabytes = trim((string) ($_POST['audio_size_mb'] ?? ''));
+            $postedBytes = trim((string) ($_POST['audio_size_bytes'] ?? ''));
+            $form['audio_size_bytes'] = $postedMegabytes === audioBytesToMegabytesForInput($postedBytes)
+                ? $postedBytes
+                : audioMegabytesToBytes($postedMegabytes);
             // rewrite_audio_metadata solo tiene sentido en edición; en creación se ignora.
             $rewriteAudioMetadata = $isEditing && ($_POST['rewrite_audio_metadata'] ?? '') === '1';
 

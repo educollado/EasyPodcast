@@ -630,8 +630,8 @@ msgstr "Ou téléverser l'audio de l'épisode"
 msgid "MIME audio *"
 msgstr "MIME audio *"
 
-msgid "Tamaño audio en bytes *"
-msgstr "Taille de l'audio en octets *"
+msgid "Tamaño audio en MB *"
+msgstr "Taille de l'audio en Mo *"
 
 msgid "Duración (HH:MM:SS)"
 msgstr "Durée (HH:MM:SS)"

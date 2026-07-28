@@ -630,8 +630,8 @@ msgstr "Ou subir audio do capítulo"
 msgid "MIME audio *"
 msgstr "MIME de audio *"
 
-msgid "Tamaño audio en bytes *"
-msgstr "Tamaño do audio en bytes *"
+msgid "Tamaño audio en MB *"
+msgstr "Tamaño do audio en MB *"
 
 msgid "Duración (HH:MM:SS)"
 msgstr "Duración (HH:MM:SS)"

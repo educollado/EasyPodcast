@@ -630,8 +630,8 @@ msgstr "Or upload episode audio"
 msgid "MIME audio *"
 msgstr "Audio MIME *"
 
-msgid "Tamaño audio en bytes *"
-msgstr "Audio size in bytes *"
+msgid "Tamaño audio en MB *"
+msgstr "Audio size in MB *"
 
 msgid "Duración (HH:MM:SS)"
 msgstr "Duration (HH:MM:SS)"

@@ -157,8 +157,10 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <input id="audio_mime_type" type="text" name="audio_mime_type" value="<?= esc($form['audio_mime_type']) ?>" placeholder="audio/mpeg">
           </label>
           <label>
-            <?= __('Tamaño audio en bytes *') ?>
-            <input id="audio_size_bytes" type="number" name="audio_size_bytes" min="1" step="1" value="<?= esc($form['audio_size_bytes']) ?>">
+            <?= __('Tamaño audio en MB *') ?>
+            <input id="audio_size_mb" type="number" name="audio_size_mb" min="0.01" step="0.01"
+                   value="<?= esc(audioBytesToMegabytesForInput((string) $form['audio_size_bytes'])) ?>">
+            <input id="audio_size_bytes" type="hidden" name="audio_size_bytes" value="<?= esc($form['audio_size_bytes']) ?>">
           </label>
           <label>
             <?= __('Duración (HH:MM:SS)') ?>

@@ -4,6 +4,7 @@
 
 - **Nueva identidad visual**: añadido el tema EasyPodcast, basado en la paleta azul marino, verde petróleo y ámbar de easypodcast.eu, y establecido como predeterminado mediante la migración `v18` sin alterar otros temas elegidos.
 - **Protección de imágenes**: al borrar un episodio desde el panel o la API, su imagen solo se elimina físicamente si ya no está referenciada por otros episodios ni como portada general del podcast.
+- **Tamaño del audio**: el formulario de episodios muestra y acepta el tamaño en MB con dos decimales, conservando internamente los bytes exactos requeridos por el RSS. Cambio realizado siguiendo las recomendaciones de Álex Ávalos.
 - **Calidad**: añadidos tests de regresión para cubrir imágenes compartidas, portadas y ficheros realmente huérfanos.
 
 ## 1.9.5

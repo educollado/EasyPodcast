@@ -10,6 +10,42 @@ require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/i18n.php';
 
 /**
+ * Convierte bytes a MB para mostrarlos en el formulario sin perder precisión
+ * al volver a guardar un episodio que no se ha modificado.
+ */
+function audioBytesToMegabytesForInput(string $bytes): string
+{
+    if ($bytes === '' || !ctype_digit($bytes)) {
+        return '';
+    }
+
+    return number_format((int) $bytes / 1048576, 2, '.', '');
+}
+
+/**
+ * Convierte los MB introducidos en el formulario al entero de bytes requerido
+ * por el enclosure RSS. Si el formato no es válido conserva el valor para que
+ * la validación habitual muestre el error.
+ */
+function audioMegabytesToBytes(string $megabytes): string
+{
+    $normalized = str_replace(',', '.', trim($megabytes));
+    if ($normalized === '') {
+        return '';
+    }
+    if (!preg_match('/^\d+(?:\.\d+)?$/', $normalized)) {
+        return $megabytes;
+    }
+
+    $bytes = (float) $normalized * 1048576;
+    if (!is_finite($bytes) || $bytes > PHP_INT_MAX) {
+        return $megabytes;
+    }
+
+    return (string) ((int) round($bytes));
+}
+
+/**
  * Valida el formulario de episodio. Función pura: sin acceso a BD ni efectos laterales.
  *
  * Al no tener dependencias externas es directamente testeable sin base de datos ni ficheros.
