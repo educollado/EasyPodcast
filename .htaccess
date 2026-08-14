@@ -14,7 +14,11 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 # Bloquea acceso directo a archivos/rutas sensibles.
 RewriteRule ^(?:podcast\.sqlite|schema\.sql|AGENTS\.md)$ - [F,L,NC]
 RewriteRule ^backups(?:/|$) - [F,L,NC]
+RewriteRule ^tests(?:/|$) - [F,L,NC]
 RewriteRule ^\.git - [F,L,NC]
+# Defensa en profundidad: ningún fichero ejecutable puede servirse desde las
+# carpetas de contenido controladas por subidas o importaciones.
+RewriteRule ^(?:audios|images)(?:/|$).*\.(?:php(?:[0-9]+|s)?|pht(?:ml)?|phar)(?:/|$) - [F,L,NC]
 # Sirve robots.txt dinámicamente para que el dominio sea siempre correcto.
 RewriteRule ^robots\.txt$ robots.php [L]
 # Pasa la cabecera Authorization a PHP (Apache la elimina por defecto).

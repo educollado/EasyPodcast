@@ -173,6 +173,12 @@ test('isPrivateOrReservedIp: permite IP pública IPv4', function () {
     assert_true(!isPrivateOrReservedIp('8.8.8.8'));
 });
 
+test('isPrivateOrReservedIp: bloquea IPv4 compatible y prefijos de transición IPv6', function () {
+    assert_true(isPrivateOrReservedIp('::192.168.1.10'));
+    assert_true(isPrivateOrReservedIp('64:ff9b::127.0.0.1'));
+    assert_true(isPrivateOrReservedIp('2002:7f00:1::'));
+});
+
 // =============================================================================
 // firstChars
 // =============================================================================

@@ -13,6 +13,10 @@ require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/i18n.php';
 
 const MEDIA_PART_MAX_BYTES = 133169152; // 127 MiB
+const MEDIA_IMPORT_MAX_FILES = 2000;
+const MEDIA_IMPORT_MAX_FILE_BYTES = 134217728; // 128 MiB
+const MEDIA_IMPORT_MAX_TOTAL_BYTES = 536870912; // 512 MiB
+const MEDIA_IMPORT_MAX_COMPRESSION_RATIO = 200;
 
 /**
  * @return array<int, array{abs:string, zip:string, size:int}>
@@ -257,6 +261,72 @@ function resolveUniquePath(string $dir, string $filename): string
 }
 
 /**
+ * Devuelve los MIME válidos para una entrada multimedia según su extensión.
+ * Una lista vacía implica que la extensión nunca se debe extraer.
+ *
+ * @return array<int,string>
+ */
+function allowedMediaImportMimes(string $entryName): array
+{
+    $extension = strtolower((string) pathinfo($entryName, PATHINFO_EXTENSION));
+    return match ($extension) {
+        'jpg', 'jpeg' => ['image/jpeg'],
+        'png' => ['image/png'],
+        'gif' => ['image/gif'],
+        'webp' => ['image/webp'],
+        'mp3' => ['audio/mpeg', 'audio/mp3', 'audio/x-mpeg', 'audio/x-mp3'],
+        'm4a' => ['audio/mp4', 'audio/x-m4a', 'video/mp4', 'application/mp4'],
+        'aac' => ['audio/aac', 'audio/x-aac'],
+        'ogg' => ['audio/ogg', 'application/ogg', 'audio/vorbis'],
+        'wav' => ['audio/wav', 'audio/wave', 'audio/x-wav', 'application/wav'],
+        'webm' => ['audio/webm', 'video/webm'],
+        default => [],
+    };
+}
+
+/**
+ * Valida ruta, tamaño declarado y ratio de compresión de una entrada ZIP.
+ */
+function validateMediaZipEntry(
+    string $entryName,
+    int $size,
+    int $compressedSize,
+    int $totalBytes
+): string {
+    $segments = explode('/', rtrim($entryName, '/'));
+    foreach ($segments as $segment) {
+        if ($segment === '' || $segment === '.' || $segment === '..' || str_starts_with($segment, '.')) {
+            return __('El ZIP contiene rutas o ficheros ocultos no permitidos.');
+        }
+    }
+
+    $root = $segments[0] ?? '';
+    if (!in_array($root, ['images', 'audios'], true)) {
+        return __('El ZIP contiene una ruta fuera de images/ o audios/.');
+    }
+
+    if ($size < 0 || $size > MEDIA_IMPORT_MAX_FILE_BYTES) {
+        return __('Un fichero del ZIP supera el máximo permitido de 128 MiB.');
+    }
+    if ($totalBytes > MEDIA_IMPORT_MAX_TOTAL_BYTES - $size) {
+        return __('El contenido descomprimido del ZIP supera el máximo permitido de 512 MiB.');
+    }
+    if ($size > 0 && $compressedSize <= 0) {
+        return __('El ZIP contiene una entrada con tamaño comprimido inválido.');
+    }
+    if ($compressedSize > 0 && ($size / $compressedSize) > MEDIA_IMPORT_MAX_COMPRESSION_RATIO) {
+        return __('El ZIP contiene una entrada con una compresión potencialmente peligrosa.');
+    }
+
+    $isDirectoryEntry = str_ends_with($entryName, '/') || in_array($entryName, ['images', 'audios'], true);
+    if (!$isDirectoryEntry && allowedMediaImportMimes($entryName) === []) {
+        return __('El ZIP contiene un tipo de fichero no permitido.');
+    }
+
+    return '';
+}
+
+/**
  * @return array{written:int, dirs:int, valid:int}
  */
 function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
@@ -270,6 +340,12 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
     $writtenFiles = 0;
     $createdDirs = 0;
     $foundValidEntries = 0;
+    $totalUncompressedBytes = 0;
+
+    if ($zip->numFiles > MEDIA_IMPORT_MAX_FILES) {
+        $zip->close();
+        throw new RuntimeException(__('El ZIP supera el máximo de %d entradas.', MEDIA_IMPORT_MAX_FILES));
+    }
 
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $entryStat = $zip->statIndex($i);
@@ -281,23 +357,42 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
             continue;
         }
 
-        if (strpos($entryName, '../') !== false || str_contains($entryName, "\0")) {
+        if (str_contains($entryName, "\0")) {
             $zip->close();
             throw new RuntimeException(__('El ZIP contiene rutas no permitidas.'));
         }
 
-        $isAllowedRoot = str_starts_with($entryName, 'images/') || str_starts_with($entryName, 'audios/');
-        $isAllowedDir = ($entryName === 'images' || $entryName === 'audios');
-        if (!$isAllowedRoot && !$isAllowedDir) {
+        // Mantiene compatibilidad con ZIP que incluyan README o metadatos del
+        // sistema: se ignoran si están fuera de media, pero nunca se tolera
+        // traversal aunque la entrada finalmente no se vaya a extraer.
+        $pathSegments = explode('/', rtrim($entryName, '/'));
+        if (in_array('.', $pathSegments, true) || in_array('..', $pathSegments, true)) {
+            $zip->close();
+            throw new RuntimeException(__('El ZIP contiene rutas no permitidas.'));
+        }
+        if (!in_array($pathSegments[0] ?? '', ['images', 'audios'], true)) {
             continue;
         }
+
+        $entrySize = (int) ($entryStat['size'] ?? -1);
+        $compressedSize = (int) ($entryStat['comp_size'] ?? -1);
+        $validationError = validateMediaZipEntry(
+            $entryName,
+            $entrySize,
+            $compressedSize,
+            $totalUncompressedBytes
+        );
+        if ($validationError !== '') {
+            $zip->close();
+            throw new RuntimeException($validationError);
+        }
+        $totalUncompressedBytes += $entrySize;
         $foundValidEntries++;
 
         $targetPath = $projectRoot . '/' . $entryName;
-        $isDirEntry = str_ends_with($entryName, '/')
-            || (isset($entryStat['size']) && (int) $entryStat['size'] === 0 && str_ends_with($entryName, '/'));
+        $isDirEntry = str_ends_with($entryName, '/') || in_array($entryName, ['images', 'audios'], true);
 
-        if ($isDirEntry || $isAllowedDir) {
+        if ($isDirEntry) {
             $dirPath = rtrim($targetPath, '/');
             if (!is_dir($dirPath)) {
                 if (!mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
@@ -315,29 +410,52 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
             throw new RuntimeException(__('No se pudo preparar directorios para extraer ficheros.'));
         }
 
+        $mediaRoot = realpath($projectRoot . '/' . explode('/', $entryName, 2)[0]);
+        $realParent = realpath($parentDir);
+        if (
+            $mediaRoot === false
+            || $realParent === false
+            || ($realParent !== $mediaRoot && !str_starts_with($realParent, $mediaRoot . DIRECTORY_SEPARATOR))
+        ) {
+            $zip->close();
+            throw new RuntimeException(__('El ZIP intenta escribir fuera del directorio multimedia permitido.'));
+        }
+
         $stream = $zip->getStream((string) $entryStat['name']);
         if ($stream === false) {
             $zip->close();
             throw new RuntimeException(__('No se pudo leer un fichero dentro del ZIP.'));
         }
-        $out = fopen($targetPath, 'wb');
+        $temporaryPath = $parentDir . '/.' . basename($targetPath) . '.import-' . bin2hex(random_bytes(4)) . '.tmp';
+        $out = fopen($temporaryPath, 'xb');
         if ($out === false) {
             fclose($stream);
             $zip->close();
             throw new RuntimeException(__('No se pudo escribir un fichero en destino.'));
         }
 
+        $actualBytes = 0;
         while (!feof($stream)) {
             $chunk = fread($stream, 8192);
             if ($chunk === false) {
                 fclose($out);
                 fclose($stream);
+                @unlink($temporaryPath);
                 $zip->close();
                 throw new RuntimeException(__('Error al leer datos del ZIP.'));
+            }
+            $actualBytes += strlen($chunk);
+            if ($actualBytes > MEDIA_IMPORT_MAX_FILE_BYTES || $actualBytes > $entrySize) {
+                fclose($out);
+                fclose($stream);
+                @unlink($temporaryPath);
+                $zip->close();
+                throw new RuntimeException(__('El tamaño real de una entrada ZIP no coincide con el declarado.'));
             }
             if ($chunk !== '' && fwrite($out, $chunk) === false) {
                 fclose($out);
                 fclose($stream);
+                @unlink($temporaryPath);
                 $zip->close();
                 throw new RuntimeException(__('Error al guardar un fichero importado.'));
             }
@@ -345,6 +463,26 @@ function importZipIntoMedia(string $uploadedPath, string $projectRoot): array
 
         fclose($out);
         fclose($stream);
+
+        if ($actualBytes !== $entrySize) {
+            @unlink($temporaryPath);
+            $zip->close();
+            throw new RuntimeException(__('El tamaño real de una entrada ZIP no coincide con el declarado.'));
+        }
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $detectedMime = (string) $finfo->file($temporaryPath);
+        if (!in_array($detectedMime, allowedMediaImportMimes($entryName), true)) {
+            @unlink($temporaryPath);
+            $zip->close();
+            throw new RuntimeException(__('El MIME de un fichero del ZIP no coincide con su extensión.'));
+        }
+
+        if (!@rename($temporaryPath, $targetPath)) {
+            @unlink($temporaryPath);
+            $zip->close();
+            throw new RuntimeException(__('No se pudo mover un fichero multimedia validado a su destino.'));
+        }
         $writtenFiles++;
     }
 

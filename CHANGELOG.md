@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.8
+
+- **Importación remota segura**: los feeds, imágenes y audios tienen límites explícitos de tamaño, las descargas fijan la IP pública validada para impedir DNS rebinding y los archivos se guardan con una extensión inerte hasta confirmar su MIME real.
+- **Restauración de medios reforzada**: los ZIP rechazan path traversal, enlaces y tipos no permitidos, validan el MIME antes de publicar cada archivo y limitan entradas, tamaño descomprimido y ratio de compresión para evitar ZIP bombs.
+- **Autenticación concurrente**: el límite de intentos de contraseña y TOTP reserva cada intento bajo bloqueo exclusivo, cerrando carreras que podían permitir comprobaciones simultáneas adicionales.
+- **XSS y aislamiento del webroot**: el JSON-LD neutraliza cierres de etiquetas y caracteres HTML; Apache bloquea el acceso a `tests/` y la ejecución de archivos PHP o PHAR dentro de `images/` y `audios/`.
+- **Documentación y calidad**: documentados en el README los límites de importación de feeds, imágenes, audios y ZIP, con nuevas pruebas de regresión para todos los endurecimientos.
+
 ## 1.9.7
 
 - **Tamaño del audio**: el formulario de episodios muestra y acepta el tamaño en MB con dos decimales, conservando internamente los bytes exactos requeridos por el RSS. Cambio realizado siguiendo las recomendaciones de Álex Ávalos.

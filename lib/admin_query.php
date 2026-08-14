@@ -74,11 +74,11 @@ function loadAdminData(string $dbPath): array
         // Un único formulario maneja:
         // - setup inicial (no existe usuario admin)
         // - login normal (ya existe al menos uno)
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_SESSION['totp_pending_user'])) {
             csrf_verify();
             $username = trim((string) ($_POST['username'] ?? ''));
             $password = (string) ($_POST['password'] ?? '');
-            $throttleState = authGetThrottleState('login', $username);
+            $throttleState = authReserveAttempt('login', $username);
 
             if ($throttleState['blocked']) {
                 $error = authThrottleErrorMessage($throttleState['retry_after']);
@@ -105,6 +105,7 @@ function loadAdminData(string $dbPath): array
 
                     session_regenerate_id(true);
                     $_SESSION['admin_user'] = $username;
+                    authClearThrottle('login', $username);
                     $notice = __('Usuario administrador creado correctamente.');
                     $adminCount = 1;
                 }
@@ -118,15 +119,16 @@ function loadAdminData(string $dbPath): array
                     $row = $stmt->fetch();
 
                     if (!$row) {
-                        authRegisterFailure('login', $username);
-                        $error = __('Credenciales inválidas.');
+                        $error = $throttleState['retry_after'] > 0
+                            ? authThrottleErrorMessage($throttleState['retry_after'])
+                            : __('Credenciales inválidas.');
                     } else {
                         $stored = (string) $row['password'];
                         // El fallback con hash_equals permite migrar contraseñas legacy en texto plano.
                         $valid = password_verify($password, $stored) || hash_equals($stored, $password);
 
                         if (!$valid) {
-                            $retryAfter = authRegisterFailure('login', $username);
+                            $retryAfter = $throttleState['retry_after'];
                             if ($retryAfter > 0) {
                                 $error = authThrottleErrorMessage($retryAfter);
                             } else {
@@ -204,7 +206,7 @@ function verifyTotpLogin(string $dbPath): string
 
     csrf_verify();
 
-    $throttleState = authGetThrottleState('totp', $pendingUser);
+    $throttleState = authReserveAttempt('totp', $pendingUser);
     if ($throttleState['blocked']) {
         return authThrottleErrorMessage($throttleState['retry_after']);
     }
@@ -264,7 +266,7 @@ function verifyTotpLogin(string $dbPath): string
             exit;
         }
 
-        $retryAfter = authRegisterFailure('totp', $pendingUser);
+        $retryAfter = $throttleState['retry_after'];
         if ($retryAfter > 0) {
             return authThrottleErrorMessage($retryAfter);
         }

@@ -55,7 +55,15 @@ function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $e
     if ($podcastImage !== '') {
         $seriesData['image'] = $ogImage;
     }
-    $seriesJsonLd = json_encode($seriesData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $seriesJsonLd = json_encode(
+        $seriesData,
+        JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES
+            | JSON_HEX_TAG
+            | JSON_HEX_AMP
+            | JSON_HEX_APOS
+            | JSON_HEX_QUOT
+    );
     if (!is_string($seriesJsonLd) || $seriesJsonLd === '') {
         $seriesJsonLd = '{}';
     }

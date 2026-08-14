@@ -75,7 +75,55 @@ function authLoadThrottleRecord(string $path): array
  */
 function authSaveThrottleRecord(string $path, array $record): void
 {
-    @file_put_contents($path, json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    @file_put_contents(
+        $path,
+        json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        LOCK_EX
+    );
+}
+
+/**
+ * Ejecuta una modificación lectura-escritura bajo un único bloqueo exclusivo.
+ *
+ * @template T
+ * @param callable(array{attempts:array<int,int>,blocked_until:int}):array{record:array{attempts:array<int,int>,blocked_until:int},result:T} $callback
+ * @return T
+ */
+function authMutateThrottleRecord(string $path, callable $callback): mixed
+{
+    $handle = @fopen($path, 'c+');
+    if ($handle === false || !@flock($handle, LOCK_EX)) {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+        $mutation = $callback(['attempts' => [], 'blocked_until' => 0]);
+        return $mutation['result'];
+    }
+
+    rewind($handle);
+    $raw = stream_get_contents($handle);
+    $decoded = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
+    $record = ['attempts' => [], 'blocked_until' => 0];
+    if (is_array($decoded)) {
+        $record['attempts'] = array_values(array_filter(
+            array_map('intval', (array) ($decoded['attempts'] ?? [])),
+            static fn(int $ts): bool => $ts > 0
+        ));
+        $record['blocked_until'] = max(0, (int) ($decoded['blocked_until'] ?? 0));
+    }
+
+    $mutation = $callback($record);
+    rewind($handle);
+    ftruncate($handle, 0);
+    fwrite($handle, (string) json_encode(
+        $mutation['record'],
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    ));
+    fflush($handle);
+    flock($handle, LOCK_UN);
+    fclose($handle);
+
+    return $mutation['result'];
 }
 
 /**
@@ -102,30 +150,72 @@ function authGetThrottleState(string $kind, string $identity = ''): array
 {
     $now = time();
     $path = authThrottlePath($kind, $identity);
-    $record = authLoadThrottleRecord($path);
-    $record['attempts'] = authPruneAttempts($record['attempts'], $now);
-
-    if ($record['blocked_until'] <= $now) {
-        $record['blocked_until'] = 0;
-    }
-
-    if ($record['attempts'] === [] && $record['blocked_until'] === 0) {
-        if (is_file($path)) {
-            @unlink($path);
-        }
+    if (!is_file($path)) {
         return ['blocked' => false, 'retry_after' => 0];
     }
 
-    authSaveThrottleRecord($path, $record);
-
-    if ($record['blocked_until'] > $now) {
+    return authMutateThrottleRecord($path, static function (array $record) use ($now): array {
+        $record['attempts'] = authPruneAttempts($record['attempts'], $now);
+        if ($record['blocked_until'] <= $now) {
+            $record['blocked_until'] = 0;
+        }
         return [
-            'blocked' => true,
-            'retry_after' => $record['blocked_until'] - $now,
+            'record' => $record,
+            'result' => [
+                'blocked' => $record['blocked_until'] > $now,
+                'retry_after' => max(0, $record['blocked_until'] - $now),
+            ],
         ];
-    }
+    });
+}
 
-    return ['blocked' => false, 'retry_after' => 0];
+/**
+ * Reserva atómicamente un intento antes de verificar credenciales.
+ * Así las peticiones concurrentes no pueden superar el límite por carreras.
+ *
+ * @return array{blocked:bool,retry_after:int}
+ */
+function authReserveAttempt(string $kind, string $identity = ''): array
+{
+    $path = authThrottlePath($kind, $identity);
+    return authReserveAttemptAtPath($path);
+}
+
+/**
+ * Variante sobre una ruta explícita para centralizar la operación atómica.
+ *
+ * @return array{blocked:bool,retry_after:int}
+ */
+function authReserveAttemptAtPath(string $path, ?int $now = null): array
+{
+    $now = $now ?? time();
+
+    return authMutateThrottleRecord($path, static function (array $record) use ($now): array {
+        $record['attempts'] = authPruneAttempts($record['attempts'], $now);
+        if ($record['blocked_until'] > $now) {
+            return [
+                'record' => $record,
+                'result' => [
+                    'blocked' => true,
+                    'retry_after' => $record['blocked_until'] - $now,
+                ],
+            ];
+        }
+
+        $record['blocked_until'] = 0;
+        $record['attempts'][] = $now;
+        if (count($record['attempts']) >= AUTH_THROTTLE_MAX_ATTEMPTS) {
+            $record['blocked_until'] = $now + AUTH_THROTTLE_BLOCK_SECONDS;
+        }
+
+        return [
+            'record' => $record,
+            'result' => [
+                'blocked' => false,
+                'retry_after' => max(0, $record['blocked_until'] - $now),
+            ],
+        ];
+    });
 }
 
 /**
@@ -133,21 +223,8 @@ function authGetThrottleState(string $kind, string $identity = ''): array
  */
 function authRegisterFailure(string $kind, string $identity = ''): int
 {
-    $now = time();
-    $path = authThrottlePath($kind, $identity);
-    $record = authLoadThrottleRecord($path);
-    $record['attempts'] = authPruneAttempts($record['attempts'], $now);
-    $record['attempts'][] = $now;
-
-    if (count($record['attempts']) >= AUTH_THROTTLE_MAX_ATTEMPTS) {
-        $record['blocked_until'] = $now + AUTH_THROTTLE_BLOCK_SECONDS;
-    } else {
-        $record['blocked_until'] = 0;
-    }
-
-    authSaveThrottleRecord($path, $record);
-
-    return max(0, $record['blocked_until'] - $now);
+    $state = authReserveAttempt($kind, $identity);
+    return $state['retry_after'];
 }
 
 /**
@@ -156,7 +233,12 @@ function authRegisterFailure(string $kind, string $identity = ''): int
 function authClearThrottle(string $kind, string $identity = ''): void
 {
     $path = authThrottlePath($kind, $identity);
-    if (is_file($path)) {
-        @unlink($path);
+    if (!is_file($path)) {
+        return;
     }
+
+    authMutateThrottleRecord($path, static fn(array $record): array => [
+        'record' => ['attempts' => [], 'blocked_until' => 0],
+        'result' => null,
+    ]);
 }

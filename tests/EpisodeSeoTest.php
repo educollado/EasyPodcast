@@ -39,6 +39,16 @@ test('buildEpisodeSeoData: episode presente → JSON-LD contiene PodcastEpisode'
     assert_contains('"name":"Ep 1"', $seo['episodeJsonLd']);
 });
 
+test('buildEpisodeSeoData: JSON-LD neutraliza cierres de script sin alterar el dato', function () {
+    $podcast = ['title' => 'P', 'link' => 'https://example.com'];
+    $episode = ['title' => '</script><iframe src="https://evil.example">', 'content' => 'Desc'];
+    $seo = buildEpisodeSeoData($podcast, $episode, '2024', '03', 'ep', '');
+
+    assert_true(!str_contains(strtolower($seo['episodeJsonLd']), '</script'));
+    $decoded = json_decode($seo['episodeJsonLd'], true);
+    assert_eq('</script><iframe src="https://evil.example">', $decoded['name'] ?? null);
+});
+
 test('buildEpisodeSeoData: JSON-LD contiene partOfSeries con nombre del podcast', function () {
     $podcast = ['title' => 'Podcast X', 'link' => 'https://example.com'];
     $episode = ['title' => 'Ep', 'content' => ''];

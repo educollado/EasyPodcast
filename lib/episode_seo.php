@@ -69,7 +69,15 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
         if ($cover !== '') {
             $episodeData['image'] = $ogImage;
         }
-        $encoded = json_encode($episodeData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $encoded = json_encode(
+            $episodeData,
+            JSON_UNESCAPED_UNICODE
+                | JSON_UNESCAPED_SLASHES
+                | JSON_HEX_TAG
+                | JSON_HEX_AMP
+                | JSON_HEX_APOS
+                | JSON_HEX_QUOT
+        );
         if (is_string($encoded) && $encoded !== '') {
             $episodeJsonLd = $encoded;
         }

@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.7-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.8-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -140,6 +140,22 @@ La imagen del proyecto se construye sobre una base PHP/Apache fijada a una versi
 - Tokens API almacenados como hash SHA-256 en vez de en claro.
 - El actualizador web verifica mediante SHA-256 cada paquete descargado antes de extraerlo.
 - Dependabot supervisa semanalmente la imagen Docker y las GitHub Actions.
+
+#### Límites de importación
+
+Para evitar agotamiento de memoria o disco al importar contenido externo:
+
+| Recurso | Límite |
+|---|---:|
+| Feed RSS remoto | 10 MiB |
+| Imagen remota | 25 MiB por archivo |
+| Audio remoto | 128 MiB por archivo |
+| ZIP de medios | 2.000 entradas |
+| Archivo dentro de un ZIP | 128 MiB descomprimidos |
+| Contenido total de un ZIP | 512 MiB descomprimidos |
+| Ratio máximo de compresión ZIP | 200:1 |
+
+Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo pueden contener formatos multimedia admitidos dentro de `images/` o `audios/`.
 
 ### Panel de administración
 

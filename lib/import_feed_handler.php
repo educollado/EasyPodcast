@@ -9,6 +9,10 @@ require_once __DIR__ . '/sitemap_builder.php';    // writePodcastSitemapFile()
 require_once __DIR__ . '/../feed_builder.php';    // writePodcastFeedFile(), resolveBaseUrl(), resolveFeedSelfHref()
 require_once __DIR__ . '/i18n.php';
 
+const REMOTE_FEED_MAX_BYTES = 10485760;     // 10 MiB
+const REMOTE_IMAGE_MAX_BYTES = 26214400;    // 25 MiB
+const REMOTE_AUDIO_MAX_BYTES = 134217728;   // 128 MiB
+
 // ---------------------------------------------------------------------------
 // Descarga del XML del feed
 // ---------------------------------------------------------------------------
@@ -66,41 +70,73 @@ function resolveHostIpAddresses(string $host): array
 /**
  * Valida que una URL remota no apunte a redes privadas o reservadas.
  *
- * @return array{ok:bool,error:string}
+ * @return array{ok:bool,error:string,ips:array<int,string>}
  */
 function validateRemoteFetchUrl(string $url): array
 {
     $parts = parse_url($url);
     if (!is_array($parts)) {
-        return ['ok' => false, 'error' => __('La URL remota no es válida.')];
+        return ['ok' => false, 'error' => __('La URL remota no es válida.'), 'ips' => []];
     }
 
     $scheme = strtolower((string) ($parts['scheme'] ?? ''));
     if (!in_array($scheme, ['http', 'https'], true)) {
-        return ['ok' => false, 'error' => __('La URL debe usar http o https.')];
+        return ['ok' => false, 'error' => __('La URL debe usar http o https.'), 'ips' => []];
     }
 
     if (isset($parts['user']) || isset($parts['pass'])) {
-        return ['ok' => false, 'error' => __('La URL remota no puede incluir credenciales.')];
+        return ['ok' => false, 'error' => __('La URL remota no puede incluir credenciales.'), 'ips' => []];
     }
 
     $host = strtolower(trim((string) ($parts['host'] ?? '')));
+    if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+        $host = substr($host, 1, -1);
+    }
     if ($host === '' || $host === 'localhost' || str_ends_with($host, '.local')) {
-        return ['ok' => false, 'error' => __('La URL remota apunta a un host no permitido.')];
+        return ['ok' => false, 'error' => __('La URL remota apunta a un host no permitido.'), 'ips' => []];
     }
 
     $ips = resolveHostIpAddresses($host);
     if ($ips === []) {
-        return ['ok' => false, 'error' => __('No se pudo resolver el host remoto.')];
+        return ['ok' => false, 'error' => __('No se pudo resolver el host remoto.'), 'ips' => []];
     }
 
     foreach ($ips as $ip) {
         if (isPrivateOrReservedIp($ip)) {
-            return ['ok' => false, 'error' => __('La URL remota apunta a una red privada o reservada y ha sido bloqueada.')];
+            return [
+                'ok' => false,
+                'error' => __('La URL remota apunta a una red privada o reservada y ha sido bloqueada.'),
+                'ips' => [],
+            ];
         }
     }
 
-    return ['ok' => true, 'error' => ''];
+    return ['ok' => true, 'error' => '', 'ips' => $ips];
+}
+
+/**
+ * Fija en cURL una IP ya validada para impedir DNS rebinding entre la
+ * comprobación de seguridad y la conexión real.
+ */
+function buildCurlResolveEntry(string $url, array $validatedIps): ?string
+{
+    $parts = parse_url($url);
+    $host = is_array($parts) ? strtolower((string) ($parts['host'] ?? '')) : '';
+    if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+        $host = substr($host, 1, -1);
+    }
+    $scheme = is_array($parts) ? strtolower((string) ($parts['scheme'] ?? '')) : '';
+    $ip = (string) ($validatedIps[0] ?? '');
+    if ($host === '' || $ip === '' || !in_array($scheme, ['http', 'https'], true)) {
+        return null;
+    }
+
+    $port = isset($parts['port']) ? (int) $parts['port'] : ($scheme === 'https' ? 443 : 80);
+    $resolveHost = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false
+        ? '[' . $host . ']'
+        : $host;
+    $address = str_contains($ip, ':') ? '[' . $ip . ']' : $ip;
+    return $resolveHost . ':' . $port . ':' . $address;
 }
 
 /**
@@ -195,17 +231,32 @@ function fetchRemoteTextResponse(string $url, int $timeout): array
             return ['body' => null, 'error' => $validation['error']];
         }
 
+        $resolveEntry = buildCurlResolveEntry($currentUrl, $validation['ips']);
+        if ($resolveEntry === null) {
+            return ['body' => null, 'error' => __('No se pudo fijar la resolución segura del host remoto.')];
+        }
+
         $headers = [];
+        $bodyBuffer = '';
+        $tooLarge = false;
         $ch = curl_init();
         $options = [
             CURLOPT_URL => $currentUrl,
-            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_MAXREDIRS => 0,
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_USERAGENT => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
             CURLOPT_ENCODING => '',
+            CURLOPT_RESOLVE => [$resolveEntry],
+            CURLOPT_WRITEFUNCTION => static function ($ch, string $chunk) use (&$bodyBuffer, &$tooLarge): int {
+                if (strlen($bodyBuffer) + strlen($chunk) > REMOTE_FEED_MAX_BYTES) {
+                    $tooLarge = true;
+                    return 0;
+                }
+                $bodyBuffer .= $chunk;
+                return strlen($chunk);
+            },
             CURLOPT_HEADERFUNCTION => static function ($ch, string $headerLine) use (&$headers): int {
                 $trimmed = trim($headerLine);
                 if ($trimmed !== '') {
@@ -216,12 +267,16 @@ function fetchRemoteTextResponse(string $url, int $timeout): array
         ] + remoteCurlProtocolOptions();
         curl_setopt_array($ch, $options);
 
-        $body = curl_exec($ch);
+        $ok = curl_exec($ch);
         $curlError = curl_error($ch);
         $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($body === false || $curlError !== '') {
+        if ($tooLarge) {
+            return ['body' => null, 'error' => __('El feed supera el tamaño máximo permitido de 10 MiB.')];
+        }
+
+        if ($ok === false || $curlError !== '') {
             return ['body' => null, 'error' => __('Error al descargar el feed: %s', $curlError)];
         }
 
@@ -239,11 +294,11 @@ function fetchRemoteTextResponse(string $url, int $timeout): array
             return ['body' => null, 'error' => __('El servidor devolvió HTTP %d.', $httpCode)];
         }
 
-        if (!is_string($body) || trim($body) === '') {
+        if (trim($bodyBuffer) === '') {
             return ['body' => null, 'error' => __('El feed está vacío.')];
         }
 
-        return ['body' => $body, 'error' => ''];
+        return ['body' => $bodyBuffer, 'error' => ''];
     }
 
     return ['body' => null, 'error' => __('La URL remota superó el número máximo de redirecciones permitidas.')];
@@ -490,22 +545,25 @@ function loadFeedPreview(string $feedUrl): array
 // ---------------------------------------------------------------------------
 
 /**
- * Descarga un fichero desde URL a un directorio local usando CURLOPT_FILE (directo a disco).
+ * Descarga un fichero desde URL a un directorio local mediante escritura limitada a disco.
  * Devuelve ['localPath' => string, 'localUrl' => string, 'mime' => string, 'size' => int, 'error' => ?string].
  */
-function downloadFile(string $url, string $destDir, string $fallbackBase, int $timeout, string $baseUrl): array
+function downloadFile(
+    string $url,
+    string $destDir,
+    string $fallbackBase,
+    int $timeout,
+    string $baseUrl,
+    int $maxBytes
+): array
 {
     $errorResult = ['localPath' => '', 'localUrl' => '', 'mime' => '', 'size' => 0, 'error' => ''];
 
-    // Extensión desde la URL para el nombre del fichero destino
+    // La extensión remota no es fiable. Se usa una extensión inerte hasta que
+    // downloadImage()/downloadAudio() validen el MIME real y renombren el fichero.
     $urlPath = (string) parse_url($url, PHP_URL_PATH);
-    $ext     = strtolower((string) pathinfo($urlPath, PATHINFO_EXTENSION));
-    if ($ext === '' || strlen($ext) > 5) {
-        $ext = 'bin';
-    }
-
     $originalName = basename($urlPath);
-    $fileName     = buildSafeFileName($originalName, $fallbackBase, $ext);
+    $fileName     = buildSafeFileName($originalName, $fallbackBase, 'download');
     $localPath    = rtrim($destDir, '/') . '/' . $fileName;
 
     $currentUrl = $url;
@@ -516,6 +574,12 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
             return $errorResult;
         }
 
+        $resolveEntry = buildCurlResolveEntry($currentUrl, $validation['ips']);
+        if ($resolveEntry === null) {
+            $errorResult['error'] = __('No se pudo fijar la resolución segura del host remoto.');
+            return $errorResult;
+        }
+
         $fh = @fopen($localPath, 'wb');
         if ($fh === false) {
             $errorResult['error'] = __('No se pudo crear el fichero destino.');
@@ -523,16 +587,31 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
         }
 
         $headers = [];
+        $writtenBytes = 0;
+        $tooLarge = false;
         $ch = curl_init();
         $options = [
             CURLOPT_URL => $currentUrl,
-            CURLOPT_FILE => $fh,
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_MAXREDIRS => 0,
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_USERAGENT => 'EasyPodcast/1.0 RSS Importer (+https://github.com/educollado/easypodcast)',
             CURLOPT_FAILONERROR => false,
+            CURLOPT_RESOLVE => [$resolveEntry],
+            CURLOPT_WRITEFUNCTION => static function ($ch, string $chunk) use ($fh, $maxBytes, &$writtenBytes, &$tooLarge): int {
+                $chunkLength = strlen($chunk);
+                if ($writtenBytes + $chunkLength > $maxBytes) {
+                    $tooLarge = true;
+                    return 0;
+                }
+                $written = fwrite($fh, $chunk);
+                if ($written === false) {
+                    return 0;
+                }
+                $writtenBytes += $written;
+                return $written;
+            },
             CURLOPT_HEADERFUNCTION => static function ($ch, string $headerLine) use (&$headers): int {
                 $trimmed = trim($headerLine);
                 if ($trimmed !== '') {
@@ -548,6 +627,12 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
         $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         fclose($fh);
+
+        if ($tooLarge) {
+            @unlink($localPath);
+            $errorResult['error'] = __('El fichero remoto supera el tamaño máximo permitido.');
+            return $errorResult;
+        }
 
         if ($ok === false || $curlError !== '') {
             @unlink($localPath);
@@ -603,24 +688,54 @@ function downloadFile(string $url, string $destDir, string $fallbackBase, int $t
 }
 
 /**
+ * Renombra una descarga ya validada usando únicamente una extensión segura.
+ */
+function finalizeDownloadedFile(array $result, string $safeExtension): array
+{
+    $oldPath = (string) ($result['localPath'] ?? '');
+    if ($oldPath === '' || !is_file($oldPath) || !preg_match('/^[a-z0-9]+$/', $safeExtension)) {
+        $result['error'] = __('No se pudo finalizar el fichero descargado.');
+        return $result;
+    }
+
+    $newName = pathinfo($oldPath, PATHINFO_FILENAME) . '.' . strtolower($safeExtension);
+    $newPath = dirname($oldPath) . '/' . $newName;
+    if (!@rename($oldPath, $newPath)) {
+        @unlink($oldPath);
+        $result['error'] = __('No se pudo asignar una extensión segura al fichero descargado.');
+        return $result;
+    }
+
+    $localUrl = (string) ($result['localUrl'] ?? '');
+    $result['localPath'] = $newPath;
+    $result['localUrl'] = preg_replace('#[^/]+$#', rawurlencode($newName), $localUrl) ?? $localUrl;
+    return $result;
+}
+
+/**
  * Descarga una imagen del feed al directorio /images/.
  * Verifica que el MIME sea de imagen antes de aceptar el fichero.
  */
 function downloadImage(string $url, string $imagesDir, string $baseUrl, string $fallbackBase): array
 {
-    $result = downloadFile($url, $imagesDir, $fallbackBase, 30, $baseUrl);
+    $result = downloadFile($url, $imagesDir, $fallbackBase, 30, $baseUrl, REMOTE_IMAGE_MAX_BYTES);
     if ($result['error'] !== null) {
         return $result;
     }
 
-    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!in_array($result['mime'], $allowedMimes, true)) {
+    $allowedMimes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp',
+    ];
+    if (!isset($allowedMimes[$result['mime']])) {
         @unlink($result['localPath']);
         $result['error'] = __('MIME de imagen no válido: %s', $result['mime']);
         return $result;
     }
 
-    return $result;
+    return finalizeDownloadedFile($result, $allowedMimes[$result['mime']]);
 }
 
 /**
@@ -629,7 +744,7 @@ function downloadImage(string $url, string $imagesDir, string $baseUrl, string $
  */
 function downloadAudio(string $url, string $audiosDir, string $baseUrl, string $fallbackBase): array
 {
-    $result = downloadFile($url, $audiosDir, $fallbackBase, 300, $baseUrl);
+    $result = downloadFile($url, $audiosDir, $fallbackBase, 300, $baseUrl, REMOTE_AUDIO_MAX_BYTES);
     if ($result['error'] !== null) {
         return $result;
     }
@@ -643,7 +758,7 @@ function downloadAudio(string $url, string $audiosDir, string $baseUrl, string $
         return $result;
     }
 
-    return $result;
+    return finalizeDownloadedFile($result, $ext);
 }
 
 // ---------------------------------------------------------------------------

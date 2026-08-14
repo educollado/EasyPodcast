@@ -91,6 +91,15 @@ test('buildHomeSeoData: JSON-LD incluye nombre del podcast', function () {
     assert_contains('"name":"Podcast Ejemplo"', $seo['seriesJsonLd']);
 });
 
+test('buildHomeSeoData: JSON-LD neutraliza cierres de script sin alterar el dato', function () {
+    $podcast = ['title' => '</script><meta http-equiv="refresh">', 'link' => 'https://example.com'];
+    $seo = buildHomeSeoData($podcast, 1, 1, '');
+
+    assert_true(!str_contains(strtolower($seo['seriesJsonLd']), '</script'));
+    $decoded = json_decode($seo['seriesJsonLd'], true);
+    assert_eq('</script><meta http-equiv="refresh">', $decoded['name'] ?? null);
+});
+
 test('buildHomeSeoData: JSON-LD incluye autor cuando owner_name está presente', function () {
     $podcast = ['title' => 'Mi podcast', 'owner_name' => 'Autor Test', 'link' => 'https://example.com'];
     $seo = buildHomeSeoData($podcast, 1, 1, '');
