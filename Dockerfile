@@ -1,4 +1,4 @@
-FROM php:8.5.8-apache-trixie
+FROM php:8.5.9-apache-trixie
 
 # Imagen base fijada a una versión concreta para evitar deriva silenciosa entre builds.
 # Las actualizaciones de seguridad deben entrar mediante una subida explícita de esta versión.
