@@ -402,7 +402,7 @@ El administrador elige el tema desde el panel (`admin.php` → tarjeta **Aparien
 
 Los temas se definen en `assets/css/themes.css` mediante variables CSS con selectores `html[data-theme="slug"]`. Para añadir uno nuevo basta con agregar la entrada en `lib/admin_theme.php` (`ADMIN_THEMES`) y el bloque de variables en `themes.css`.
 
-La cabecera pública admite una imagen hero opcional desde `podcast_management.php`. La imagen cubre la cabecera sin cambiar sus dimensiones, incorpora una superposición oscura y muestra el texto en blanco. Si el campo queda vacío, se conserva la cabecera normal del tema seleccionado.
+La cabecera pública admite una imagen hero opcional desde `podcast_management.php`. La imagen cubre la cabecera sin cambiar sus dimensiones, incorpora una superposición oscura y muestra el texto en blanco. Las imágenes subidas se recortan de forma centrada hasta un máximo de 1720 × 720 px y se comprimen con calidad 82 como WebP cuando GD lo soporta o como JPEG en caso contrario, sin dependencias adicionales. Si el campo queda vacío, se conserva la cabecera normal del tema seleccionado.
 
 ### Archivos CSS
 

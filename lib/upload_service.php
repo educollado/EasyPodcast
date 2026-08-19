@@ -97,6 +97,172 @@ function normalizeUploadedJpegOrientation(string $imagePath): bool
 }
 
 /**
+ * Calcula un recorte centrado con la proporción del hero, sin ampliar la imagen.
+ *
+ * @return array{source_x: int, source_y: int, source_width: int, source_height: int, target_width: int, target_height: int}
+ */
+function calculateHeroImageCrop(
+    int $sourceWidth,
+    int $sourceHeight,
+    int $maxWidth = 1720,
+    int $maxHeight = 720
+): array {
+    if ($sourceWidth < 1 || $sourceHeight < 1 || $maxWidth < 1 || $maxHeight < 1) {
+        throw new InvalidArgumentException('Las dimensiones de la imagen deben ser mayores que cero.');
+    }
+
+    $sourceRatio = $sourceWidth / $sourceHeight;
+    $targetRatio = $maxWidth / $maxHeight;
+    $cropWidth = $sourceWidth;
+    $cropHeight = $sourceHeight;
+    $sourceX = 0;
+    $sourceY = 0;
+
+    if ($sourceRatio > $targetRatio) {
+        $cropWidth = max(1, (int) round($sourceHeight * $targetRatio));
+        $sourceX = intdiv($sourceWidth - $cropWidth, 2);
+    } elseif ($sourceRatio < $targetRatio) {
+        $cropHeight = max(1, (int) round($sourceWidth / $targetRatio));
+        $sourceY = intdiv($sourceHeight - $cropHeight, 2);
+    }
+
+    $scale = min(1.0, $maxWidth / $cropWidth, $maxHeight / $cropHeight);
+
+    return [
+        'source_x' => $sourceX,
+        'source_y' => $sourceY,
+        'source_width' => $cropWidth,
+        'source_height' => $cropHeight,
+        'target_width' => max(1, (int) round($cropWidth * $scale)),
+        'target_height' => max(1, (int) round($cropHeight * $scale)),
+    ];
+}
+
+/**
+ * Recorta y comprime un hero subido. Usa WebP cuando GD lo soporta y JPEG
+ * como alternativa, sin añadir dependencias ni impedir la subida si GD falla.
+ */
+function optimizeUploadedHeroImage(string $sourcePath): string
+{
+    if (
+        !is_file($sourcePath)
+        || !function_exists('getimagesize')
+        || !function_exists('imagecreatefromstring')
+        || !function_exists('imagecreatetruecolor')
+        || !function_exists('imagecopyresampled')
+        || !function_exists('imagejpeg')
+    ) {
+        return $sourcePath;
+    }
+
+    $metadata = @getimagesize($sourcePath);
+    $sourceWidth = is_array($metadata) ? (int) ($metadata[0] ?? 0) : 0;
+    $sourceHeight = is_array($metadata) ? (int) ($metadata[1] ?? 0) : 0;
+    $fileSize = @filesize($sourcePath);
+
+    // Evita agotar memoria al decodificar imágenes desproporcionadamente grandes.
+    if (
+        $sourceWidth < 1
+        || $sourceHeight < 1
+        || $sourceHeight > intdiv(16_000_000, $sourceWidth)
+        || $fileSize === false
+        || $fileSize > 24 * 1024 * 1024
+    ) {
+        return $sourcePath;
+    }
+
+    $sourceBytes = @file_get_contents($sourcePath);
+    if ($sourceBytes === false) {
+        return $sourcePath;
+    }
+
+    $sourceImage = @imagecreatefromstring($sourceBytes);
+    if ($sourceImage === false) {
+        return $sourcePath;
+    }
+
+    $crop = calculateHeroImageCrop($sourceWidth, $sourceHeight);
+    $targetImage = @imagecreatetruecolor($crop['target_width'], $crop['target_height']);
+    if ($targetImage === false) {
+        imagedestroy($sourceImage);
+        return $sourcePath;
+    }
+
+    $background = imagecolorallocate($targetImage, 255, 255, 255);
+    imagefilledrectangle($targetImage, 0, 0, $crop['target_width'], $crop['target_height'], $background);
+    $resampled = @imagecopyresampled(
+        $targetImage,
+        $sourceImage,
+        0,
+        0,
+        $crop['source_x'],
+        $crop['source_y'],
+        $crop['target_width'],
+        $crop['target_height'],
+        $crop['source_width'],
+        $crop['source_height']
+    );
+    imagedestroy($sourceImage);
+
+    if (!$resampled) {
+        imagedestroy($targetImage);
+        return $sourcePath;
+    }
+
+    try {
+        $randomSuffix = bin2hex(random_bytes(4));
+    } catch (Throwable) {
+        imagedestroy($targetImage);
+        return $sourcePath;
+    }
+
+    $directory = dirname($sourcePath);
+    $baseName = pathinfo($sourcePath, PATHINFO_FILENAME);
+    $temporaryPath = $directory . '/.' . $baseName . '-optimized-' . $randomSuffix . '.tmp';
+    $extension = function_exists('imagewebp') ? 'webp' : 'jpg';
+    $written = $extension === 'webp'
+        ? @imagewebp($targetImage, $temporaryPath, 82)
+        : @imagejpeg($targetImage, $temporaryPath, 82);
+
+    // Algunas compilaciones exponen imagewebp() aunque el codificador falle.
+    if (!$written && $extension === 'webp') {
+        @unlink($temporaryPath);
+        $extension = 'jpg';
+        $written = @imagejpeg($targetImage, $temporaryPath, 82);
+    }
+    imagedestroy($targetImage);
+
+    if (!$written) {
+        @unlink($temporaryPath);
+        return $sourcePath;
+    }
+
+    $geometryChanged = $crop['source_x'] !== 0
+        || $crop['source_y'] !== 0
+        || $crop['source_width'] !== $sourceWidth
+        || $crop['source_height'] !== $sourceHeight
+        || $crop['target_width'] !== $sourceWidth
+        || $crop['target_height'] !== $sourceHeight;
+    $optimizedSize = @filesize($temporaryPath);
+    if (!$geometryChanged && $optimizedSize !== false && $optimizedSize >= $fileSize) {
+        @unlink($temporaryPath);
+        return $sourcePath;
+    }
+
+    $optimizedPath = $directory . '/' . $baseName . '.' . $extension;
+    if (!@rename($temporaryPath, $optimizedPath)) {
+        @unlink($temporaryPath);
+        return $sourcePath;
+    }
+
+    if ($optimizedPath !== $sourcePath) {
+        @unlink($sourcePath);
+    }
+
+    return $optimizedPath;
+}
+
+/**
  * Maneja la subida opcional de imagen de portada del episodio.
  *
  * @param array  $fileData   Entrada de $_FILES['image_file']
@@ -110,6 +276,16 @@ function handleImageUpload(array $fileData, string $baseUrl, string $imagesDir):
 }
 
 /**
+ * Maneja la subida y optimización de la imagen panorámica del hero.
+ *
+ * @return array{url: ?string, error: ?string}
+ */
+function handleHeroImageUpload(array $fileData, string $baseUrl, string $imagesDir): array
+{
+    return handleNamedImageUpload($fileData, $baseUrl, $imagesDir, 'podcast-hero', true);
+}
+
+/**
  * Maneja una subida de imagen con un nombre base específico para su contexto.
  *
  * @return array{url: ?string, error: ?string}
@@ -118,7 +294,8 @@ function handleNamedImageUpload(
     array $fileData,
     string $baseUrl,
     string $imagesDir,
-    string $fallbackName
+    string $fallbackName,
+    bool $optimizeForHero = false
 ): array
 {
     // UPLOAD_ERR_NO_FILE significa que el usuario no seleccionó fichero: no es un error.
@@ -168,6 +345,11 @@ function handleNamedImageUpload(
     if ($mimeType === 'image/jpeg' && !normalizeUploadedJpegOrientation($targetPath)) {
         @unlink($targetPath);
         return ['url' => null, 'error' => 'No se pudo corregir la orientación de la imagen subida.'];
+    }
+
+    if ($optimizeForHero) {
+        $targetPath = optimizeUploadedHeroImage($targetPath);
+        $fileName = basename($targetPath);
     }
 
     return ['url' => rtrim($baseUrl, '/') . '/images/' . $fileName, 'error' => null];

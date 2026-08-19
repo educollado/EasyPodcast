@@ -3,6 +3,7 @@
 ## Próxima versión
 
 - **Imágenes alineadas en contenido**: las imágenes flotadas a izquierda o derecha desde el editor conservan su alineación en páginas y episodios mediante clases CSS seguras, sin permitir estilos inline arbitrarios.
+- **Hero optimizado**: las imágenes subidas para la cabecera se recortan a proporción panorámica, se limitan a 1720 × 720 px y se comprimen como WebP o JPEG utilizando GD, sin incorporar dependencias nuevas.
 
 ## 1.9.9
 

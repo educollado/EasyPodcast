@@ -60,7 +60,7 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
     }
 
     $heroFileData = is_array($files['hero_image_file'] ?? null) ? $files['hero_image_file'] : ['error' => UPLOAD_ERR_NO_FILE];
-    $heroResult = handleNamedImageUpload($heroFileData, $baseUrl, dirname(__DIR__) . '/images', 'podcast-hero');
+    $heroResult = handleHeroImageUpload($heroFileData, $baseUrl, dirname(__DIR__) . '/images');
 
     if ($heroResult['error'] !== null) {
         apiError($heroResult['error']);

@@ -337,11 +337,10 @@ function loadPodcastManagementData(string $dbPath): array
                     $uploadedHero = is_array($_FILES['hero_image_file'] ?? null)
                         ? $_FILES['hero_image_file']
                         : ['error' => UPLOAD_ERR_NO_FILE];
-                    $heroResult = handleNamedImageUpload(
+                    $heroResult = handleHeroImageUpload(
                         $uploadedHero,
                         resolvePodcastFormBaseUrl($form, $pdo),
-                        __DIR__ . '/../images',
-                        'podcast-hero'
+                        __DIR__ . '/../images'
                     );
                     if ($heroResult['error'] !== null) {
                         $error = __('No se pudo subir la imagen del hero: %s', $heroResult['error']);

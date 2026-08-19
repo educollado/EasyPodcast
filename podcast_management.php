@@ -296,6 +296,7 @@ extract($data);  // form, error, notice
           <label>
             <?= __('O subir imagen para el hero') ?>
             <input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/gif,image/webp">
+            <small><?= __('La imagen subida se recorta y optimiza automáticamente para la cabecera.') ?></small>
             <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
           </label>
           <label class="align-start">

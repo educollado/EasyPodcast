@@ -4,16 +4,49 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/upload_service.php';
 
-test('handleNamedImageUpload: no seleccionar hero no produce error', function () {
-    $result = handleNamedImageUpload(
+test('handleHeroImageUpload: no seleccionar hero no produce error', function () {
+    $result = handleHeroImageUpload(
         ['error' => UPLOAD_ERR_NO_FILE],
         'https://example.com',
-        sys_get_temp_dir(),
-        'podcast-hero'
+        sys_get_temp_dir()
     );
 
     assert_null($result['url']);
     assert_null($result['error']);
+});
+
+test('calculateHeroImageCrop: recorta una imagen horizontal desde el centro', function () {
+    $crop = calculateHeroImageCrop(4000, 2000);
+    assert_eq(4000, $crop['source_width']);
+    assert_eq(1674, $crop['source_height']);
+    assert_eq(163, $crop['source_y']);
+    assert_eq(1720, $crop['target_width']);
+    assert_eq(720, $crop['target_height']);
+});
+
+test('calculateHeroImageCrop: recorta una imagen vertical desde el centro', function () {
+    $crop = calculateHeroImageCrop(1200, 2000);
+    assert_eq(1200, $crop['source_width']);
+    assert_eq(502, $crop['source_height']);
+    assert_eq(749, $crop['source_y']);
+    assert_eq(1200, $crop['target_width']);
+    assert_eq(502, $crop['target_height']);
+});
+
+test('calculateHeroImageCrop: no amplía imágenes pequeñas', function () {
+    $crop = calculateHeroImageCrop(860, 360);
+    assert_eq(860, $crop['target_width']);
+    assert_eq(360, $crop['target_height']);
+});
+
+test('calculateHeroImageCrop: rechaza dimensiones inválidas', function () {
+    $thrown = false;
+    try {
+        calculateHeroImageCrop(0, 720);
+    } catch (InvalidArgumentException) {
+        $thrown = true;
+    }
+    assert_true($thrown, 'Se esperaba InvalidArgumentException para dimensiones inválidas.');
 });
 
 test('getExifOrientationTransform: orientación normal no transforma', function () {
