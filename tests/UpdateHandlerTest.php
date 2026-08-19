@@ -57,6 +57,74 @@ test('parseLatestReleaseData rechaza etiquetas no válidas', function () {
     assert_contains('Versión no reconocida', $result['error']);
 });
 
+test('buildAdminUpdateStatus detecta versiones nuevas y descarta valores inválidos', function () {
+    assert_true(buildAdminUpdateStatus('9.9.9')['available']);
+    assert_eq(false, buildAdminUpdateStatus(APP_VERSION)['available']);
+    assert_eq(['available' => false, 'version' => ''], buildAdminUpdateStatus('<script>'));
+});
+
+test('loadDailyAdminUpdateStatus consulta GitHub solo una vez por día', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+        return;
+    }
+
+    $dbPath = tempnam(sys_get_temp_dir(), 'easypodcast-update-check-');
+    assert_true(is_string($dbPath));
+    $calls = 0;
+    $fetch = static function () use (&$calls): array {
+        $calls++;
+        return [
+            'version' => '9.9.9',
+            'tar_url' => '',
+            'checksum_url' => '',
+            'error' => '',
+        ];
+    };
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->exec(
+            'CREATE TABLE podcast (
+                id INTEGER PRIMARY KEY,
+                last_update_check_date TEXT,
+                latest_version_checked TEXT
+            )'
+        );
+        $pdo->exec('INSERT INTO podcast (id) VALUES (1)');
+        $pdo = null;
+
+        $first = loadDailyAdminUpdateStatus($dbPath, $fetch, '2026-08-19');
+        $second = loadDailyAdminUpdateStatus($dbPath, $fetch, '2026-08-19');
+        assert_true($first['available']);
+        assert_true($second['available']);
+        assert_eq(1, $calls);
+
+        loadDailyAdminUpdateStatus($dbPath, $fetch, '2026-08-20');
+        assert_eq(2, $calls);
+    } finally {
+        @unlink($dbPath);
+    }
+});
+
+test('aviso de actualización está traducido en todos los idiomas soportados', function () {
+    $messages = [
+        'Hay una nueva versión de EasyPodcast disponible:',
+        'Actualizar ahora',
+    ];
+    $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
+    assert_eq(8, count($localeFiles));
+
+    foreach ($localeFiles as $localeFile) {
+        $translations = i18n_parse_po($localeFile);
+        foreach ($messages as $message) {
+            assert_true(
+                isset($translations[$message]) && $translations[$message] !== '',
+                basename($localeFile) . ' no traduce: ' . $message
+            );
+        }
+    }
+});
+
 test('parseSha256Checksum acepta el formato de sha256sum', function () {
     $hash = str_repeat('A', 64);
     $result = parseSha256Checksum($hash . "  EasyPodcast-1.2.3.tar.gz\n", 'EasyPodcast-1.2.3.tar.gz');

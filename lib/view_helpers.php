@@ -214,6 +214,49 @@ function sanitizeRichHtmlUrl(string $url, array $allowedSchemes, bool $allowRela
 }
 
 /**
+ * Renderiza un subconjunto seguro de Markdown inline.
+ *
+ * Admite código, negrita, cursiva y enlaces HTTP/HTTPS. Todo el texto y las
+ * URL se escapan antes de incorporarse al HTML.
+ */
+function renderSafeMarkdownInline(string $value): string
+{
+    $pattern = '~`([^`\r\n]+)`|\*\*([^*\r\n]+)\*\*|(?<!\*)\*([^*\r\n]+)\*(?!\*)|\[([^\]\r\n]+)\]\(([^)\s]+)\)~u';
+    $html = '';
+    $offset = 0;
+    $length = strlen($value);
+
+    while (
+        $offset < $length
+        && preg_match($pattern, $value, $match, PREG_OFFSET_CAPTURE | PREG_UNMATCHED_AS_NULL, $offset) === 1
+    ) {
+        $token = (string) $match[0][0];
+        $tokenOffset = (int) $match[0][1];
+        $html .= esc(substr($value, $offset, $tokenOffset - $offset));
+
+        if (($match[1][1] ?? -1) >= 0) {
+            $html .= '<code>' . esc((string) $match[1][0]) . '</code>';
+        } elseif (($match[2][1] ?? -1) >= 0) {
+            $html .= '<strong>' . esc((string) $match[2][0]) . '</strong>';
+        } elseif (($match[3][1] ?? -1) >= 0) {
+            $html .= '<em>' . esc((string) $match[3][0]) . '</em>';
+        } else {
+            $safeUrl = sanitizeRichHtmlUrl((string) $match[5][0], ['http', 'https'], false);
+            if ($safeUrl === null) {
+                $html .= esc($token);
+            } else {
+                $html .= '<a href="' . esc($safeUrl) . '" target="_blank" rel="noopener noreferrer">'
+                    . esc((string) $match[4][0]) . '</a>';
+            }
+        }
+
+        $offset = $tokenOffset + strlen($token);
+    }
+
+    return $html . esc(substr($value, $offset));
+}
+
+/**
  * Devuelve la versión saneada del contenido HTML enriquecido.
  */
 function sanitizeRichHtml(string $value): string

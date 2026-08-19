@@ -11,6 +11,7 @@ require_once __DIR__ . '/lib/session.php';
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/admin_query.php';
 require_once __DIR__ . '/lib/cache_service.php';
+require_once __DIR__ . '/lib/update_handler.php';
 
 startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
@@ -71,6 +72,7 @@ $currentAppLanguage = 'es_ES';
 // Tema activo para mostrar el selector.
 $currentAdminTheme  = 'easypodcast';
 $currentPublicThemeModeAuto = false;
+$adminUpdateStatus = ['available' => false, 'version' => ''];
 if ($isLoggedIn) {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
@@ -87,6 +89,7 @@ if ($isLoggedIn) {
     } catch (Throwable $e) {
         // Usa el fallback.
     }
+    $adminUpdateStatus = loadDailyAdminUpdateStatus($dbPath);
 }
 ?>
 <!doctype html>
@@ -112,6 +115,14 @@ if ($isLoggedIn) {
 
         <?php if ($notice !== ''): ?>
           <div class="notice"><?= esc($notice) ?></div>
+        <?php endif; ?>
+
+        <?php if ($adminUpdateStatus['available']): ?>
+          <div class="update-status-warning admin-update-notice">
+            <?= __('Hay una nueva versión de EasyPodcast disponible:') ?>
+            <strong>v<?= esc($adminUpdateStatus['version']) ?></strong>.
+            <a href="update.php" class="update-footer-link"><?= __('Actualizar ahora') ?></a>
+          </div>
         <?php endif; ?>
 
         <div class="admin-cards">

@@ -2072,3 +2072,9 @@ msgstr "Segundo o sistema"
 
 msgid "Tema:"
 msgstr "Tema:"
+
+msgid "Hay una nueva versión de EasyPodcast disponible:"
+msgstr "Está disponível uma nova versão do EasyPodcast:"
+
+msgid "Actualizar ahora"
+msgstr "Atualizar agora"

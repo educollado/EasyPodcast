@@ -962,6 +962,10 @@ code.inline {
   font-size: .91rem;
 }
 
+.admin-update-notice {
+  margin-bottom: .85rem;
+}
+
 .update-footer-note {
   margin-top: 1.5rem;
   font-size: .83rem;

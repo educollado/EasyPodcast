@@ -127,6 +127,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 19');
         $version = 19;
     }
+
+    if ($version < 20) {
+        migration_v20($pdo);
+        $pdo->exec('PRAGMA user_version = 20');
+        $version = 20;
+    }
 }
 
 /**
@@ -660,5 +666,23 @@ function migration_v19(PDO $pdo): void
     );
     if (!in_array('hero_image_url', $existing, true)) {
         $pdo->exec("ALTER TABLE podcast ADD COLUMN hero_image_url TEXT");
+    }
+}
+
+/**
+ * Migración v20: recuerda la comprobación diaria de actualizaciones para no
+ * consultar GitHub en cada entrada al panel de administración.
+ */
+function migration_v20(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('last_update_check_date', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN last_update_check_date TEXT");
+    }
+    if (!in_array('latest_version_checked', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN latest_version_checked TEXT");
     }
 }

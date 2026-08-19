@@ -71,6 +71,107 @@ function getLatestReleaseInfo(): array
 }
 
 /**
+ * Convierte una versión comprobada en el estado mínimo que necesita admin.php.
+ *
+ * @return array{available: bool, version: string}
+ */
+function buildAdminUpdateStatus(string $latestVersion): array
+{
+    $validVersion = preg_match('/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/', $latestVersion) === 1;
+
+    return [
+        'available' => $validVersion && version_compare($latestVersion, APP_VERSION, '>'),
+        'version' => $validVersion ? $latestVersion : '',
+    ];
+}
+
+/**
+ * Comprueba actualizaciones como máximo una vez por día natural para toda la
+ * instalación. La fecha se reserva bajo BEGIN IMMEDIATE antes de contactar con
+ * GitHub, evitando consultas duplicadas por peticiones concurrentes.
+ *
+ * @param null|callable():array{version:string,tar_url:string,checksum_url:string,error:string} $fetchRelease
+ * @return array{available: bool, version: string}
+ */
+function loadDailyAdminUpdateStatus(
+    string $dbPath,
+    ?callable $fetchRelease = null,
+    ?string $today = null
+): array {
+    $empty = ['available' => false, 'version' => ''];
+    $today = $today !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $today) === 1
+        ? $today
+        : date('Y-m-d');
+    $transactionOpen = false;
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $pdo->exec('BEGIN IMMEDIATE');
+        $transactionOpen = true;
+
+        $row = $pdo->query(
+            'SELECT id, last_update_check_date, latest_version_checked
+             FROM podcast ORDER BY id ASC LIMIT 1'
+        )->fetch();
+        if (!is_array($row)) {
+            $pdo->exec('COMMIT');
+            $transactionOpen = false;
+            return $empty;
+        }
+
+        if ((string) ($row['last_update_check_date'] ?? '') === $today) {
+            $latestVersion = (string) ($row['latest_version_checked'] ?? '');
+            $pdo->exec('COMMIT');
+            $transactionOpen = false;
+            return buildAdminUpdateStatus($latestVersion);
+        }
+
+        $reserve = $pdo->prepare(
+            'UPDATE podcast
+             SET last_update_check_date = :check_date, latest_version_checked = :version
+             WHERE id = :id'
+        );
+        $reserve->execute([
+            ':check_date' => $today,
+            ':version' => '',
+            ':id' => (int) $row['id'],
+        ]);
+        $pdo->exec('COMMIT');
+        $transactionOpen = false;
+
+        $releaseInfo = $fetchRelease !== null ? $fetchRelease() : getLatestReleaseInfo();
+        $latestVersion = (string) ($releaseInfo['version'] ?? '');
+        if ((string) ($releaseInfo['error'] ?? '') !== '') {
+            return $empty;
+        }
+
+        $status = buildAdminUpdateStatus($latestVersion);
+        $save = $pdo->prepare(
+            'UPDATE podcast SET latest_version_checked = :version
+             WHERE id = :id AND last_update_check_date = :check_date'
+        );
+        $save->execute([
+            ':version' => $status['version'],
+            ':id' => (int) $row['id'],
+            ':check_date' => $today,
+        ]);
+
+        return $status;
+    } catch (Throwable) {
+        if ($transactionOpen && isset($pdo) && $pdo instanceof PDO) {
+            try {
+                $pdo->exec('ROLLBACK');
+            } catch (Throwable) {
+                // El aviso nunca debe impedir la carga del panel.
+            }
+        }
+        return $empty;
+    }
+}
+
+/**
  * Valida la respuesta de GitHub y localiza el paquete junto a su checksum.
  *
  * @return array{version: string, tar_url: string, checksum_url: string, error: string}

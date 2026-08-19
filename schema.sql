@@ -20,7 +20,9 @@ CREATE TABLE IF NOT EXISTS podcast (
   cache_enabled INTEGER NOT NULL DEFAULT 0,
   app_language TEXT NOT NULL DEFAULT 'es_ES',
   admin_theme TEXT NOT NULL DEFAULT 'easypodcast',
-  public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
+  public_theme_mode_auto INTEGER NOT NULL DEFAULT 0,
+  last_update_check_date TEXT,
+  latest_version_checked TEXT
 );
 
 -- episodes: una fila por episodio.
@@ -176,4 +178,4 @@ BEGIN
   ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 19;
+PRAGMA user_version = 20;

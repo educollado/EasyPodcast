@@ -185,6 +185,23 @@ test('sanitizeRichHtml: descarta estilos de imagen sin alineación permitida', f
     assert_true(!str_contains($result, 'style='));
 });
 
+test('renderSafeMarkdownInline: formatea novedades habituales', function () {
+    $result = renderSafeMarkdownInline('**Novedad** con *detalle*, `código` y [documentación](https://example.com/docs).');
+    assert_contains('<strong>Novedad</strong>', $result);
+    assert_contains('<em>detalle</em>', $result);
+    assert_contains('<code>código</code>', $result);
+    assert_contains('href="https://example.com/docs"', $result);
+    assert_contains('rel="noopener noreferrer"', $result);
+});
+
+test('renderSafeMarkdownInline: escapa HTML y rechaza enlaces inseguros', function () {
+    $result = renderSafeMarkdownInline('**<img src=x onerror=alert(1)>** [clic](javascript:alert(1))');
+    assert_true(!str_contains($result, '<img'));
+    assert_true(!str_contains($result, 'href='));
+    assert_contains('&lt;img src=x onerror=alert(1)&gt;', $result);
+    assert_contains('[clic](javascript:alert(1))', $result);
+});
+
 // =============================================================================
 // isPrivateOrReservedIp
 // =============================================================================

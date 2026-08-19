@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.9-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.10-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -215,19 +215,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 19) {
-    migration_v19($pdo);
-    $pdo->exec('PRAGMA user_version = 19');
+if ($version < 21) {
+    migration_v21($pdo);
+    $pdo->exec('PRAGMA user_version = 21');
 }
 
 // 2. Función de migración
-function migration_v19(PDO $pdo): void
+function migration_v21(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 19`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 21`.
 
 #### Historial de versiones
 
@@ -252,6 +252,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 19`.
 | 17 | Añade `public_theme_mode_auto` a `podcast` para guardar el modo público `Según sistema` como ajuste global |
 | 18 | Activa EasyPodcast como tema predeterminado sin alterar otros temas elegidos |
 | 19 | Añade `hero_image_url` al podcast para configurar la imagen de cabecera |
+| 20 | Guarda la fecha y versión de la comprobación diaria de actualizaciones del panel |
 
 ---
 
@@ -403,6 +404,8 @@ El administrador elige el tema desde el panel (`admin.php` → tarjeta **Aparien
 Los temas se definen en `assets/css/themes.css` mediante variables CSS con selectores `html[data-theme="slug"]`. Para añadir uno nuevo basta con agregar la entrada en `lib/admin_theme.php` (`ADMIN_THEMES`) y el bloque de variables en `themes.css`.
 
 La cabecera pública admite una imagen hero opcional desde `podcast_management.php`. La imagen cubre la cabecera sin cambiar sus dimensiones, incorpora una superposición oscura y muestra el texto en blanco. Las imágenes subidas se recortan de forma centrada hasta un máximo de 1720 × 720 px y se comprimen con calidad 82 como WebP cuando GD lo soporta o como JPEG en caso contrario, sin dependencias adicionales. Si el campo queda vacío, se conserva la cabecera normal del tema seleccionado.
+
+Al entrar en `admin.php`, EasyPodcast consulta como máximo una vez al día si existe una release nueva en GitHub. El resultado se comparte entre sesiones mediante la base de datos y, cuando hay una actualización, el panel muestra un aviso con acceso directo a `update.php`.
 
 ### Archivos CSS
 

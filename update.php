@@ -71,8 +71,7 @@ $updatingLabel        = __('Actualizando…');
               <?php foreach (explode("\n", $changelogNotes) as $line): ?>
                 <?php $line = trim($line); if ($line === '') { continue; } ?>
                 <?php $line = ltrim($line, '- '); ?>
-                <?php $line = preg_replace('/`([^`]+)`/', '<code>$1</code>', htmlspecialchars($line, ENT_QUOTES, 'UTF-8')); ?>
-                <li><?= $line ?></li>
+                <li><?= renderSafeMarkdownInline($line) ?></li>
               <?php endforeach; ?>
             </ul>
           </div>

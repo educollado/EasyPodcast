@@ -1,9 +1,11 @@
 # Changelog
 
-## Próxima versión
+## 1.9.10
 
 - **Imágenes alineadas en contenido**: las imágenes flotadas a izquierda o derecha desde el editor conservan su alineación en páginas y episodios mediante clases CSS seguras, sin permitir estilos inline arbitrarios.
 - **Hero optimizado**: las imágenes subidas para la cabecera se recortan a proporción panorámica, se limitan a 1720 × 720 px y se comprimen como WebP o JPEG utilizando GD, sin incorporar dependencias nuevas.
+- **Novedades con formato**: la pantalla posterior a una actualización interpreta de forma segura negritas, cursivas, código y enlaces Markdown del changelog.
+- **Aviso diario de actualizaciones**: el panel consulta GitHub una sola vez al día para toda la instalación y muestra un enlace a `update.php` cuando detecta una versión nueva.
 
 ## 1.9.9
 
