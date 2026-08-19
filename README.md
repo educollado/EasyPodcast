@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.10-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.11-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -101,7 +101,7 @@ docker run -d \
   ghcr.io/educollado/easypodcast:latest
 ```
 
-La imagen del proyecto se construye sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
+La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
 
 ---
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.11
+
+- **Docker multi-arquitectura**: el workflow de publicación construye una única imagen compatible con `linux/amd64` y `linux/arm64` mediante QEMU y Docker Buildx, reutiliza la caché de GitHub Actions y obtiene dinámicamente el namespace de GHCR. Mejora basada en la contribución de Damián Muraña y validada originalmente en una Raspberry Pi 4 con ARM64.
+- **Contenedor actualizado**: la imagen base oficial pasa de PHP 8.5.8 a PHP 8.5.9 sobre Apache y Debian Trixie, manteniendo la versión fijada para evitar cambios silenciosos entre builds.
+
 ## 1.9.10
 
 - **Imágenes alineadas en contenido**: las imágenes flotadas a izquierda o derecha desde el editor conservan su alineación en páginas y episodios mediante clases CSS seguras, sin permitir estilos inline arbitrarios.
