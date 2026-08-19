@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 const ADMIN_THEMES = [
     'easypodcast'  => 'EasyPodcast',
+    'corporate'    => 'Corporate',
     'default'      => 'Amber Parchment',
     'oscuro'       => 'Ember Noir',
     'agua'         => 'Arctic Tide',

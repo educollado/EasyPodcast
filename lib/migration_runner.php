@@ -121,6 +121,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 18');
         $version = 18;
     }
+
+    if ($version < 19) {
+        migration_v19($pdo);
+        $pdo->exec('PRAGMA user_version = 19');
+        $version = 19;
+    }
 }
 
 /**
@@ -641,4 +647,18 @@ function migration_v18(PDO $pdo): void
         ':new_theme' => 'easypodcast',
         ':legacy_theme' => 'default',
     ]);
+}
+
+/**
+ * Migración v19: añade una imagen hero opcional para la cabecera pública.
+ */
+function migration_v19(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('hero_image_url', $existing, true)) {
+        $pdo->exec("ALTER TABLE podcast ADD COLUMN hero_image_url TEXT");
+    }
 }

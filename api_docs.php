@@ -166,8 +166,8 @@ $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_S
 
         <div class="endpoint-block">
           <p><span class="method method-post">POST</span> <code class="inline">/api/v1/podcast</code> — <?= __('Actualizar metadatos') ?></p>
-          <p><?= __('Campos actualizables:') ?> <code class="inline">title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language</code>.<br>
-          <?= __('Para subir imagen del canal usa') ?> <code class="inline">multipart/form-data</code> <?= __('con el campo') ?> <code class="inline">image_file</code>.</p>
+          <p><?= __('Campos actualizables:') ?> <code class="inline">title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, hero_image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language</code>.<br>
+          <?= __('Para subir imágenes del canal usa') ?> <code class="inline">multipart/form-data</code> <?= __('con los campos') ?> <code class="inline">image_file</code> <?= __('y') ?> <code class="inline">hero_image_file</code>.</p>
           <pre>curl -s -X POST \
   -H "Authorization: Bearer TOKEN" \
   -H "Content-Type: application/json" \

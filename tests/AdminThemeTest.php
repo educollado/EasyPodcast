@@ -19,6 +19,10 @@ test('adminTheme: por defecto usa el tema EasyPodcast', function () {
     assert_eq('easypodcast', adminTheme());
 });
 
+test('ADMIN_THEMES: incluye el tema Corporate', function () {
+    assert_eq('Corporate', ADMIN_THEMES['corporate'] ?? null);
+});
+
 test('publicThemeMode: devuelve auto cuando está cargado en globals', function () {
     $GLOBALS['_public_theme_mode'] = 'auto';
     assert_eq('auto', publicThemeMode());
@@ -44,11 +48,11 @@ test('loadAdminTheme: carga tema visual y modo público desde la BD', function (
                 public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
             )"
         );
-        $pdo->exec("INSERT INTO podcast (id, admin_theme, public_theme_mode_auto) VALUES (1, 'agua', 1)");
+        $pdo->exec("INSERT INTO podcast (id, admin_theme, public_theme_mode_auto) VALUES (1, 'corporate', 1)");
 
         loadAdminTheme($dbPath);
 
-        assert_eq('agua', adminTheme());
+        assert_eq('corporate', adminTheme());
         assert_eq('auto', publicThemeMode());
     } finally {
         unset($GLOBALS['_admin_theme'], $GLOBALS['_public_theme_mode']);

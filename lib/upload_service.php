@@ -106,6 +106,21 @@ function normalizeUploadedJpegOrientation(string $imagePath): bool
  */
 function handleImageUpload(array $fileData, string $baseUrl, string $imagesDir): array
 {
+    return handleNamedImageUpload($fileData, $baseUrl, $imagesDir, 'episode-image');
+}
+
+/**
+ * Maneja una subida de imagen con un nombre base específico para su contexto.
+ *
+ * @return array{url: ?string, error: ?string}
+ */
+function handleNamedImageUpload(
+    array $fileData,
+    string $baseUrl,
+    string $imagesDir,
+    string $fallbackName
+): array
+{
     // UPLOAD_ERR_NO_FILE significa que el usuario no seleccionó fichero: no es un error.
     if ((int) ($fileData['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return ['url' => null, 'error' => null];
@@ -114,7 +129,7 @@ function handleImageUpload(array $fileData, string $baseUrl, string $imagesDir):
     // Cualquier otro código distinto de UPLOAD_ERR_OK indica un fallo real de PHP.
     $uploadError = (int) ($fileData['error'] ?? UPLOAD_ERR_OK);
     if ($uploadError !== UPLOAD_ERR_OK) {
-        return ['url' => null, 'error' => 'No se pudo subir la imagen del capítulo.'];
+        return ['url' => null, 'error' => 'No se pudo subir la imagen.'];
     }
 
     $tmpPath = (string) ($fileData['tmp_name'] ?? '');
@@ -136,7 +151,7 @@ function handleImageUpload(array $fileData, string $baseUrl, string $imagesDir):
     }
 
     // Nombre seguro con timestamp + bytes aleatorios para evitar colisiones y path traversal.
-    $fileName = buildSafeFileName($originalName, 'episode-image', $allowedImages[$mimeType]);
+    $fileName = buildSafeFileName($originalName, $fallbackName, $allowedImages[$mimeType]);
 
     // triple comprobación: is_dir → mkdir → is_dir para manejar condiciones de carrera.
     if (!is_dir($imagesDir) && !mkdir($imagesDir, 0755, true) && !is_dir($imagesDir)) {

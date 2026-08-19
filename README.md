@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.8-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.9.9-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -251,6 +251,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 19`.
 | 16 | Migra `api_tokens` a hash + sufijo visible y añade alcance explícito |
 | 17 | Añade `public_theme_mode_auto` a `podcast` para guardar el modo público `Según sistema` como ajuste global |
 | 18 | Activa EasyPodcast como tema predeterminado sin alterar otros temas elegidos |
+| 19 | Añade `hero_image_url` al podcast para configurar la imagen de cabecera |
 
 ---
 
@@ -388,6 +389,7 @@ El administrador elige el tema desde el panel (`admin.php` → tarjeta **Aparien
 | Slug | Nombre | Estilo |
 |---|---|---|
 | `easypodcast` | EasyPodcast | Predeterminado, azul marino y verde petróleo |
+| `corporate` | Corporate | Claro editorial, acento rojo y estética de eduardocollado.com |
 | `default` | Amber Parchment | Claro cálido, acento terracota |
 | `oscuro` | Ember Noir | Oscuro cálido, acento naranja |
 | `agua` | Arctic Tide | Claro azul |
@@ -399,6 +401,8 @@ El administrador elige el tema desde el panel (`admin.php` → tarjeta **Aparien
 | `monocromo` | Silver Void | Escala de grises pura |
 
 Los temas se definen en `assets/css/themes.css` mediante variables CSS con selectores `html[data-theme="slug"]`. Para añadir uno nuevo basta con agregar la entrada en `lib/admin_theme.php` (`ADMIN_THEMES`) y el bloque de variables en `themes.css`.
+
+La cabecera pública admite una imagen hero opcional desde `podcast_management.php`. La imagen cubre la cabecera sin cambiar sus dimensiones, incorpora una superposición oscura y muestra el texto en blanco. Si el campo queda vacío, se conserva la cabecera normal del tema seleccionado.
 
 ### Archivos CSS
 

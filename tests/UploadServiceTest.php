@@ -4,6 +4,18 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/upload_service.php';
 
+test('handleNamedImageUpload: no seleccionar hero no produce error', function () {
+    $result = handleNamedImageUpload(
+        ['error' => UPLOAD_ERR_NO_FILE],
+        'https://example.com',
+        sys_get_temp_dir(),
+        'podcast-hero'
+    );
+
+    assert_null($result['url']);
+    assert_null($result['error']);
+});
+
 test('getExifOrientationTransform: orientación normal no transforma', function () {
     assert_eq(['angle' => 0, 'flip' => null], getExifOrientationTransform(1));
 });

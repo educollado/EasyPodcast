@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.9
+
+- **Tema Corporate**: nueva apariencia clara y editorial basada en eduardocollado.com, con acento rojo, tipografía clásica para titulares y adaptación completa a la web pública y al panel.
+- **Hero configurable**: la gestión del podcast permite definir o subir una imagen de cabecera opcional, oscurecida para mantener el texto blanco legible y sin modificar las dimensiones actuales.
+- **Bloques de código**: las líneas largas se desplazan horizontalmente dentro del bloque sin ensanchar la columna ni desmontar la página.
+
 ## 1.9.8
 
 - **Importación remota segura**: los feeds, imágenes y audios tienen límites explícitos de tamaño, las descargas fijan la IP pública validada para impedir DNS rebinding y los archivos se guardan con una extensión inerte hasta confirmar su MIME real.

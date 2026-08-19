@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Figtree:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Lora:wght@400;500;600;700&display=swap');
 
 /* =========================================================
    Variables de tema (claro)
@@ -57,8 +57,100 @@ body {
 }
 
 /* =========================================================
+   Código en contenido público
+   Las líneas largas se desplazan dentro del bloque y nunca
+   aumentan el ancho de la tarjeta o de la cuadrícula.
+   ========================================================= */
+.detail > div:not(.cover),
+.detail .desc,
+.page-article,
+.page-article > div,
+.page-article .desc {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.detail .desc pre,
+.page-article .desc pre {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre;
+  font-family: var(--font-code, "SFMono-Regular", Consolas, "Liberation Mono", monospace);
+  font-size: .86em;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.detail .desc pre code,
+.page-article .desc pre code {
+  font: inherit;
+  color: inherit;
+  white-space: inherit;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* =========================================================
    Cabecera pública
    ========================================================= */
+.podcast-site-header.has-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.podcast-hero-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.podcast-site-header.has-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.58));
+  pointer-events: none;
+}
+
+.podcast-site-header.has-hero h1,
+.podcast-site-header.has-hero h1 a,
+.podcast-site-header.has-hero .author,
+.podcast-site-header.has-hero .desc,
+.podcast-site-header.has-hero .desc a {
+  color: #ffffff;
+}
+
+.podcast-site-header.has-hero .rss-link {
+  color: #ffffff;
+  border-color: rgba(255,255,255,.55);
+}
+
+.podcast-site-header.has-hero .search-form input[type="search"] {
+  color: #ffffff;
+  background: rgba(17,24,39,.55);
+  border-color: rgba(255,255,255,.55);
+}
+
+.podcast-site-header.has-hero .search-form input[type="search"]::placeholder {
+  color: rgba(255,255,255,.78);
+}
+
 .podcast-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

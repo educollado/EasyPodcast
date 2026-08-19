@@ -9,11 +9,17 @@ $podcastTitle = isset($podcastTitle) ? (string) $podcastTitle : 'Podcast';
 $podcastAuthor = isset($podcastAuthor) ? (string) $podcastAuthor : '';
 $podcastDescription = isset($podcastDescription) ? (string) $podcastDescription : '';
 $podcastImage = isset($podcastImage) ? (string) $podcastImage : '';
+$podcastHeroImage = isset($podcastHeroImage)
+    ? trim((string) $podcastHeroImage)
+    : trim((string) (is_array($podcast ?? null) ? ($podcast['hero_image_url'] ?? '') : ''));
 $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
 // Variantes 80px (normal) y 144px (retina) para la miniatura de cabecera.
 $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($podcastImage, [80, 144]) : ['src' => '', 'srcset' => ''];
 ?>
-<header class="card">
+<header class="card podcast-site-header<?= $podcastHeroImage !== '' ? ' has-hero' : '' ?>">
+  <?php if ($podcastHeroImage !== ''): ?>
+    <img class="podcast-hero-image" src="<?= esc($podcastHeroImage) ?>" alt="" aria-hidden="true">
+  <?php endif; ?>
   <div class="podcast-header">
     <div class="podcast-header-left header-box">
       <div class="podcast-branding">

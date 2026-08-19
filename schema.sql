@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS podcast (
   category TEXT,
   explicit INTEGER NOT NULL DEFAULT 0,
   image_url TEXT,
+  hero_image_url TEXT,
   copyright TEXT,
   itunes_type TEXT DEFAULT 'episodic',
   rss_item_limit INTEGER NOT NULL DEFAULT 0,
@@ -175,4 +176,4 @@ BEGIN
   ON CONFLICT(episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 18;
+PRAGMA user_version = 19;

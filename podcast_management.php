@@ -288,6 +288,16 @@ extract($data);  // form, error, notice
             <?= __('O subir imagen del podcast') ?>
             <input type="file" name="image_file" accept="image/*">
           </label>
+          <label>
+            <?= __('Imagen del hero (URL)') ?>
+            <input type="url" name="hero_image_url" value="<?= esc($form['hero_image_url']) ?>">
+            <small><?= __('Déjala vacía para mantener la cabecera actual sin hero.') ?></small>
+          </label>
+          <label>
+            <?= __('O subir imagen para el hero') ?>
+            <input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/gif,image/webp">
+            <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
+          </label>
           <label class="align-start">
             <?= __('Tipo iTunes') ?>
             <select name="itunes_type">

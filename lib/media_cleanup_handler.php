@@ -117,10 +117,15 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
             }
         }
 
-        // Imagen de portada del canal
-        $podcastImage = $pdo->query("SELECT image_url FROM podcast WHERE image_url != '' LIMIT 1")->fetchColumn();
-        if (is_string($podcastImage) && str_contains($podcastImage, '/images/')) {
-            $usedImages[] = basename($podcastImage);
+        // Imágenes de portada y hero del canal.
+        $podcastImages = $pdo
+            ->query('SELECT image_url, hero_image_url FROM podcast ORDER BY id ASC LIMIT 1')
+            ->fetch(PDO::FETCH_ASSOC) ?: [];
+        foreach (['image_url', 'hero_image_url'] as $imageColumn) {
+            $podcastImage = $podcastImages[$imageColumn] ?? null;
+            if (is_string($podcastImage) && str_contains($podcastImage, '/images/')) {
+                $usedImages[] = basename($podcastImage);
+            }
         }
 
         // Imágenes embebidas en el contenido HTML de las páginas

@@ -8,6 +8,7 @@ require_once __DIR__ . '/sitemap_builder.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/episode_helpers.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/upload_service.php';
 
 // ---------------------------------------------------------------------------
 // Helpers de URL
@@ -176,6 +177,7 @@ function loadPodcastManagementData(string $dbPath): array
         'category'            => '',
         'explicit'            => '0',
         'image_url'           => '',
+        'hero_image_url'      => '',
         'copyright'           => '',
         'itunes_type'         => 'episodic',
         'rss_item_limit'      => '0',
@@ -204,6 +206,7 @@ function loadPodcastManagementData(string $dbPath): array
               category TEXT,
               explicit INTEGER NOT NULL DEFAULT 0,
               image_url TEXT,
+              hero_image_url TEXT,
               copyright TEXT,
               itunes_type TEXT DEFAULT 'episodic',
               rss_item_limit INTEGER NOT NULL DEFAULT 0,
@@ -329,6 +332,24 @@ function loadPodcastManagementData(string $dbPath): array
                     }
                 }
 
+                // Subida opcional de la imagen panorámica usada como hero de la cabecera.
+                if ($error === '') {
+                    $uploadedHero = is_array($_FILES['hero_image_file'] ?? null)
+                        ? $_FILES['hero_image_file']
+                        : ['error' => UPLOAD_ERR_NO_FILE];
+                    $heroResult = handleNamedImageUpload(
+                        $uploadedHero,
+                        resolvePodcastFormBaseUrl($form, $pdo),
+                        __DIR__ . '/../images',
+                        'podcast-hero'
+                    );
+                    if ($heroResult['error'] !== null) {
+                        $error = __('No se pudo subir la imagen del hero: %s', $heroResult['error']);
+                    } elseif ($heroResult['url'] !== null) {
+                        $form['hero_image_url'] = $heroResult['url'];
+                    }
+                }
+
                 if ($error === '') {
                     $params = [
                         ':title'                => $form['title'],
@@ -341,6 +362,7 @@ function loadPodcastManagementData(string $dbPath): array
                         ':category'             => $form['category'],
                         ':explicit'             => (int) $form['explicit'],
                         ':image_url'            => $form['image_url'],
+                        ':hero_image_url'       => $form['hero_image_url'],
                         ':copyright'            => $form['copyright'],
                         ':itunes_type'          => $form['itunes_type'],
                         ':rss_item_limit'       => (int) $form['rss_item_limit'],
@@ -364,6 +386,7 @@ function loadPodcastManagementData(string $dbPath): array
                                  category = :category,
                                  explicit = :explicit,
                                  image_url = :image_url,
+                                 hero_image_url = :hero_image_url,
                                  copyright = :copyright,
                                  itunes_type = :itunes_type,
                                  rss_item_limit = :rss_item_limit,
@@ -380,9 +403,9 @@ function loadPodcastManagementData(string $dbPath): array
                         // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                         $stmt = $pdo->prepare(
                             'INSERT INTO podcast
-                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language, admin_theme)
+                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, hero_image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language, admin_theme)
                              VALUES
-                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language, \'easypodcast\')'
+                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :hero_image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language, \'easypodcast\')'
                         );
                         $stmt->execute($params);
                         $notice = __('Podcast guardado correctamente.');

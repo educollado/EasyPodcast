@@ -25,7 +25,7 @@ function apiGetPodcast(PDO $pdo): void
 /**
  * POST /api/v1/podcast
  * Actualiza los metadatos del canal. Solo los campos enviados se modifican.
- * Para subir imagen del podcast, usa multipart/form-data con campo image_file.
+ * Para subir imágenes, usa multipart/form-data con image_file y hero_image_file.
  */
 function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
 {
@@ -39,7 +39,7 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
     $updatable = [
         'title', 'description', 'link', 'language', 'author',
         'owner_name', 'owner_email', 'category', 'explicit',
-        'image_url', 'copyright', 'itunes_type',
+        'image_url', 'hero_image_url', 'copyright', 'itunes_type',
         'rss_item_limit', 'home_items_per_page',
         'write_audio_metadata', 'cache_enabled', 'app_language', 'public_theme_mode_auto',
     ];
@@ -57,6 +57,16 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
     }
     if ($imageResult['url'] !== null) {
         $body['image_url'] = $imageResult['url'];
+    }
+
+    $heroFileData = is_array($files['hero_image_file'] ?? null) ? $files['hero_image_file'] : ['error' => UPLOAD_ERR_NO_FILE];
+    $heroResult = handleNamedImageUpload($heroFileData, $baseUrl, dirname(__DIR__) . '/images', 'podcast-hero');
+
+    if ($heroResult['error'] !== null) {
+        apiError($heroResult['error']);
+    }
+    if ($heroResult['url'] !== null) {
+        $body['hero_image_url'] = $heroResult['url'];
     }
 
     foreach ($updatable as $col) {
