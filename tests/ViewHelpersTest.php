@@ -161,6 +161,30 @@ test('sanitizeRichHtml: conserva marcado seguro y fuerza rel en target blank', f
     assert_contains('rel="noopener noreferrer"', $result);
 });
 
+test('sanitizeRichHtml: convierte float inline de imágenes en clases seguras', function () {
+    $html = '<p><img src="https://example.com/a.webp" style="float: left; border-radius: 20px; margin-right: 15px">Texto</p>';
+    $result = sanitizeRichHtml($html);
+    assert_contains('class="rich-img-float-left"', $result);
+    assert_true(!str_contains($result, 'style='));
+
+    $secondPass = sanitizeRichHtml($result);
+    assert_contains('class="rich-img-float-left"', $secondPass);
+});
+
+test('sanitizeRichHtml: conserva solo clases de alineación de imagen controladas', function () {
+    $html = '<img src="/images/a.jpg" class="evil rich-img-float-right" style="position: fixed">';
+    $result = sanitizeRichHtml($html);
+    assert_contains('class="rich-img-float-right"', $result);
+    assert_true(!str_contains($result, 'evil'));
+    assert_true(!str_contains($result, 'style='));
+});
+
+test('sanitizeRichHtml: descarta estilos de imagen sin alineación permitida', function () {
+    $result = sanitizeRichHtml('<img src="/images/a.jpg" style="position: fixed; width: 9999px">');
+    assert_true(!str_contains($result, 'class='));
+    assert_true(!str_contains($result, 'style='));
+});
+
 // =============================================================================
 // isPrivateOrReservedIp
 // =============================================================================

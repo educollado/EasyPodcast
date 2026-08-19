@@ -41,7 +41,7 @@ function richHtmlAllowedTags(): array
         'h6' => [],
         'hr' => [],
         'i' => [],
-        'img' => ['src', 'alt', 'title', 'width', 'height'],
+        'img' => ['src', 'alt', 'title', 'width', 'height', 'class'],
         'li' => [],
         'mark' => [],
         'ol' => ['start'],
@@ -324,6 +324,9 @@ function unwrapDomElement(DOMElement $element): void
 function sanitizeRichHtmlAttributes(DOMElement $element, array $allowedAttributes): void
 {
     $tagName = strtolower($element->tagName);
+    $imageAlignmentClass = $tagName === 'img'
+        ? richHtmlImageAlignmentClass($element->getAttribute('style'))
+        : null;
     $attributes = [];
     foreach ($element->attributes as $attribute) {
         $attributes[] = $attribute->name;
@@ -379,6 +382,19 @@ function sanitizeRichHtmlAttributes(DOMElement $element, array $allowedAttribute
             continue;
         }
 
+        if ($lowerName === 'class' && $tagName === 'img') {
+            $safeClasses = array_values(array_intersect(
+                preg_split('/\s+/', $value) ?: [],
+                ['rich-img-float-left', 'rich-img-float-right']
+            ));
+            if ($safeClasses === []) {
+                $element->removeAttribute($name);
+            } else {
+                $element->setAttribute($name, $safeClasses[0]);
+            }
+            continue;
+        }
+
         if (in_array($lowerName, ['width', 'height', 'colspan', 'rowspan', 'start'], true)) {
             if (!ctype_digit($value)) {
                 $element->removeAttribute($name);
@@ -427,9 +443,34 @@ function sanitizeRichHtmlAttributes(DOMElement $element, array $allowedAttribute
         $element->setAttribute('rel', 'noopener noreferrer');
     }
 
+    if ($imageAlignmentClass !== null) {
+        $element->setAttribute('class', $imageAlignmentClass);
+    }
+
     if (in_array($tagName, ['audio', 'video'], true) && !$element->hasAttribute('controls')) {
         $element->setAttribute('controls', 'controls');
     }
+}
+
+/**
+ * Traduce únicamente la alineación inline del editor a una clase CSS segura.
+ */
+function richHtmlImageAlignmentClass(string $style): ?string
+{
+    foreach (explode(';', $style) as $declaration) {
+        $parts = explode(':', $declaration, 2);
+        if (count($parts) !== 2 || strtolower(trim($parts[0])) !== 'float') {
+            continue;
+        }
+
+        return match (strtolower(trim($parts[1]))) {
+            'left' => 'rich-img-float-left',
+            'right' => 'rich-img-float-right',
+            default => null,
+        };
+    }
+
+    return null;
 }
 
 /**

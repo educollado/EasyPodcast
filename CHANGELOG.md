@@ -1,5 +1,9 @@
 # Changelog
 
+## Próxima versión
+
+- **Imágenes alineadas en contenido**: las imágenes flotadas a izquierda o derecha desde el editor conservan su alineación en páginas y episodios mediante clases CSS seguras, sin permitir estilos inline arbitrarios.
+
 ## 1.9.9
 
 - **Tema Corporate**: nueva apariencia clara y editorial basada en eduardocollado.com, con acento rojo, tipografía clásica para titulares y adaptación completa a la web pública y al panel.

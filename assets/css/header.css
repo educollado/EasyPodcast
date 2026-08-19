@@ -283,6 +283,21 @@ figure.img-float-right img {
   vertical-align: middle;
 }
 
+/* Alineación segura conservada desde el editor HTML enriquecido */
+.page-article .desc img.rich-img-float-left,
+.detail .desc img.rich-img-float-left {
+  float: left;
+  max-width: 45%;
+  margin: .25rem 1.5rem 1rem 0;
+}
+
+.page-article .desc img.rich-img-float-right,
+.detail .desc img.rich-img-float-right {
+  float: right;
+  max-width: 45%;
+  margin: .25rem 0 1rem 1.5rem;
+}
+
 /* Clearfix: evita que el contenedor colapse cuando hay imágenes flotadas */
 .page-article .desc::after,
 .detail .desc::after {
@@ -294,7 +309,11 @@ figure.img-float-right img {
 /* En móvil las imágenes flotadas ocupan ancho completo */
 @media (max-width: 540px) {
   figure.img-float-left,
-  figure.img-float-right {
+  figure.img-float-right,
+  .page-article .desc img.rich-img-float-left,
+  .page-article .desc img.rich-img-float-right,
+  .detail .desc img.rich-img-float-left,
+  .detail .desc img.rich-img-float-right {
     float: none;
     max-width: 100%;
     margin: 1rem 0;
