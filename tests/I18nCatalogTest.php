@@ -95,6 +95,7 @@ test('las cadenas de Multipodcast están traducidas en todos los idiomas', funct
         'Contenido de la portada principal',
         'Resumen de todos los podcasts',
         'Podcasts disponibles',
+        'Podcasts disponibles (ordenados por última actualización)',
         'Directorio:',
         '%d capítulos',
         'Administrar podcast',

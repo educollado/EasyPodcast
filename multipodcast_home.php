@@ -11,7 +11,7 @@ $podcasts = $aggregatePdo->query(
      LEFT JOIN episodes e ON e.podcast_id = p.id
      WHERE p.slug IS NOT NULL AND p.slug != ''
      GROUP BY p.id
-     ORDER BY p.title COLLATE NOCASE ASC"
+     ORDER BY latest_pub_date IS NULL ASC, latest_pub_date DESC, p.title COLLATE NOCASE ASC"
 )->fetchAll();
 $summarySettings = loadAppSettings($aggregatePdo);
 $summaryHeroImage = $summarySettings['summary_hero_image_url'];
@@ -52,7 +52,7 @@ header('Content-Type: text/html; charset=UTF-8');
     </div>
   </header>
   <main class="card">
-    <h2><?= __('Podcasts disponibles') ?></h2>
+    <h2><?= __('Podcasts disponibles (ordenados por última actualización)') ?></h2>
     <?php if (!$podcasts): ?>
       <p class="empty"><?= __('Todavía no hay podcasts disponibles.') ?></p>
     <?php else: ?>
@@ -75,4 +75,5 @@ header('Content-Type: text/html; charset=UTF-8');
       </div>
     <?php endif; ?>
   </main>
-</div><script src="/assets/js/public.js"></script></body></html>
+  <?php require __DIR__ . '/footer.php'; ?>
+</div></body></html>
