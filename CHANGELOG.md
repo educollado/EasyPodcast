@@ -4,8 +4,6 @@
 
 - **Publicación de releases reparada**: el validador usado por GitHub Actions queda incluido en el repositorio y la imagen Docker puede relanzarse manualmente para una versión concreta conservando el código exacto de su tag.
 
-## 2.0.0
-
 - **Multipodcast opcional**: una única instalación puede alojar varios podcasts aislados por directorio, con selector administrativo, portada agregada o podcast destacado, feeds y sitemaps propios, y alias compatibles en la raíz.
 - **Aislamiento de datos y medios**: episodios, páginas, redes, tokens y estadísticas quedan asociados a su podcast; audios e imágenes se organizan por directorio y las URLs antiguas de episodios redirigen al podcast destacado.
 - **Creación y borrado seguros**: se validan slugs reservados y rutas ocupadas; antes de borrar un podcast se genera una copia ZIP consistente de la base de datos y sus medios.
