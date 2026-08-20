@@ -17,3 +17,14 @@ test('la gestión del podcast ofrece el selector de visibilidad dentro del formu
     assert_contains('name="include_in_summary"', $source);
     assert_contains('form="podcast-metadata-form"', $source);
 });
+
+test('el aviso de activación solo aparece después de cambiar el check', function () {
+    $pageSource = file_get_contents(__DIR__ . '/../multipodcast.php');
+    $scriptSource = file_get_contents(__DIR__ . '/../assets/js/multipodcast.js');
+
+    assert_true(is_string($pageSource));
+    assert_true(is_string($scriptSource));
+    assert_contains('data-multipodcast-warning role="status" aria-live="polite" hidden', $pageSource);
+    assert_contains('warning.hidden = false;', $scriptSource);
+    assert_true(!str_contains($scriptSource, "enabledCheckbox.addEventListener('change', updateWarning);\n    updateWarning();"));
+});

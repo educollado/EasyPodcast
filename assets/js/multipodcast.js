@@ -17,20 +17,21 @@
 
   function initMultipodcastWarning() {
     var enabledCheckbox = document.getElementById('multipodcast_enabled');
+    var warning = document.querySelector('[data-multipodcast-warning]');
     var enabledWarning = document.querySelector('[data-multipodcast-enabled-warning]');
     var disabledWarning = document.querySelector('[data-multipodcast-disabled-warning]');
 
-    if (!enabledCheckbox || !enabledWarning || !disabledWarning) {
+    if (!enabledCheckbox || !warning || !enabledWarning || !disabledWarning) {
       return;
     }
 
     function updateWarning() {
+      warning.hidden = false;
       enabledWarning.hidden = !enabledCheckbox.checked;
       disabledWarning.hidden = enabledCheckbox.checked;
     }
 
     enabledCheckbox.addEventListener('change', updateWarning);
-    updateWarning();
   }
 
   function initSummaryThemePreview() {
