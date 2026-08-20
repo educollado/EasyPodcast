@@ -18,14 +18,17 @@ function openPodcastDatabase(string $dbPath): PDO
     return $pdo;
 }
 
-/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string} */
+/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string,summary_title:string,summary_subtitle:string,summary_theme:string} */
 function loadAppSettings(PDO $pdo): array
 {
-    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url FROM app_settings WHERE id = 1')->fetch();
+    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url, summary_title, summary_subtitle, summary_theme FROM app_settings WHERE id = 1')->fetch();
     return [
         'multipodcast_enabled' => (int) ($row['multipodcast_enabled'] ?? 0),
         'homepage_podcast_id' => isset($row['homepage_podcast_id']) ? (int) $row['homepage_podcast_id'] : null,
         'summary_hero_image_url' => trim((string) ($row['summary_hero_image_url'] ?? '')),
+        'summary_title' => trim((string) ($row['summary_title'] ?? '')),
+        'summary_subtitle' => trim((string) ($row['summary_subtitle'] ?? '')),
+        'summary_theme' => trim((string) ($row['summary_theme'] ?? '')) ?: 'easypodcast',
     ];
 }
 

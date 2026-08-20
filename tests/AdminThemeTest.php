@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/admin_theme.php';
+require_once __DIR__ . '/../lib/podcast_context.php';
 
 function adminThemeTestHasSqliteDriver(): bool
 {
@@ -56,6 +57,35 @@ test('loadAdminTheme: carga tema visual y modo público desde la BD', function (
         assert_eq('auto', publicThemeMode());
     } finally {
         unset($GLOBALS['_admin_theme'], $GLOBALS['_public_theme_mode']);
+        @unlink($dbPath);
+    }
+});
+
+test('loadAdminTheme: usa el tema propio de la portada resumen multipodcast', function () {
+    if (!adminThemeTestHasSqliteDriver()) {
+        return;
+    }
+
+    $dbPath = tempnam(sys_get_temp_dir(), 'easypodcast-summary-theme-');
+    if ($dbPath === false) {
+        throw new RuntimeException('No se pudo crear la BD temporal del tema del resumen');
+    }
+
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec("CREATE TABLE podcast (id INTEGER PRIMARY KEY, admin_theme TEXT, public_theme_mode_auto INTEGER)");
+        $pdo->exec("INSERT INTO podcast VALUES (1, 'corporate', 1)");
+        $pdo->exec("CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT)");
+        $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, NULL, NULL, NULL, 'monokai')");
+        $GLOBALS['_active_podcast'] = null;
+
+        loadAdminTheme($dbPath);
+
+        assert_eq('monokai', adminTheme());
+        assert_eq('normal', publicThemeMode());
+    } finally {
+        unset($GLOBALS['_active_podcast'], $GLOBALS['_admin_theme'], $GLOBALS['_public_theme_mode']);
         @unlink($dbPath);
     }
 });

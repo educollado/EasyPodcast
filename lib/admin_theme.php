@@ -46,8 +46,19 @@ function loadAdminTheme(string $dbPath): void
             'name'
         );
 
+        $podcast = function_exists('activePodcast') ? activePodcast($pdo) : null;
+        if ($podcast === null && function_exists('loadAppSettings')) {
+            $settings = loadAppSettings($pdo);
+            if ($settings['multipodcast_enabled'] === 1 && $settings['homepage_podcast_id'] === null) {
+                $summaryTheme = $settings['summary_theme'];
+                if (isset(ADMIN_THEMES[$summaryTheme])) {
+                    $GLOBALS['_admin_theme'] = $summaryTheme;
+                }
+                return;
+            }
+        }
+
         if (in_array('admin_theme', $columns, true)) {
-            $podcast = function_exists('activePodcast') ? activePodcast($pdo) : null;
             $theme = $podcast['admin_theme'] ?? $pdo->query('SELECT admin_theme FROM podcast LIMIT 1')->fetchColumn();
             if (is_string($theme) && $theme !== '' && isset(ADMIN_THEMES[$theme])) {
                 $GLOBALS['_admin_theme'] = $theme;

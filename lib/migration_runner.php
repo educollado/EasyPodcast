@@ -145,6 +145,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 22');
         $version = 22;
     }
+
+    if ($version < 23) {
+        migration_v23($pdo);
+        $pdo->exec('PRAGMA user_version = 23');
+        $version = 23;
+    }
 }
 
 /**
@@ -766,6 +772,33 @@ function migration_v22(PDO $pdo): void
     );
     if (!in_array('summary_hero_image_url', $existing, true)) {
         $pdo->exec('ALTER TABLE app_settings ADD COLUMN summary_hero_image_url TEXT');
+    }
+}
+
+/**
+ * Migración v23: personaliza textos y tema de la portada-resumen Multipodcast.
+ */
+function migration_v23(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(app_settings)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('summary_title', $existing, true)) {
+        $pdo->exec('ALTER TABLE app_settings ADD COLUMN summary_title TEXT');
+    }
+    if (!in_array('summary_subtitle', $existing, true)) {
+        $pdo->exec('ALTER TABLE app_settings ADD COLUMN summary_subtitle TEXT');
+    }
+    if (!in_array('summary_theme', $existing, true)) {
+        $pdo->exec("ALTER TABLE app_settings ADD COLUMN summary_theme TEXT NOT NULL DEFAULT 'easypodcast'");
+        $pdo->exec(
+            "UPDATE app_settings
+             SET summary_theme = COALESCE(
+               (SELECT admin_theme FROM podcast ORDER BY id ASC LIMIT 1),
+               'easypodcast'
+             )"
+        );
     }
 }
 

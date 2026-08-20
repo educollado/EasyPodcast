@@ -6,6 +6,7 @@ require_once __DIR__ . '/podcast_context.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/upload_service.php';
+require_once __DIR__ . '/admin_theme.php';
 
 /** @return array{podcasts:array,settings:array,error:string,notice:string,backup_file:string} */
 function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
@@ -124,6 +125,9 @@ function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
     $homepageId = ($_POST['homepage_podcast_id'] ?? '') !== '' ? (int) $_POST['homepage_podcast_id'] : null;
     $currentSettings = loadAppSettings($pdo);
     $summaryHeroImageUrl = $currentSettings['summary_hero_image_url'];
+    $summaryTitle = $currentSettings['summary_title'];
+    $summarySubtitle = $currentSettings['summary_subtitle'];
+    $summaryTheme = $currentSettings['summary_theme'];
     if ($enabled === 1) {
         $missing = (int) $pdo->query("SELECT COUNT(*) FROM podcast WHERE slug IS NULL OR slug = ''")->fetchColumn();
         if ($missing > 0) {
@@ -135,6 +139,12 @@ function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
     }
 
     if ($homepageId === null) {
+        $summaryTitle = trim((string) ($_POST['summary_title'] ?? ''));
+        $summarySubtitle = trim((string) ($_POST['summary_subtitle'] ?? ''));
+        $summaryTheme = trim((string) ($_POST['summary_theme'] ?? 'easypodcast'));
+        if (!isset(ADMIN_THEMES[$summaryTheme])) {
+            throw new RuntimeException(__('El tema del resumen no es válido.'));
+        }
         $summaryHeroImageUrl = trim((string) ($_POST['summary_hero_image_url'] ?? ''));
         if ($summaryHeroImageUrl !== '' && filter_var($summaryHeroImageUrl, FILTER_VALIDATE_URL) === false) {
             throw new RuntimeException(__('La URL de la imagen del hero no es válida.'));
@@ -155,10 +165,13 @@ function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
         }
     }
 
-    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage, summary_hero_image_url = :summary_hero WHERE id = 1');
+    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage, summary_hero_image_url = :summary_hero, summary_title = :summary_title, summary_subtitle = :summary_subtitle, summary_theme = :summary_theme WHERE id = 1');
     $stmt->bindValue(':enabled', $enabled, PDO::PARAM_INT);
     $stmt->bindValue(':homepage', $homepageId, $homepageId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue(':summary_hero', $summaryHeroImageUrl);
+    $stmt->bindValue(':summary_title', $summaryTitle);
+    $stmt->bindValue(':summary_subtitle', $summarySubtitle);
+    $stmt->bindValue(':summary_theme', $summaryTheme);
     $stmt->execute();
 }
 

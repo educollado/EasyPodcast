@@ -13,7 +13,14 @@ $podcasts = $aggregatePdo->query(
      GROUP BY p.id
      ORDER BY p.title COLLATE NOCASE ASC"
 )->fetchAll();
-$summaryHeroImage = loadAppSettings($aggregatePdo)['summary_hero_image_url'];
+$summarySettings = loadAppSettings($aggregatePdo);
+$summaryHeroImage = $summarySettings['summary_hero_image_url'];
+$summaryTitle = $summarySettings['summary_title'] !== ''
+    ? $summarySettings['summary_title']
+    : __('Todos nuestros podcasts, en un solo lugar.');
+$summarySubtitle = $summarySettings['summary_subtitle'] !== ''
+    ? $summarySettings['summary_subtitle']
+    : __('Descubre todos los podcasts disponibles y sus feeds RSS.');
 $baseUrl = runtimeBaseUrl();
 header('Content-Type: text/html; charset=UTF-8');
 ?>
@@ -22,8 +29,8 @@ header('Content-Type: text/html; charset=UTF-8');
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= esc(__('Podcasts')) ?> | EasyPodcast</title>
-  <meta name="description" content="<?= esc(__('Descubre todos los podcasts disponibles y sus feeds RSS.')) ?>">
+  <title><?= esc($summaryTitle) ?></title>
+  <meta name="description" content="<?= esc($summarySubtitle) ?>">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="<?= esc($baseUrl . '/') ?>">
   <link rel="icon" href="/favicon.ico">
@@ -37,9 +44,8 @@ header('Content-Type: text/html; charset=UTF-8');
       <img class="multipodcast-hero-image" src="<?= esc($summaryHeroImage) ?>" alt="" aria-hidden="true">
     <?php endif; ?>
     <div class="multipodcast-hero-content">
-      <p class="multipodcast-hero-brand">EasyPodcast</p>
-      <h1><?= __('Todos nuestros podcasts, en un solo lugar.') ?></h1>
-      <p><?= __('Descubre todos los podcasts disponibles y sus feeds RSS.') ?></p>
+      <h1><?= esc($summaryTitle) ?></h1>
+      <p><?= esc($summarySubtitle) ?></p>
     </div>
     <div class="multipodcast-hero-art" aria-hidden="true">
       <span></span><span></span><span></span>

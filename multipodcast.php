@@ -33,6 +33,8 @@ if (isset($_GET['download_backup']) && isset($_SESSION['podcast_backup_file'])) 
 
 $data = loadPodcastsManagementData($dbPath, __DIR__);
 extract($data);
+$summaryTitleValue = $settings['summary_title'] !== '' ? $settings['summary_title'] : __('Todos nuestros podcasts, en un solo lugar.');
+$summarySubtitleValue = $settings['summary_subtitle'] !== '' ? $settings['summary_subtitle'] : __('Descubre todos los podcasts disponibles y sus feeds RSS.');
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -111,6 +113,26 @@ extract($data);
           <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
         </label>
       </article>
+      <div class="summary-content-settings">
+        <label>
+          <?= __('Tema del resumen') ?>
+          <select name="summary_theme">
+            <?php foreach (ADMIN_THEMES as $themeSlug => $themeLabel): ?>
+              <option value="<?= esc($themeSlug) ?>" <?= $settings['summary_theme'] === $themeSlug ? 'selected' : '' ?>><?= esc($themeLabel) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <div class="grid two">
+          <label>
+            <?= __('Título del resumen') ?>
+            <input type="text" name="summary_title" value="<?= esc($summaryTitleValue) ?>">
+          </label>
+          <label>
+            <?= __('Subtítulo del resumen') ?>
+            <input type="text" name="summary_subtitle" value="<?= esc($summarySubtitleValue) ?>">
+          </label>
+        </div>
+      </div>
     </section>
     <button type="submit"><?= __('Guardar configuración') ?></button>
   </form>

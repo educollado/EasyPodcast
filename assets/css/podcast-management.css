@@ -94,6 +94,12 @@
   font-size: .86rem;
 }
 
+.summary-content-settings {
+  display: grid;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
 @media (min-width: 760px) {
   .podcast-images {
     grid-template-columns: 1fr 1fr;
