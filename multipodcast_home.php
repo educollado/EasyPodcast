@@ -13,6 +13,7 @@ $podcasts = $aggregatePdo->query(
      GROUP BY p.id
      ORDER BY p.title COLLATE NOCASE ASC"
 )->fetchAll();
+$summaryHeroImage = loadAppSettings($aggregatePdo)['summary_hero_image_url'];
 $baseUrl = runtimeBaseUrl();
 header('Content-Type: text/html; charset=UTF-8');
 ?>
@@ -31,7 +32,10 @@ header('Content-Type: text/html; charset=UTF-8');
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body><div class="container">
-  <header class="multipodcast-hero">
+  <header class="multipodcast-hero<?= $summaryHeroImage !== '' ? ' has-hero' : '' ?>">
+    <?php if ($summaryHeroImage !== ''): ?>
+      <img class="multipodcast-hero-image" src="<?= esc($summaryHeroImage) ?>" alt="" aria-hidden="true">
+    <?php endif; ?>
     <div class="multipodcast-hero-content">
       <p class="multipodcast-hero-brand">EasyPodcast</p>
       <h1><?= __('Todos nuestros podcasts, en un solo lugar.') ?></h1>

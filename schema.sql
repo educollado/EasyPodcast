@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS app_settings (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   multipodcast_enabled INTEGER NOT NULL DEFAULT 0,
   homepage_podcast_id INTEGER,
+  summary_hero_image_url TEXT,
   FOREIGN KEY(homepage_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL
 );
 INSERT OR IGNORE INTO app_settings (id, multipodcast_enabled, homepage_podcast_id) VALUES (1, 0, NULL);
@@ -208,4 +209,4 @@ BEGIN
   ON CONFLICT(podcast_id, episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 21;
+PRAGMA user_version = 22;

@@ -119,7 +119,7 @@ La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una b
 
 El modo Multipodcast se activa desde `multipodcast.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
 
-La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. En este último caso, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast destacado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios se almacenan en `audios/<slug>/` e `images/<slug>/`.
+La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. El resumen permite configurar su propia imagen hero desde `multipodcast.php`. Cuando se destaca un podcast, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast seleccionado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios se almacenan en `audios/<slug>/` e `images/<slug>/`.
 
 ### Feed RSS
 

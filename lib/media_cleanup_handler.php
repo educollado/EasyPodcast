@@ -137,6 +137,12 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
             }
         }
 
+        // El hero de la portada-resumen es global y también debe conservarse.
+        $summaryHeroImage = loadAppSettings($pdo)['summary_hero_image_url'];
+        if ($summaryHeroImage !== '' && str_contains($summaryHeroImage, '/images/')) {
+            $usedImages[] = basename($summaryHeroImage);
+        }
+
         // Imágenes embebidas en el contenido HTML de las páginas
         $pageStmt = $pdo->prepare('SELECT content FROM pages WHERE podcast_id = :podcast_id');
         $pageStmt->execute([':podcast_id' => $podcastId]);

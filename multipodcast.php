@@ -41,6 +41,7 @@ extract($data);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Multipodcast') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/podcast-management.css?v=<?= (int) filemtime(__DIR__ . '/assets/css/podcast-management.css') ?>">
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
@@ -52,7 +53,7 @@ extract($data);
   <?php if ($backup_file !== ''): ?><p><a class="button" href="multipodcast.php?download_backup=<?= esc(rawurlencode($backup_file)) ?>"><?= __('Descargar copia de seguridad') ?></a></p><?php endif; ?>
 
   <h2><?= __('Configuración Multipodcast') ?></h2>
-  <form method="post" action="multipodcast.php">
+  <form method="post" action="multipodcast.php" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
     <label class="inline-checkbox multipodcast-toggle">
@@ -67,6 +68,50 @@ extract($data);
         <option value="<?= (int) $podcast['id'] ?>" <?= $settings['homepage_podcast_id'] === (int) $podcast['id'] ? 'selected' : '' ?>><?= esc((string) $podcast['title']) ?></option>
       <?php endforeach; ?>
     </select>
+
+    <section
+      class="summary-hero-settings"
+      data-summary-hero-settings
+      <?= $settings['homepage_podcast_id'] !== null ? 'hidden' : '' ?>
+      aria-label="<?= esc(__('Imagen del hero')) ?>"
+    >
+      <article class="podcast-image-card">
+        <h2><?= __('Imagen del hero') ?></h2>
+        <p class="summary-hero-help"><?= __('Esta imagen se mostrará únicamente cuando la portada principal sea el resumen de todos los podcasts.') ?></p>
+        <div class="podcast-image-preview podcast-image-preview-hero">
+          <img
+            id="summary-hero-image-preview"
+            <?php if ($settings['summary_hero_image_url'] !== ''): ?>src="<?= esc($settings['summary_hero_image_url']) ?>"<?php endif; ?>
+            alt="<?= esc(__('Vista previa de la imagen del hero')) ?>"
+            <?= $settings['summary_hero_image_url'] === '' ? 'hidden' : '' ?>
+          >
+          <span id="summary-hero-image-placeholder" <?= $settings['summary_hero_image_url'] !== '' ? 'hidden' : '' ?>>
+            <?= __('Sin imagen') ?>
+          </span>
+        </div>
+        <label>
+          <?= __('Imagen del hero (URL)') ?>
+          <input
+            type="url"
+            name="summary_hero_image_url"
+            value="<?= esc($settings['summary_hero_image_url']) ?>"
+            data-image-preview="summary-hero-image-preview"
+          >
+          <small><?= __('Déjala vacía para mantener la cabecera actual sin hero.') ?></small>
+        </label>
+        <label>
+          <?= __('O subir imagen para el hero') ?>
+          <input
+            type="file"
+            name="summary_hero_image_file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            data-image-preview="summary-hero-image-preview"
+          >
+          <small><?= __('La imagen subida se recorta y optimiza automáticamente para la cabecera.') ?></small>
+          <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
+        </label>
+      </article>
+    </section>
     <button type="submit"><?= __('Guardar configuración') ?></button>
   </form>
 
@@ -105,4 +150,6 @@ extract($data);
     <button type="submit"><?= __('Crear podcast') ?></button>
   </form>
 </main></div>
+<script src="/assets/js/podcast_management.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/podcast_management.js') ?>"></script>
+<script src="/assets/js/multipodcast.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/multipodcast.js') ?>"></script>
 </body></html>

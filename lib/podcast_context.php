@@ -18,13 +18,14 @@ function openPodcastDatabase(string $dbPath): PDO
     return $pdo;
 }
 
-/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int} */
+/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string} */
 function loadAppSettings(PDO $pdo): array
 {
-    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id FROM app_settings WHERE id = 1')->fetch();
+    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url FROM app_settings WHERE id = 1')->fetch();
     return [
         'multipodcast_enabled' => (int) ($row['multipodcast_enabled'] ?? 0),
         'homepage_podcast_id' => isset($row['homepage_podcast_id']) ? (int) $row['homepage_podcast_id'] : null,
+        'summary_hero_image_url' => trim((string) ($row['summary_hero_image_url'] ?? '')),
     ];
 }
 

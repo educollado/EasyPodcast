@@ -75,6 +75,25 @@
   display: none;
 }
 
+.summary-hero-settings {
+  max-width: 680px;
+  margin: 1rem 0;
+}
+
+.summary-hero-settings[hidden] {
+  display: none;
+}
+
+.summary-hero-settings .podcast-image-card {
+  grid-template-rows: auto auto 190px minmax(5.6rem, auto) auto;
+}
+
+.summary-hero-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
 @media (min-width: 760px) {
   .podcast-images {
     grid-template-columns: 1fr 1fr;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/podcast_context.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/cache_service.php';
+require_once __DIR__ . '/upload_service.php';
 
 /** @return array{podcasts:array,settings:array,error:string,notice:string,backup_file:string} */
 function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
@@ -63,7 +64,7 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
                 clearWebCache();
                 $notice = __('Podcast creado correctamente.');
             } elseif ($action === 'save_settings') {
-                saveMultipodcastSettings($pdo);
+                saveMultipodcastSettings($pdo, $projectRoot);
                 clearWebCache();
                 $notice = __('Configuración multipodcast guardada correctamente.');
             } elseif ($action === 'rename_slug') {
@@ -117,10 +118,12 @@ function assertPodcastPathsAvailable(string $projectRoot, string $slug): void
     }
 }
 
-function saveMultipodcastSettings(PDO $pdo): void
+function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
 {
     $enabled = isset($_POST['multipodcast_enabled']) ? 1 : 0;
     $homepageId = ($_POST['homepage_podcast_id'] ?? '') !== '' ? (int) $_POST['homepage_podcast_id'] : null;
+    $currentSettings = loadAppSettings($pdo);
+    $summaryHeroImageUrl = $currentSettings['summary_hero_image_url'];
     if ($enabled === 1) {
         $missing = (int) $pdo->query("SELECT COUNT(*) FROM podcast WHERE slug IS NULL OR slug = ''")->fetchColumn();
         if ($missing > 0) {
@@ -130,9 +133,32 @@ function saveMultipodcastSettings(PDO $pdo): void
     if ($homepageId !== null && podcastById($pdo, $homepageId) === null) {
         throw new RuntimeException(__('El podcast elegido para la portada no existe.'));
     }
-    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage WHERE id = 1');
+
+    if ($homepageId === null) {
+        $summaryHeroImageUrl = trim((string) ($_POST['summary_hero_image_url'] ?? ''));
+        if ($summaryHeroImageUrl !== '' && filter_var($summaryHeroImageUrl, FILTER_VALIDATE_URL) === false) {
+            throw new RuntimeException(__('La URL de la imagen del hero no es válida.'));
+        }
+        $uploadedHero = is_array($_FILES['summary_hero_image_file'] ?? null)
+            ? $_FILES['summary_hero_image_file']
+            : ['error' => UPLOAD_ERR_NO_FILE];
+        $heroResult = handleHeroImageUpload(
+            $uploadedHero,
+            requestBaseUrl(),
+            rtrim($projectRoot, '/') . '/images'
+        );
+        if ($heroResult['error'] !== null) {
+            throw new RuntimeException(__('No se pudo subir la imagen del hero: %s', $heroResult['error']));
+        }
+        if ($heroResult['url'] !== null) {
+            $summaryHeroImageUrl = $heroResult['url'];
+        }
+    }
+
+    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage, summary_hero_image_url = :summary_hero WHERE id = 1');
     $stmt->bindValue(':enabled', $enabled, PDO::PARAM_INT);
     $stmt->bindValue(':homepage', $homepageId, $homepageId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $stmt->bindValue(':summary_hero', $summaryHeroImageUrl);
     $stmt->execute();
 }
 

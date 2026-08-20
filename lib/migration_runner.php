@@ -139,6 +139,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 21');
         $version = 21;
     }
+
+    if ($version < 22) {
+        migration_v22($pdo);
+        $pdo->exec('PRAGMA user_version = 22');
+        $version = 22;
+    }
 }
 
 /**
@@ -746,6 +752,20 @@ function migration_v21(PDO $pdo): void
         throw $e;
     } finally {
         $pdo->exec('PRAGMA foreign_keys = ON');
+    }
+}
+
+/**
+ * Migración v22: añade la imagen hero propia de la portada-resumen Multipodcast.
+ */
+function migration_v22(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(app_settings)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('summary_hero_image_url', $existing, true)) {
+        $pdo->exec('ALTER TABLE app_settings ADD COLUMN summary_hero_image_url TEXT');
     }
 }
 

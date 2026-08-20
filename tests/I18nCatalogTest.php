@@ -51,6 +51,9 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
 test('las cadenas de Multipodcast están traducidas en todos los idiomas', function () {
     $messages = [
         'Multipodcast',
+        'Esta imagen se mostrará únicamente cuando la portada principal sea el resumen de todos los podcasts.',
+        'La URL de la imagen del hero no es válida.',
+        'No se pudo subir la imagen del hero: %s',
         'Podcasts',
         'Crea, selecciona y configura los podcasts de la instalación',
         'El directorio debe contener únicamente letras minúsculas, números y guiones.',
@@ -104,6 +107,7 @@ test('las cadenas de Multipodcast están traducidas en todos los idiomas', funct
         foreach ($messages as $message) {
             assert_true(isset($translations[$message]) && $translations[$message] !== '', basename($localeFile) . ' no traduce: ' . $message);
             assert_eq(substr_count($message, '%d'), substr_count($translations[$message], '%d'));
+            assert_eq(substr_count($message, '%s'), substr_count($translations[$message], '%s'));
         }
     }
 });
