@@ -27,11 +27,20 @@ header('Content-Type: text/html; charset=UTF-8');
   <link rel="canonical" href="<?= esc($baseUrl . '/') ?>">
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/assets/css/common.css">
-  <link rel="stylesheet" href="/assets/css/index.css">
+  <link rel="stylesheet" href="/assets/css/index.css?v=<?= (int) filemtime(__DIR__ . '/assets/css/index.css') ?>">
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body><div class="container">
-  <header class="card"><h1>EasyPodcast</h1><p><?= __('Todos nuestros podcasts, en un solo lugar.') ?></p></header>
+  <header class="multipodcast-hero">
+    <div class="multipodcast-hero-content">
+      <p class="multipodcast-hero-brand">EasyPodcast</p>
+      <h1><?= __('Todos nuestros podcasts, en un solo lugar.') ?></h1>
+      <p><?= __('Descubre todos los podcasts disponibles y sus feeds RSS.') ?></p>
+    </div>
+    <div class="multipodcast-hero-art" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </header>
   <main class="card">
     <h2><?= __('Podcasts disponibles') ?></h2>
     <?php if (!$podcasts): ?>

@@ -39,20 +39,20 @@ extract($data);
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= __('Podcasts') ?></title>
+  <title><?= __('Multipodcast') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
-<?php $currentAdminPage = 'podcasts'; require __DIR__ . '/admin_nav.php'; ?>
+<?php $currentAdminPage = 'multipodcast'; require __DIR__ . '/admin_nav.php'; ?>
 <div class="admin-wrap"><main class="card">
-  <h1><?= __('Podcasts') ?></h1>
+  <h1><?= __('Multipodcast') ?></h1>
   <?php if ($error !== ''): ?><div class="error"><?= esc($error) ?></div><?php endif; ?>
   <?php if ($notice !== ''): ?><div class="notice"><?= esc($notice) ?></div><?php endif; ?>
-  <?php if ($backup_file !== ''): ?><p><a class="button" href="podcasts.php?download_backup=<?= esc(rawurlencode($backup_file)) ?>"><?= __('Descargar copia de seguridad') ?></a></p><?php endif; ?>
+  <?php if ($backup_file !== ''): ?><p><a class="button" href="multipodcast.php?download_backup=<?= esc(rawurlencode($backup_file)) ?>"><?= __('Descargar copia de seguridad') ?></a></p><?php endif; ?>
 
   <h2><?= __('Configuración Multipodcast') ?></h2>
-  <form method="post" action="podcasts.php">
+  <form method="post" action="multipodcast.php">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
     <label class="inline-checkbox multipodcast-toggle">
@@ -78,14 +78,14 @@ extract($data);
       <p><?= __('Directorio:') ?> <code>/<?= esc((string) ($podcast['slug'] ?? '')) ?>/</code></p>
       <p><?= __('%d capítulos', (int) $podcast['episode_count']) ?></p>
       <p><a class="button" href="admin.php?podcast=<?= esc(rawurlencode((string) $podcast['slug'])) ?>&amp;manage=1"><?= __('Administrar podcast') ?></a></p>
-      <form method="post" action="podcasts.php">
+      <form method="post" action="multipodcast.php">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <input type="hidden" name="action" value="rename_slug"><input type="hidden" name="podcast_id" value="<?= (int) $podcast['id'] ?>">
         <label><?= __('Directorio del podcast') ?><input name="slug" value="<?= esc((string) ($podcast['slug'] ?? '')) ?>" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"></label>
         <button type="submit"><?= __('Cambiar directorio') ?></button>
       </form>
       <?php if (count($podcasts) > 1): ?>
-      <form method="post" action="podcasts.php" data-confirm-message="<?= esc(__('Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?')) ?>">
+      <form method="post" action="multipodcast.php" data-confirm-message="<?= esc(__('Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?')) ?>">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <input type="hidden" name="action" value="delete"><input type="hidden" name="podcast_id" value="<?= (int) $podcast['id'] ?>">
         <label><?= __('Escribe el título para confirmar') ?><input name="confirm_title" required autocomplete="off"></label>
@@ -97,7 +97,7 @@ extract($data);
   </div>
 
   <h2><?= __('Crear un podcast nuevo') ?></h2>
-  <form method="post" action="podcasts.php">
+  <form method="post" action="multipodcast.php">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="create">
     <label><?= __('Título') ?><input name="title" required></label>

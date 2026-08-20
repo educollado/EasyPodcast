@@ -17,9 +17,9 @@ $navPublicUrl = is_array($navPodcast) ? podcastPath($navPodcast, '', $navMulti) 
   data-file-empty-label="<?= esc(__('No se ha seleccionado ningún archivo')) ?>"
   data-file-multiple-label="<?= esc(__('%d archivos seleccionados')) ?>"
 >
-  <a class="admin-nav-brand" href="<?= $navMulti ? 'podcasts.php' : 'admin.php' ?>">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
+  <a class="admin-nav-brand" href="<?= $navMulti ? 'multipodcast.php' : 'admin.php' ?>">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
   <div class="admin-nav-links">
-    <?php if ($navMulti): ?><a class="admin-nav-link <?= $_navPage === 'podcasts' ? 'active' : '' ?>" href="podcasts.php"><?= __('Podcasts') ?></a><?php endif; ?>
+    <?php if ($navMulti): ?><a class="admin-nav-link <?= $_navPage === 'multipodcast' ? 'active' : '' ?>" href="multipodcast.php"><?= __('Multipodcast') ?></a><?php endif; ?>
     <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php<?= $navMulti ? '?manage=1' : '' ?>"><?= __('Panel') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'podcast'   ? 'active' : '' ?>" href="podcast_management.php"><?= __('Podcast') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'episodes'  ? 'active' : '' ?>" href="episodes_management.php"><?= __('Capítulos') ?></a>

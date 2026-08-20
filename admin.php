@@ -76,7 +76,7 @@ if (isset($_SESSION['admin_user']) && !isset($_GET['manage'])) {
         $multipodcastIsEnabled = loadAppSettings($contextPdo)['multipodcast_enabled'] === 1;
         $contextPdo = null;
         if ($multipodcastIsEnabled) {
-            header('Location: podcasts.php');
+            header('Location: multipodcast.php');
             exit;
         }
     } catch (Throwable $e) {
@@ -150,9 +150,9 @@ if ($isLoggedIn) {
         <?php endif; ?>
 
         <div class="admin-cards">
-          <a class="admin-card" href="podcasts.php">
+          <a class="admin-card" href="multipodcast.php">
             <div class="admin-card-icon">🎧</div>
-            <h2><?= __('Podcasts') ?></h2>
+            <h2><?= __('Multipodcast') ?></h2>
             <p><?= __('Crea, selecciona y configura los podcasts de la instalación') ?></p>
           </a>
           <a class="admin-card" href="podcast_management.php">

@@ -117,7 +117,7 @@ La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una b
 
 ### Multipodcast
 
-El modo Multipodcast se activa desde `podcasts.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
+El modo Multipodcast se activa desde `multipodcast.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
 
 La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. En este último caso, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast destacado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios se almacenan en `audios/<slug>/` e `images/<slug>/`.
 
@@ -168,7 +168,7 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 | Página | Función |
 |---|---|
 | `admin.php` | Login/logout y acceso al panel |
-| `podcasts.php` | Activación, selección, creación y borrado seguro de podcasts |
+| `multipodcast.php` | Activación, selección, creación y borrado seguro de podcasts |
 | `podcast_management.php` | Metadatos del canal |
 | `episodes_management.php` | CRUD de episodios con borrado seguro de imágenes compartidas con la portada del podcast |
 | `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación con preescucha Web Audio y subida de imágenes con orientación EXIF |

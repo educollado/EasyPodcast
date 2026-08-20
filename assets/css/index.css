@@ -2,6 +2,78 @@
    Lista de episodios — depende de common.css
    ========================================================= */
 
+/* Hero de la portada-resumen Multipodcast. */
+.multipodcast-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 250px;
+  margin-bottom: 1.4rem;
+  padding: clamp(2rem, 6vw, 4rem);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(255, 255, 255, .2), transparent 25%),
+    linear-gradient(135deg, var(--accent-dark), #162b3a 72%);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+}
+
+.multipodcast-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 650px;
+}
+
+.multipodcast-hero-brand {
+  margin: 0 0 .65rem;
+  color: rgba(255, 255, 255, .78);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.multipodcast-hero h1 {
+  margin: 0;
+  max-width: 13ch;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 4.2rem);
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+
+.multipodcast-hero-content > p:last-child {
+  max-width: 540px;
+  margin: 1.15rem 0 0;
+  color: rgba(255, 255, 255, .86);
+  font-size: clamp(.95rem, 2vw, 1.08rem);
+}
+
+.multipodcast-hero-art {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(38%, 360px);
+  opacity: .9;
+}
+
+.multipodcast-hero-art span {
+  position: absolute;
+  border: 2px solid rgba(255, 255, 255, .32);
+  border-radius: 50%;
+}
+
+.multipodcast-hero-art span:nth-child(1) { width: 210px; height: 210px; right: -45px; top: -30px; }
+.multipodcast-hero-art span:nth-child(2) { width: 130px; height: 130px; right: 80px; bottom: -38px; }
+.multipodcast-hero-art span:nth-child(3) { width: 54px; height: 54px; right: 54px; top: 105px; background: rgba(255, 255, 255, .14); }
+
+@media (max-width: 620px) {
+  .multipodcast-hero { min-height: 220px; }
+  .multipodcast-hero-art { opacity: .5; width: 46%; }
+}
+
 /* El contenedor principal pasa a ser un flex column transparente:
    cada episodio es su propia tarjeta flotante. */
 main.card {

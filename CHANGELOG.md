@@ -8,6 +8,7 @@
 - **Multipodcast internacionalizado**: todas las cadenas nuevas están traducidas a los ocho idiomas disponibles y cubiertas por pruebas de catálogo.
 - **Administración estable con SQLite**: el panel evita solapar cursores de lectura con la transacción diaria de comprobación de actualizaciones, impidiendo que una entrada autenticada bloquee el resto de la web.
 - **Activación más clara**: el control Multipodcast mantiene juntos el checkbox y su etiqueta, y muestra un aviso destacado sobre el cambio de URLs y el comportamiento de la portada.
+- **Acceso e identidad Multipodcast**: la gestión pasa a `multipodcast.php`, el menú adopta ese nombre y la portada-resumen incorpora un hero propio.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

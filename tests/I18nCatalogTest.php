@@ -50,6 +50,7 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
 
 test('las cadenas de Multipodcast están traducidas en todos los idiomas', function () {
     $messages = [
+        'Multipodcast',
         'Podcasts',
         'Crea, selecciona y configura los podcasts de la instalación',
         'El directorio debe contener únicamente letras minúsculas, números y guiones.',

@@ -21,6 +21,7 @@ RewriteRule ^\.git - [F,L,NC]
 RewriteRule ^(?:[a-z0-9-]+/)?(?:audios|images)(?:/|$).*\.(?:php(?:[0-9]+|s)?|pht(?:ml)?|phar)(?:/|$) - [F,L,NC]
 # Sirve robots.txt dinámicamente para que el dominio sea siempre correcto.
 RewriteRule ^robots\.txt$ robots.php [L]
+RewriteRule ^podcasts\.php$ multipodcast.php [R=301,L]
 RewriteRule ^feed\.xml$ feed.php [L,QSA]
 RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
 RewriteRule ^search/?$ search.php [L,QSA]

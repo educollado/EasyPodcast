@@ -5,7 +5,7 @@ declare(strict_types=1);
 const RESERVED_PODCAST_SLUGS = [
     'admin', 'api', 'assets', 'audios', 'images', 'cache', 'locale', 'lib', 'tests', 'tools',
     'feed', 'feed.xml', 'sitemap', 'sitemap.xml', 'robots', 'robots.txt', 'search', 'track',
-    'index', 'episode', 'page', 'podcast', 'podcasts', 'backups', 'update', 'stats', 'login',
+    'index', 'episode', 'page', 'podcast', 'podcasts', 'multipodcast', 'backups', 'update', 'stats', 'login',
     'import-feed', 'media-cleanup', 'pages', 'social', 'favicon.ico',
 ];
 
