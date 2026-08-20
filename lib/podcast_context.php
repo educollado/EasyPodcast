@@ -88,6 +88,15 @@ function primaryPodcast(PDO $pdo): ?array
     return firstPodcast($pdo);
 }
 
+/** Resuelve el podcast de un feed: el feed raíz pertenece siempre al principal. */
+function resolveFeedPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
+{
+    if ($requestedSlug !== null && $requestedSlug !== '') {
+        return podcastBySlug($pdo, $requestedSlug);
+    }
+    return primaryPodcast($pdo);
+}
+
 /** Resuelve el podcast público. null significa portada agregada multipodcast. */
 function resolvePublicPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
 {

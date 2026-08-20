@@ -9,13 +9,18 @@ require_once __DIR__ . '/lib/cache_service.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
-if (tryServeWebCache($dbPath, 'application/rss+xml; charset=UTF-8')) {
-    exit;
-}
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
-    if (activePodcast($pdo) === null) {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $requestedSlug = isset($_GET['podcast_slug']) ? trim((string) $_GET['podcast_slug']) : null;
+    $feedPodcast = resolveFeedPodcast($pdo, $requestedSlug);
+    activatePodcastContext($feedPodcast, multipodcastEnabled($pdo));
+    if (tryServeWebCache($dbPath, 'application/rss+xml; charset=UTF-8')) {
+        exit;
+    }
+    if ($feedPodcast === null) {
         http_response_code(404);
         header('Content-Type: text/plain; charset=UTF-8');
         echo __('No hay un podcast definido para el feed principal.');

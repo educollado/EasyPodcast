@@ -38,3 +38,21 @@ test('resolvePublicPodcast usa el podcast principal cuando Multipodcast está de
 
     assert_eq(2, (int) (resolvePublicPodcast($pdo)['id'] ?? 0));
 });
+
+test('resolveFeedPodcast usa el principal en la raíz y respeta el directorio solicitado', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+        return;
+    }
+
+    $pdo = new PDO('sqlite::memory:');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, title TEXT, slug TEXT)');
+    $pdo->exec("INSERT INTO podcast VALUES (1, 'Principal', 'principal'), (2, 'Secundario', 'secundario')");
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)');
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, 2, NULL, NULL, NULL, 'easypodcast', 1)");
+
+    assert_eq(1, (int) (resolveFeedPodcast($pdo)['id'] ?? 0));
+    assert_eq(2, (int) (resolveFeedPodcast($pdo, 'secundario')['id'] ?? 0));
+    assert_null(resolveFeedPodcast($pdo, 'inexistente'));
+});
