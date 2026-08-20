@@ -32,6 +32,7 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('href="twofa_management.php"', $html);
     assert_contains('href="backups.php"', $html);
     assert_contains('href="api_tokens.php"', $html);
+    assert_contains('>Administración<', $html);
     assert_contains('Ver podcasts ↗', $html);
     assert_true(!str_contains($html, '>Panel<'));
     assert_true(!str_contains($html, '>Capítulos<'));
@@ -49,7 +50,7 @@ test('barra de un podcast muestra sus opciones de administración', function () 
     $html = renderAdminNavFixture('podcast', ['id' => 2, 'slug' => 'demo']);
 
     assert_contains('href="multipodcast.php">EasyPodcast', $html);
-    assert_contains('>Panel<', $html);
+    assert_contains('>Administración<', $html);
     assert_contains('>Capítulos<', $html);
     assert_contains('href="/demo/"', $html);
     assert_contains('Ver podcast ↗', $html);
@@ -79,4 +80,14 @@ test('el panel de podcast no duplica las herramientas globales de Multipodcast',
     assert_contains('<?php if (!$adminMultipodcastEnabled): ?>', $source);
     assert_contains('<a class="admin-card" href="backups.php">', $source);
     assert_contains('<a class="admin-card" href="api_tokens.php">', $source);
+});
+
+test('los dashboards identifican el ámbito administrado en el encabezado', function () {
+    $podcastDashboard = file_get_contents(__DIR__ . '/../admin.php');
+    $multipodcastDashboard = file_get_contents(__DIR__ . '/../multipodcast.php');
+
+    assert_true(is_string($podcastDashboard));
+    assert_true(is_string($multipodcastDashboard));
+    assert_contains('Panel de administración del Podcast %s', $podcastDashboard);
+    assert_contains('Panel de administración del Multipodcast', $multipodcastDashboard);
 });

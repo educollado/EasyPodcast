@@ -51,6 +51,8 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
 test('las cadenas de Multipodcast están traducidas en todos los idiomas', function () {
     $messages = [
         'Multipodcast',
+        'Panel de administración del Podcast %s',
+        'Panel de administración del Multipodcast',
         'Esta imagen se mostrará únicamente cuando la portada principal sea el resumen de todos los podcasts.',
         'La URL de la imagen del hero no es válida.',
         'No se pudo subir la imagen del hero: %s',

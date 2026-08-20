@@ -91,6 +91,7 @@ $currentAppLanguage = 'es_ES';
 $currentAdminTheme  = 'easypodcast';
 $currentPublicThemeModeAuto = false;
 $adminUpdateStatus = ['available' => false, 'version' => ''];
+$activeAdminPodcast = null;
 if ($isLoggedIn) {
     // Esta comprobación puede abrir una transacción de escritura. Debe ejecutarse
     // antes de mantener cursores de lectura abiertos en otra conexión SQLite.
@@ -98,6 +99,7 @@ if ($isLoggedIn) {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
         $podcastId = activePodcastId($pdo);
+        $activeAdminPodcast = podcastById($pdo, $podcastId);
         $stmt = $pdo->prepare('SELECT app_language, admin_theme, public_theme_mode_auto FROM podcast WHERE id = :podcast_id LIMIT 1');
         $stmt->execute([':podcast_id' => $podcastId]);
         $row = $stmt->fetch();
@@ -131,7 +133,7 @@ if ($isLoggedIn) {
     <?php $currentAdminPage = 'dashboard'; require __DIR__ . '/admin_nav.php'; ?>
     <div class="admin-wrap">
       <main class="card">
-        <h1><?= __('Panel de administración') ?></h1>
+        <h1><?= esc(__('Panel de administración del Podcast %s', (string) ($activeAdminPodcast['title'] ?? __('Podcast')))) ?></h1>
         <p><?= __('Sesión iniciada como') ?> <strong><?= esc((string) $_SESSION['admin_user']) ?></strong>.</p>
 
         <?php if ($error !== ''): ?>
@@ -228,7 +230,6 @@ if ($isLoggedIn) {
             <p><?= __('Genera y revoca tokens para la API REST') ?></p>
           </a>
           <?php endif; ?>
-          <?php $activeAdminPodcast = activePodcast(openPodcastDatabase($dbPath)); ?>
           <a class="admin-card" href="<?= esc($activeAdminPodcast !== null ? podcastPath($activeAdminPodcast, '', multipodcastEnabled(openPodcastDatabase($dbPath))) : '/') ?>" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2><?= __('Ver podcast') ?></h2>

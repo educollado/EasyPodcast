@@ -36,7 +36,7 @@ $multipodcastDashboardTheme = isset(ADMIN_THEMES[$multipodcastDashboardSettings[
   <?php $currentAdminPage = 'multipodcast'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
     <main class="card">
-      <h1><?= __('Multipodcast') ?></h1>
+      <h1><?= __('Panel de administración del Multipodcast') ?></h1>
       <p><?= __('Sesión iniciada como') ?> <strong><?= esc((string) $_SESSION['admin_user']) ?></strong>.</p>
 
       <div class="admin-cards">

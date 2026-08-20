@@ -488,6 +488,12 @@ msgstr ""
 msgid "Panel de administración"
 msgstr ""
 
+msgid "Panel de administración del Podcast %s"
+msgstr "Panel de administración del Podcast %s"
+
+msgid "Panel de administración del Multipodcast"
+msgstr "Panel de administración del Multipodcast"
+
 msgid "Sesión iniciada como"
 msgstr ""
 

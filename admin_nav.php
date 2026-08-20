@@ -59,7 +59,7 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
       </form>
     <?php endif; ?>
     <?php if ($navIsMultipodcastArea): ?>
-    <a class="admin-nav-link <?= in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true) ? 'active' : '' ?>" href="multipodcast.php"><?= __('Multipodcast') ?></a>
+    <a class="admin-nav-link <?= in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true) ? 'active' : '' ?>" href="multipodcast.php"><?= __('Administración') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'cache' ? 'active' : '' ?>" href="cache_management.php"><?= __('Caché') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'update' ? 'active' : '' ?>" href="update.php"><?= __('Actualizar') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'password' ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
@@ -67,7 +67,7 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
     <a class="admin-nav-link <?= $_navPage === 'backups' ? 'active' : '' ?>" href="backups.php"><?= __('Backups') ?></a>
     <a class="admin-nav-link <?= in_array($_navPage, ['api_tokens', 'api_docs'], true) ? 'active' : '' ?>" href="api_tokens.php">API</a>
     <?php else: ?>
-    <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php<?= $navMulti ? '?manage=1' : '' ?>"><?= __('Panel') ?></a>
+    <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php<?= $navMulti ? '?manage=1' : '' ?>"><?= __('Administración') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'podcast'   ? 'active' : '' ?>" href="podcast_management.php"><?= __('Podcast') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'episodes'  ? 'active' : '' ?>" href="episodes_management.php"><?= __('Capítulos') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'add'       ? 'active' : '' ?>" href="add_episode.php"><?= __('Añadir') ?></a>
