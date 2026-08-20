@@ -11,7 +11,7 @@ function podcastsHandlerSettingsDatabase(): PDO
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, slug TEXT)');
-    $pdo->exec("INSERT INTO podcast (id, slug) VALUES (1, 'principal')");
+    $pdo->exec("INSERT INTO podcast (id, slug) VALUES (1, 'principal'), (2, 'secundario')");
     $pdo->exec(
         "CREATE TABLE app_settings (
           id INTEGER PRIMARY KEY,
@@ -20,10 +20,11 @@ function podcastsHandlerSettingsDatabase(): PDO
           summary_hero_image_url TEXT,
           summary_title TEXT,
           summary_subtitle TEXT,
-          summary_theme TEXT NOT NULL DEFAULT 'easypodcast'
+          summary_theme TEXT NOT NULL DEFAULT 'easypodcast',
+          primary_podcast_id INTEGER
         )"
     );
-    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, 'https://example.com/old.jpg', 'Título anterior', 'Subtítulo anterior', 'corporate')");
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, 'https://example.com/old.jpg', 'Título anterior', 'Subtítulo anterior', 'corporate', 1)");
     return $pdo;
 }
 
@@ -83,4 +84,16 @@ test('ajustes multipodcast conservan el hero del resumen al elegir un podcast', 
     assert_eq('Subtítulo anterior', $pdo->query('SELECT summary_subtitle FROM app_settings')->fetchColumn());
     assert_eq('corporate', $pdo->query('SELECT summary_theme FROM app_settings')->fetchColumn());
     assert_eq(1, (int) $pdo->query('SELECT homepage_podcast_id FROM app_settings')->fetchColumn());
+});
+
+test('setPrimaryPodcast cambia el podcast que queda visible en modo sencillo', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+        return;
+    }
+    $pdo = podcastsHandlerSettingsDatabase();
+
+    setPrimaryPodcast($pdo, 2);
+
+    assert_eq(2, (int) $pdo->query('SELECT primary_podcast_id FROM app_settings')->fetchColumn());
+    assert_eq('secundario', primaryPodcast($pdo)['slug'] ?? null);
 });

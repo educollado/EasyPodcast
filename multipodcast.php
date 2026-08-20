@@ -142,25 +142,61 @@ $primaryPodcastTitle = trim((string) ($primary_podcast['title'] ?? ''));
   </form>
 
   <h2><?= __('Podcasts disponibles') ?></h2>
-  <div class="admin-cards">
+  <div class="admin-cards podcast-admin-list">
   <?php foreach ($podcasts as $podcast): ?>
-    <section class="admin-card">
-      <h3><?= esc((string) $podcast['title']) ?></h3>
-      <p><?= __('Directorio:') ?> <code>/<?= esc((string) ($podcast['slug'] ?? '')) ?>/</code></p>
-      <p><?= __('%d capítulos', (int) $podcast['episode_count']) ?></p>
-      <p><a class="button" href="admin.php?podcast=<?= esc(rawurlencode((string) $podcast['slug'])) ?>&amp;manage=1"><?= __('Administrar podcast') ?></a></p>
-      <form method="post" action="multipodcast.php">
+    <?php
+      $isPrimaryPodcast = (int) $podcast['id'] === (int) ($primary_podcast['id'] ?? 0);
+      $podcastImage = trim((string) ($podcast['image_url'] ?? ''));
+      $podcastImageSources = $podcastImage !== ''
+          ? buildResponsiveSquareImageSources($podcastImage, [80, 144])
+          : ['src' => '', 'srcset' => ''];
+    ?>
+    <section class="admin-card podcast-admin-card<?= $isPrimaryPodcast ? ' is-primary' : '' ?>">
+      <div class="podcast-admin-card-header">
+        <?php if ($podcastImageSources['src'] !== ''): ?>
+          <img
+            class="podcast-admin-cover"
+            src="<?= esc($podcastImageSources['src']) ?>"
+            <?php if ($podcastImageSources['srcset'] !== ''): ?>srcset="<?= esc($podcastImageSources['srcset']) ?>" sizes="80px"<?php endif; ?>
+            width="80"
+            height="80"
+            alt="<?= esc(__('Portada del podcast')) ?>"
+          >
+        <?php else: ?>
+          <div class="podcast-admin-cover-placeholder" aria-hidden="true">🎙️</div>
+        <?php endif; ?>
+        <div class="podcast-admin-card-title">
+          <h3><?= esc((string) $podcast['title']) ?></h3>
+          <?php if ($isPrimaryPodcast): ?><span class="podcast-primary-badge"><?= __('Podcast principal') ?></span><?php endif; ?>
+        </div>
+      </div>
+      <div class="podcast-admin-meta">
+        <p><?= __('Directorio:') ?> <code>/<?= esc((string) ($podcast['slug'] ?? '')) ?>/</code></p>
+        <p><?= __('%d capítulos', (int) $podcast['episode_count']) ?></p>
+      </div>
+      <div class="podcast-admin-actions">
+        <a class="btn" href="admin.php?podcast=<?= esc(rawurlencode((string) $podcast['slug'])) ?>&amp;manage=1"><?= __('Administrar podcast') ?></a>
+        <?php if (!$isPrimaryPodcast): ?>
+          <form method="post" action="multipodcast.php">
+            <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+            <input type="hidden" name="action" value="set_primary">
+            <input type="hidden" name="podcast_id" value="<?= (int) $podcast['id'] ?>">
+            <button class="btn back" type="submit"><?= __('Marcar como principal') ?></button>
+          </form>
+        <?php endif; ?>
+      </div>
+      <form class="podcast-admin-form" method="post" action="multipodcast.php">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <input type="hidden" name="action" value="rename_slug"><input type="hidden" name="podcast_id" value="<?= (int) $podcast['id'] ?>">
         <label><?= __('Directorio del podcast') ?><input name="slug" value="<?= esc((string) ($podcast['slug'] ?? '')) ?>" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"></label>
-        <button type="submit"><?= __('Cambiar directorio') ?></button>
+        <button class="btn" type="submit"><?= __('Cambiar directorio') ?></button>
       </form>
       <?php if (count($podcasts) > 1): ?>
-      <form method="post" action="multipodcast.php" data-confirm-message="<?= esc(__('Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?')) ?>">
+      <form class="podcast-admin-form podcast-admin-delete" method="post" action="multipodcast.php" data-confirm-message="<?= esc(__('Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?')) ?>">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <input type="hidden" name="action" value="delete"><input type="hidden" name="podcast_id" value="<?= (int) $podcast['id'] ?>">
         <label><?= __('Escribe el título para confirmar') ?><input name="confirm_title" required autocomplete="off"></label>
-        <button class="danger" type="submit"><?= __('Crear backup y borrar podcast') ?></button>
+        <button class="btn danger" type="submit"><?= __('Crear backup y borrar podcast') ?></button>
       </form>
       <?php endif; ?>
     </section>

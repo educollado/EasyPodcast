@@ -22,3 +22,19 @@ test('podcastPath añade el directorio únicamente en modo multipodcast', functi
     assert_eq('/redes/feed.xml', podcastPath($podcast, 'feed.xml', true));
     assert_eq('/feed.xml', podcastPath($podcast, 'feed.xml', false));
 });
+
+test('resolvePublicPodcast usa el podcast principal cuando Multipodcast está desactivado', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+        return;
+    }
+
+    $pdo = new PDO('sqlite::memory:');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, title TEXT)');
+    $pdo->exec("INSERT INTO podcast VALUES (1, 'Primero'), (2, 'Principal')");
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)');
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 0, NULL, NULL, NULL, NULL, 'easypodcast', 2)");
+
+    assert_eq(2, (int) (resolvePublicPodcast($pdo)['id'] ?? 0));
+});

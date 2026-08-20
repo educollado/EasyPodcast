@@ -18,10 +18,10 @@ function openPodcastDatabase(string $dbPath): PDO
     return $pdo;
 }
 
-/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string,summary_title:string,summary_subtitle:string,summary_theme:string} */
+/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string,summary_title:string,summary_subtitle:string,summary_theme:string,primary_podcast_id:?int} */
 function loadAppSettings(PDO $pdo): array
 {
-    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url, summary_title, summary_subtitle, summary_theme FROM app_settings WHERE id = 1')->fetch();
+    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url, summary_title, summary_subtitle, summary_theme, primary_podcast_id FROM app_settings WHERE id = 1')->fetch();
     return [
         'multipodcast_enabled' => (int) ($row['multipodcast_enabled'] ?? 0),
         'homepage_podcast_id' => isset($row['homepage_podcast_id']) ? (int) $row['homepage_podcast_id'] : null,
@@ -29,6 +29,7 @@ function loadAppSettings(PDO $pdo): array
         'summary_title' => trim((string) ($row['summary_title'] ?? '')),
         'summary_subtitle' => trim((string) ($row['summary_subtitle'] ?? '')),
         'summary_theme' => trim((string) ($row['summary_theme'] ?? '')) ?: 'easypodcast',
+        'primary_podcast_id' => isset($row['primary_podcast_id']) ? (int) $row['primary_podcast_id'] : null,
     ];
 }
 
@@ -71,12 +72,30 @@ function firstPodcast(PDO $pdo): ?array
     return $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
 }
 
+function primaryPodcast(PDO $pdo): ?array
+{
+    try {
+        $primaryPodcastId = loadAppSettings($pdo)['primary_podcast_id'];
+        if ($primaryPodcastId !== null) {
+            $podcast = podcastById($pdo, $primaryPodcastId);
+            if ($podcast !== null) {
+                return $podcast;
+            }
+        }
+    } catch (Throwable $e) {
+        // Instalaciones anteriores a Multipodcast conservan el primer podcast.
+    }
+    return firstPodcast($pdo);
+}
+
 /** Resuelve el podcast público. null significa portada agregada multipodcast. */
 function resolvePublicPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
 {
     $settings = loadAppSettings($pdo);
     if ($settings['multipodcast_enabled'] !== 1) {
-        return firstPodcast($pdo);
+        return $settings['primary_podcast_id'] !== null
+            ? (podcastById($pdo, $settings['primary_podcast_id']) ?? firstPodcast($pdo))
+            : firstPodcast($pdo);
     }
     if ($requestedSlug !== null && $requestedSlug !== '') {
         return podcastBySlug($pdo, $requestedSlug);
@@ -102,7 +121,7 @@ function resolveAdminPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
         }
         unset($_SESSION['active_podcast_id']);
     }
-    return firstPodcast($pdo);
+    return primaryPodcast($pdo);
 }
 
 function activatePodcastContext(?array $podcast, bool $multipodcastEnabled): void
@@ -119,7 +138,7 @@ function activePodcast(PDO $pdo): ?array
     if (array_key_exists('_active_podcast', $GLOBALS)) {
         return is_array($GLOBALS['_active_podcast']) ? $GLOBALS['_active_podcast'] : null;
     }
-    return firstPodcast($pdo);
+    return primaryPodcast($pdo);
 }
 
 function activePodcastId(PDO $pdo): int

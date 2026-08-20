@@ -488,6 +488,132 @@ small {
   color: var(--muted);
 }
 
+/* Gestión Multipodcast: tarjetas amplias que evitan solapes entre contenido y formularios. */
+.podcast-admin-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 1.2rem;
+}
+
+.podcast-admin-card {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.podcast-admin-card.is-primary {
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px rgba(181, 71, 14, .14);
+}
+
+.podcast-admin-card-header {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: .85rem;
+  align-items: center;
+}
+
+.podcast-admin-cover,
+.podcast-admin-cover-placeholder {
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.podcast-admin-cover {
+  display: block;
+  object-fit: cover;
+}
+
+.podcast-admin-cover-placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+}
+
+.podcast-admin-card-title {
+  min-width: 0;
+}
+
+.podcast-admin-card-title h3 {
+  margin: 0 0 .45rem;
+  overflow-wrap: anywhere;
+}
+
+.podcast-primary-badge {
+  display: inline-flex;
+  max-width: 100%;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  color: var(--accent-dark);
+  background: rgba(181, 71, 14, .1);
+  font-size: .76rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.podcast-admin-meta {
+  display: grid;
+  gap: .35rem;
+  min-width: 0;
+}
+
+.podcast-admin-meta code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.podcast-admin-actions {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.podcast-admin-actions form {
+  display: contents;
+}
+
+.podcast-admin-actions .btn {
+  justify-content: center;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.podcast-admin-form {
+  min-width: 0;
+  display: grid;
+  gap: .65rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.podcast-admin-form input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.podcast-admin-form .btn {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.podcast-admin-delete .btn {
+  background: var(--danger);
+}
+
+.podcast-admin-delete .btn:hover {
+  background: #991b1b;
+}
+
 /* =========================================================
    Tabla de episodios
    ========================================================= */

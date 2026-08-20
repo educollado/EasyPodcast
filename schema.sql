@@ -37,7 +37,9 @@ CREATE TABLE IF NOT EXISTS app_settings (
   summary_title TEXT,
   summary_subtitle TEXT,
   summary_theme TEXT NOT NULL DEFAULT 'easypodcast',
-  FOREIGN KEY(homepage_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL
+  primary_podcast_id INTEGER,
+  FOREIGN KEY(homepage_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL,
+  FOREIGN KEY(primary_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL
 );
 INSERT OR IGNORE INTO app_settings (id, multipodcast_enabled, homepage_podcast_id) VALUES (1, 0, NULL);
 
@@ -212,4 +214,4 @@ BEGIN
   ON CONFLICT(podcast_id, episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 23;
+PRAGMA user_version = 24;

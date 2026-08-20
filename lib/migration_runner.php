@@ -151,6 +151,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 23');
         $version = 23;
     }
+
+    if ($version < 24) {
+        migration_v24($pdo);
+        $pdo->exec('PRAGMA user_version = 24');
+        $version = 24;
+    }
 }
 
 /**
@@ -798,6 +804,25 @@ function migration_v23(PDO $pdo): void
                (SELECT admin_theme FROM podcast ORDER BY id ASC LIMIT 1),
                'easypodcast'
              )"
+        );
+    }
+}
+
+/**
+ * Migración v24: permite elegir explícitamente el podcast principal.
+ */
+function migration_v24(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(app_settings)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('primary_podcast_id', $existing, true)) {
+        $pdo->exec('ALTER TABLE app_settings ADD COLUMN primary_podcast_id INTEGER');
+        $pdo->exec(
+            'UPDATE app_settings
+             SET primary_podcast_id = (SELECT id FROM podcast ORDER BY id ASC LIMIT 1)
+             WHERE primary_podcast_id IS NULL'
         );
     }
 }

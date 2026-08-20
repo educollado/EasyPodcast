@@ -72,6 +72,10 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
                 renamePodcastSlug($pdo, $projectRoot, (int) ($_POST['podcast_id'] ?? 0), (string) ($_POST['slug'] ?? ''));
                 clearWebCache();
                 $notice = __('Directorio del podcast actualizado correctamente.');
+            } elseif ($action === 'set_primary') {
+                setPrimaryPodcast($pdo, (int) ($_POST['podcast_id'] ?? 0));
+                clearWebCache();
+                $notice = __('Podcast principal actualizado correctamente.');
             } elseif ($action === 'delete') {
                 $result = deletePodcastWithBackup($pdo, $dbPath, $projectRoot, (int) ($_POST['podcast_id'] ?? 0), (string) ($_POST['confirm_title'] ?? ''));
                 clearWebCache();
@@ -89,12 +93,21 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
          FROM podcast p LEFT JOIN episodes e ON e.podcast_id = p.id
          GROUP BY p.id ORDER BY p.title COLLATE NOCASE ASC"
     )->fetchAll();
-    $primaryPodcast = firstPodcast($pdo);
+    $primaryPodcast = primaryPodcast($pdo);
     $settings = loadAppSettings($pdo);
     return compact('podcasts', 'settings', 'error', 'notice') + [
         'primary_podcast' => $primaryPodcast,
         'backup_file' => $backupFile,
     ];
+}
+
+function setPrimaryPodcast(PDO $pdo, int $podcastId): void
+{
+    if (podcastById($pdo, $podcastId) === null) {
+        throw new RuntimeException(__('El podcast no existe.'));
+    }
+    $stmt = $pdo->prepare('UPDATE app_settings SET primary_podcast_id = :podcast_id WHERE id = 1');
+    $stmt->execute([':podcast_id' => $podcastId]);
 }
 
 function requestBaseUrl(): string
@@ -304,6 +317,10 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
     if ($count <= 1) {
         throw new RuntimeException(__('No se puede borrar el único podcast de la instalación.'));
     }
+    $replacementStmt = $pdo->prepare('SELECT id FROM podcast WHERE id != :id ORDER BY id ASC LIMIT 1');
+    $replacementStmt->execute([':id' => $podcastId]);
+    $replacementPodcastId = (int) $replacementStmt->fetchColumn();
+    $deletingPrimaryPodcast = loadAppSettings($pdo)['primary_podcast_id'] === $podcastId;
     if (!class_exists('ZipArchive') || !class_exists('SQLite3')) {
         throw new RuntimeException(__('No se puede borrar sin crear antes una copia consistente porque ZipArchive o SQLite3 no están disponibles.'));
     }
@@ -343,6 +360,10 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
 
     $pdo->beginTransaction();
     try {
+        if ($deletingPrimaryPodcast) {
+            $pdo->prepare('UPDATE app_settings SET primary_podcast_id = :replacement WHERE id = 1')
+                ->execute([':replacement' => $replacementPodcastId]);
+        }
         foreach (['estadisticas', 'estadisticas_mensuales', 'estadisticas_anuales', 'api_tokens', 'social'] as $table) {
             $pdo->prepare('DELETE FROM ' . $table . ' WHERE podcast_id = :id')->execute([':id' => $podcastId]);
         }

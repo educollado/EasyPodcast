@@ -76,8 +76,8 @@ test('loadAdminTheme: usa el tema propio de la portada resumen multipodcast', fu
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->exec("CREATE TABLE podcast (id INTEGER PRIMARY KEY, admin_theme TEXT, public_theme_mode_auto INTEGER)");
         $pdo->exec("INSERT INTO podcast VALUES (1, 'corporate', 1)");
-        $pdo->exec("CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT)");
-        $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, NULL, NULL, NULL, 'monokai')");
+        $pdo->exec("CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)");
+        $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, NULL, NULL, NULL, 'monokai', 1)");
         $GLOBALS['_active_podcast'] = null;
 
         loadAdminTheme($dbPath);
