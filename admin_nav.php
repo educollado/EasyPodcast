@@ -32,7 +32,7 @@ $navActivePodcastId = !$navIsOverview && is_array($navPodcast) ? (int) ($navPodc
   data-file-empty-label="<?= esc(__('No se ha seleccionado ningún archivo')) ?>"
   data-file-multiple-label="<?= esc(__('%d archivos seleccionados')) ?>"
 >
-  <a class="admin-nav-brand" href="<?= $navMulti ? 'multipodcast.php' : 'admin.php' ?>"><?= $navMulti ? __('Multipodcast') : 'EasyPodcast' ?> <small>v<?= APP_VERSION ?></small></a>
+  <a class="admin-nav-brand" href="<?= $navMulti ? 'multipodcast.php' : 'admin.php' ?>">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
   <div class="admin-nav-links">
     <?php if ($navMulti): ?>
       <form class="admin-nav-podcast-selector" method="get" action="admin.php">

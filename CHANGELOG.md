@@ -16,6 +16,7 @@
 - **Listado Multipodcast más legible**: fija dos tarjetas por fila en escritorio y una en pantallas estrechas para mantener siempre espacio suficiente.
 - **Navegación Multipodcast por niveles**: la barra general muestra únicamente la vuelta a Multipodcast, el selector de podcast, el acceso a la portada pública y la salida; las opciones de gestión aparecen al entrar en un podcast.
 - **Resumen por actividad**: la portada Multipodcast ordena los podcasts por la fecha de su último episodio publicado, lo indica en el encabezado y muestra el pie público compartido de EasyPodcast.
+- **Marca del panel**: la esquina superior izquierda vuelve a mostrar EasyPodcast también cuando está activo el modo Multipodcast, conservando el enlace a su gestión.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

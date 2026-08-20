@@ -22,7 +22,7 @@ function renderAdminNavFixture(string $page, ?array $podcast = null): string
 test('barra multipodcast general oculta las opciones internas y permite elegir podcast', function () {
     $html = renderAdminNavFixture('multipodcast');
 
-    assert_contains('href="multipodcast.php">Multipodcast', $html);
+    assert_contains('href="multipodcast.php">EasyPodcast', $html);
     assert_contains('class="admin-nav-podcast-selector"', $html);
     assert_contains('name="podcast"', $html);
     assert_contains('Ver podcasts ↗', $html);
@@ -33,7 +33,7 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
 test('barra de un podcast muestra sus opciones de administración', function () {
     $html = renderAdminNavFixture('podcast', ['id' => 2, 'slug' => 'demo']);
 
-    assert_contains('href="multipodcast.php">Multipodcast', $html);
+    assert_contains('href="multipodcast.php">EasyPodcast', $html);
     assert_contains('>Panel<', $html);
     assert_contains('>Capítulos<', $html);
     assert_contains('href="/demo/"', $html);
