@@ -22,6 +22,7 @@
 - **Visibilidad en el resumen**: cada podcast puede decidir desde su gestión si aparece en la portada-resumen Multipodcast; la opción solo se muestra cuando esa portada está activa y conserva por defecto la visibilidad existente.
 - **Avisos bajo demanda**: la advertencia roja de activación o desactivación permanece oculta al abrir Multipodcast y solo aparece después de cambiar el check, antes de guardar.
 - **Administración global separada**: el área Multipodcast incorpora un menú propio para caché, actualizaciones, contraseña, 2FA, backups y API; caché y tokens identifican el podcast gestionado y permiten cambiarlo sin abandonar la pantalla.
+- **Dashboard Multipodcast**: `multipodcast.php` adopta el mismo diseño de tarjetas que el panel de un podcast y concentra los accesos globales; la configuración y la lista de podcasts pasan a `multipodcast_management.php`.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

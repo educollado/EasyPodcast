@@ -90,8 +90,8 @@ test('loadAdminTheme: usa el tema propio de la portada resumen multipodcast', fu
     }
 });
 
-test('multipodcast.php aplica y previsualiza el tema propio del resumen', function () {
-    $pageSource = file_get_contents(__DIR__ . '/../multipodcast.php');
+test('la gestión Multipodcast aplica y previsualiza el tema propio del resumen', function () {
+    $pageSource = file_get_contents(__DIR__ . '/../multipodcast_management.php');
     $scriptSource = file_get_contents(__DIR__ . '/../assets/js/multipodcast.js');
 
     assert_true(is_string($pageSource));

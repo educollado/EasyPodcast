@@ -8,9 +8,9 @@ require_once __DIR__ . '/lib/podcast_context.php';
 $_navPage = $currentAdminPage ?? '';
 $navPodcast = $GLOBALS['_active_podcast'] ?? null;
 $navMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
-$navMultipodcastPages = ['multipodcast', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
+$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
 $navPodcastScopedMultipodcastPages = ['cache', 'api_tokens', 'api_docs'];
-$navIsMultipodcastArea = $_navPage === 'multipodcast'
+$navIsMultipodcastArea = in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true)
     || ($navMultipodcastEnabled && in_array($_navPage, $navMultipodcastPages, true));
 $navUsesPodcastContext = $navIsMultipodcastArea
     && in_array($_navPage, $navPodcastScopedMultipodcastPages, true);
@@ -59,7 +59,7 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
       </form>
     <?php endif; ?>
     <?php if ($navIsMultipodcastArea): ?>
-    <a class="admin-nav-link <?= $_navPage === 'multipodcast' ? 'active' : '' ?>" href="multipodcast.php"><?= __('Multipodcast') ?></a>
+    <a class="admin-nav-link <?= in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true) ? 'active' : '' ?>" href="multipodcast.php"><?= __('Multipodcast') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'cache' ? 'active' : '' ?>" href="cache_management.php"><?= __('Caché') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'update' ? 'active' : '' ?>" href="update.php"><?= __('Actualizar') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'password' ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
