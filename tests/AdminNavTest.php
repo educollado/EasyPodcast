@@ -33,9 +33,20 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('href="backups.php"', $html);
     assert_contains('href="api_tokens.php"', $html);
     assert_contains('>Administración<', $html);
+    assert_contains('href="podcasts_management.php">Podcasts</a>', $html);
     assert_contains('Ver podcasts ↗', $html);
     assert_true(!str_contains($html, '>Panel<'));
     assert_true(!str_contains($html, '>Capítulos<'));
+});
+
+test('Podcasts aparece junto a Administración y se activa en su gestión', function () {
+    $html = renderAdminNavFixture('podcasts');
+
+    $administrationPosition = strpos($html, 'href="multipodcast.php">Administración</a>');
+    $podcastsPosition = strpos($html, 'href="podcasts_management.php">Podcasts</a>');
+    assert_true(is_int($administrationPosition) && is_int($podcastsPosition));
+    assert_true($administrationPosition < $podcastsPosition);
+    assert_contains('class="admin-nav-link active" href="podcasts_management.php"', $html);
 });
 
 test('el selector superior navega a Multipodcast sin enviarlo como podcast', function () {

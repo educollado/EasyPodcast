@@ -26,6 +26,7 @@
 - **Selector con retorno global**: el desplegable superior incluye Multipodcast como primera opción y vuelve directamente a `multipodcast.php` al seleccionarla.
 - **Encabezados de administración contextuales**: ambas barras llaman Administración al acceso principal; los dashboards identifican expresamente el podcast activo o el panel Multipodcast.
 - **Gestión de podcasts separada**: el dashboard Multipodcast añade una tarjeta Podcasts que abre primero la creación y después el listado; estas acciones dejan de mezclarse con la configuración general de la portada.
+- **Acceso directo a Podcasts**: la barra superior Multipodcast sitúa Podcasts inmediatamente después de Administración y resalta la sección al gestionarlos.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

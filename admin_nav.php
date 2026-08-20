@@ -60,6 +60,7 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
     <?php endif; ?>
     <?php if ($navIsMultipodcastArea): ?>
     <a class="admin-nav-link <?= in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true) ? 'active' : '' ?>" href="multipodcast.php"><?= __('Administración') ?></a>
+    <a class="admin-nav-link <?= $_navPage === 'podcasts' ? 'active' : '' ?>" href="podcasts_management.php"><?= __('Podcasts') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'cache' ? 'active' : '' ?>" href="cache_management.php"><?= __('Caché') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'update' ? 'active' : '' ?>" href="update.php"><?= __('Actualizar') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'password' ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
