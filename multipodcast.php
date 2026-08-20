@@ -36,9 +36,10 @@ extract($data);
 $summaryTitleValue = $settings['summary_title'] !== '' ? $settings['summary_title'] : __('Todos nuestros podcasts, en un solo lugar.');
 $summarySubtitleValue = $settings['summary_subtitle'] !== '' ? $settings['summary_subtitle'] : __('Descubre todos los podcasts disponibles y sus feeds RSS.');
 $primaryPodcastTitle = trim((string) ($primary_podcast['title'] ?? ''));
+$multipodcastTheme = isset(ADMIN_THEMES[$settings['summary_theme']]) ? $settings['summary_theme'] : 'easypodcast';
 ?>
 <!doctype html>
-<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
+<html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc($multipodcastTheme) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -120,7 +121,7 @@ $primaryPodcastTitle = trim((string) ($primary_podcast['title'] ?? ''));
       <div class="summary-content-settings">
         <label>
           <?= __('Tema del resumen') ?>
-          <select name="summary_theme">
+          <select id="summary_theme" name="summary_theme" data-summary-theme-selector>
             <?php foreach (ADMIN_THEMES as $themeSlug => $themeLabel): ?>
               <option value="<?= esc($themeSlug) ?>" <?= $settings['summary_theme'] === $themeSlug ? 'selected' : '' ?>><?= esc($themeLabel) ?></option>
             <?php endforeach; ?>

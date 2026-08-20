@@ -89,3 +89,14 @@ test('loadAdminTheme: usa el tema propio de la portada resumen multipodcast', fu
         @unlink($dbPath);
     }
 });
+
+test('multipodcast.php aplica y previsualiza el tema propio del resumen', function () {
+    $pageSource = file_get_contents(__DIR__ . '/../multipodcast.php');
+    $scriptSource = file_get_contents(__DIR__ . '/../assets/js/multipodcast.js');
+
+    assert_true(is_string($pageSource));
+    assert_true(is_string($scriptSource));
+    assert_contains("data-theme=\"<?= esc(\$multipodcastTheme) ?>\"", $pageSource);
+    assert_contains('data-summary-theme-selector', $pageSource);
+    assert_contains('document.documentElement.dataset.theme = themeSelect.value', $scriptSource);
+});

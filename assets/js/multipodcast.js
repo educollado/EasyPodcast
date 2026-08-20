@@ -33,13 +33,29 @@
     updateWarning();
   }
 
+  function initSummaryThemePreview() {
+    var themeSelect = document.querySelector('[data-summary-theme-selector]');
+    if (!themeSelect) {
+      return;
+    }
+
+    function updateTheme() {
+      document.documentElement.dataset.theme = themeSelect.value || 'easypodcast';
+    }
+
+    themeSelect.addEventListener('change', updateTheme);
+    updateTheme();
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initSummaryHeroSettings();
       initMultipodcastWarning();
+      initSummaryThemePreview();
     });
   } else {
     initSummaryHeroSettings();
     initMultipodcastWarning();
+    initSummaryThemePreview();
   }
 }());
