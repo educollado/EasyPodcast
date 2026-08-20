@@ -17,7 +17,8 @@ function regenerateAllImages(PDO $pdo): int
     $count = 0;
 
     // Imagen del podcast
-    $podcast = $pdo->query('SELECT image_url FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+    $podcast = activePodcast($pdo);
+    $podcastId = (int) ($podcast['id'] ?? 0);
     if ($podcast && (string) ($podcast['image_url'] ?? '') !== '') {
         foreach ($sizes as $size) {
             ensureSquareImageVariant((string) $podcast['image_url'], $size);
@@ -26,9 +27,8 @@ function regenerateAllImages(PDO $pdo): int
     }
 
     // Imágenes de episodios (distintas y no vacías)
-    $stmt = $pdo->query(
-        "SELECT DISTINCT image_url FROM episodes WHERE image_url IS NOT NULL AND image_url != '' ORDER BY id DESC"
-    );
+    $stmt = $pdo->prepare("SELECT DISTINCT image_url FROM episodes WHERE podcast_id = :podcast_id AND image_url IS NOT NULL AND image_url != '' ORDER BY id DESC");
+    $stmt->execute([':podcast_id' => $podcastId]);
     while ($row = $stmt->fetch()) {
         $url = (string) ($row['image_url'] ?? '');
         if ($url === '') {
@@ -60,7 +60,10 @@ function loadCacheManagementData(string $dbPath): array
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-        $existing = $pdo->query('SELECT cache_enabled FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        $podcastId = activePodcastId($pdo);
+        $existingStmt = $pdo->prepare('SELECT cache_enabled FROM podcast WHERE id = :podcast_id LIMIT 1');
+        $existingStmt->execute([':podcast_id' => $podcastId]);
+        $existing = $existingStmt->fetch();
         if ($existing) {
             $cacheEnabled = (string) ($existing['cache_enabled'] ?? '0');
         }
@@ -71,8 +74,8 @@ function loadCacheManagementData(string $dbPath): array
 
             if ($action === 'save_settings') {
                 $newEnabled = isset($_POST['cache_enabled']) ? 1 : 0;
-                $stmt = $pdo->prepare('UPDATE podcast SET cache_enabled = :val');
-                $stmt->execute([':val' => $newEnabled]);
+                $stmt = $pdo->prepare('UPDATE podcast SET cache_enabled = :val WHERE id = :podcast_id');
+                $stmt->execute([':val' => $newEnabled, ':podcast_id' => $podcastId]);
                 $cacheEnabled = (string) $newEnabled;
                 // Si se deshabilita la caché, limpiarla para no servir datos huérfanos.
                 if (!$newEnabled) {

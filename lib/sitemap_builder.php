@@ -64,8 +64,9 @@ function buildPodcastSitemapXml(PDO $pdo): string
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     $baseUrl = resolveBaseUrl($pdo);
-    $podcast = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: [];
-    $homeUrl = toAbsoluteUrl((string) ($podcast['link'] ?? ''), $baseUrl);
+    $podcast = activePodcast($pdo) ?? [];
+    $podcastId = (int) ($podcast['id'] ?? 0);
+    $homeUrl = rtrim($baseUrl, '/') . '/';
 
     $episodes = [];
     $homeLastmodRaw = null;
@@ -76,10 +77,10 @@ function buildPodcastSitemapXml(PDO $pdo): string
         $episodesStmt = $pdo->prepare(
             "SELECT title, link, pub_date, updated_at
              FROM episodes
-             WHERE status = 'published'
+             WHERE podcast_id = :podcast_id AND status = 'published'
              ORDER BY datetime(pub_date) DESC, id DESC"
         );
-        $episodesStmt->execute();
+        $episodesStmt->execute([':podcast_id' => $podcastId]);
         $episodes = $episodesStmt->fetchAll();
         if ($episodes) {
             $homeLastmodRaw = (string) ($episodes[0]['updated_at'] ?? $episodes[0]['pub_date'] ?? '');
@@ -96,7 +97,9 @@ function buildPodcastSitemapXml(PDO $pdo): string
             }
         }
         if ($hasPodcastUpdatedAt) {
-            $podcastUpdated = $pdo->query('SELECT updated_at FROM podcast ORDER BY id ASC LIMIT 1')->fetchColumn();
+            $updatedStmt = $pdo->prepare('SELECT updated_at FROM podcast WHERE id = :podcast_id LIMIT 1');
+            $updatedStmt->execute([':podcast_id' => $podcastId]);
+            $podcastUpdated = $updatedStmt->fetchColumn();
             if (is_string($podcastUpdated) && trim($podcastUpdated) !== '') {
                 $homeLastmodRaw = $podcastUpdated;
             }
@@ -123,7 +126,19 @@ function buildPodcastSitemapXml(PDO $pdo): string
         $path = $storedLink !== ''
             ? $storedLink
             : buildEpisodePathForSitemap((string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''));
-        $episodeUrl = toAbsoluteUrl($path, $baseUrl);
+        if (multipodcastEnabled($pdo) && trim((string) ($podcast['slug'] ?? '')) !== '') {
+            $publicPath = resolvePodcastEpisodeHref(
+                $podcast,
+                $path,
+                (string) ($episode['pub_date'] ?? ''),
+                (string) ($episode['title'] ?? ''),
+                true
+            );
+            $origin = extractBaseUrlFromLink((string) ($podcast['link'] ?? '')) ?? runtimeBaseUrl();
+            $episodeUrl = rtrim($origin, '/') . $publicPath;
+        } else {
+            $episodeUrl = toAbsoluteUrl($path, $baseUrl);
+        }
 
         $xml->startElement('url');
         $xml->writeElement('loc', $episodeUrl);

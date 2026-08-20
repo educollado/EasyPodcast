@@ -28,7 +28,8 @@ function buildSearchSeoData(?array $podcast, string $query, int $page, int $tota
     if ($page > 1) {
         $queryParams['page'] = $page;
     }
-    $canonicalPath = '/search.php' . ($query !== '' ? ('?' . http_build_query($queryParams)) : '');
+    $searchPath = podcastSeoPath($p, 'search');
+    $canonicalPath = $searchPath . ($query !== '' ? ('?' . http_build_query($queryParams)) : '');
     $canonicalUrl  = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
     $robotsContent = 'noindex,follow';
 
@@ -37,7 +38,7 @@ function buildSearchSeoData(?array $podcast, string $query, int $page, int $tota
         : ('Resultados para "' . $query . '" en ' . $podcastTitle . '.');
 
     $ogImage = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-    $rssUrl  = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
+    $rssUrl  = toAbsoluteSeoUrl(podcastSeoPath($p, 'feed.xml'), $baseSeoUrl);
 
     // URLs de paginación para <link rel="prev/next">.
     $prevUrl = null;
@@ -46,12 +47,12 @@ function buildSearchSeoData(?array $podcast, string $query, int $page, int $tota
         if ($page > 2) {
             $prevParams['page'] = $page - 1;
         }
-        $prevUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($prevParams), $baseSeoUrl);
+        $prevUrl = toAbsoluteSeoUrl($searchPath . '?' . http_build_query($prevParams), $baseSeoUrl);
     }
     $nextUrl = null;
     if ($query !== '' && $page < $totalPages) {
         $nextParams = ['q' => $query, 'page' => $page + 1];
-        $nextUrl = toAbsoluteSeoUrl('/search.php?' . http_build_query($nextParams), $baseSeoUrl);
+        $nextUrl = toAbsoluteSeoUrl($searchPath . '?' . http_build_query($nextParams), $baseSeoUrl);
     }
 
     return compact(

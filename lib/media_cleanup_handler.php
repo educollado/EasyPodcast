@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/podcast_context.php';
 
 /**
  * Convierte bytes a una cadena legible (KB / MB).
@@ -48,6 +49,12 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
     $orphanImages = [];
     $error        = '';
     $notice       = '';
+    $contextPdo = openPodcastDatabase($dbPath);
+    $contextPodcast = activePodcast($contextPdo) ?? [];
+    $isMulti = multipodcastEnabled($contextPdo);
+    $podcastId = (int) ($contextPodcast['id'] ?? 0);
+    $audiosBaseDir = podcastStorageDirectory($projectDir, 'audios', $contextPodcast, $isMulti);
+    $imagesBaseDir = podcastStorageDirectory($projectDir, 'images', $contextPodcast, $isMulti);
 
     // --- Borrado POST ---
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -57,8 +64,8 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         $deleted      = 0;
         $freedBytes   = 0;
 
-        $audiosDir = realpath($projectDir . '/audios');
-        $imagesDir = realpath($projectDir . '/images');
+        $audiosDir = realpath($audiosBaseDir);
+        $imagesDir = realpath($imagesBaseDir);
 
         foreach ($files as $item) {
             // Formato esperado: "audio:filename.mp3" o "image:filename.jpg"
@@ -102,7 +109,9 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         $usedImages = [];
 
         // Audios usados en episodios (acepta URLs relativas /audios/... y absolutas https://.../audios/...)
-        $rows = $pdo->query('SELECT audio_url FROM episodes')->fetchAll(PDO::FETCH_COLUMN);
+        $stmt = $pdo->prepare('SELECT audio_url FROM episodes WHERE podcast_id = :podcast_id');
+        $stmt->execute([':podcast_id' => $podcastId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($rows as $url) {
             if (is_string($url) && str_contains($url, '/audios/')) {
                 $usedAudios[] = basename($url);
@@ -110,7 +119,9 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes usadas en episodios (acepta URLs relativas y absolutas)
-        $rows = $pdo->query("SELECT image_url FROM episodes WHERE image_url != ''")->fetchAll(PDO::FETCH_COLUMN);
+        $stmt = $pdo->prepare("SELECT image_url FROM episodes WHERE podcast_id = :podcast_id AND image_url != ''");
+        $stmt->execute([':podcast_id' => $podcastId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($rows as $url) {
             if (is_string($url) && str_contains($url, '/images/')) {
                 $usedImages[] = basename($url);
@@ -118,9 +129,7 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes de portada y hero del canal.
-        $podcastImages = $pdo
-            ->query('SELECT image_url, hero_image_url FROM podcast ORDER BY id ASC LIMIT 1')
-            ->fetch(PDO::FETCH_ASSOC) ?: [];
+        $podcastImages = $contextPodcast;
         foreach (['image_url', 'hero_image_url'] as $imageColumn) {
             $podcastImage = $podcastImages[$imageColumn] ?? null;
             if (is_string($podcastImage) && str_contains($podcastImage, '/images/')) {
@@ -129,7 +138,9 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes embebidas en el contenido HTML de las páginas
-        $pageContents = $pdo->query('SELECT content FROM pages')->fetchAll(PDO::FETCH_COLUMN);
+        $pageStmt = $pdo->prepare('SELECT content FROM pages WHERE podcast_id = :podcast_id');
+        $pageStmt->execute([':podcast_id' => $podcastId]);
+        $pageContents = $pageStmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($pageContents as $html) {
             if (is_string($html) && $html !== '') {
                 foreach (extractImageBasenamesFromHtml($html) as $basename) {
@@ -142,8 +153,8 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         $usedImages = array_unique($usedImages);
 
         // Escanear disco
-        $audiosDir = $projectDir . '/audios';
-        $imagesDir = $projectDir . '/images';
+        $audiosDir = $audiosBaseDir;
+        $imagesDir = $imagesBaseDir;
 
         $skipFiles = ['.', '..', '.htaccess'];
 

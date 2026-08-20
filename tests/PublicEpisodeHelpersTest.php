@@ -51,6 +51,28 @@ test('resolveEpisodeHref: enlace con sólo espacios se trata como vacío', funct
     assert_eq('/2024/03/mi-episodio', $result);
 });
 
+test('resolvePodcastEpisodeHref: antepone el directorio en multipodcast', function () {
+    $result = resolvePodcastEpisodeHref(
+        ['slug' => 'mi-podcast'],
+        '/2024/03/mi-episodio',
+        '2024-03-15 10:00:00',
+        'Mi Episodio',
+        true
+    );
+    assert_eq('/mi-podcast/2024/03/mi-episodio', $result);
+});
+
+test('resolvePodcastEpisodeHref: reemplaza un directorio antiguo sin duplicarlo', function () {
+    $result = resolvePodcastEpisodeHref(
+        ['slug' => 'nuevo'],
+        'https://example.test/antiguo/2026/08/episodio',
+        '2026-08-20 10:00:00',
+        'Episodio',
+        true
+    );
+    assert_eq('/nuevo/2026/08/episodio', $result);
+});
+
 // =============================================================================
 // slugFromEpisodeLink
 // =============================================================================

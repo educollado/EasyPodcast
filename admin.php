@@ -32,10 +32,12 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ??
         $publicThemeModeAuto = isset($_POST['public_theme_mode_auto']) ? 1 : 0;
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->prepare('UPDATE podcast SET admin_theme = :theme, public_theme_mode_auto = :public_theme_mode_auto');
+        $podcastId = activePodcastId($pdo);
+        $stmt = $pdo->prepare('UPDATE podcast SET admin_theme = :theme, public_theme_mode_auto = :public_theme_mode_auto WHERE id = :podcast_id');
         $stmt->execute([
             ':theme' => $theme,
             ':public_theme_mode_auto' => $publicThemeModeAuto,
+            ':podcast_id' => $podcastId,
         ]);
         clearWebCache();
     }
@@ -50,8 +52,9 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ??
     if (file_exists(__DIR__ . '/locale/' . $lang . '.po')) {
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->prepare('UPDATE podcast SET app_language = :lang');
-        $stmt->execute([':lang' => $lang]);
+        $podcastId = activePodcastId($pdo);
+        $stmt = $pdo->prepare('UPDATE podcast SET app_language = :lang WHERE id = :podcast_id');
+        $stmt->execute([':lang' => $lang, ':podcast_id' => $podcastId]);
         clearWebCache();
     }
     header('Location: admin.php');
@@ -67,6 +70,18 @@ if ($isTotpPending) {
 $data = loadAdminData($dbPath);
 extract($data); // adminCount, isSetupMode, error, notice
 
+if (isset($_SESSION['admin_user']) && !isset($_GET['manage'])) {
+    try {
+        $contextPdo = openPodcastDatabase($dbPath);
+        if (loadAppSettings($contextPdo)['multipodcast_enabled'] === 1) {
+            header('Location: podcasts.php');
+            exit;
+        }
+    } catch (Throwable $e) {
+        // El panel normal continúa disponible si aún no existe la configuración.
+    }
+}
+
 // Idioma activo para mostrar el selector.
 $currentAppLanguage = 'es_ES';
 // Tema activo para mostrar el selector.
@@ -76,7 +91,10 @@ $adminUpdateStatus = ['available' => false, 'version' => ''];
 if ($isLoggedIn) {
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
-        $row = $pdo->query('SELECT app_language, admin_theme, public_theme_mode_auto FROM podcast LIMIT 1')->fetch();
+        $podcastId = activePodcastId($pdo);
+        $stmt = $pdo->prepare('SELECT app_language, admin_theme, public_theme_mode_auto FROM podcast WHERE id = :podcast_id LIMIT 1');
+        $stmt->execute([':podcast_id' => $podcastId]);
+        $row = $stmt->fetch();
         if (is_array($row)) {
             if (is_string($row['app_language'] ?? null) && $row['app_language'] !== '') {
                 $currentAppLanguage = $row['app_language'];
@@ -126,6 +144,11 @@ if ($isLoggedIn) {
         <?php endif; ?>
 
         <div class="admin-cards">
+          <a class="admin-card" href="podcasts.php">
+            <div class="admin-card-icon">🎧</div>
+            <h2><?= __('Podcasts') ?></h2>
+            <p><?= __('Crea, selecciona y configura los podcasts de la instalación') ?></p>
+          </a>
           <a class="admin-card" href="podcast_management.php">
             <div class="admin-card-icon">🎙</div>
             <h2><?= __('Podcast') ?></h2>
@@ -196,7 +219,8 @@ if ($isLoggedIn) {
             <h2>API Tokens</h2>
             <p><?= __('Genera y revoca tokens para la API REST') ?></p>
           </a>
-          <a class="admin-card" href="/" target="_blank" rel="noopener">
+          <?php $activeAdminPodcast = activePodcast(openPodcastDatabase($dbPath)); ?>
+          <a class="admin-card" href="<?= esc($activeAdminPodcast !== null ? podcastPath($activeAdminPodcast, '', multipodcastEnabled(openPodcastDatabase($dbPath))) : '/') ?>" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
             <h2><?= __('Ver podcast') ?></h2>
             <p><?= __('Abre la web pública en una pestaña nueva') ?></p>

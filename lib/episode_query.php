@@ -24,7 +24,7 @@ function extractEpisodeRouteFromLink(?string $link): ?array
         return null;
     }
 
-    if (preg_match('#^/([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$#', $path, $matches) !== 1) {
+    if (preg_match('#^/(?:[a-z0-9-]+/)?([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$#', $path, $matches) !== 1) {
         return null;
     }
 
@@ -99,7 +99,8 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
             // Silencioso: el detalle debe seguir cargando aunque falle el scheduler.
         }
 
-        $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
+        $podcast = activePodcast($pdo);
+        $podcastId = (int) ($podcast['id'] ?? 0);
 
         $statusClause = $allowUnpublished
             ? "status IN ('published', 'draft', 'scheduled')"
@@ -110,9 +111,9 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
         // ya que buildEpisodePublicLink guarda el link con dominio completo.
         $linkPath = "/$year/$month/$slug";
         $fastStmt = $pdo->prepare(
-            "SELECT * FROM episodes WHERE (link = :link OR link LIKE :suffix) AND $statusClause LIMIT 1"
+            "SELECT * FROM episodes WHERE podcast_id = :podcast_id AND (link = :link OR link LIKE :suffix) AND $statusClause LIMIT 1"
         );
-        $fastStmt->execute([':link' => $linkPath, ':suffix' => '%' . $linkPath]);
+        $fastStmt->execute([':podcast_id' => $podcastId, ':link' => $linkPath, ':suffix' => '%' . $linkPath]);
         $episode = $fastStmt->fetch() ?: null;
 
         // Fallback legacy: episodios sin link (importados antes de que se guardara la ruta).
@@ -121,13 +122,13 @@ function loadEpisodeData(string $dbPath, string $year, string $month, string $sl
             $fallbackStmt = $pdo->prepare(
                 "SELECT *
                  FROM episodes
-                 WHERE $statusClause
+                 WHERE podcast_id = :podcast_id AND $statusClause
                    AND (link IS NULL OR TRIM(link) = '')
                    AND strftime('%Y', pub_date) = :year
                    AND strftime('%m', pub_date) = :month
                  ORDER BY datetime(pub_date) DESC, id DESC"
             );
-            $fallbackStmt->execute([':year' => $year, ':month' => $month]);
+            $fallbackStmt->execute([':podcast_id' => $podcastId, ':year' => $year, ':month' => $month]);
             foreach ($fallbackStmt->fetchAll() as $row) {
                 if (episodeMatchesRoute($row, $year, $month, $slug)) {
                     $episode = $row;

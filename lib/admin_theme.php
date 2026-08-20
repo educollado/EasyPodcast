@@ -47,14 +47,16 @@ function loadAdminTheme(string $dbPath): void
         );
 
         if (in_array('admin_theme', $columns, true)) {
-            $theme = $pdo->query('SELECT admin_theme FROM podcast LIMIT 1')->fetchColumn();
+            $podcast = function_exists('activePodcast') ? activePodcast($pdo) : null;
+            $theme = $podcast['admin_theme'] ?? $pdo->query('SELECT admin_theme FROM podcast LIMIT 1')->fetchColumn();
             if (is_string($theme) && $theme !== '' && isset(ADMIN_THEMES[$theme])) {
                 $GLOBALS['_admin_theme'] = $theme;
             }
         }
 
         if (in_array('public_theme_mode_auto', $columns, true)) {
-            $modeAuto = $pdo->query('SELECT public_theme_mode_auto FROM podcast LIMIT 1')->fetchColumn();
+            $podcast ??= function_exists('activePodcast') ? activePodcast($pdo) : null;
+            $modeAuto = $podcast['public_theme_mode_auto'] ?? $pdo->query('SELECT public_theme_mode_auto FROM podcast LIMIT 1')->fetchColumn();
             if ((int) $modeAuto === 1) {
                 $GLOBALS['_public_theme_mode'] = 'auto';
             }

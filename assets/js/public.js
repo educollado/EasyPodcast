@@ -15,7 +15,8 @@
 
         tracked = true;
 
-        fetch('/track.php?episode_id=' + episodeId + '&action=play', {
+        var trackUrl = audio.getAttribute('data-track-url') || '/track.php';
+        fetch(trackUrl + '?episode_id=' + encodeURIComponent(episodeId) + '&action=play', {
           method: 'GET',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'

@@ -29,7 +29,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
         $cover = trim((string) ($p['image_url'] ?? ''));
     }
     $baseSeoUrl    = resolveSeoBaseUrl((string) ($p['link'] ?? ''));
-    $canonicalPath = '/' . $year . '/' . $month . '/' . $slug;
+    $canonicalPath = podcastSeoPath($p, $year . '/' . $month . '/' . $slug);
     $canonicalUrl  = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
     $robotsContent = $error !== '' ? 'noindex,follow' : 'index,follow';
     $episodeTitle  = (string) ($e['title'] ?? $podcastTitle);
@@ -42,7 +42,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
         $metaDescription = 'Escucha este episodio en ' . $podcastTitle . '.';
     }
     $ogImage = $cover !== '' ? toAbsoluteSeoUrl($cover, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-    $rssUrl  = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
+    $rssUrl  = toAbsoluteSeoUrl(podcastSeoPath($p, 'feed.xml'), $baseSeoUrl);
 
     $episodeJsonLd = '{}';
     if ($episode !== null) {
@@ -57,7 +57,7 @@ function buildEpisodeSeoData(?array $podcast, ?array $episode, string $year, str
             'partOfSeries'  => [
                 '@type' => 'PodcastSeries',
                 'name'  => $podcastTitle,
-                'url'   => toAbsoluteSeoUrl('/', $baseSeoUrl),
+                'url'   => toAbsoluteSeoUrl(podcastSeoPath($p), $baseSeoUrl),
             ],
         ];
         if (!empty($e['audio_url'])) {

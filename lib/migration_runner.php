@@ -133,6 +133,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 20');
         $version = 20;
     }
+
+    if ($version < 21) {
+        migration_v21($pdo);
+        $pdo->exec('PRAGMA user_version = 21');
+        $version = 21;
+    }
 }
 
 /**
@@ -685,4 +691,232 @@ function migration_v20(PDO $pdo): void
     if (!in_array('latest_version_checked', $existing, true)) {
         $pdo->exec("ALTER TABLE podcast ADD COLUMN latest_version_checked TEXT");
     }
+}
+
+/**
+ * Migración v21: convierte el modelo de un único podcast en un modelo multi-tenant.
+ * La configuración de la instalación y las credenciales siguen siendo globales;
+ * el contenido y sus estadísticas quedan asociados explícitamente a un podcast.
+ */
+function migration_v21(PDO $pdo): void
+{
+    $pdo->exec('PRAGMA foreign_keys = OFF');
+    $pdo->beginTransaction();
+
+    try {
+        $podcastColumns = array_column($pdo->query('PRAGMA table_info(podcast)')->fetchAll(), 'name');
+        if (!in_array('slug', $podcastColumns, true)) {
+            $pdo->exec('ALTER TABLE podcast ADD COLUMN slug TEXT');
+        }
+        if (!in_array('created_at', $podcastColumns, true)) {
+            $pdo->exec("ALTER TABLE podcast ADD COLUMN created_at TEXT");
+            $pdo->exec("UPDATE podcast SET created_at = datetime('now') WHERE created_at IS NULL");
+        }
+        if (!in_array('updated_at', $podcastColumns, true)) {
+            $pdo->exec("ALTER TABLE podcast ADD COLUMN updated_at TEXT");
+            $pdo->exec("UPDATE podcast SET updated_at = datetime('now') WHERE updated_at IS NULL");
+        }
+        $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_podcast_slug ON podcast(slug) WHERE slug IS NOT NULL AND slug != ''");
+
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS app_settings (
+              id INTEGER PRIMARY KEY CHECK (id = 1),
+              multipodcast_enabled INTEGER NOT NULL DEFAULT 0,
+              homepage_podcast_id INTEGER,
+              FOREIGN KEY(homepage_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL
+            )"
+        );
+        $pdo->exec('INSERT OR IGNORE INTO app_settings (id, multipodcast_enabled, homepage_podcast_id) VALUES (1, 0, NULL)');
+
+        $firstPodcastId = (int) ($pdo->query('SELECT id FROM podcast ORDER BY id ASC LIMIT 1')->fetchColumn() ?: 1);
+
+        migrationV21RebuildEpisodes($pdo, $firstPodcastId);
+        migrationV21RebuildPages($pdo, $firstPodcastId);
+        migrationV21AddPodcastId($pdo, 'social', $firstPodcastId);
+        migrationV21AddPodcastId($pdo, 'api_tokens', $firstPodcastId);
+        migrationV21RebuildStatistics($pdo, $firstPodcastId);
+
+        $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_social_podcast ON social(podcast_id)');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_api_tokens_podcast ON api_tokens(podcast_id)');
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    } finally {
+        $pdo->exec('PRAGMA foreign_keys = ON');
+    }
+}
+
+function migrationV21AddPodcastId(PDO $pdo, string $table, int $podcastId): void
+{
+    $columns = array_column($pdo->query('PRAGMA table_info(' . $table . ')')->fetchAll(), 'name');
+    if (!in_array('podcast_id', $columns, true)) {
+        $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN podcast_id INTEGER');
+    }
+    $stmt = $pdo->prepare('UPDATE ' . $table . ' SET podcast_id = :podcast_id WHERE podcast_id IS NULL');
+    $stmt->execute([':podcast_id' => $podcastId]);
+}
+
+function migrationV21RebuildEpisodes(PDO $pdo, int $podcastId): void
+{
+    $columns = array_column($pdo->query('PRAGMA table_info(episodes)')->fetchAll(), 'name');
+    if (in_array('podcast_id', $columns, true)) {
+        return;
+    }
+
+    $pdo->exec('ALTER TABLE episodes RENAME TO episodes_v20');
+    $pdo->exec(
+        "CREATE TABLE episodes (
+          id INTEGER PRIMARY KEY,
+          podcast_id INTEGER NOT NULL,
+          guid TEXT NOT NULL,
+          title TEXT NOT NULL,
+          content TEXT NOT NULL,
+          short_description TEXT,
+          link TEXT,
+          pub_date TEXT,
+          audio_url TEXT NOT NULL,
+          audio_mime_type TEXT NOT NULL,
+          audio_size_bytes INTEGER NOT NULL,
+          duration TEXT,
+          explicit INTEGER,
+          season_number INTEGER,
+          episode_number INTEGER,
+          episode_type TEXT,
+          image_url TEXT,
+          author TEXT,
+          status TEXT NOT NULL DEFAULT 'draft',
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE,
+          UNIQUE(podcast_id, guid)
+        )"
+    );
+    $stmt = $pdo->prepare(
+        'INSERT INTO episodes (id, podcast_id, guid, title, content, short_description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, duration, explicit, season_number, episode_number, episode_type, image_url, author, status, created_at, updated_at)
+         SELECT id, :podcast_id, guid, title, content, short_description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes, duration, explicit, season_number, episode_number, episode_type, image_url, author, status, created_at, updated_at FROM episodes_v20'
+    );
+    $stmt->execute([':podcast_id' => $podcastId]);
+    $pdo->exec('DROP TABLE episodes_v20');
+    $pdo->exec('CREATE INDEX idx_episodes_status_pubdate ON episodes(podcast_id, status, pub_date)');
+    $pdo->exec('CREATE INDEX idx_episodes_link ON episodes(podcast_id, link)');
+}
+
+function migrationV21RebuildPages(PDO $pdo, int $podcastId): void
+{
+    $columns = array_column($pdo->query('PRAGMA table_info(pages)')->fetchAll(), 'name');
+    if (in_array('podcast_id', $columns, true)) {
+        return;
+    }
+
+    $pdo->exec('ALTER TABLE pages RENAME TO pages_v20');
+    $pdo->exec(
+        "CREATE TABLE pages (
+          id INTEGER PRIMARY KEY,
+          podcast_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          slug TEXT NOT NULL,
+          full_path TEXT NOT NULL,
+          content TEXT NOT NULL DEFAULT '',
+          parent_id INTEGER,
+          sort_order INTEGER NOT NULL DEFAULT 0,
+          status TEXT NOT NULL DEFAULT 'draft',
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE,
+          FOREIGN KEY(parent_id) REFERENCES pages(id) ON DELETE RESTRICT,
+          UNIQUE(podcast_id, full_path)
+        )"
+    );
+    $stmt = $pdo->prepare(
+        'INSERT INTO pages (id, podcast_id, title, slug, full_path, content, parent_id, sort_order, status, created_at, updated_at)
+         SELECT id, :podcast_id, title, slug, full_path, content, parent_id, sort_order, status, created_at, updated_at FROM pages_v20'
+    );
+    $stmt->execute([':podcast_id' => $podcastId]);
+    $pdo->exec('DROP TABLE pages_v20');
+    $pdo->exec('CREATE INDEX idx_pages_status ON pages(podcast_id, status, parent_id, sort_order)');
+}
+
+function migrationV21RebuildStatistics(PDO $pdo, int $podcastId): void
+{
+    foreach (['trg_mensual_after_insert', 'trg_anual_after_insert'] as $trigger) {
+        $pdo->exec('DROP TRIGGER IF EXISTS ' . $trigger);
+    }
+    $columns = array_column($pdo->query('PRAGMA table_info(estadisticas)')->fetchAll(), 'name');
+    if (!in_array('podcast_id', $columns, true)) {
+        $pdo->exec('ALTER TABLE estadisticas RENAME TO estadisticas_v20');
+        $pdo->exec('ALTER TABLE estadisticas_mensuales RENAME TO estadisticas_mensuales_v20');
+        $pdo->exec('ALTER TABLE estadisticas_anuales RENAME TO estadisticas_anuales_v20');
+
+        $pdo->exec(
+            "CREATE TABLE estadisticas (
+              id INTEGER PRIMARY KEY,
+              podcast_id INTEGER NOT NULL,
+              episode_id INTEGER NOT NULL,
+              episode_guid TEXT NOT NULL,
+              episode_title TEXT NOT NULL,
+              ip_address TEXT NOT NULL,
+              user_agent TEXT,
+              referer TEXT,
+              action_type TEXT NOT NULL DEFAULT 'download',
+              download_date TEXT DEFAULT (datetime('now')),
+              FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE,
+              FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+            )"
+        );
+        $pdo->exec(
+            "CREATE TABLE estadisticas_mensuales (
+              id INTEGER PRIMARY KEY,
+              podcast_id INTEGER NOT NULL,
+              episode_id INTEGER NOT NULL,
+              episode_title TEXT NOT NULL,
+              anio INTEGER NOT NULL,
+              mes INTEGER NOT NULL,
+              descargas INTEGER NOT NULL DEFAULT 0,
+              FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE,
+              UNIQUE(podcast_id, episode_id, anio, mes)
+            )"
+        );
+        $pdo->exec(
+            "CREATE TABLE estadisticas_anuales (
+              id INTEGER PRIMARY KEY,
+              podcast_id INTEGER NOT NULL,
+              episode_id INTEGER NOT NULL,
+              episode_title TEXT NOT NULL,
+              anio INTEGER NOT NULL,
+              descargas INTEGER NOT NULL DEFAULT 0,
+              FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE,
+              UNIQUE(podcast_id, episode_id, anio)
+            )"
+        );
+
+        $stmt = $pdo->prepare('INSERT INTO estadisticas (id, podcast_id, episode_id, episode_guid, episode_title, ip_address, user_agent, referer, action_type, download_date) SELECT id, :podcast_id, episode_id, episode_guid, episode_title, ip_address, user_agent, referer, action_type, download_date FROM estadisticas_v20');
+        $stmt->execute([':podcast_id' => $podcastId]);
+        $stmt = $pdo->prepare('INSERT INTO estadisticas_mensuales (id, podcast_id, episode_id, episode_title, anio, mes, descargas) SELECT id, :podcast_id, episode_id, episode_title, anio, mes, descargas FROM estadisticas_mensuales_v20');
+        $stmt->execute([':podcast_id' => $podcastId]);
+        $stmt = $pdo->prepare('INSERT INTO estadisticas_anuales (id, podcast_id, episode_id, episode_title, anio, descargas) SELECT id, :podcast_id, episode_id, episode_title, anio, descargas FROM estadisticas_anuales_v20');
+        $stmt->execute([':podcast_id' => $podcastId]);
+
+        $pdo->exec('DROP TABLE estadisticas_v20');
+        $pdo->exec('DROP TABLE estadisticas_mensuales_v20');
+        $pdo->exec('DROP TABLE estadisticas_anuales_v20');
+    }
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_estadisticas_date ON estadisticas(podcast_id, download_date)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_estadisticas_episode ON estadisticas(podcast_id, episode_id)');
+    $pdo->exec(
+        "CREATE TRIGGER trg_mensual_after_insert AFTER INSERT ON estadisticas FOR EACH ROW BEGIN
+          INSERT INTO estadisticas_mensuales (podcast_id, episode_id, episode_title, anio, mes, descargas)
+          VALUES (NEW.podcast_id, NEW.episode_id, NEW.episode_title, CAST(STRFTIME('%Y', NEW.download_date) AS INTEGER), CAST(STRFTIME('%m', NEW.download_date) AS INTEGER), 1)
+          ON CONFLICT(podcast_id, episode_id, anio, mes) DO UPDATE SET descargas = descargas + 1;
+        END"
+    );
+    $pdo->exec(
+        "CREATE TRIGGER trg_anual_after_insert AFTER INSERT ON estadisticas FOR EACH ROW BEGIN
+          INSERT INTO estadisticas_anuales (podcast_id, episode_id, episode_title, anio, descargas)
+          VALUES (NEW.podcast_id, NEW.episode_id, NEW.episode_title, CAST(STRFTIME('%Y', NEW.download_date) AS INTEGER), 1)
+          ON CONFLICT(podcast_id, episode_id, anio) DO UPDATE SET descargas = descargas + 1;
+        END"
+    );
 }

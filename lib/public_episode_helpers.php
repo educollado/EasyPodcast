@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/podcast_context.php';
+
 require_once __DIR__ . '/view_helpers.php';
 
 /**
@@ -32,6 +34,29 @@ function resolveEpisodeHref(?string $storedLink, string $pubDate, string $title)
     return buildEpisodePath($pubDate, $title);
 }
 
+function resolvePodcastEpisodeHref(array $podcast, ?string $storedLink, string $pubDate, string $title, bool $multipodcast): string
+{
+    $href = resolveEpisodeHref($storedLink, $pubDate, $title);
+    if (!$multipodcast) {
+        return $href;
+    }
+    $slug = trim((string) ($podcast['slug'] ?? ''));
+    if ($slug === '') {
+        return $href;
+    }
+    $path = (string) parse_url($href, PHP_URL_PATH);
+    if ($path === '') {
+        $path = buildEpisodePath($pubDate, $title);
+    }
+    if (str_starts_with($path, '/' . $slug . '/')) {
+        return $path;
+    }
+    if (preg_match('#^/[a-z0-9-]+/([0-9]{4}/[0-9]{2}/[a-z0-9-]+)/?$#', $path, $matches) === 1) {
+        return '/' . rawurlencode($slug) . '/' . $matches[1];
+    }
+    return '/' . rawurlencode($slug) . '/' . ltrim($path, '/');
+}
+
 /**
  * Extrae el slug desde una URL guardada en formato /YYYY/MM/slug.
  * Devuelve null si el enlace está vacío o no coincide con el patrón.
@@ -48,7 +73,7 @@ function slugFromEpisodeLink(?string $link): ?string
         return null;
     }
 
-    if (preg_match('#^/[0-9]{4}/[0-9]{2}/([a-z0-9-]+)/?$#', $path, $matches) === 1) {
+    if (preg_match('#^/(?:[a-z0-9-]+/)?[0-9]{4}/[0-9]{2}/([a-z0-9-]+)/?$#', $path, $matches) === 1) {
         return $matches[1];
     }
 

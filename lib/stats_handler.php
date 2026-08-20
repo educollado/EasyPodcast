@@ -26,9 +26,10 @@ function getStatsOverview(PDO $pdo): array
     $lastPubDate = '';
     $audioSizeBytes = 0;
 
-    $rows = $pdo->query(
-        "SELECT status, COUNT(*) AS cnt FROM episodes GROUP BY status"
-    )->fetchAll(PDO::FETCH_ASSOC);
+    $podcastId = activePodcastId($pdo);
+    $rowsStmt = $pdo->prepare("SELECT status, COUNT(*) AS cnt FROM episodes WHERE podcast_id = :podcast_id GROUP BY status");
+    $rowsStmt->execute([':podcast_id' => $podcastId]);
+    $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($rows as $row) {
         $cnt = (int) $row['cnt'];
@@ -40,18 +41,17 @@ function getStatsOverview(PDO $pdo): array
         $total += $cnt;
     }
 
-    $last = $pdo->query(
-        "SELECT title, pub_date FROM episodes WHERE status = 'published'
-         ORDER BY pub_date DESC LIMIT 1"
-    )->fetch(PDO::FETCH_ASSOC);
+    $lastStmt = $pdo->prepare("SELECT title, pub_date FROM episodes WHERE podcast_id = :podcast_id AND status = 'published' ORDER BY pub_date DESC LIMIT 1");
+    $lastStmt->execute([':podcast_id' => $podcastId]);
+    $last = $lastStmt->fetch(PDO::FETCH_ASSOC);
     if ($last) {
         $lastTitle = (string) ($last['title'] ?? '');
         $lastPubDate = (string) ($last['pub_date'] ?? '');
     }
 
-    $sizeRow = $pdo->query(
-        "SELECT COALESCE(SUM(audio_size_bytes), 0) AS total FROM episodes"
-    )->fetch(PDO::FETCH_ASSOC);
+    $sizeStmt = $pdo->prepare("SELECT COALESCE(SUM(audio_size_bytes), 0) AS total FROM episodes WHERE podcast_id = :podcast_id");
+    $sizeStmt->execute([':podcast_id' => $podcastId]);
+    $sizeRow = $sizeStmt->fetch(PDO::FETCH_ASSOC);
     $audioSizeBytes = (int) ($sizeRow['total'] ?? 0);
 
     return compact(

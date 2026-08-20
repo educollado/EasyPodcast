@@ -23,29 +23,30 @@ function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $e
     $podcastDescription = trim((string) ($p['description'] ?? ''));
     $podcastImage       = trim((string) ($p['image_url'] ?? ''));
     $baseSeoUrl         = resolveSeoBaseUrl((string) ($p['link'] ?? ''));
-    $canonicalPath      = $page > 1 ? '/?page=' . $page : '/';
+    $homePath           = podcastSeoPath($p);
+    $canonicalPath      = $page > 1 ? $homePath . '?page=' . $page : $homePath;
     $canonicalUrl       = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
     $robotsContent      = $error !== '' ? 'noindex,follow' : ($page > 1 ? 'noindex,follow' : 'index,follow');
     $prevUrl            = null;
     if ($page > 1) {
-        $prevPath = $page === 2 ? '/' : '/?page=' . ($page - 1);
+        $prevPath = $page === 2 ? $homePath : $homePath . '?page=' . ($page - 1);
         $prevUrl  = toAbsoluteSeoUrl($prevPath, $baseSeoUrl);
     }
     $nextUrl = null;
     if ($page < $totalPages) {
-        $nextUrl = toAbsoluteSeoUrl('/?page=' . ($page + 1), $baseSeoUrl);
+        $nextUrl = toAbsoluteSeoUrl($homePath . '?page=' . ($page + 1), $baseSeoUrl);
     }
     $metaDescription = compactMetaText((string) ($p['description'] ?? ''), 160);
     if ($metaDescription === '') {
         $metaDescription = 'Podcast en EasyPodcast: episodios, reproductor y feed RSS.';
     }
     $ogImage    = $podcastImage !== '' ? toAbsoluteSeoUrl($podcastImage, $baseSeoUrl) : toAbsoluteSeoUrl('/favicon.ico', $baseSeoUrl);
-    $rssUrl     = toAbsoluteSeoUrl('/feed.xml', $baseSeoUrl);
+    $rssUrl     = toAbsoluteSeoUrl(podcastSeoPath($p, 'feed.xml'), $baseSeoUrl);
     $seriesData = [
         '@context'    => 'https://schema.org',
         '@type'       => 'PodcastSeries',
         'name'        => $podcastTitle,
-        'url'         => toAbsoluteSeoUrl('/', $baseSeoUrl),
+        'url'         => toAbsoluteSeoUrl($homePath, $baseSeoUrl),
         'description' => (string) ($p['description'] ?? ''),
         'inLanguage'  => (string) ($p['language'] ?? 'es-ES'),
     ];

@@ -2,21 +2,32 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/canonical_redirect.php';
 require_once __DIR__ . '/lib/seo_helpers.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 
-// Obtiene la URL base desde podcast.link; cae en el host actual como fallback.
 $podcastLink = null;
+$sitemapLines = [];
 try {
-    $pdo = new PDO('sqlite:' . $dbPath, '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    $row = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
-    $podcastLink = $row['link'] ?? null;
+    enforceCanonicalHostFromPodcastLink($dbPath);
+    $pdo = openPodcastDatabase($dbPath);
+    $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
+    $podcastLink = $podcast['link'] ?? null;
+    $baseUrl = rtrim(resolveSeoBaseUrl($podcastLink), '/');
+    $settings = loadAppSettings($pdo);
+    if ($settings['multipodcast_enabled'] === 1 && $settings['homepage_podcast_id'] === null) {
+        foreach ($pdo->query("SELECT slug FROM podcast WHERE slug IS NOT NULL AND slug != '' ORDER BY id")->fetchAll(PDO::FETCH_COLUMN) as $slug) {
+            $sitemapLines[] = 'Sitemap: ' . $baseUrl . '/' . rawurlencode((string) $slug) . '/sitemap.xml';
+        }
+    } else {
+        $sitemapLines[] = 'Sitemap: ' . $baseUrl . '/sitemap.xml';
+    }
 } catch (Throwable) {
-    // Si la BD no está disponible, resolveSeoBaseUrl() usará el host actual.
+    $baseUrl = rtrim(resolveSeoBaseUrl(null), '/');
+    $sitemapLines[] = 'Sitemap: ' . $baseUrl . '/sitemap.xml';
 }
-
-$baseUrl = rtrim(resolveSeoBaseUrl($podcastLink), '/');
+$sitemaps = implode("\n", $sitemapLines);
 
 header('Content-Type: text/plain; charset=UTF-8');
 echo <<<ROBOTS
@@ -37,5 +48,5 @@ Disallow: /podcast_management.php
 Disallow: /backups.php
 
 # Mapa del sitio para indexacion
-Sitemap: {$baseUrl}/sitemap.xml
+{$sitemaps}
 ROBOTS;

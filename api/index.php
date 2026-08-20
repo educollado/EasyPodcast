@@ -19,6 +19,7 @@ require_once dirname(__DIR__) . '/lib/api_social_handler.php';
 require_once dirname(__DIR__) . '/lib/api_misc_handlers.php';
 require_once dirname(__DIR__) . '/lib/api_system_handler.php';
 require_once dirname(__DIR__) . '/lib/migration_runner.php';
+require_once dirname(__DIR__) . '/lib/podcast_context.php';
 
 // Cabeceras de respuesta.
 header('Content-Type: application/json; charset=UTF-8');
@@ -52,10 +53,19 @@ $apiToken = apiAuth($pdo);
 if ($apiToken === false) {
     apiError('Token de autenticación inválido o ausente.', 401);
 }
+$tokenPodcast = podcastById($pdo, (int) ($apiToken['podcast_id'] ?? 0));
+if ($tokenPodcast === null) {
+    apiError('El podcast asociado al token ya no existe.', 401);
+}
+$requestedPodcastSlug = trim((string) ($_GET['podcast_slug'] ?? ''));
+if ($requestedPodcastSlug !== '' && !hash_equals((string) ($tokenPodcast['slug'] ?? ''), $requestedPodcastSlug)) {
+    apiError('El token no pertenece al podcast solicitado.', 403);
+}
+activatePodcastContext($tokenPodcast, loadAppSettings($pdo)['multipodcast_enabled'] === 1);
 
 // Parsear la ruta: eliminar /api/v1 y dividir en segmentos.
 $uri    = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
-$uri    = (string) preg_replace('#^/api/v1#', '', (string) $uri);
+$uri    = (string) preg_replace('#^/(?:[a-z0-9-]+/)?api/v1#', '', (string) $uri);
 $uri    = rtrim($uri, '/');
 $parts  = $uri !== '' ? explode('/', ltrim($uri, '/')) : [];
 

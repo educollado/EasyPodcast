@@ -16,11 +16,11 @@ function apiListPages(PDO $pdo, array $params): void
     $status = (string) ($params['status'] ?? '');
     $offset = ($page - 1) * $limit;
 
-    $where = '';
-    $binds = [];
+    $where = 'WHERE podcast_id = :podcast_id';
+    $binds = [':podcast_id' => activePodcastId($pdo)];
 
     if ($status !== '' && in_array($status, ['draft', 'published'], true)) {
-        $where          = 'WHERE status = :status';
+        $where         .= ' AND status = :status';
         $binds[':status'] = $status;
     }
 
@@ -57,8 +57,8 @@ function apiListPages(PDO $pdo, array $params): void
  */
 function apiGetPage(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $page = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$page) {
@@ -87,8 +87,8 @@ function apiCreatePage(PDO $pdo, array $body): void
     }
 
     $lastId = (int) $pdo->lastInsertId();
-    $stmt   = $pdo->prepare('SELECT * FROM pages WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $lastId]);
+    $stmt   = $pdo->prepare('SELECT * FROM pages WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $lastId, ':podcast_id' => activePodcastId($pdo)]);
     $created = $stmt->fetch(PDO::FETCH_ASSOC);
 
     apiJsonResponse(['success' => true, 'data' => $created ?: []], 201);
@@ -101,8 +101,8 @@ function apiCreatePage(PDO $pdo, array $body): void
  */
 function apiUpdatePage(PDO $pdo, int $id, array $body): void
 {
-    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$existing) {
@@ -139,8 +139,8 @@ function apiUpdatePage(PDO $pdo, int $id, array $body): void
         apiError($e->getMessage());
     }
 
-    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM pages WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $updated = $stmt->fetch(PDO::FETCH_ASSOC);
 
     apiJsonResponse(['success' => true, 'data' => $updated ?: []]);
@@ -151,8 +151,8 @@ function apiUpdatePage(PDO $pdo, int $id, array $body): void
  */
 function apiDeletePage(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare('SELECT id FROM pages WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT id FROM pages WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
 
     if (!$stmt->fetch()) {
         apiError('Página no encontrada.', 404);

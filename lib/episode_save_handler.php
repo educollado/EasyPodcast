@@ -158,7 +158,13 @@ function loadPodcastDefaults(PDO $pdo): array
         return $defaults;
     }
 
-    $podcastData = $pdo->query('SELECT title, image_url, owner_name, write_audio_metadata FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+    $podcast = activePodcast($pdo);
+    $podcastData = $podcast !== null ? [
+        'title' => $podcast['title'] ?? '',
+        'image_url' => $podcast['image_url'] ?? '',
+        'owner_name' => $podcast['owner_name'] ?? '',
+        'write_audio_metadata' => $podcast['write_audio_metadata'] ?? 0,
+    ] : null;
     if ($podcastData) {
         $defaults['title']                = trim((string) ($podcastData['title'] ?? ''));
         $defaults['image_url']            = trim((string) ($podcastData['image_url'] ?? ''));
@@ -194,6 +200,9 @@ function saveEpisode(
     array $files,
     bool $rewriteAudioMetadata
 ): array {
+    $podcastId = activePodcastId($pdo);
+    $podcast = activePodcast($pdo) ?? [];
+    $isMulti = multipodcastEnabled($pdo);
     $form['content'] = sanitizeRichHtml((string) ($form['content'] ?? ''));
     $form['short_description'] = trim(
         preg_replace('/\s+/u', ' ', strip_tags((string) ($form['short_description'] ?? ''))) ?? ''
@@ -205,8 +214,8 @@ function saveEpisode(
     $previousStatus  = null;
     $existingPubDate = null;
     if ($isEditing && $episodeId !== null) {
-        $prevStmt = $pdo->prepare('SELECT status, pub_date FROM episodes WHERE id = :id LIMIT 1');
-        $prevStmt->execute([':id' => $episodeId]);
+        $prevStmt = $pdo->prepare('SELECT status, pub_date FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+        $prevStmt->execute([':id' => $episodeId, ':podcast_id' => $podcastId]);
         $prev = $prevStmt->fetch();
         if ($prev) {
             $previousStatus  = (string) ($prev['status'] ?? '');
@@ -250,8 +259,8 @@ function saveEpisode(
     $pubDateNormalized = normalizeDateTime($form['pub_date']);
     $baseUrl = resolveBaseUrl($pdo);
 
-    $imagesDir = dirname(__DIR__) . '/images';
-    $audiosDir = dirname(__DIR__) . '/audios';
+    $imagesDir = podcastStorageDirectory(dirname(__DIR__), 'images', $podcast, $isMulti);
+    $audiosDir = podcastStorageDirectory(dirname(__DIR__), 'audios', $podcast, $isMulti);
 
     // 2. Subida imagen.
     // Si no viene el índice 'image_file' en $files, simulamos un array con UPLOAD_ERR_NO_FILE
@@ -359,15 +368,15 @@ function saveEpisode(
                  author = :author,
                  status = :status,
                  updated_at = datetime(\'now\')
-             WHERE id = :id'
+             WHERE id = :id AND podcast_id = :podcast_id'
         );
     } else {
         $stmt = $pdo->prepare(
             'INSERT INTO episodes
-             (guid, title, content, short_description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
+             (podcast_id, guid, title, content, short_description, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
               duration, explicit, season_number, episode_number, episode_type, image_url, author, status, updated_at)
              VALUES
-             (:guid, :title, :content, :short_description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
+             (:podcast_id, :guid, :title, :content, :short_description, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
               :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
         );
     }
@@ -375,6 +384,7 @@ function saveEpisode(
     // Los campos opcionales se guardan como NULL en BD cuando están vacíos,
     // en lugar de cadena vacía, para que los JOINs y filtros funcionen correctamente.
     $params = [
+        ':podcast_id'       => $podcastId,
         ':guid'              => $form['guid'],
         ':title'             => $form['title'],
         ':content'           => $form['content'],

@@ -64,8 +64,8 @@ function loadAddEpisodeData(string $dbPath): array
         // Modo edición: carga los datos del episodio en el formulario (solo en GET).
         $requestedEpisodeId = (int) ($_GET['episode_id'] ?? 0);
         if ($requestedEpisodeId > 0 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $editStmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-            $editStmt->execute([':id' => $requestedEpisodeId]);
+            $editStmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+            $editStmt->execute([':id' => $requestedEpisodeId, ':podcast_id' => activePodcastId($pdo)]);
             $episodeToEdit = $editStmt->fetch();
             if ($episodeToEdit) {
                 $editingEpisodeId = $requestedEpisodeId;
@@ -93,9 +93,10 @@ function loadAddEpisodeData(string $dbPath): array
         // En modo edición o POST este bloque no se ejecuta, para no pisar los
         // valores reales del episodio que se está modificando.
         if (!$isEditing && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $lastStmt = $pdo->query(
-                'SELECT season_number, episode_number, episode_type FROM episodes ORDER BY datetime(pub_date) DESC, id DESC LIMIT 1'
+            $lastStmt = $pdo->prepare(
+                'SELECT season_number, episode_number, episode_type FROM episodes WHERE podcast_id = :podcast_id ORDER BY datetime(pub_date) DESC, id DESC LIMIT 1'
             );
+            $lastStmt->execute([':podcast_id' => activePodcastId($pdo)]);
             $lastEpisode = $lastStmt ? $lastStmt->fetch() : false;
             if ($lastEpisode) {
                 $form['season_number'] = (string) ((int) ($lastEpisode['season_number'] ?? 0));

@@ -115,6 +115,12 @@ La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una b
 | Episodio (`episode.php`) | URL amigable `/YYYY/MM/slug`, reproductor, descripción HTML saneada y descarga |
 | Búsqueda (`search.php`) | Búsqueda por título y descripción con paginación |
 
+### Multipodcast
+
+El modo Multipodcast se activa desde `podcasts.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
+
+La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. En este último caso, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast destacado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios se almacenan en `audios/<slug>/` e `images/<slug>/`.
+
 ### Feed RSS
 
 - `feed.php` genera el RSS en tiempo real; `feed.xml` se regenera automáticamente tras cada cambio.
@@ -162,6 +168,7 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 | Página | Función |
 |---|---|
 | `admin.php` | Login/logout y acceso al panel |
+| `podcasts.php` | Activación, selección, creación y borrado seguro de podcasts |
 | `podcast_management.php` | Metadatos del canal |
 | `episodes_management.php` | CRUD de episodios con borrado seguro de imágenes compartidas con la portada del podcast |
 | `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación con preescucha Web Audio y subida de imágenes con orientación EXIF |
@@ -195,8 +202,9 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 
 | Tabla | Uso |
 |---|---|
-| `podcast` | Metadatos del canal (una fila) |
-| `episodes` | Episodios y estado de publicación |
+| `app_settings` | Activación Multipodcast y podcast destacado en portada |
+| `podcast` | Metadatos y directorio único de cada canal |
+| `episodes` | Episodios, podcast propietario y estado de publicación |
 | `management` | Credenciales y configuración 2FA (TOTP) |
 | `social` | Enlaces a redes sociales (una fila) |
 | `pages` | Páginas estáticas con jerarquía padre/hijo |
@@ -215,19 +223,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 21) {
-    migration_v21($pdo);
-    $pdo->exec('PRAGMA user_version = 21');
+if ($version < 22) {
+    migration_v22($pdo);
+    $pdo->exec('PRAGMA user_version = 22');
 }
 
 // 2. Función de migración
-function migration_v21(PDO $pdo): void
+function migration_v22(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 21`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 22`.
 
 #### Historial de versiones
 
@@ -253,6 +261,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 21`.
 | 18 | Activa EasyPodcast como tema predeterminado sin alterar otros temas elegidos |
 | 19 | Añade `hero_image_url` al podcast para configurar la imagen de cabecera |
 | 20 | Guarda la fecha y versión de la comprobación diaria de actualizaciones del panel |
+| 21 | Añade configuración Multipodcast y aísla contenido, tokens, medios y estadísticas por `podcast_id` |
 
 ---
 
@@ -435,6 +444,8 @@ Al entrar en `admin.php`, EasyPodcast consulta como máximo una vez al día si e
 | Feed generado | `/feed.xml` |
 | Sitemap | `/sitemap.xml` |
 | Robots | `/robots.txt` |
+
+Con Multipodcast activo, cada recurso queda bajo `/<podcast>/`: `/<podcast>/YYYY/MM/slug`, `/<podcast>/feed.xml`, `/<podcast>/sitemap.xml`, `/<podcast>/search` y `/<podcast>/api/v1/...`.
 
 ---
 

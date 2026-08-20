@@ -18,6 +18,11 @@ require_once __DIR__ . '/lib/social_handler.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+$contextPdo = openPodcastDatabase($dbPath);
+if (multipodcastEnabled($contextPdo) && activePodcast($contextPdo) === null) {
+    require __DIR__ . '/multipodcast_home.php';
+    exit;
+}
 if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
     exit;
 }
@@ -92,7 +97,7 @@ if ($error !== '') {
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
             <?php // Genera srcset responsive de miniaturas cuadradas y reutiliza variantes existentes. ?>
             <?php $episodeTitle = (string) ($episode['title'] !== '' && $episode['title'] !== null ? $episode['title'] : __('Sin título')); ?>
-            <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
+            <?php $episodeHref = resolvePodcastEpisodeHref($podcast ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle, multipodcastEnabled($contextPdo)); ?>
             <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144,220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <a href="<?= esc($episodeHref) ?>" tabindex="-1" aria-hidden="true">
@@ -119,7 +124,7 @@ if ($error !== '') {
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
-                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int)($episode['id'] ?? 0) ?>">
+                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int)($episode['id'] ?? 0) ?>" data-track-url="<?= esc(podcastBasePath($podcast ?? [], multipodcastEnabled($contextPdo)) . '/track') ?>">
                   <?= __('Tu navegador no soporta audio HTML5.') ?>
                 </audio>
               <?php endif; ?>

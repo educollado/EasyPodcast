@@ -13,7 +13,7 @@ require_once __DIR__ . '/episode_helpers.php';
  */
 function apiGetPodcast(PDO $pdo): void
 {
-    $row = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $row = activePodcast($pdo);
 
     if (!$row) {
         apiError('No hay datos de podcast configurados.', 404);
@@ -29,7 +29,7 @@ function apiGetPodcast(PDO $pdo): void
  */
 function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
 {
-    $existing = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $existing = activePodcast($pdo);
 
     if (!$existing) {
         apiError('No hay datos de podcast configurados. Configúralo primero desde el panel admin.', 404);
@@ -50,7 +50,8 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
     // Subida de imagen si se adjunta fichero.
     $imageFileData = is_array($files['image_file'] ?? null) ? $files['image_file'] : ['error' => UPLOAD_ERR_NO_FILE];
     $baseUrl = resolveBaseUrl($pdo);
-    $imageResult = handleImageUpload($imageFileData, $baseUrl, dirname(__DIR__) . '/images');
+    $mediaDir = podcastStorageDirectory(dirname(__DIR__), 'images', $existing, multipodcastEnabled($pdo));
+    $imageResult = handleImageUpload($imageFileData, $baseUrl, $mediaDir);
 
     if ($imageResult['error'] !== null) {
         apiError($imageResult['error']);
@@ -60,7 +61,7 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
     }
 
     $heroFileData = is_array($files['hero_image_file'] ?? null) ? $files['hero_image_file'] : ['error' => UPLOAD_ERR_NO_FILE];
-    $heroResult = handleHeroImageUpload($heroFileData, $baseUrl, dirname(__DIR__) . '/images');
+    $heroResult = handleHeroImageUpload($heroFileData, $baseUrl, $mediaDir);
 
     if ($heroResult['error'] !== null) {
         apiError($heroResult['error']);
@@ -86,6 +87,6 @@ function apiUpdatePodcast(PDO $pdo, array $body, array $files): void
 
     clearWebCache();
 
-    $updated = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $updated = podcastById($pdo, (int) $existing['id']);
     apiJsonResponse(['success' => true, 'data' => $updated ?: []]);
 }

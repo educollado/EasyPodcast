@@ -49,9 +49,9 @@ function loadApiTokensData(string $dbPath): array
             ->fetchColumn();
 
         if ($tableExists) {
-            $tokens = $pdo
-                ->query("SELECT id, name, token_suffix, scope, expires_at, created_at, last_used_at FROM api_tokens ORDER BY created_at DESC")
-                ->fetchAll();
+            $tokensStmt = $pdo->prepare("SELECT id, name, token_suffix, scope, expires_at, created_at, last_used_at FROM api_tokens WHERE podcast_id = :podcast_id ORDER BY created_at DESC");
+            $tokensStmt->execute([':podcast_id' => activePodcastId($pdo)]);
+            $tokens = $tokensStmt->fetchAll();
         }
 
         // Recoger token generado desde el flash de sesión (PRG).
@@ -117,10 +117,11 @@ function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $sc
     $scope = normalizeApiTokenScope($scope);
 
     $stmt = $pdo->prepare(
-        "INSERT INTO api_tokens (token, token_hash, token_suffix, scope, name, user_id, expires_at, created_at)
-         VALUES (:token, :token_hash, :token_suffix, :scope, :name, 1, :expires_at, datetime('now'))"
+        "INSERT INTO api_tokens (podcast_id, token, token_hash, token_suffix, scope, name, user_id, expires_at, created_at)
+         VALUES (:podcast_id, :token, :token_hash, :token_suffix, :scope, :name, 1, :expires_at, datetime('now'))"
     );
     $stmt->execute([
+        ':podcast_id' => activePodcastId($pdo),
         ':token'      => '',
         ':token_hash' => $tokenHash,
         ':token_suffix' => $tokenSuffix,
@@ -137,6 +138,6 @@ function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $sc
  */
 function revokeApiToken(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare('DELETE FROM api_tokens WHERE id = :id');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('DELETE FROM api_tokens WHERE id = :id AND podcast_id = :podcast_id');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
 }

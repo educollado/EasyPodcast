@@ -520,7 +520,18 @@ function resolveLocalAudioPathFromUrl(string $audioUrl): ?string
         return null;
     }
 
-    if (!preg_match('#/audios/([^/]+)$#', $path, $matches)) {
+    if (preg_match('#^/([a-z0-9-]+)/audios/([^/]+)$#', $path, $scopedMatches)) {
+        $scopedPath = __DIR__ . '/../audios/' . $scopedMatches[1] . '/' . basename((string) $scopedMatches[2]);
+        $realScopedPath = realpath($scopedPath);
+        $audioRoot = realpath(__DIR__ . '/../audios');
+        if ($realScopedPath !== false && $audioRoot !== false && is_file($realScopedPath)
+            && str_starts_with($realScopedPath, $audioRoot . DIRECTORY_SEPARATOR)) {
+            return $realScopedPath;
+        }
+        return null;
+    }
+
+    if (!preg_match('#^/audios/([^/]+)$#', $path, $matches)) {
         return null;
     }
 
@@ -579,7 +590,9 @@ function resolveLocalImagePathFromUrl(string $imageUrl): ?string
         return null;
     }
 
-    if ($candidate[0] === '/') {
+    if (preg_match('#^/([a-z0-9-]+)/images/(.+)$#', $candidate, $scopedImage)) {
+        $candidate = $projectRoot . '/images/' . $scopedImage[1] . '/' . $scopedImage[2];
+    } elseif ($candidate[0] === '/') {
         $candidate = $projectRoot . $candidate;
     } else {
         $candidate = $projectRoot . '/' . $candidate;

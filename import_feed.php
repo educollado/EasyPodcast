@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'preview') {
 
           // Cargar datos actuales del podcast para comparación
           $pdoPreview     = new PDO('sqlite:' . $dbPath);
-          $currentPodcast = $pdoPreview->query('SELECT * FROM podcast LIMIT 1')->fetch(PDO::FETCH_ASSOC) ?: [];
+          $currentPodcast = activePodcast($pdoPreview) ?? [];
           unset($pdoPreview);
 
           // Campos mapeables del feed → etiqueta

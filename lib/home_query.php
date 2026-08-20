@@ -32,16 +32,17 @@ function loadHomeData(string $dbPath, int $requestedPage): array
         }
 
         // La app está diseñada alrededor de una única fila de podcast.
-        $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch() ?: null;
+        $podcast = activePodcast($pdo);
+        $podcastId = (int) ($podcast['id'] ?? 0);
         $configuredPerPage = (int) (($podcast['home_items_per_page'] ?? null) ?? 20);
         if ($configuredPerPage >= 1) {
             $perPage = $configuredPerPage;
         }
 
         // Calcula paginación total antes de consultar la página actual.
-        $totalEpisodes = (int) $pdo
-            ->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")
-            ->fetchColumn();
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND status = 'published'");
+        $totalStmt->execute([':podcast_id' => $podcastId]);
+        $totalEpisodes = (int) $totalStmt->fetchColumn();
         $totalPages = max(1, (int) ceil($totalEpisodes / $perPage));
         if ($page > $totalPages) {
             $page = $totalPages;
@@ -52,12 +53,13 @@ function loadHomeData(string $dbPath, int $requestedPage): array
         $stmt = $pdo->prepare(
             "SELECT id, title, content, short_description, link, pub_date, audio_url, duration, image_url
              FROM episodes
-             WHERE status = 'published'
+             WHERE podcast_id = :podcast_id AND status = 'published'
              ORDER BY datetime(pub_date) DESC, id DESC
              LIMIT :limit OFFSET :offset"
         );
         $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':podcast_id', $podcastId, PDO::PARAM_INT);
         $stmt->execute();
         $episodes = $stmt->fetchAll();
     } catch (Throwable $e) {

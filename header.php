@@ -15,6 +15,9 @@ $podcastHeroImage = isset($podcastHeroImage)
 $searchQuery = isset($searchQuery) ? (string) $searchQuery : '';
 // Variantes 80px (normal) y 144px (retina) para la miniatura de cabecera.
 $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($podcastImage, [80, 144]) : ['src' => '', 'srcset' => ''];
+$headerPodcast = is_array($podcast ?? null) ? $podcast : [];
+$headerBasePath = podcastBasePath($headerPodcast, (bool) ($GLOBALS['_multipodcast_enabled'] ?? false));
+$headerHomePath = $headerBasePath . '/';
 ?>
 <header class="card podcast-site-header<?= $podcastHeroImage !== '' ? ' has-hero' : '' ?>">
   <?php if ($podcastHeroImage !== ''): ?>
@@ -24,7 +27,7 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     <div class="podcast-header-left header-box">
       <div class="podcast-branding">
         <?php if ($headerImgSources['src'] !== ''): ?>
-          <a href="/" aria-label="<?= esc(__('Ir a la página de inicio')) ?>">
+          <a href="<?= esc($headerHomePath) ?>" aria-label="<?= esc(__('Ir a la página de inicio')) ?>">
             <img class="podcast-cover-header"
                  src="<?= esc($headerImgSources['src']) ?>"
                  <?php if ($headerImgSources['srcset'] !== ''): ?>srcset="<?= esc($headerImgSources['srcset']) ?>" sizes="(max-width: 460px) 64px, 80px"<?php endif; ?>
@@ -32,7 +35,7 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
           </a>
         <?php endif; ?>
         <div class="podcast-info">
-          <h1><a href="/"><?= esc($podcastTitle) ?></a></h1>
+          <h1><a href="<?= esc($headerHomePath) ?>"><?= esc($podcastTitle) ?></a></h1>
           <?php if ($podcastAuthor !== ''): ?>
             <p class="author"><?= esc($podcastAuthor) ?></p>
           <?php endif; ?>
@@ -44,7 +47,7 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
     </div>
     <div class="podcast-header-right header-box">
       <div class="header-controls">
-        <a class="rss-link" href="/feed.xml" aria-label="<?= esc(__('Feed RSS')) ?>">
+        <a class="rss-link" href="<?= esc($headerBasePath . '/feed.xml') ?>" aria-label="<?= esc(__('Feed RSS')) ?>">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             <circle cx="5" cy="19" r="3"/>
             <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z"/>
@@ -52,7 +55,7 @@ $headerImgSources = $podcastImage !== '' ? buildResponsiveSquareImageSources($po
           </svg>
         </a>
       </div>
-      <form class="search-form" method="get" action="/search.php" role="search">
+      <form class="search-form" method="get" action="<?= esc($headerBasePath . '/search') ?>" role="search">
         <input type="search" name="q" value="<?= esc($searchQuery) ?>" placeholder="<?= esc(__('Buscar episodios')) ?>" aria-label="<?= esc(__('Buscar episodios')) ?>">
         <button type="submit"><?= __('Buscar') ?></button>
       </form>
@@ -65,21 +68,21 @@ $_navPages = isset($dbPath) ? getPublishedPagesForNav($dbPath) : [];
 ?>
 <nav class="pages-nav" aria-label="Navegación principal">
   <div class="pages-nav-item">
-    <a href="/"><?= __('Inicio') ?></a>
+    <a href="<?= esc($headerHomePath) ?>"><?= __('Inicio') ?></a>
   </div>
   <?php foreach ($_navPages as $_navPage): ?>
     <?php if ($_navPage['children']): ?>
       <div class="pages-nav-item has-submenu">
-        <a href="/<?= esc((string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
+        <a href="<?= esc($headerBasePath . '/' . (string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
         <ul class="pages-submenu">
           <?php foreach ($_navPage['children'] as $_navChild): ?>
-            <li><a href="/<?= esc((string) $_navChild['full_path']) ?>"><?= esc((string) $_navChild['title']) ?></a></li>
+            <li><a href="<?= esc($headerBasePath . '/' . (string) $_navChild['full_path']) ?>"><?= esc((string) $_navChild['title']) ?></a></li>
           <?php endforeach; ?>
         </ul>
       </div>
     <?php else: ?>
       <div class="pages-nav-item">
-        <a href="/<?= esc((string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
+        <a href="<?= esc($headerBasePath . '/' . (string) $_navPage['full_path']) ?>"><?= esc((string) $_navPage['title']) ?></a>
       </div>
     <?php endif; ?>
   <?php endforeach; ?>

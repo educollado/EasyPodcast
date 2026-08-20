@@ -9,6 +9,7 @@ declare(strict_types=1);
 // Devuelve JSON: { url, mime, size } en éxito, o { error } en fallo.
 
 require_once __DIR__ . '/lib/session.php';
+require_once __DIR__ . '/canonical_redirect.php';
 
 startSecureSession();
 require_once __DIR__ . '/lib/csrf.php';
@@ -31,6 +32,7 @@ if (!csrf_is_valid()) {
 require_once __DIR__ . '/lib/episode_save_handler.php'; // incluye feed_builder.php (resolveBaseUrl)
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
+enforceCanonicalHostFromPodcastLink($dbPath);
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
@@ -45,7 +47,8 @@ try {
     exit;
 }
 
-$audiosDir     = __DIR__ . '/audios';
+$uploadPodcast = activePodcast($pdo) ?? [];
+$audiosDir = podcastStorageDirectory(__DIR__, 'audios', $uploadPodcast, multipodcastEnabled($pdo));
 $audioFileData = is_array($_FILES['audio_file'] ?? null)
     ? $_FILES['audio_file']
     : ['error' => UPLOAD_ERR_NO_FILE];

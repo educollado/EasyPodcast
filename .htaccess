@@ -18,23 +18,38 @@ RewriteRule ^tests(?:/|$) - [F,L,NC]
 RewriteRule ^\.git - [F,L,NC]
 # Defensa en profundidad: ningún fichero ejecutable puede servirse desde las
 # carpetas de contenido controladas por subidas o importaciones.
-RewriteRule ^(?:audios|images)(?:/|$).*\.(?:php(?:[0-9]+|s)?|pht(?:ml)?|phar)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:[a-z0-9-]+/)?(?:audios|images)(?:/|$).*\.(?:php(?:[0-9]+|s)?|pht(?:ml)?|phar)(?:/|$) - [F,L,NC]
 # Sirve robots.txt dinámicamente para que el dominio sea siempre correcto.
 RewriteRule ^robots\.txt$ robots.php [L]
+RewriteRule ^feed\.xml$ feed.php [L,QSA]
+RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
+RewriteRule ^search/?$ search.php [L,QSA]
+RewriteRule ^track/?$ track.php [L,QSA]
 # Pasa la cabecera Authorization a PHP (Apache la elimina por defecto).
 RewriteCond %{HTTP:Authorization} ^(.+)$
 RewriteRule ^ - [E=HTTP_AUTHORIZATION:%1]
 # API REST: enruta /api/v1/* al router de la API.
+RewriteRule ^([a-z0-9-]+)/api/v1/(.*)$ api/index.php?podcast_slug=$1 [L,QSA]
 RewriteRule ^api/v1/(.*)$ api/index.php [L,QSA]
+
 # Mantiene archivos/directorios existentes sin tocar por reglas de rewrite.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
-# Ruta amigable de episodio: /YYYY/MM/slug -> parámetros de episode.php.
+
+# Rutas públicas aisladas por podcast. Los slugs reservados se validan al guardarlos.
+RewriteRule ^([a-z0-9-]+)/audios/(.+)$ audios/$1/$2 [L]
+RewriteRule ^([a-z0-9-]+)/images/(.+)$ images/$1/$2 [L]
+RewriteRule ^([a-z0-9-]+)/feed\.xml$ feed.php?podcast_slug=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/sitemap\.xml$ sitemap.php?podcast_slug=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/search/?$ search.php?podcast_slug=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/track/?$ track.php?podcast_slug=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$ episode.php?podcast_slug=$1&year=$2&month=$3&slug=$4 [L,QSA]
+# Ruta legacy de episodio. En Multipodcast, episode.php la redirige al podcast destacado.
 RewriteRule ^([0-9]{4})/([0-9]{2})/([a-z0-9-]+)/?$ episode.php?year=$1&month=$2&slug=$3 [L,QSA]
-# Páginas estáticas: /padre/hijo y /slug (deben ir DESPUÉS de la regla de episodios).
-RewriteRule ^([a-z0-9-]+)/([a-z0-9-]+)/?$ page.php?full_path=$1/$2 [L,QSA]
-RewriteRule ^([a-z0-9-]+)/?$ page.php?full_path=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/([a-z0-9-]+)/([a-z0-9-]+)/?$ route.php?first=$1&second=$2&third=$3 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/([a-z0-9-]+)/?$ route.php?first=$1&second=$2 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/?$ route.php?first=$1 [L,QSA]
 </IfModule>
 # Evita listado de directorios.
 Options -Indexes

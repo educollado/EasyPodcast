@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/podcast_context.php';
+
 /**
  * Registra una accion (descarga o reproduccion) de episodio en la base de datos.
  *
@@ -27,11 +29,12 @@ function registerDownload(
 ): bool {
     try {
         $stmt = $pdo->prepare(
-            "INSERT INTO estadisticas (episode_id, episode_guid, episode_title, ip_address, action_type, user_agent, referer, download_date)
-             VALUES (:episode_id, :episode_guid, :episode_title, :ip_address, :action_type, :user_agent, :referer, datetime('now'))"
+            "INSERT INTO estadisticas (podcast_id, episode_id, episode_guid, episode_title, ip_address, action_type, user_agent, referer, download_date)
+             VALUES (:podcast_id, :episode_id, :episode_guid, :episode_title, :ip_address, :action_type, :user_agent, :referer, datetime('now'))"
         );
         
         $stmt->execute([
+            ':podcast_id' => activePodcastId($pdo),
             ':episode_id' => $episodeId,
             ':episode_guid' => $episodeGuid,
             ':episode_title' => $episodeTitle,
@@ -42,7 +45,8 @@ function registerDownload(
         ]);
 
         // Limpiar datos brutos de hace más de 7 días
-        $pdo->exec("DELETE FROM estadisticas WHERE download_date < datetime('now', '-7 days')");
+        $cleanup = $pdo->prepare("DELETE FROM estadisticas WHERE podcast_id = :podcast_id AND download_date < datetime('now', '-7 days')");
+        $cleanup->execute([':podcast_id' => activePodcastId($pdo)]);
 
         return true;
     } catch (Throwable $e) {
@@ -84,8 +88,8 @@ function registerPlay(PDO $pdo, int $episodeId): bool
 {
     try {
         // Obtener info del episodio
-        $stmt = $pdo->prepare("SELECT id, guid, title FROM episodes WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $episodeId]);
+        $stmt = $pdo->prepare("SELECT id, guid, title FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1");
+        $stmt->execute([':id' => $episodeId, ':podcast_id' => activePodcastId($pdo)]);
         $episode = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$episode) {
@@ -122,8 +126,8 @@ function registerPlay(PDO $pdo, int $episodeId): bool
 function getEpisodeInfo(PDO $pdo, int $episodeId): ?array
 {
     try {
-        $stmt = $pdo->prepare("SELECT id, guid, title FROM episodes WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $episodeId]);
+        $stmt = $pdo->prepare("SELECT id, guid, title FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1");
+        $stmt->execute([':id' => $episodeId, ':podcast_id' => activePodcastId($pdo)]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($result) {
@@ -150,8 +154,8 @@ function getEpisodeInfo(PDO $pdo, int $episodeId): ?array
 function getEpisodeAudioUrl(PDO $pdo, int $episodeId): ?string
 {
     try {
-        $stmt = $pdo->prepare("SELECT audio_url FROM episodes WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $episodeId]);
+        $stmt = $pdo->prepare("SELECT audio_url FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1");
+        $stmt->execute([':id' => $episodeId, ':podcast_id' => activePodcastId($pdo)]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (string) $result['audio_url'] : null;
     } catch (Throwable $e) {

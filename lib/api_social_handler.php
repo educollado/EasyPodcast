@@ -21,7 +21,9 @@ function apiGetSocial(PDO $pdo): void
         apiJsonResponse(['success' => true, 'data' => []]);
     }
 
-    $row = $pdo->query('SELECT * FROM social ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare('SELECT * FROM social WHERE podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
     apiJsonResponse(['success' => true, 'data' => $row ?: []]);
 }
 
@@ -40,7 +42,10 @@ function apiUpdateSocial(PDO $pdo, array $body): void
         apiError('La tabla social no existe. Ejecuta las migraciones.', 500);
     }
 
-    $existing = $pdo->query('SELECT * FROM social ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $podcastId = activePodcastId($pdo);
+    $existingStmt = $pdo->prepare('SELECT * FROM social WHERE podcast_id = :podcast_id LIMIT 1');
+    $existingStmt->execute([':podcast_id' => $podcastId]);
+    $existing = $existingStmt->fetch(PDO::FETCH_ASSOC);
 
     // Construir mapa de valores: partir de los existentes y sobrescribir con los enviados.
     $values = [];
@@ -60,15 +65,19 @@ function apiUpdateSocial(PDO $pdo, array $body): void
     if ($existing) {
         $sets = implode(', ', array_map(fn($f) => "$f = :$f", API_SOCIAL_FIELDS));
         $params[':id'] = (int) $existing['id'];
-        $pdo->prepare("UPDATE social SET $sets WHERE id = :id")->execute($params);
+        $params[':podcast_id'] = $podcastId;
+        $pdo->prepare("UPDATE social SET $sets WHERE id = :id AND podcast_id = :podcast_id")->execute($params);
     } else {
         $cols         = implode(', ', API_SOCIAL_FIELDS);
         $placeholders = implode(', ', array_map(fn($f) => ":$f", API_SOCIAL_FIELDS));
-        $pdo->prepare("INSERT INTO social ($cols) VALUES ($placeholders)")->execute($params);
+        $params[':podcast_id'] = $podcastId;
+        $pdo->prepare("INSERT INTO social (podcast_id, $cols) VALUES (:podcast_id, $placeholders)")->execute($params);
     }
 
     clearWebCache();
 
-    $updated = $pdo->query('SELECT * FROM social ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+    $updatedStmt = $pdo->prepare('SELECT * FROM social WHERE podcast_id = :podcast_id LIMIT 1');
+    $updatedStmt->execute([':podcast_id' => $podcastId]);
+    $updated = $updatedStmt->fetch(PDO::FETCH_ASSOC);
     apiJsonResponse(['success' => true, 'data' => $updated ?: []]);
 }

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/podcast_context.php';
+
 /**
  * Obtiene estadísticas diarias de descargas (últimos 7 días).
  *
@@ -24,9 +26,10 @@ function getDailyStats(PDO $pdo): array
             " . ($hasActionType ? 'action_type,' : "'download' as action_type,") . 
             " download_date, datetime(download_date) as formatted_date
          FROM estadisticas
+         WHERE podcast_id = :podcast_id
          ORDER BY download_date DESC";
-        
-        $stmt = $pdo->query($sql);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
         error_log("Error al obtener estadísticas diarias: " . $e->getMessage());
@@ -44,11 +47,11 @@ function getDailyStats(PDO $pdo): array
 function getMonthlyStats(PDO $pdo, ?int $year = null): array
 {
     try {
-        $sql = "SELECT * FROM estadisticas_mensuales";
-        $params = [];
+        $sql = "SELECT * FROM estadisticas_mensuales WHERE podcast_id = :podcast_id";
+        $params = [':podcast_id' => activePodcastId($pdo)];
         
         if ($year !== null) {
-            $sql .= " WHERE anio = :year";
+            $sql .= " AND anio = :year";
             $params[':year'] = $year;
         }
         
@@ -72,9 +75,8 @@ function getMonthlyStats(PDO $pdo, ?int $year = null): array
 function getYearlyStats(PDO $pdo): array
 {
     try {
-        $stmt = $pdo->query(
-            "SELECT * FROM estadisticas_anuales ORDER BY anio DESC"
-        );
+        $stmt = $pdo->prepare("SELECT * FROM estadisticas_anuales WHERE podcast_id = :podcast_id ORDER BY anio DESC");
+        $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
         error_log("Error al obtener estadísticas anuales: " . $e->getMessage());
@@ -91,17 +93,19 @@ function getYearlyStats(PDO $pdo): array
 function getTotalDownloadsByEpisode(PDO $pdo): array
 {
     try {
-        $stmt = $pdo->query(
+        $stmt = $pdo->prepare(
             "SELECT 
                 e.id AS episode_id,
                 e.title AS episode_title,
                 e.guid AS episode_guid,
                 COALESCE(SUM(em.descargas), 0) as total_downloads
              FROM episodes e
-             LEFT JOIN estadisticas_mensuales em ON em.episode_id = e.id
+             LEFT JOIN estadisticas_mensuales em ON em.episode_id = e.id AND em.podcast_id = e.podcast_id
+             WHERE e.podcast_id = :podcast_id
              GROUP BY e.id, e.title, e.guid
              ORDER BY total_downloads DESC, e.title ASC"
         );
+        $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
         error_log("Error al obtener total de descargas: " . $e->getMessage());
@@ -118,9 +122,8 @@ function getTotalDownloadsByEpisode(PDO $pdo): array
 function getAvailableYears(PDO $pdo): array
 {
     try {
-        $stmt = $pdo->query(
-            "SELECT DISTINCT anio FROM estadisticas_anuales ORDER BY anio DESC"
-        );
+        $stmt = $pdo->prepare("SELECT DISTINCT anio FROM estadisticas_anuales WHERE podcast_id = :podcast_id ORDER BY anio DESC");
+        $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
         $years = $stmt->fetchAll(PDO::FETCH_COLUMN);
         return array_map('intval', $years);
     } catch (Throwable $e) {

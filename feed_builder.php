@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/lib/view_helpers.php';
 require_once __DIR__ . '/lib/episode_helpers.php';
+require_once __DIR__ . '/lib/podcast_context.php';
+require_once __DIR__ . '/lib/public_episode_helpers.php';
 
 // Generador RSS compartido usado por:
 // - feed.php para salida dinámica
@@ -135,11 +137,11 @@ function resolveBaseUrl(PDO $pdo): string
         ->fetchColumn();
 
     if ($tableExists) {
-        $podcast = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
         if ($podcast) {
             $fromLink = extractBaseUrlFromLink((string) ($podcast['link'] ?? ''));
             if ($fromLink !== null) {
-                return $fromLink;
+                return rtrim($fromLink, '/') . podcastBasePath($podcast, multipodcastEnabled($pdo));
             }
         }
     }
@@ -173,7 +175,32 @@ function buildFeedTrackingUrl(string $baseUrl, int $episodeId): string
  */
 function resolveFeedTrackingUrl(PDO $pdo, int $episodeId): string
 {
-    return buildFeedTrackingUrl(resolveBaseUrl($pdo), $episodeId);
+    return rtrim(resolveBaseUrl($pdo), '/') . '/track?' . http_build_query([
+        'episode_id' => $episodeId,
+        'action' => 'feed',
+    ]);
+}
+
+function resolveEpisodeLinkForFeed(PDO $pdo, array $episode): string
+{
+    $stored = trim((string) ($episode['link'] ?? ''));
+    if ($stored === '') {
+        return (string) ($episode['audio_url'] ?? '');
+    }
+    $podcast = activePodcast($pdo) ?? [];
+    $slug = trim((string) ($podcast['slug'] ?? ''));
+    if (!multipodcastEnabled($pdo) || $slug === '') {
+        return $stored;
+    }
+    $path = resolvePodcastEpisodeHref(
+        $podcast,
+        $stored,
+        (string) ($episode['pub_date'] ?? ''),
+        (string) ($episode['title'] ?? ''),
+        true
+    );
+    $origin = extractBaseUrlFromLink((string) ($podcast['link'] ?? '')) ?? runtimeBaseUrl();
+    return rtrim($origin, '/') . $path;
 }
 
 /**
@@ -187,30 +214,32 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    $podcast = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+    $podcast = activePodcast($pdo);
     if (!$podcast) {
         throw new RuntimeException('No se encontró ningún registro en la tabla podcast.');
     }
 
     $rssItemLimit = max(0, (int) ($podcast['rss_item_limit'] ?? 0));
+    $podcastId = (int) $podcast['id'];
     if ($rssItemLimit > 0) {
         $episodesStmt = $pdo->prepare(
             "SELECT *
              FROM episodes
-             WHERE status = 'published'
+             WHERE podcast_id = :podcast_id AND status = 'published'
              ORDER BY datetime(pub_date) DESC
              LIMIT :limit"
         );
         $episodesStmt->bindValue(':limit', $rssItemLimit, PDO::PARAM_INT);
+        $episodesStmt->bindValue(':podcast_id', $podcastId, PDO::PARAM_INT);
         $episodesStmt->execute();
     } else {
         $episodesStmt = $pdo->prepare(
             "SELECT *
              FROM episodes
-             WHERE status = 'published'
+             WHERE podcast_id = :podcast_id AND status = 'published'
              ORDER BY datetime(pub_date) DESC"
         );
-        $episodesStmt->execute();
+        $episodesStmt->execute([':podcast_id' => $podcastId]);
     }
     $episodes = $episodesStmt->fetchAll();
 
@@ -303,7 +332,7 @@ function buildPodcastFeedXml(PDO $pdo, string $selfHref): string
         $xml->writeCdata(sanitizeRichHtml((string) ($episode['content'] ?? '')));
         $xml->endElement();
 
-        $episodeLink = $episode['link'] ?: $episode['audio_url'];
+        $episodeLink = resolveEpisodeLinkForFeed($pdo, $episode);
         writeTextIfNotEmpty($xml, 'link', $episodeLink);
 
         $xml->startElement('guid');

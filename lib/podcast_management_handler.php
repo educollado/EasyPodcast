@@ -20,6 +20,9 @@ require_once __DIR__ . '/upload_service.php';
  */
 function resolvePodcastFormBaseUrl(array $form, PDO $pdo): string
 {
+    if (multipodcastEnabled($pdo)) {
+        return resolveBaseUrl($pdo);
+    }
     $fromForm = extractBaseUrlFromLink((string) ($form['link'] ?? ''));
     if ($fromForm !== null) {
         return $fromForm;
@@ -220,7 +223,7 @@ function loadPodcastManagementData(string $dbPath): array
         );
 
         // La app usa una sola fila de canal; se carga cuando existe.
-        $existing = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        $existing = activePodcast($pdo);
         if ($existing) {
             foreach ($form as $key => $value) {
                 $form[$key] = (string) ($existing[$key] ?? $value);
@@ -319,7 +322,7 @@ function loadPodcastManagementData(string $dbPath): array
 
                             $extension = $allowedTypes[$mimeType];
                             $fileName = $safeBaseName . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
-                            $imagesDir = __DIR__ . '/../images';
+                            $imagesDir = podcastStorageDirectory(dirname(__DIR__), 'images', $existing ?: [], multipodcastEnabled($pdo));
 
                             if (!is_dir($imagesDir) && !mkdir($imagesDir, 0755, true) && !is_dir($imagesDir)) {
                                 $error = __('No se pudo crear la carpeta de imágenes.');
@@ -340,7 +343,7 @@ function loadPodcastManagementData(string $dbPath): array
                     $heroResult = handleHeroImageUpload(
                         $uploadedHero,
                         resolvePodcastFormBaseUrl($form, $pdo),
-                        __DIR__ . '/../images'
+                        podcastStorageDirectory(dirname(__DIR__), 'images', $existing ?: [], multipodcastEnabled($pdo))
                     );
                     if ($heroResult['error'] !== null) {
                         $error = __('No se pudo subir la imagen del hero: %s', $heroResult['error']);
@@ -350,6 +353,10 @@ function loadPodcastManagementData(string $dbPath): array
                 }
 
                 if ($error === '') {
+                    if (multipodcastEnabled($pdo) && $existing && trim((string) ($existing['slug'] ?? '')) !== '') {
+                        $canonicalBase = extractBaseUrlFromLink($form['link']) ?? runtimeBaseUrl();
+                        $form['link'] = rtrim($canonicalBase, '/') . '/' . (string) $existing['slug'];
+                    }
                     $params = [
                         ':title'                => $form['title'],
                         ':description'          => $form['description'],
@@ -427,7 +434,7 @@ function loadPodcastManagementData(string $dbPath): array
                     }
 
                     // Recarga el formulario con los datos persistidos.
-                    $existing = $pdo->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+                    $existing = activePodcast($pdo);
                     if ($existing) {
                         foreach ($form as $key => $value) {
                             $form[$key] = (string) ($existing[$key] ?? $value);

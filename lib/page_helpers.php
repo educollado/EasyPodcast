@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/podcast_context.php';
+
 /**
  * Devuelve páginas publicadas de primer nivel con sus hijos publicados.
  * Se usa en header.php para la barra de navegación pública.
@@ -23,9 +25,10 @@ function getPublishedPagesForNav(string $dbPath): array
         }
 
         // Páginas de primer nivel publicadas, ordenadas por sort_order.
-        $parents = $pdo
-            ->query("SELECT id, title, full_path FROM pages WHERE status='published' AND parent_id IS NULL ORDER BY sort_order ASC, id ASC")
-            ->fetchAll();
+        $podcastId = activePodcastId($pdo);
+        $parentsStmt = $pdo->prepare("SELECT id, title, full_path FROM pages WHERE podcast_id = :podcast_id AND status='published' AND parent_id IS NULL ORDER BY sort_order ASC, id ASC");
+        $parentsStmt->execute([':podcast_id' => $podcastId]);
+        $parents = $parentsStmt->fetchAll();
         if (!$parents) {
             return [];
         }
@@ -35,10 +38,10 @@ function getPublishedPagesForNav(string $dbPath): array
         $placeholders = implode(',', array_fill(0, count($parentIds), '?'));
         $stmt = $pdo->prepare(
             "SELECT id, title, full_path, parent_id FROM pages
-             WHERE status='published' AND parent_id IN ($placeholders)
+             WHERE podcast_id = ? AND status='published' AND parent_id IN ($placeholders)
              ORDER BY sort_order ASC, id ASC"
         );
-        $stmt->execute($parentIds);
+        $stmt->execute(array_merge([$podcastId], $parentIds));
         $children = $stmt->fetchAll();
 
         // Agrupa hijos por parent_id.
@@ -81,9 +84,8 @@ function loadPageData(string $dbPath, string $fullPath, bool $adminPreview = fal
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-        $result['podcast'] = $pdo
-            ->query('SELECT * FROM podcast ORDER BY id ASC LIMIT 1')
-            ->fetch() ?: null;
+        $result['podcast'] = activePodcast($pdo);
+        $podcastId = (int) ($result['podcast']['id'] ?? 0);
 
         // Verificar que la tabla existe.
         $tableExists = (bool) $pdo
@@ -97,10 +99,10 @@ function loadPageData(string $dbPath, string $fullPath, bool $adminPreview = fal
 
         // Busca la página.
         $sql = $adminPreview
-            ? "SELECT * FROM pages WHERE full_path = ? LIMIT 1"
-            : "SELECT * FROM pages WHERE full_path = ? AND status = 'published' LIMIT 1";
+            ? "SELECT * FROM pages WHERE podcast_id = ? AND full_path = ? LIMIT 1"
+            : "SELECT * FROM pages WHERE podcast_id = ? AND full_path = ? AND status = 'published' LIMIT 1";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$fullPath]);
+        $stmt->execute([$podcastId, $fullPath]);
         $page = $stmt->fetch();
 
         if (!$page) {
@@ -112,16 +114,16 @@ function loadPageData(string $dbPath, string $fullPath, bool $adminPreview = fal
 
         // Hijos publicados (o todos si adminPreview).
         $childSql = $adminPreview
-            ? "SELECT id, title, full_path FROM pages WHERE parent_id = ? ORDER BY sort_order ASC, id ASC"
-            : "SELECT id, title, full_path FROM pages WHERE parent_id = ? AND status = 'published' ORDER BY sort_order ASC, id ASC";
+            ? "SELECT id, title, full_path FROM pages WHERE podcast_id = ? AND parent_id = ? ORDER BY sort_order ASC, id ASC"
+            : "SELECT id, title, full_path FROM pages WHERE podcast_id = ? AND parent_id = ? AND status = 'published' ORDER BY sort_order ASC, id ASC";
         $childStmt = $pdo->prepare($childSql);
-        $childStmt->execute([(int) $page['id']]);
+        $childStmt->execute([$podcastId, (int) $page['id']]);
         $result['children'] = $childStmt->fetchAll();
 
         // Info del padre para breadcrumb (solo en páginas hijas).
         if ($page['parent_id'] !== null) {
-            $parentStmt = $pdo->prepare("SELECT id, title, full_path FROM pages WHERE id = ? LIMIT 1");
-            $parentStmt->execute([(int) $page['parent_id']]);
+            $parentStmt = $pdo->prepare("SELECT id, title, full_path FROM pages WHERE podcast_id = ? AND id = ? LIMIT 1");
+            $parentStmt->execute([$podcastId, (int) $page['parent_id']]);
             $result['parent'] = $parentStmt->fetch() ?: null;
         }
     } catch (Throwable $e) {
@@ -147,7 +149,7 @@ function buildPageSeoData(array $podcast, ?array $page, string $error): array
     $podcastDescription = trim((string) ($podcast['description'] ?? ''));
     $cover              = trim((string) ($podcast['image_url'] ?? ''));
     $baseSeoUrl         = resolveSeoBaseUrl($podcast['link'] ?? null);
-    $rssUrl             = $baseSeoUrl . '/feed.xml';
+    $rssUrl             = toAbsoluteSeoUrl(podcastSeoPath($podcast, 'feed.xml'), $baseSeoUrl);
 
     if ($error !== '' || $page === null) {
         return [
@@ -167,7 +169,7 @@ function buildPageSeoData(array $podcast, ?array $page, string $error): array
 
     $pageTitle = trim((string) ($page['title'] ?? ''));
     $fullTitle = $pageTitle !== '' ? $pageTitle . ' — ' . $podcastTitle : $podcastTitle;
-    $canonical = $baseSeoUrl . '/' . ltrim((string) ($page['full_path'] ?? ''), '/');
+    $canonical = toAbsoluteSeoUrl(podcastSeoPath($podcast, (string) ($page['full_path'] ?? '')), $baseSeoUrl);
 
     // Meta description a partir del contenido HTML (sin etiquetas, max 160 chars).
     $plainContent = strip_tags((string) ($page['content'] ?? ''));

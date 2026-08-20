@@ -24,18 +24,23 @@ function scheduledPublicationCutoff(?DateTimeInterface $now = null): string
  * Devuelve cuántos episodios han pasado a published. No regenera feed/sitemap ni limpia caché;
  * esos efectos secundarios se ejecutan fuera para que esta función sea testeable.
  */
-function publishScheduledEpisodesInDatabase(PDO $pdo, ?string $cutoff = null): int
+function publishScheduledEpisodesInDatabase(PDO $pdo, ?string $cutoff = null, ?int $podcastId = null): int
 {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $cutoff ??= scheduledPublicationCutoff();
 
+    $scopeClause = $podcastId !== null ? 'podcast_id = :podcast_id AND ' : '';
+    $params = [':cutoff' => $cutoff];
+    if ($podcastId !== null) {
+        $params[':podcast_id'] = $podcastId;
+    }
     $countStmt = $pdo->prepare(
         "SELECT COUNT(*)
          FROM episodes
-         WHERE status = 'scheduled' AND datetime(pub_date) <= datetime(:cutoff)"
+         WHERE {$scopeClause}status = 'scheduled' AND datetime(pub_date) <= datetime(:cutoff)"
     );
-    $countStmt->execute([':cutoff' => $cutoff]);
+    $countStmt->execute($params);
     $count = (int) $countStmt->fetchColumn();
 
     if ($count === 0) {
@@ -46,9 +51,9 @@ function publishScheduledEpisodesInDatabase(PDO $pdo, ?string $cutoff = null): i
         "UPDATE episodes
          SET status = 'published',
              updated_at = :cutoff
-         WHERE status = 'scheduled' AND datetime(pub_date) <= datetime(:cutoff)"
+         WHERE {$scopeClause}status = 'scheduled' AND datetime(pub_date) <= datetime(:cutoff)"
     );
-    $updateStmt->execute([':cutoff' => $cutoff]);
+    $updateStmt->execute($params);
 
     return $count;
 }
@@ -61,7 +66,12 @@ function publishScheduledEpisodesInDatabase(PDO $pdo, ?string $cutoff = null): i
  */
 function publishScheduledEpisodesAndRefresh(PDO $pdo): int
 {
-    $count = publishScheduledEpisodesInDatabase($pdo);
+    $podcast = activePodcast($pdo);
+    if ($podcast === null) {
+        return 0;
+    }
+    $podcastId = (int) $podcast['id'];
+    $count = publishScheduledEpisodesInDatabase($pdo, null, $podcastId);
 
     if ($count === 0) {
         return 0;

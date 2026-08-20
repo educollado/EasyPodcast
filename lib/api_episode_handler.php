@@ -30,11 +30,11 @@ function apiListEpisodes(PDO $pdo, array $params): void
     $status = (string) ($params['status'] ?? '');
     $offset = ($page - 1) * $limit;
 
-    $where  = '';
-    $binds  = [];
+    $where  = 'WHERE podcast_id = :podcast_id';
+    $binds  = [':podcast_id' => activePodcastId($pdo)];
 
     if ($status !== '' && in_array($status, ['draft', 'scheduled', 'published'], true)) {
-        $where          = 'WHERE status = :status';
+        $where         .= ' AND status = :status';
         $binds[':status'] = $status;
     }
 
@@ -71,8 +71,8 @@ function apiListEpisodes(PDO $pdo, array $params): void
  */
 function apiGetEpisode(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $episode = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$episode) {
@@ -105,8 +105,8 @@ function apiCreateEpisode(PDO $pdo, array $body, array $files, array $podcastDef
 
     // lastInsertId() es seguro aquí: saveEpisode solo hace SELECT/feed-write después del INSERT.
     $lastId = (int) $pdo->lastInsertId();
-    $stmt   = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $lastId]);
+    $stmt   = $pdo->prepare('SELECT * FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $lastId, ':podcast_id' => activePodcastId($pdo)]);
     $episode = $stmt->fetch(PDO::FETCH_ASSOC);
 
     apiJsonResponse(['success' => true, 'data' => episodeToApiResponse($episode ?: [])], 201);
@@ -118,8 +118,8 @@ function apiCreateEpisode(PDO $pdo, array $body, array $files, array $podcastDef
  */
 function apiUpdateEpisode(PDO $pdo, int $id, array $body, array $files, array $podcastDefaults): void
 {
-    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$existing) {
@@ -143,8 +143,8 @@ function apiUpdateEpisode(PDO $pdo, int $id, array $body, array $files, array $p
         apiError($result['error']);
     }
 
-    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT * FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $updated = $stmt->fetch(PDO::FETCH_ASSOC);
 
     apiJsonResponse(['success' => true, 'data' => episodeToApiResponse($updated ?: [])]);
@@ -156,21 +156,21 @@ function apiUpdateEpisode(PDO $pdo, int $id, array $body, array $files, array $p
 function apiDeleteEpisode(PDO $pdo, int $id): void
 {
     // Guardar URLs de archivos antes de borrar el registro.
-    $stmt = $pdo->prepare('SELECT audio_url, image_url FROM episodes WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare('SELECT audio_url, image_url FROM episodes WHERE id = :id AND podcast_id = :podcast_id LIMIT 1');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
     $episodeFiles = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$episodeFiles) {
         apiError('Episodio no encontrado.', 404);
     }
 
-    $pdo->prepare('DELETE FROM episodes WHERE id = :id')->execute([':id' => $id]);
+    $pdo->prepare('DELETE FROM episodes WHERE id = :id AND podcast_id = :podcast_id')->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
 
     // Eliminar archivos huérfanos si ningún otro episodio los usa.
     $audioUrl = (string) ($episodeFiles['audio_url'] ?? '');
     if ($audioUrl !== '') {
-        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE audio_url = :url');
-        $cntStmt->execute([':url' => $audioUrl]);
+        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND audio_url = :url');
+        $cntStmt->execute([':podcast_id' => activePodcastId($pdo), ':url' => $audioUrl]);
         if ((int) $cntStmt->fetchColumn() === 0) {
             $localAudio = resolveLocalAudioPathFromUrl($audioUrl);
             if ($localAudio !== null) {

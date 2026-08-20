@@ -15,6 +15,8 @@ require_once __DIR__ . '/lib/seo_helpers.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+$pageContextPdo = openPodcastDatabase($dbPath);
+$pageBasePath = podcastBasePath(activePodcast($pageContextPdo) ?? [], multipodcastEnabled($pageContextPdo));
 
 // Detecta sesión de admin para previsualización de borradores.
 startSecureSession();
@@ -98,7 +100,7 @@ if ($error !== '') {
           <div>
             <?php if ($parent !== null): ?>
               <nav class="breadcrumb" aria-label="Ruta">
-                <a href="/<?= esc((string) $parent['full_path']) ?>"><?= esc((string) $parent['title']) ?></a>
+                <a href="<?= esc($pageBasePath . '/' . (string) $parent['full_path']) ?>"><?= esc((string) $parent['title']) ?></a>
                 <span aria-hidden="true"> › </span>
                 <span><?= esc((string) ($page['title'] ?? '')) ?></span>
               </nav>
@@ -114,7 +116,7 @@ if ($error !== '') {
               <nav class="page-children" aria-label="Subpáginas">
                 <ul>
                   <?php foreach ($children as $child): ?>
-                    <li><a href="/<?= esc((string) $child['full_path']) ?>"><?= esc((string) $child['title']) ?></a></li>
+                    <li><a href="<?= esc($pageBasePath . '/' . (string) $child['full_path']) ?>"><?= esc((string) $child['title']) ?></a></li>
                   <?php endforeach; ?>
                 </ul>
               </nav>

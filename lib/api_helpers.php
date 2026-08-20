@@ -87,7 +87,7 @@ function apiAuth(PDO $pdo): array|false
 
     $tokenHash = hashApiTokenValue($token);
     $stmt = $pdo->prepare(
-        "SELECT id, scope FROM api_tokens
+        "SELECT id, podcast_id, scope FROM api_tokens
          WHERE token_hash = :token_hash
            AND (expires_at IS NULL OR expires_at > datetime('now'))
          LIMIT 1"
@@ -97,7 +97,7 @@ function apiAuth(PDO $pdo): array|false
 
     if (!$row) {
         $legacyStmt = $pdo->prepare(
-            "SELECT id, token, scope FROM api_tokens
+            "SELECT id, podcast_id, token, scope FROM api_tokens
              WHERE token = :token
                AND (expires_at IS NULL OR expires_at > datetime('now'))
              LIMIT 1"
@@ -134,6 +134,7 @@ function apiAuth(PDO $pdo): array|false
 
     return [
         'id' => (int) $row['id'],
+        'podcast_id' => (int) ($row['podcast_id'] ?? 0),
         'scope' => normalizeApiTokenScope((string) ($row['scope'] ?? '')),
     ];
 }

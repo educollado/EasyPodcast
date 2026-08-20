@@ -31,6 +31,8 @@ $deleteConfirmMessage = __('Se borrará el capítulo de la base de datos. El aud
 
 $data = loadEpisodesManagementData($dbPath, $requestedPage, $requestedDraftPage, $searchQuery);
 extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes, publishedEpisodes, draftCurrentPage, draftTotalPages, totalDrafts, totalScheduled, currentPage, totalPublished, totalPages, error, notice
+$episodesContextPdo = openPodcastDatabase($dbPath);
+$episodesAdminBasePath = podcastBasePath(activePodcast($episodesContextPdo) ?? [], multipodcastEnabled($episodesContextPdo));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -94,7 +96,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
-                        <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
+                        <a class="edit-link" href="<?= esc(resolvePodcastEpisodeHref(activePodcast($episodesContextPdo) ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''), multipodcastEnabled($episodesContextPdo))) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <form class="inline-form" method="post" action="episodes_management.php?q=<?= esc(urlencode($searchQuery)) ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">
@@ -138,7 +140,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
-                        <?php $draftPreviewHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? '')); ?>
+                        <?php $draftPreviewHref = resolvePodcastEpisodeHref(activePodcast($episodesContextPdo) ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''), multipodcastEnabled($episodesContextPdo)); ?>
                         <?php if ($draftPreviewHref !== ''): ?>
                           <a class="edit-link" href="<?= esc($draftPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <?php endif; ?>
@@ -196,7 +198,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
-                        <?php $scheduledPreviewHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? '')); ?>
+                        <?php $scheduledPreviewHref = resolvePodcastEpisodeHref(activePodcast($episodesContextPdo) ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''), multipodcastEnabled($episodesContextPdo)); ?>
                         <?php if ($scheduledPreviewHref !== ''): ?>
                           <a class="edit-link" href="<?= esc($scheduledPreviewHref) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <?php endif; ?>
@@ -241,7 +243,7 @@ extract($data);  // searchQuery, searchResults, draftEpisodes, scheduledEpisodes
                     <td>
                       <div class="row-actions">
                         <a class="edit-link" href="add_episode.php?episode_id=<?= (int) ($episode['id'] ?? 0) ?>"><?= __('Editar') ?></a>
-                        <a class="edit-link" href="<?= esc(resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''))) ?>" target="_blank"><?= __('Vista previa') ?></a>
+                        <a class="edit-link" href="<?= esc(resolvePodcastEpisodeHref(activePodcast($episodesContextPdo) ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), (string) ($episode['title'] ?? ''), multipodcastEnabled($episodesContextPdo))) ?>" target="_blank"><?= __('Vista previa') ?></a>
                         <form class="inline-form" method="post" action="episodes_management.php?page=<?= $currentPage ?>&draft_page=<?= $draftCurrentPage ?>" data-confirm-message="<?= esc($deleteConfirmMessage) ?>">
                           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
                           <input type="hidden" name="delete_episode_id" value="<?= (int) ($episode['id'] ?? 0) ?>">

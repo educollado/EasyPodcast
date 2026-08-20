@@ -12,6 +12,8 @@ require_once __DIR__ . '/lib/social_handler.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+$searchContextPdo = openPodcastDatabase($dbPath);
+$searchBasePath = podcastBasePath(activePodcast($searchContextPdo) ?? [], multipodcastEnabled($searchContextPdo));
 
 $query         = trim((string) ($_GET['q'] ?? ''));
 $requestedPage = max(1, (int) ($_GET['page'] ?? 1));
@@ -82,7 +84,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
             <?php $episodeImage = trim((string) ($episode['image_url'] ?? '')); ?>
             <?php $cover = $episodeImage !== '' ? $episodeImage : $podcastImage; ?>
             <?php $episodeTitle = ($episode['title'] ?? '') !== '' ? (string) $episode['title'] : __('Sin título'); ?>
-            <?php $episodeHref = resolveEpisodeHref((string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle); ?>
+            <?php $episodeHref = resolvePodcastEpisodeHref($podcast ?? [], (string) ($episode['link'] ?? ''), (string) ($episode['pub_date'] ?? ''), $episodeTitle, multipodcastEnabled($searchContextPdo)); ?>
             <?php $coverSources = $cover !== '' ? buildResponsiveSquareImageSources($cover, [144, 220]) : ['src' => '', 'srcset' => '']; ?>
             <?php if ($cover !== ''): ?>
               <a href="<?= esc($episodeHref) ?>" tabindex="-1" aria-hidden="true">
@@ -102,7 +104,7 @@ header('X-Robots-Tag: noindex, follow, noarchive');
                 <?php endif; ?>
               </p>
               <?php if (!empty($episode['audio_url'])): ?>
-                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int)($episode['id'] ?? 0) ?>">
+                <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int)($episode['id'] ?? 0) ?>" data-track-url="<?= esc($searchBasePath . '/track') ?>">
                   <?= __('Tu navegador no soporta audio HTML5.') ?>
                 </audio>
               <?php endif; ?>
@@ -115,15 +117,15 @@ header('X-Robots-Tag: noindex, follow, noarchive');
             <div class="links">
               <?php if ($page > 1): ?>
                 <?php $prevParams = ['q' => $query, 'page' => $page - 1]; ?>
-                <a class="page-link" href="/search.php?<?= esc(http_build_query($prevParams)) ?>"><?= __('Anterior') ?></a>
+                <a class="page-link" href="<?= esc($searchBasePath) ?>/search?<?= esc(http_build_query($prevParams)) ?>"><?= __('Anterior') ?></a>
               <?php endif; ?>
               <?php for ($p = 1; $p <= $totalPages; $p++): ?>
                 <?php $pageParams = ['q' => $query, 'page' => $p]; ?>
-                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="/search.php?<?= esc(http_build_query($pageParams)) ?>"><?= $p ?></a>
+                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="<?= esc($searchBasePath) ?>/search?<?= esc(http_build_query($pageParams)) ?>"><?= $p ?></a>
               <?php endfor; ?>
               <?php if ($page < $totalPages): ?>
                 <?php $nextParams = ['q' => $query, 'page' => $page + 1]; ?>
-                <a class="page-link" href="/search.php?<?= esc(http_build_query($nextParams)) ?>"><?= __('Siguiente') ?></a>
+                <a class="page-link" href="<?= esc($searchBasePath) ?>/search?<?= esc(http_build_query($nextParams)) ?>"><?= __('Siguiente') ?></a>
               <?php endif; ?>
             </div>
           </nav>

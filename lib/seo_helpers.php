@@ -45,6 +45,17 @@ function toAbsoluteSeoUrl(string $value, string $baseUrl): string
     return rtrim($baseUrl, '/') . '/' . ltrim($raw, '/');
 }
 
+/** Construye una ruta pública con el prefijo del podcast cuando tiene directorio. */
+function podcastSeoPath(array $podcast, string $path = ''): string
+{
+    $slug = (($podcast['_multipodcast_enabled'] ?? true) === true)
+        ? trim((string) ($podcast['slug'] ?? ''))
+        : '';
+    $prefix = $slug !== '' ? '/' . rawurlencode($slug) : '';
+    $suffix = '/' . ltrim($path, '/');
+    return $prefix . $suffix;
+}
+
 /**
  * Convierte una URL de perfil de Mastodon al formato fediverse:creator.
  * Ejemplo: https://mastodon.social/@ecollado → @ecollado@mastodon.social

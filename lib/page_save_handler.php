@@ -77,6 +77,7 @@ function validatePageForm(array $post): array
  */
 function savePage(PDO $pdo, array $form, ?int $editId): void
 {
+    $podcastId = activePodcastId($pdo);
     $slug     = $form['slug'];
     $parentId = $form['parent_id'];
 
@@ -84,8 +85,8 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
 
     // Calcular full_path según si es hija o de primer nivel.
     if ($parentId !== null) {
-        $parentStmt = $pdo->prepare("SELECT slug FROM pages WHERE id = ? LIMIT 1");
-        $parentStmt->execute([$parentId]);
+        $parentStmt = $pdo->prepare("SELECT slug FROM pages WHERE id = ? AND podcast_id = ? LIMIT 1");
+        $parentStmt->execute([$parentId, $podcastId]);
         $parentRow = $parentStmt->fetch(PDO::FETCH_ASSOC);
         if (!$parentRow) {
             throw new RuntimeException(__('La página padre seleccionada no existe.'));
@@ -100,11 +101,11 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
 
     // Verificar unicidad de full_path (excluir la propia página en modo edición).
     if ($editId !== null) {
-        $uniqueStmt = $pdo->prepare("SELECT id FROM pages WHERE full_path = ? AND id != ? LIMIT 1");
-        $uniqueStmt->execute([$fullPath, $editId]);
+        $uniqueStmt = $pdo->prepare("SELECT id FROM pages WHERE podcast_id = ? AND full_path = ? AND id != ? LIMIT 1");
+        $uniqueStmt->execute([$podcastId, $fullPath, $editId]);
     } else {
-        $uniqueStmt = $pdo->prepare("SELECT id FROM pages WHERE full_path = ? LIMIT 1");
-        $uniqueStmt->execute([$fullPath]);
+        $uniqueStmt = $pdo->prepare("SELECT id FROM pages WHERE podcast_id = ? AND full_path = ? LIMIT 1");
+        $uniqueStmt->execute([$podcastId, $fullPath]);
     }
     if ($uniqueStmt->fetch()) {
         throw new RuntimeException(__('Ya existe una página con la ruta "%s".', $fullPath));
@@ -115,7 +116,7 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
         $stmt = $pdo->prepare(
             "UPDATE pages
              SET title=?, slug=?, full_path=?, content=?, parent_id=?, sort_order=?, status=?, updated_at=?
-             WHERE id=?"
+             WHERE id=? AND podcast_id=?"
         );
         $stmt->execute([
             $form['title'],
@@ -127,13 +128,15 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
             $form['status'],
             $now,
             $editId,
+            $podcastId,
         ]);
     } else {
         $stmt = $pdo->prepare(
-            "INSERT INTO pages (title, slug, full_path, content, parent_id, sort_order, status, created_at, updated_at)
-             VALUES (?,?,?,?,?,?,?,?,?)"
+            "INSERT INTO pages (podcast_id, title, slug, full_path, content, parent_id, sort_order, status, created_at, updated_at)
+             VALUES (?,?,?,?,?,?,?,?,?,?)"
         );
         $stmt->execute([
+            $podcastId,
             $form['title'],
             $slug,
             $fullPath,
@@ -155,14 +158,15 @@ function savePage(PDO $pdo, array $form, ?int $editId): void
  */
 function deletePage(PDO $pdo, int $id): string
 {
-    $childStmt = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE parent_id = ?");
-    $childStmt->execute([$id]);
+    $podcastId = activePodcastId($pdo);
+    $childStmt = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE podcast_id = ? AND parent_id = ?");
+    $childStmt->execute([$podcastId, $id]);
     if ((int) $childStmt->fetchColumn() > 0) {
         return __('No se puede borrar una página que tiene subpáginas. Borra primero las subpáginas.');
     }
 
-    $stmt = $pdo->prepare("DELETE FROM pages WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt = $pdo->prepare("DELETE FROM pages WHERE id = ? AND podcast_id = ?");
+    $stmt->execute([$id, $podcastId]);
     clearWebCache();
     return '';
 }
@@ -196,9 +200,10 @@ function loadPagesManagementData(string $dbPath): array
         }
 
         // Padres primero, luego hijos indentados: SELECT ordenado por parent_id (NULL primero) y sort_order.
-        $parents = $pdo
-            ->query("SELECT id, title, full_path, status, sort_order, parent_id FROM pages WHERE parent_id IS NULL ORDER BY sort_order ASC, id ASC")
-            ->fetchAll();
+        $podcastId = activePodcastId($pdo);
+        $parentsStmt = $pdo->prepare("SELECT id, title, full_path, status, sort_order, parent_id FROM pages WHERE podcast_id = :podcast_id AND parent_id IS NULL ORDER BY sort_order ASC, id ASC");
+        $parentsStmt->execute([':podcast_id' => $podcastId]);
+        $parents = $parentsStmt->fetchAll();
 
         if (!$parents) {
             return $result;
@@ -208,10 +213,10 @@ function loadPagesManagementData(string $dbPath): array
         $placeholders = implode(',', array_fill(0, count($parentIds), '?'));
         $stmt = $pdo->prepare(
             "SELECT id, title, full_path, status, sort_order, parent_id FROM pages
-             WHERE parent_id IN ($placeholders)
+             WHERE podcast_id = ? AND parent_id IN ($placeholders)
              ORDER BY parent_id ASC, sort_order ASC, id ASC"
         );
-        $stmt->execute($parentIds);
+        $stmt->execute(array_merge([$podcastId], $parentIds));
         $children = $stmt->fetchAll();
 
         $childrenByParent = [];
@@ -257,15 +262,16 @@ function loadAddPageData(string $dbPath): array
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $podcastId = activePodcastId($pdo);
 
         // Páginas top-level disponibles para el selector de padre.
         $tableExists = (bool) $pdo
             ->query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='pages' LIMIT 1")
             ->fetchColumn();
         if ($tableExists) {
-            $result['topLevelPages'] = $pdo
-                ->query("SELECT id, title FROM pages WHERE parent_id IS NULL ORDER BY sort_order ASC, id ASC")
-                ->fetchAll();
+            $topStmt = $pdo->prepare("SELECT id, title FROM pages WHERE podcast_id = :podcast_id AND parent_id IS NULL ORDER BY sort_order ASC, id ASC");
+            $topStmt->execute([':podcast_id' => $podcastId]);
+            $result['topLevelPages'] = $topStmt->fetchAll();
         }
 
         $editId = isset($_GET['page_id']) && $_GET['page_id'] !== '' ? (int) $_GET['page_id'] : null;
@@ -306,8 +312,8 @@ function loadAddPageData(string $dbPath): array
 
                 // Recarga el form con los datos guardados para que el usuario los vea actualizados.
                 if ($editId !== null) {
-                    $rowStmt = $pdo->prepare("SELECT * FROM pages WHERE id = ? LIMIT 1");
-                    $rowStmt->execute([$editId]);
+                    $rowStmt = $pdo->prepare("SELECT * FROM pages WHERE id = ? AND podcast_id = ? LIMIT 1");
+                    $rowStmt->execute([$editId, $podcastId]);
                     $saved = $rowStmt->fetch();
                     if ($saved) {
                         $result['form'] = formFromPageRow($saved);
@@ -327,8 +333,8 @@ function loadAddPageData(string $dbPath): array
 
         // GET: cargar datos de la página si es edición.
         if ($editId !== null) {
-            $stmt = $pdo->prepare("SELECT * FROM pages WHERE id = ? LIMIT 1");
-            $stmt->execute([$editId]);
+            $stmt = $pdo->prepare("SELECT * FROM pages WHERE id = ? AND podcast_id = ? LIMIT 1");
+            $stmt->execute([$editId, $podcastId]);
             $row = $stmt->fetch();
             if ($row) {
                 $result['form']          = formFromPageRow($row);

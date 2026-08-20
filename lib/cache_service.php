@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/podcast_context.php';
+
 /**
  * Devuelve la ruta absoluta del directorio de caché pública (<raíz>/cache).
  */
@@ -55,7 +57,8 @@ function isWebCacheEnabled(string $dbPath): bool
             return false;
         }
 
-        $value = $pdo->query('SELECT cache_enabled FROM podcast ORDER BY id ASC LIMIT 1')->fetchColumn();
+        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
+        $value = $podcast['cache_enabled'] ?? 0;
         return ((int) $value) === 1;
     } catch (Throwable $e) {
         return false;
@@ -150,24 +153,21 @@ function storeWebCache(string $dbPath, string $body): void
  */
 function clearImageCache(): bool
 {
-    $dir = dirname(__DIR__) . '/images/generated';
-    if (!is_dir($dir)) {
-        return true;
-    }
-
     $ok = true;
-    $entries = @scandir($dir);
-    if (!is_array($entries)) {
-        return false;
+    $imageRoot = dirname(__DIR__) . '/images';
+    $directories = [$imageRoot . '/generated'];
+    foreach (@glob($imageRoot . '/*/generated', GLOB_ONLYDIR) ?: [] as $scopedDir) {
+        $directories[] = $scopedDir;
     }
-
-    foreach ($entries as $entry) {
-        if ($entry === '.' || $entry === '..') {
+    foreach ($directories as $dir) {
+        if (!is_dir($dir)) {
             continue;
         }
-        $path = $dir . '/' . $entry;
-        if (is_file($path) && !@unlink($path)) {
-            $ok = false;
+        foreach (@scandir($dir) ?: [] as $entry) {
+            $path = $dir . '/' . $entry;
+            if ($entry !== '.' && $entry !== '..' && is_file($path) && !@unlink($path)) {
+                $ok = false;
+            }
         }
     }
 

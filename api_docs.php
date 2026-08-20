@@ -20,6 +20,8 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 // URL base para los ejemplos curl.
 $baseUrl = rtrim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_SERVER['HTTP_HOST'] ?? 'tu-dominio.com'), '/');
+$apiDocsPdo = openPodcastDatabase($dbPath);
+$baseUrl .= podcastBasePath(activePodcast($apiDocsPdo) ?? [], multipodcastEnabled($apiDocsPdo));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">

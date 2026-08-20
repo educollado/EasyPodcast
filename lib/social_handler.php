@@ -76,7 +76,9 @@ function getSocialLinks(string $dbPath): array
             return [];
         }
 
-        $row = $pdo->query('SELECT * FROM social ORDER BY id ASC LIMIT 1')->fetch();
+        $stmt = $pdo->prepare('SELECT * FROM social WHERE podcast_id = :podcast_id LIMIT 1');
+        $stmt->execute([':podcast_id' => activePodcastId($pdo)]);
+        $row = $stmt->fetch();
         return is_array($row) ? $row : [];
     } catch (Throwable $e) {
         return [];
@@ -116,7 +118,10 @@ function loadSocialData(string $dbPath): array
             )"
         );
 
-        $existing = $pdo->query('SELECT * FROM social ORDER BY id ASC LIMIT 1')->fetch();
+        $podcastId = activePodcastId($pdo);
+        $existingStmt = $pdo->prepare('SELECT * FROM social WHERE podcast_id = :podcast_id LIMIT 1');
+        $existingStmt->execute([':podcast_id' => $podcastId]);
+        $existing = $existingStmt->fetch();
         if ($existing) {
             foreach ($form as $key => $_) {
                 $form[$key] = (string) ($existing[$key] ?? '');
@@ -148,10 +153,12 @@ function loadSocialData(string $dbPath): array
                 if ($existing) {
                     $sets  = implode(', ', array_map(fn ($f) => "$f = :$f", SOCIAL_FIELDS));
                     $params[':id'] = (int) $existing['id'];
-                    $pdo->prepare("UPDATE social SET $sets WHERE id = :id")->execute($params);
+                    $params[':podcast_id'] = $podcastId;
+                    $pdo->prepare("UPDATE social SET $sets WHERE id = :id AND podcast_id = :podcast_id")->execute($params);
                 } else {
                     $placeholders = implode(', ', array_map(fn ($f) => ":$f", SOCIAL_FIELDS));
-                    $pdo->prepare("INSERT INTO social ($cols) VALUES ($placeholders)")->execute($params);
+                    $params[':podcast_id'] = $podcastId;
+                    $pdo->prepare("INSERT INTO social (podcast_id, $cols) VALUES (:podcast_id, $placeholders)")->execute($params);
                 }
 
                 clearWebCache();

@@ -669,10 +669,12 @@ function downloadFile(
         $mime  = (string) $finfo->file($localPath);
         $size  = (int) filesize($localPath);
 
-        // URL pública local: base + ruta relativa desde la raíz del proyecto
+        // URL pública local: la ruta física incluye el slug (/images/<slug>),
+        // pero la URL ya lo lleva en $baseUrl y debe quedar /<slug>/images/<fichero>.
         $projectRoot = dirname(__DIR__);
-        $relativePath = str_replace($projectRoot, '', $localPath);
-        $localUrl = rtrim($baseUrl, '/') . '/' . ltrim(str_replace('\\', '/', $relativePath), '/');
+        $normalizedPath = str_replace('\\', '/', $localPath);
+        $kind = str_starts_with($normalizedPath, str_replace('\\', '/', $projectRoot . '/images/')) ? 'images' : 'audios';
+        $localUrl = rtrim($baseUrl, '/') . '/' . $kind . '/' . rawurlencode(basename($localPath));
 
         return [
             'localPath' => $localPath,
@@ -856,8 +858,10 @@ function runFeedImport(
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     $baseUrl   = resolveBaseUrl($pdo);
-    $imagesDir = dirname(__DIR__) . '/images';
-    $audiosDir = dirname(__DIR__) . '/audios';
+    $activeImportPodcast = activePodcast($pdo) ?? [];
+    $podcastId = (int) ($activeImportPodcast['id'] ?? 0);
+    $imagesDir = podcastStorageDirectory(dirname(__DIR__), 'images', $activeImportPodcast, multipodcastEnabled($pdo));
+    $audiosDir = podcastStorageDirectory(dirname(__DIR__), 'audios', $activeImportPodcast, multipodcastEnabled($pdo));
 
     // --- 3. Actualizar / insertar metadatos del podcast ---
     // 'link' excluido: la URL principal siempre se toma del host actual, nunca del feed externo.
@@ -866,7 +870,7 @@ function runFeedImport(
                           'image_url', 'copyright', 'itunes_type'];
     $fieldsToUpdate = array_values(array_intersect($overwriteFields, $allowedMetaFields));
 
-    $existingPodcastId = $pdo->query('SELECT id FROM podcast LIMIT 1')->fetchColumn();
+    $existingPodcastId = $podcastId > 0 ? $podcastId : false;
 
     if ($existingPodcastId === false) {
         // Primera importación: la tabla podcast está vacía → INSERT con todos los campos del feed.
@@ -938,13 +942,13 @@ function runFeedImport(
     $skipped  = 0;
     $errors   = 0;
 
-    $checkGuidStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE guid = :guid LIMIT 1');
+    $checkGuidStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND guid = :guid LIMIT 1');
     $insertStmt    = $pdo->prepare(
         'INSERT INTO episodes
-         (guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
+         (podcast_id, guid, title, content, link, pub_date, audio_url, audio_mime_type, audio_size_bytes,
           duration, explicit, season_number, episode_number, episode_type, image_url, author, status, updated_at)
          VALUES
-         (:guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
+         (:podcast_id, :guid, :title, :content, :link, :pub_date, :audio_url, :audio_mime_type, :audio_size_bytes,
           :duration, :explicit, :season_number, :episode_number, :episode_type, :image_url, :author, :status, datetime(\'now\'))'
     );
 
@@ -958,7 +962,7 @@ function runFeedImport(
 
         // Comprobar duplicado por GUID
         if ($skipExisting) {
-            $checkGuidStmt->execute([':guid' => $ep['guid']]);
+            $checkGuidStmt->execute([':podcast_id' => $podcastId, ':guid' => $ep['guid']]);
             if ((int) $checkGuidStmt->fetchColumn() > 0) {
                 $skipped++;
                 streamLine('<li class="import-stream-item">⏭ [' . $num . '/' . $total . '] ' . $titleEsc . ' — <em>' . __('saltado (GUID ya existe)') . '</em></li>');
@@ -1009,6 +1013,7 @@ function runFeedImport(
         // Insertar en BD
         try {
             $insertStmt->execute([
+                ':podcast_id'       => $podcastId,
                 ':guid'             => $guid,
                 ':title'            => $ep['title'],
                 ':content'          => $ep['content'],

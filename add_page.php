@@ -23,6 +23,8 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadAddPageData($dbPath);
 extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
+$addPageContextPdo = openPodcastDatabase($dbPath);
+$addPageBasePath = podcastBasePath(activePodcast($addPageContextPdo) ?? [], multipodcastEnabled($addPageContextPdo));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -115,7 +117,7 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="actions">
           <?php if ($isEditing): ?>
-            <a class="btn" href="<?= esc(buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener"><?= __('Vista previa') ?></a>
+            <a class="btn" href="<?= esc($addPageBasePath . buildPagePreviewPath($form)) ?>" target="_blank" rel="noopener"><?= __('Vista previa') ?></a>
           <?php endif; ?>
           <a class="btn" href="pages_management.php"><?= __('Volver a la lista') ?></a>
           <button class="btn" type="submit"><?= $isEditing ? __('Actualizar página') : __('Guardar página') ?></button>

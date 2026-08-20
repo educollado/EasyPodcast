@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_page_id'])) {
 
 $data = loadPagesManagementData($dbPath);
 extract($data);  // pagesList, error, notice
+$pagesContextPdo = openPodcastDatabase($dbPath);
+$pagesAdminBasePath = podcastBasePath(activePodcast($pagesContextPdo) ?? [], multipodcastEnabled($pagesContextPdo));
 
 // Si hubo error de borrado, sobreescribe el notice.
 if (!empty($deleteError)) {
@@ -92,7 +94,7 @@ if (!empty($deleteError)) {
                     <?= esc((string) ($p['title'] ?? '')) ?>
                   </td>
                   <td>
-                    <a href="/<?= esc((string) ($p['full_path'] ?? '')) ?>" target="_blank" rel="noopener">
+                    <a href="<?= esc($pagesAdminBasePath . '/' . (string) ($p['full_path'] ?? '')) ?>" target="_blank" rel="noopener">
                       /<?= esc((string) ($p['full_path'] ?? '')) ?>
                     </a>
                   </td>

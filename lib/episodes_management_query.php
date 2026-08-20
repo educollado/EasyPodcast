@@ -49,6 +49,7 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         $pdo = new PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $podcastId = activePodcastId($pdo);
 
         try {
             publishScheduledEpisodesAndRefresh($pdo);
@@ -89,19 +90,19 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
 
             if ($deleteEpisodeId > 0) {
                 // Guardar URLs de archivos antes de borrar el registro.
-                $fetchStmt = $pdo->prepare('SELECT audio_url, image_url FROM episodes WHERE id = :id');
-                $fetchStmt->execute([':id' => $deleteEpisodeId]);
+                $fetchStmt = $pdo->prepare('SELECT audio_url, image_url FROM episodes WHERE id = :id AND podcast_id = :podcast_id');
+                $fetchStmt->execute([':id' => $deleteEpisodeId, ':podcast_id' => $podcastId]);
                 $episodeFiles = $fetchStmt->fetch() ?: [];
 
-                $deleteStmt = $pdo->prepare('DELETE FROM episodes WHERE id = :id');
-                $deleteStmt->execute([':id' => $deleteEpisodeId]);
+                $deleteStmt = $pdo->prepare('DELETE FROM episodes WHERE id = :id AND podcast_id = :podcast_id');
+                $deleteStmt->execute([':id' => $deleteEpisodeId, ':podcast_id' => $podcastId]);
 
                 if ($deleteStmt->rowCount() > 0) {
                     // Eliminar archivos huérfanos si ningún otro episodio los usa.
                     $audioUrl = (string) ($episodeFiles['audio_url'] ?? '');
                     if ($audioUrl !== '') {
-                        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE audio_url = :url');
-                        $cntStmt->execute([':url' => $audioUrl]);
+                        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND audio_url = :url');
+                        $cntStmt->execute([':podcast_id' => $podcastId, ':url' => $audioUrl]);
                         if ((int) $cntStmt->fetchColumn() === 0) {
                             $localAudio = resolveLocalAudioPathFromUrl($audioUrl);
                             if ($localAudio !== null) {
@@ -147,18 +148,20 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
             $searchStmt = $pdo->prepare(
                 "SELECT id, title, guid, status, pub_date, link
                  FROM episodes
-                 WHERE title LIKE :q
+                 WHERE podcast_id = :podcast_id AND title LIKE :q
                  ORDER BY title ASC
                  LIMIT 100"
             );
-            $searchStmt->execute([':q' => '%' . $searchQuery . '%']);
+            $searchStmt->execute([':podcast_id' => $podcastId, ':q' => '%' . $searchQuery . '%']);
             $searchResults = $searchStmt->fetchAll();
 
             return compact('searchQuery', 'searchResults', 'draftEpisodes', 'scheduledEpisodes', 'publishedEpisodes', 'draftCurrentPage', 'draftTotalPages', 'totalDrafts', 'totalScheduled', 'currentPage', 'totalPublished', 'totalPages', 'error', 'notice');
         }
 
         // Borradores: paginados.
-        $totalDrafts     = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'draft'")->fetchColumn();
+        $countDrafts = $pdo->prepare("SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND status = 'draft'");
+        $countDrafts->execute([':podcast_id' => $podcastId]);
+        $totalDrafts = (int) $countDrafts->fetchColumn();
         $draftTotalPages = max(1, (int) ceil($totalDrafts / $perPage));
         if ($draftCurrentPage > $draftTotalPages) {
             $draftCurrentPage = $draftTotalPages;
@@ -168,27 +171,33 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         $draftStmt = $pdo->prepare(
             'SELECT id, title, guid, status, pub_date, link
              FROM episodes
-             WHERE status = \'draft\'
+             WHERE podcast_id = :podcast_id AND status = \'draft\'
              ORDER BY id DESC
              LIMIT :limit OFFSET :offset'
         );
         $draftStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $draftStmt->bindValue(':offset', $draftOffset, PDO::PARAM_INT);
+        $draftStmt->bindValue(':podcast_id', $podcastId, PDO::PARAM_INT);
         $draftStmt->execute();
         $draftEpisodes = $draftStmt->fetchAll();
 
         // Programados: sin paginación (suelen ser pocos), ordenados por fecha de publicación ascendente.
-        $totalScheduled    = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'scheduled'")->fetchColumn();
-        $scheduledStmt     = $pdo->query(
+        $countScheduled = $pdo->prepare("SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND status = 'scheduled'");
+        $countScheduled->execute([':podcast_id' => $podcastId]);
+        $totalScheduled = (int) $countScheduled->fetchColumn();
+        $scheduledStmt = $pdo->prepare(
             "SELECT id, title, guid, status, pub_date, link
              FROM episodes
-             WHERE status = 'scheduled'
+             WHERE podcast_id = :podcast_id AND status = 'scheduled'
              ORDER BY datetime(pub_date) ASC"
         );
+        $scheduledStmt->execute([':podcast_id' => $podcastId]);
         $scheduledEpisodes = $scheduledStmt->fetchAll();
 
         // Publicados: paginados.
-        $totalPublished = (int) $pdo->query("SELECT COUNT(*) FROM episodes WHERE status = 'published'")->fetchColumn();
+        $countPublished = $pdo->prepare("SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND status = 'published'");
+        $countPublished->execute([':podcast_id' => $podcastId]);
+        $totalPublished = (int) $countPublished->fetchColumn();
         $totalPages     = max(1, (int) ceil($totalPublished / $perPage));
         if ($currentPage > $totalPages) {
             $currentPage = $totalPages;
@@ -198,12 +207,13 @@ function loadEpisodesManagementData(string $dbPath, int $requestedPage, int $req
         $publishedStmt = $pdo->prepare(
             'SELECT id, title, guid, status, pub_date, link
              FROM episodes
-             WHERE status = \'published\'
+             WHERE podcast_id = :podcast_id AND status = \'published\'
              ORDER BY datetime(pub_date) DESC, id DESC
              LIMIT :limit OFFSET :offset'
         );
         $publishedStmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $publishedStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $publishedStmt->bindValue(':podcast_id', $podcastId, PDO::PARAM_INT);
         $publishedStmt->execute();
         $publishedEpisodes = $publishedStmt->fetchAll();
     } catch (Throwable $e) {

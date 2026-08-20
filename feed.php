@@ -15,6 +15,12 @@ if (tryServeWebCache($dbPath, 'application/rss+xml; charset=UTF-8')) {
 
 try {
     $pdo = new PDO('sqlite:' . $dbPath);
+    if (activePodcast($pdo) === null) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo __('No hay un podcast definido para el feed principal.');
+        exit;
+    }
     // Prioriza la URL principal del podcast para atom:link/self.
     $selfHref = resolveFeedSelfHref($pdo);
 

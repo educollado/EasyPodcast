@@ -665,7 +665,11 @@ function resolveLocalImagePath(string $imageUrl): ?string
     }
 
     $projectRoot = dirname(__DIR__);
-    $candidate = $path[0] === '/' ? $projectRoot . $path : $projectRoot . '/' . ltrim($path, '/');
+    if (preg_match('#^/([a-z0-9-]+)/images/(.+)$#', $path, $scopedImage)) {
+        $candidate = $projectRoot . '/images/' . $scopedImage[1] . '/' . $scopedImage[2];
+    } else {
+        $candidate = $path[0] === '/' ? $projectRoot . $path : $projectRoot . '/' . ltrim($path, '/');
+    }
     $real = realpath($candidate);
     if ($real === false || !is_file($real)) {
         return null;
@@ -706,7 +710,11 @@ function buildSizedImageUrl(string $sourceUrl, int $size): ?string
         return null;
     }
 
-    $variantPath = '/images/generated/' . $base . '-' . $size . 'x' . $size . '.' . $ext;
+    if (preg_match('#^/([a-z0-9-]+)/images/#', $path, $scopedImage)) {
+        $variantPath = '/' . $scopedImage[1] . '/images/generated/' . $base . '-' . $size . 'x' . $size . '.' . $ext;
+    } else {
+        $variantPath = '/images/generated/' . $base . '-' . $size . 'x' . $size . '.' . $ext;
+    }
 
     $query = isset($parts['query']) ? '?' . $parts['query'] : '';
     $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
@@ -792,7 +800,11 @@ function ensureSquareImageVariant(string $sourceUrl, int $size): string
 
     $variantPath = (string) parse_url($variantUrl, PHP_URL_PATH);
     $projectRoot = dirname(__DIR__);
-    $targetFile = $variantPath !== '' ? $projectRoot . $variantPath : '';
+    if (preg_match('#^/([a-z0-9-]+)/images/(.+)$#', $variantPath, $scopedVariant)) {
+        $targetFile = $projectRoot . '/images/' . $scopedVariant[1] . '/' . $scopedVariant[2];
+    } else {
+        $targetFile = $variantPath !== '' ? $projectRoot . $variantPath : '';
+    }
     $targetDir = $targetFile !== '' ? dirname($targetFile) : '';
     if ($targetFile === '' || $targetDir === '' || (!is_dir($targetDir) && !mkdir($targetDir, 0755, true) && !is_dir($targetDir))) {
         imagedestroy($dst);

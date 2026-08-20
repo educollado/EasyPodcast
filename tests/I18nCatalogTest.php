@@ -47,3 +47,61 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
         }
     }
 });
+
+test('las cadenas de Multipodcast están traducidas en todos los idiomas', function () {
+    $messages = [
+        'Podcasts',
+        'Crea, selecciona y configura los podcasts de la instalación',
+        'El directorio debe contener únicamente letras minúsculas, números y guiones.',
+        'Ese directorio está reservado por la aplicación.',
+        'El título del podcast es obligatorio.',
+        'Ese directorio ya está siendo utilizado por otro podcast.',
+        'Podcast creado correctamente.',
+        'Configuración multipodcast guardada correctamente.',
+        'Directorio del podcast actualizado correctamente.',
+        'Podcast borrado correctamente. Descarga y conserva su copia de seguridad.',
+        'No se pudo crear el directorio de medios del podcast.',
+        'Todos los podcasts deben tener un directorio antes de activar Multipodcast.',
+        'El podcast elegido para la portada no existe.',
+        'El podcast no existe.',
+        'No se puede cambiar el directorio porque la ruta de medios de destino ya existe.',
+        'No se pudo mover el directorio de medios del podcast.',
+        'Escribe exactamente el título del podcast para confirmar el borrado.',
+        'No se puede borrar el único podcast de la instalación.',
+        'No se puede borrar sin crear antes una copia consistente porque ZipArchive o SQLite3 no están disponibles.',
+        'No se pudo crear el directorio de backups.',
+        'No se pudo crear la copia de seguridad del podcast.',
+        'No se pudo crear una copia consistente de la base de datos.',
+        'No se pudo finalizar la copia de seguridad del podcast.',
+        'Descargar copia de seguridad',
+        'Configuración Multipodcast',
+        'Activar Multipodcast',
+        'Contenido de la portada principal',
+        'Resumen de todos los podcasts',
+        'Podcasts disponibles',
+        'Directorio:',
+        '%d capítulos',
+        'Administrar podcast',
+        'Directorio del podcast',
+        'Cambiar directorio',
+        'Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?',
+        'Escribe el título para confirmar',
+        'Crear backup y borrar podcast',
+        'Crear un podcast nuevo',
+        'Crear podcast',
+        'Descubre todos los podcasts disponibles y sus feeds RSS.',
+        'Todos nuestros podcasts, en un solo lugar.',
+        'Todavía no hay podcasts disponibles.',
+        'No se pudo generar el sitemap.',
+        'No hay un podcast definido para el feed principal.',
+        'Ese directorio está ocupado en el servidor. Elige otro.',
+    ];
+
+    foreach (glob(__DIR__ . '/../locale/*.po') ?: [] as $localeFile) {
+        $translations = i18n_parse_po($localeFile);
+        foreach ($messages as $message) {
+            assert_true(isset($translations[$message]) && $translations[$message] !== '', basename($localeFile) . ' no traduce: ' . $message);
+            assert_eq(substr_count($message, '%d'), substr_count($translations[$message], '%d'));
+        }
+    }
+});

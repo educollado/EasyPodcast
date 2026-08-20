@@ -18,6 +18,8 @@ require_once __DIR__ . '/lib/social_handler.php';
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+$episodeContextPdo = openPodcastDatabase($dbPath);
+$episodeBasePath = podcastBasePath(activePodcast($episodeContextPdo) ?? [], multipodcastEnabled($episodeContextPdo));
 
 // Detecta sesión de admin para permitir previsualización de borradores.
 startSecureSession();
@@ -32,6 +34,14 @@ ob_start();
 $year  = trim((string) ($_GET['year'] ?? ''));
 $month = trim((string) ($_GET['month'] ?? ''));
 $slug  = trim((string) ($_GET['slug'] ?? ''));
+
+if (multipodcastEnabled($episodeContextPdo) && !isset($_GET['podcast_slug'])) {
+    $redirectPodcast = activePodcast($episodeContextPdo);
+    if ($redirectPodcast !== null && trim((string) ($redirectPodcast['slug'] ?? '')) !== '') {
+        header('Location: ' . podcastPath($redirectPodcast, $year . '/' . $month . '/' . $slug, true), true, 301);
+        exit;
+    }
+}
 
 $data = loadEpisodeData($dbPath, $year, $month, $slug, $isAdminPreview);
 extract($data);  // podcast, episode, error, httpStatus
@@ -115,7 +125,7 @@ if ($error !== '') {
             <h1><?= esc(($episode['title'] ?? '') !== '' ? (string) $episode['title'] : __('Sin título')) ?></h1>
             <p class="meta"><?= esc(formatPublishedDate((string) ($episode['pub_date'] ?? ''))) ?></p>
             <?php if (!empty($episode['audio_url'])): ?>
-              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int) ($episode['id'] ?? 0) ?>">
+              <audio class="player" controls preload="none" src="<?= esc((string) $episode['audio_url']) ?>" data-episode-id="<?= (int) ($episode['id'] ?? 0) ?>" data-track-url="<?= esc($episodeBasePath . '/track') ?>">
                 <?= __('Tu navegador no soporta audio HTML5.') ?>
               </audio>
               <?php // Metadatos de audio: enlace de descarga con duración y tamaño entre paréntesis. ?>
@@ -129,7 +139,7 @@ if ($error !== '') {
                 $metaParens = $metaParts ? ' (' . implode(' — ', $metaParts) . ')' : '';
               ?>
               <p class="audio-meta">
-                <a class="download" href="/track.php?episode_id=<?= (int)($episode['id'] ?? 0) ?>&action=download" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
+                <a class="download" href="<?= esc($episodeBasePath) ?>/track?episode_id=<?= (int)($episode['id'] ?? 0) ?>&amp;action=download" download><?= __('Descargar') ?></a><?= esc($metaParens) ?>
               </p>
             <?php endif; ?>
             <?php if (!empty($episode['content'])): ?>

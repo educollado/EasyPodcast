@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/lib/migration_runner.php';
+require_once __DIR__ . '/lib/podcast_context.php';
 require_once __DIR__ . '/lib/i18n.php';
 require_once __DIR__ . '/lib/admin_theme.php';
 require_once __DIR__ . '/lib/csp.php';
@@ -35,8 +36,9 @@ function isHttpsRequest(): bool
 function loadAppLocale(string $dbPath): void
 {
     try {
-        $pdo = new PDO('sqlite:' . $dbPath);
-        $appLang = $pdo->query('SELECT app_language FROM podcast LIMIT 1')->fetchColumn();
+        $pdo = openPodcastDatabase($dbPath);
+        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
+        $appLang = $podcast['app_language'] ?? null;
         if (is_string($appLang) && $appLang !== '') {
             i18n_load($appLang);
         }
@@ -56,6 +58,11 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
     // de si las cabeceras ya se han enviado (headers_sent solo afecta al redirect).
     if (PHP_SAPI !== 'cli') {
         runMigrations($dbPath);
+        if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['admin_user'])) {
+            activateAdminPodcastContext($dbPath, isset($_GET['podcast']) ? (string) $_GET['podcast'] : null);
+        } else {
+            activatePublicPodcastContext($dbPath, isset($_GET['podcast_slug']) ? (string) $_GET['podcast_slug'] : null);
+        }
         loadAppLocale($dbPath);
         loadAdminTheme($dbPath);
         require_once __DIR__ . '/lib/scheduler.php';
@@ -91,7 +98,7 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
             return;
         }
 
-        $podcast = $pdo->query('SELECT link FROM podcast ORDER BY id ASC LIMIT 1')->fetch();
+        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
         if (!$podcast) {
             return;
         }
