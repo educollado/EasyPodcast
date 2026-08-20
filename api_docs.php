@@ -37,6 +37,7 @@ $baseUrl .= podcastBasePath(activePodcast($apiDocsPdo) ?? [], multipodcastEnable
   <div class="admin-wrap">
     <main class="card">
       <h1><?= __('Documentación API REST') ?></h1>
+      <?php if (activePodcast($apiDocsPdo) !== null): ?><p class="muted"><strong><?= __('Podcast') ?>:</strong> <?= esc((string) activePodcast($apiDocsPdo)['title']) ?></p><?php endif; ?>
       <p><?= __('La API REST permite gestionar el podcast de forma programática. Todas las peticiones requieren autenticación.') ?></p>
 
       <h2><?= __('Autenticación') ?></h2>

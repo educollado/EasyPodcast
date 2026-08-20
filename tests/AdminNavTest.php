@@ -25,6 +25,12 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('href="multipodcast.php">EasyPodcast', $html);
     assert_contains('class="admin-nav-podcast-selector"', $html);
     assert_contains('name="podcast"', $html);
+    assert_contains('href="cache_management.php"', $html);
+    assert_contains('href="update.php"', $html);
+    assert_contains('href="change_password.php"', $html);
+    assert_contains('href="twofa_management.php"', $html);
+    assert_contains('href="backups.php"', $html);
+    assert_contains('href="api_tokens.php"', $html);
     assert_contains('Ver podcasts ↗', $html);
     assert_true(!str_contains($html, '>Panel<'));
     assert_true(!str_contains($html, '>Capítulos<'));
@@ -39,5 +45,29 @@ test('barra de un podcast muestra sus opciones de administración', function () 
     assert_contains('href="/demo/"', $html);
     assert_contains('Ver podcast ↗', $html);
 
+    assert_true(!str_contains($html, 'href="cache_management.php"'));
+    assert_true(!str_contains($html, 'href="backups.php"'));
+
     unset($GLOBALS['_multipodcast_enabled'], $GLOBALS['_active_podcast']);
+});
+
+test('caché permanece en el menú Multipodcast y cambia de podcast sin salir', function () {
+    $html = renderAdminNavFixture('cache', ['id' => 2, 'slug' => 'demo']);
+
+    assert_contains('action="cache_management.php"', $html);
+    assert_contains('href="multipodcast.php"', $html);
+    assert_contains('class="admin-nav-link active" href="cache_management.php"', $html);
+    assert_true(!str_contains($html, '>Panel<'));
+    assert_true(!str_contains($html, '>Capítulos<'));
+
+    unset($GLOBALS['_multipodcast_enabled'], $GLOBALS['_active_podcast']);
+});
+
+test('el panel de podcast no duplica las herramientas globales de Multipodcast', function () {
+    $source = file_get_contents(__DIR__ . '/../admin.php');
+
+    assert_true(is_string($source));
+    assert_contains('<?php if (!$adminMultipodcastEnabled): ?>', $source);
+    assert_contains('<a class="admin-card" href="backups.php">', $source);
+    assert_contains('<a class="admin-card" href="api_tokens.php">', $source);
 });

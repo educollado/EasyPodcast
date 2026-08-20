@@ -21,6 +21,7 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadApiTokensData($dbPath);
 extract($data); // tokens, error, notice, newToken
+$apiPodcast = activePodcast(openPodcastDatabase($dbPath));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -36,6 +37,7 @@ extract($data); // tokens, error, notice, newToken
   <div class="admin-wrap">
     <main class="card">
       <h1><?= __('Tokens de API') ?></h1>
+      <?php if ($apiPodcast !== null): ?><p class="muted"><strong><?= __('Podcast') ?>:</strong> <?= esc((string) $apiPodcast['title']) ?></p><?php endif; ?>
       <p><?= __('Genera tokens para autenticar peticiones a la API REST. Cada token solo se muestra una vez al crearlo.') ?></p>
 
       <?php if ($error !== ''): ?>

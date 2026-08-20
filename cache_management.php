@@ -21,6 +21,7 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadCacheManagementData($dbPath);
 extract($data); // cacheEnabled, error, notice
+$cachePodcast = activePodcast(openPodcastDatabase($dbPath));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -36,6 +37,7 @@ extract($data); // cacheEnabled, error, notice
   <div class="admin-wrap">
     <main class="card">
       <h1><?= __('Gestión de Caché') ?></h1>
+      <?php if ($cachePodcast !== null): ?><p class="muted"><strong><?= __('Podcast') ?>:</strong> <?= esc((string) $cachePodcast['title']) ?></p><?php endif; ?>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>

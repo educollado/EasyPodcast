@@ -23,6 +23,7 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $isLoggedIn    = isset($_SESSION['admin_user']);
 $isTotpPending = !$isLoggedIn && isset($_SESSION['totp_pending_user']);
+$adminMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
 
 // Cambio de tema visual desde el panel.
 if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'set_theme') {
@@ -150,11 +151,6 @@ if ($isLoggedIn) {
         <?php endif; ?>
 
         <div class="admin-cards">
-          <a class="admin-card" href="multipodcast.php">
-            <div class="admin-card-icon">🎧</div>
-            <h2><?= __('Multipodcast') ?></h2>
-            <p><?= __('Crea, selecciona y configura los podcasts de la instalación') ?></p>
-          </a>
           <a class="admin-card" href="podcast_management.php">
             <div class="admin-card-icon">🎙</div>
             <h2><?= __('Podcast') ?></h2>
@@ -169,6 +165,37 @@ if ($isLoggedIn) {
             <div class="admin-card-icon">➕</div>
             <h2><?= __('Añadir capítulo') ?></h2>
             <p><?= __('Sube un nuevo episodio al podcast') ?></p>
+          </a>
+          <a class="admin-card" href="social_management.php">
+            <div class="admin-card-icon">🔗</div>
+            <h2><?= __('Redes Sociales') ?></h2>
+            <p><?= __('Blog, LinkedIn, Mastodon, X y más') ?></p>
+          </a>
+          <a class="admin-card" href="pages_management.php">
+            <div class="admin-card-icon">📄</div>
+            <h2><?= __('Páginas') ?></h2>
+            <p><?= __('Crea páginas estáticas tipo "Acerca de"') ?></p>
+          </a>
+          <a class="admin-card" href="stats.php">
+            <div class="admin-card-icon">📊</div>
+            <h2><?= __('Estadísticas') ?></h2>
+            <p><?= __('Episodios, borradores, tamaño de audios y descargas/reproducciones') ?></p>
+          </a>
+          <a class="admin-card" href="import_feed.php">
+            <div class="admin-card-icon">📥</div>
+            <h2><?= __('Importar feed RSS') ?></h2>
+            <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
+          </a>
+          <a class="admin-card" href="media_cleanup.php">
+            <div class="admin-card-icon">🧹</div>
+            <h2><?= __('Limpiar') ?></h2>
+            <p><?= __('Borra audios e imágenes que no usa ningún episodio') ?></p>
+          </a>
+          <?php if (!$adminMultipodcastEnabled): ?>
+          <a class="admin-card" href="multipodcast.php">
+            <div class="admin-card-icon">🎧</div>
+            <h2><?= __('Multipodcast') ?></h2>
+            <p><?= __('Crea, selecciona y configura los podcasts de la instalación') ?></p>
           </a>
           <a class="admin-card" href="backups.php">
             <div class="admin-card-icon">💾</div>
@@ -190,41 +217,17 @@ if ($isLoggedIn) {
             <h2><?= __('Contraseña') ?></h2>
             <p><?= __('Cambia la contraseña de acceso al panel') ?></p>
           </a>
-          <a class="admin-card" href="social_management.php">
-            <div class="admin-card-icon">🔗</div>
-            <h2><?= __('Redes Sociales') ?></h2>
-            <p><?= __('Blog, LinkedIn, Mastodon, X y más') ?></p>
-          </a>
-          <a class="admin-card" href="pages_management.php">
-            <div class="admin-card-icon">📄</div>
-            <h2><?= __('Páginas') ?></h2>
-            <p><?= __('Crea páginas estáticas tipo "Acerca de"') ?></p>
-          </a>
-          <a class="admin-card" href="stats.php">
-            <div class="admin-card-icon">📊</div>
-            <h2><?= __('Estadísticas') ?></h2>
-            <p><?= __('Episodios, borradores, tamaño de audios y descargas/reproducciones') ?></p>
-          </a>
           <a class="admin-card" href="update.php">
             <div class="admin-card-icon">⬆️</div>
             <h2><?= __('Actualizar') ?></h2>
             <p><?= __('Comprueba e instala nuevas versiones') ?></p>
-          </a>
-          <a class="admin-card" href="import_feed.php">
-            <div class="admin-card-icon">📥</div>
-            <h2><?= __('Importar feed RSS') ?></h2>
-            <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
-          </a>
-          <a class="admin-card" href="media_cleanup.php">
-            <div class="admin-card-icon">🧹</div>
-            <h2><?= __('Limpiar') ?></h2>
-            <p><?= __('Borra audios e imágenes que no usa ningún episodio') ?></p>
           </a>
           <a class="admin-card" href="api_tokens.php">
             <div class="admin-card-icon">🔌</div>
             <h2>API Tokens</h2>
             <p><?= __('Genera y revoca tokens para la API REST') ?></p>
           </a>
+          <?php endif; ?>
           <?php $activeAdminPodcast = activePodcast(openPodcastDatabase($dbPath)); ?>
           <a class="admin-card" href="<?= esc($activeAdminPodcast !== null ? podcastPath($activeAdminPodcast, '', multipodcastEnabled(openPodcastDatabase($dbPath))) : '/') ?>" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
