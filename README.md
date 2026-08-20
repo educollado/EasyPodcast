@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.11-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-2.0.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -204,13 +204,13 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 
 | Tabla | Uso |
 |---|---|
-| `app_settings` | Activación Multipodcast y podcast destacado en portada |
 | `podcast` | Metadatos y directorio único de cada canal |
+| `app_settings` | Configuración global de Multipodcast y de la portada-resumen |
 | `episodes` | Episodios, podcast propietario y estado de publicación |
 | `management` | Credenciales y configuración 2FA (TOTP) |
-| `social` | Enlaces a redes sociales (una fila) |
-| `pages` | Páginas estáticas con jerarquía padre/hijo |
-| `api_tokens` | Tokens de API (reservada) |
+| `social` | Enlaces a redes sociales aislados por podcast |
+| `pages` | Páginas estáticas por podcast con jerarquía padre/hijo |
+| `api_tokens` | Tokens de API aislados por podcast |
 | `estadisticas` | Datos brutos de descargas/reproducciones (7 días) |
 | `estadisticas_mensuales` | Resumen mensual histórico |
 | `estadisticas_anuales` | Resumen anual histórico |
@@ -225,19 +225,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 22) {
-    migration_v22($pdo);
-    $pdo->exec('PRAGMA user_version = 22');
+if ($version < 26) {
+    migration_v26($pdo);
+    $pdo->exec('PRAGMA user_version = 26');
 }
 
 // 2. Función de migración
-function migration_v22(PDO $pdo): void
+function migration_v26(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 22`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 26`.
 
 #### Historial de versiones
 
@@ -264,6 +264,10 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 22`.
 | 19 | Añade `hero_image_url` al podcast para configurar la imagen de cabecera |
 | 20 | Guarda la fecha y versión de la comprobación diaria de actualizaciones del panel |
 | 21 | Añade configuración Multipodcast y aísla contenido, tokens, medios y estadísticas por `podcast_id` |
+| 22 | Añade la imagen hero configurable de la portada-resumen Multipodcast |
+| 23 | Añade título, subtítulo y tema propios a la portada-resumen |
+| 24 | Permite elegir explícitamente el podcast principal de la instalación |
+| 25 | Permite decidir qué podcasts aparecen en la portada-resumen |
 
 ---
 

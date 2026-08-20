@@ -1,6 +1,6 @@
 # Changelog
 
-## Siguiente release
+## 2.0.0
 
 - **Multipodcast opcional**: una única instalación puede alojar varios podcasts aislados por directorio, con selector administrativo, portada agregada o podcast destacado, feeds y sitemaps propios, y alias compatibles en la raíz.
 - **Aislamiento de datos y medios**: episodios, páginas, redes, tokens y estadísticas quedan asociados a su podcast; audios e imágenes se organizan por directorio y las URLs antiguas de episodios redirigen al podcast destacado.
