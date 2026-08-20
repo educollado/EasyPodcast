@@ -73,7 +73,9 @@ extract($data); // adminCount, isSetupMode, error, notice
 if (isset($_SESSION['admin_user']) && !isset($_GET['manage'])) {
     try {
         $contextPdo = openPodcastDatabase($dbPath);
-        if (loadAppSettings($contextPdo)['multipodcast_enabled'] === 1) {
+        $multipodcastIsEnabled = loadAppSettings($contextPdo)['multipodcast_enabled'] === 1;
+        $contextPdo = null;
+        if ($multipodcastIsEnabled) {
             header('Location: podcasts.php');
             exit;
         }
@@ -89,6 +91,9 @@ $currentAdminTheme  = 'easypodcast';
 $currentPublicThemeModeAuto = false;
 $adminUpdateStatus = ['available' => false, 'version' => ''];
 if ($isLoggedIn) {
+    // Esta comprobación puede abrir una transacción de escritura. Debe ejecutarse
+    // antes de mantener cursores de lectura abiertos en otra conexión SQLite.
+    $adminUpdateStatus = loadDailyAdminUpdateStatus($dbPath);
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
         $podcastId = activePodcastId($pdo);
@@ -104,10 +109,11 @@ if ($isLoggedIn) {
             }
             $currentPublicThemeModeAuto = ((int) ($row['public_theme_mode_auto'] ?? 0)) === 1;
         }
+        $stmt->closeCursor();
+        $pdo = null;
     } catch (Throwable $e) {
         // Usa el fallback.
     }
-    $adminUpdateStatus = loadDailyAdminUpdateStatus($dbPath);
 }
 ?>
 <!doctype html>

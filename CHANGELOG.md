@@ -6,6 +6,7 @@
 - **Aislamiento de datos y medios**: episodios, páginas, redes, tokens y estadísticas quedan asociados a su podcast; audios e imágenes se organizan por directorio y las URLs antiguas de episodios redirigen al podcast destacado.
 - **Creación y borrado seguros**: se validan slugs reservados y rutas ocupadas; antes de borrar un podcast se genera una copia ZIP consistente de la base de datos y sus medios.
 - **Multipodcast internacionalizado**: todas las cadenas nuevas están traducidas a los ocho idiomas disponibles y cubiertas por pruebas de catálogo.
+- **Administración estable con SQLite**: el panel evita solapar cursores de lectura con la transacción diaria de comprobación de actualizaciones, impidiendo que una entrada autenticada bloquee el resto de la web.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.
