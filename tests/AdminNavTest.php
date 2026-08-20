@@ -25,6 +25,7 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('href="multipodcast.php">EasyPodcast', $html);
     assert_contains('class="admin-nav-podcast-selector"', $html);
     assert_contains('name="podcast"', $html);
+    assert_contains('data-navigation-url="multipodcast.php" selected>Multipodcast</option>', $html);
     assert_contains('href="cache_management.php"', $html);
     assert_contains('href="update.php"', $html);
     assert_contains('href="change_password.php"', $html);
@@ -34,6 +35,14 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('Ver podcasts ↗', $html);
     assert_true(!str_contains($html, '>Panel<'));
     assert_true(!str_contains($html, '>Capítulos<'));
+});
+
+test('el selector superior navega a Multipodcast sin enviarlo como podcast', function () {
+    $script = file_get_contents(__DIR__ . '/../assets/js/admin.js');
+
+    assert_true(is_string($script));
+    assert_contains('selectedOption.dataset.navigationUrl', $script);
+    assert_contains('window.location.assign(navigationUrl);', $script);
 });
 
 test('barra de un podcast muestra sus opciones de administración', function () {

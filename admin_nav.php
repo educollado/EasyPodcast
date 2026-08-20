@@ -51,7 +51,7 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
       <form class="admin-nav-podcast-selector" method="get" action="<?= esc($navSelectorAction) ?>">
         <?php if (!$navUsesPodcastContext): ?><input type="hidden" name="manage" value="1"><?php endif; ?>
         <select name="podcast" data-submit-on-change="1" aria-label="<?= esc(__('Elegir podcast')) ?>">
-          <option value="" disabled <?= $navActivePodcastId === 0 ? 'selected' : '' ?>><?= __('Elegir podcast') ?></option>
+          <option value="" data-navigation-url="multipodcast.php" <?= $navActivePodcastId === 0 ? 'selected' : '' ?>><?= __('Multipodcast') ?></option>
           <?php foreach ($navPodcasts as $navPodcastOption): ?>
             <option value="<?= esc((string) $navPodcastOption['slug']) ?>" <?= $navActivePodcastId === (int) $navPodcastOption['id'] ? 'selected' : '' ?>><?= esc((string) $navPodcastOption['title']) ?></option>
           <?php endforeach; ?>

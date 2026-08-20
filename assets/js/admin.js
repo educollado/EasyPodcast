@@ -35,6 +35,14 @@
     }
 
     if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+      if (field instanceof HTMLSelectElement) {
+        var selectedOption = field.options[field.selectedIndex];
+        var navigationUrl = selectedOption ? selectedOption.dataset.navigationUrl || '' : '';
+        if (navigationUrl !== '') {
+          window.location.assign(navigationUrl);
+          return;
+        }
+      }
       if (field.form) {
         field.form.submit();
       }
