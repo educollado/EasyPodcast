@@ -625,11 +625,17 @@ function isImageUrlInUse(PDO $pdo, string $imageUrl): bool
             SELECT 1 FROM episodes WHERE image_url = :episode_url
             UNION ALL
             SELECT 1 FROM podcast WHERE image_url = :podcast_url
+            UNION ALL
+            SELECT 1 FROM podcast WHERE hero_image_url = :hero_url
+            UNION ALL
+            SELECT 1 FROM app_settings WHERE summary_hero_image_url = :summary_url
         )'
     );
     $stmt->execute([
         ':episode_url' => $imageUrl,
         ':podcast_url' => $imageUrl,
+        ':hero_url' => $imageUrl,
+        ':summary_url' => $imageUrl,
     ]);
 
     return (int) $stmt->fetchColumn() === 1;

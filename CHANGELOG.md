@@ -2,10 +2,13 @@
 
 ## Siguiente release
 
+- **Conversión Multipodcast reversible**: al activarlo se solicita en la misma pantalla el directorio del podcast actual, que queda como principal; imágenes, audios y URLs de enclosure permanecen globales y estables, y la regeneración de imágenes abarca todos los podcasts. Al desactivarlo se exige confirmación reforzada y se crean ZIP de los secundarios antes de borrar sus datos y medios exclusivos.
+- **Portada Multipodcast más clara**: la configuración muestra dos opciones visibles para elegir entre el resumen de todos los podcasts o la portada de un único podcast.
+- **Enlaces del resumen integrados con el tema**: los títulos de los podcasts dejan de usar el azul subrayado del navegador y adoptan los colores y estados de enlace del tema elegido.
+- **Hero del resumen integrado con el tema**: la cabecera Multipodcast hereda ahora los remates visuales del tema seleccionado, incluida la línea superior de acento del tema Corporate.
 - **Publicación de releases reparada**: el validador usado por GitHub Actions queda incluido en el repositorio y la imagen Docker puede relanzarse manualmente para una versión concreta conservando el código exacto de su tag.
-
 - **Multipodcast opcional**: una única instalación puede alojar varios podcasts aislados por directorio, con selector administrativo, portada agregada o podcast destacado, feeds y sitemaps propios, y alias compatibles en la raíz.
-- **Aislamiento de datos y medios**: episodios, páginas, redes, tokens y estadísticas quedan asociados a su podcast; audios e imágenes se organizan por directorio y las URLs antiguas de episodios redirigen al podcast destacado.
+- **Aislamiento de datos por podcast**: episodios, páginas, redes, tokens y estadísticas quedan asociados a su podcast; audios e imágenes conservan rutas globales estables y las URLs antiguas de episodios redirigen al podcast destacado.
 - **Creación y borrado seguros**: se validan slugs reservados y rutas ocupadas; antes de borrar un podcast se genera una copia ZIP consistente de la base de datos y sus medios.
 - **Multipodcast internacionalizado**: todas las cadenas nuevas están traducidas a los ocho idiomas disponibles y cubiertas por pruebas de catálogo.
 - **Administración estable con SQLite**: el panel evita solapar cursores de lectura con la transacción diaria de comprobación de actualizaciones, impidiendo que una entrada autenticada bloquee el resto de la web.

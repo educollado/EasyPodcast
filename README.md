@@ -119,7 +119,7 @@ La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una b
 
 El modo Multipodcast se administra desde el dashboard global `multipodcast.php`; su configuración se abre en `multipodcast_management.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
 
-La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. El resumen permite configurar desde `multipodcast_management.php` su imagen hero, título, subtítulo y tema visual propios. El podcast principal que permanecerá visible si se desactiva Multipodcast se elige en `podcasts_management.php`. Cuando se destaca un podcast, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast seleccionado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios se almacenan en `audios/<slug>/` e `images/<slug>/`.
+La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. El resumen permite configurar desde `multipodcast_management.php` su imagen hero, título, subtítulo y tema visual propios. El podcast principal que permanecerá visible si se desactiva Multipodcast se elige en `podcasts_management.php`. Cuando se destaca un podcast, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast seleccionado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios de todos los podcasts se almacenan conjuntamente en `audios/` e `images/`; así sus URLs permanecen estables al activar o desactivar Multipodcast y al cambiar el podcast principal.
 
 ### Feed RSS
 

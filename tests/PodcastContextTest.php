@@ -5,6 +5,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/../lib/i18n.php';
 require_once __DIR__ . '/../lib/podcast_context.php';
 
+test('podcastStorageDirectory mantiene un almacén multimedia global en modo Multipodcast', function () {
+    assert_eq('/srv/app/audios', podcastStorageDirectory('/srv/app', 'audios', ['slug' => 'aratos'], true));
+    assert_eq('/srv/app/images', podcastStorageDirectory('/srv/app', 'images', ['slug' => 'otro'], false));
+});
+
 test('normalizePodcastSlug translitera y normaliza el directorio', function () {
     assert_eq('aratos-tecnologia', normalizePodcastSlug('  Aratós Tecnología  '));
     assert_eq('mi-podcast-2', normalizePodcastSlug('Mi Podcast 2'));

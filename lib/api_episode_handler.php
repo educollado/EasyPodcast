@@ -169,8 +169,8 @@ function apiDeleteEpisode(PDO $pdo, int $id): void
     // Eliminar archivos huérfanos si ningún otro episodio los usa.
     $audioUrl = (string) ($episodeFiles['audio_url'] ?? '');
     if ($audioUrl !== '') {
-        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcast_id AND audio_url = :url');
-        $cntStmt->execute([':podcast_id' => activePodcastId($pdo), ':url' => $audioUrl]);
+        $cntStmt = $pdo->prepare('SELECT COUNT(*) FROM episodes WHERE audio_url = :url');
+        $cntStmt->execute([':url' => $audioUrl]);
         if ((int) $cntStmt->fetchColumn() === 0) {
             $localAudio = resolveLocalAudioPathFromUrl($audioUrl);
             if ($localAudio !== null) {

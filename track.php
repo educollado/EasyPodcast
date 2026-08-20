@@ -26,6 +26,13 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
+    // /track es una URL global y estable. El episodio determina el podcast al
+    // que pertenecen tanto el audio como la estadística registrada.
+    if (!activateEpisodePodcastContext($pdo, $episodeId)) {
+        http_response_code(404);
+        exit;
+    }
+
     // Obtener información del episodio
     $episodeInfo = getEpisodeInfo($pdo, $episodeId);
     

@@ -92,6 +92,26 @@
   gap: 1rem;
 }
 
+.podcast-directory h3 {
+  margin: 0 0 .3rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.8vw, 1.2rem);
+  line-height: 1.25;
+}
+
+.podcast-directory h3 a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .12s;
+}
+
+.podcast-directory h3 a:hover,
+.podcast-directory h3 a:focus-visible {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
 /* El contenedor principal pasa a ser un flex column transparente:
    cada episodio es su propia tarjeta flotante. */
 main.card {

@@ -39,7 +39,7 @@ header('Content-Type: text/html; charset=UTF-8');
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body><div class="container">
-  <header class="multipodcast-hero<?= $summaryHeroImage !== '' ? ' has-hero' : '' ?>">
+  <header class="card multipodcast-hero<?= $summaryHeroImage !== '' ? ' has-hero' : '' ?>">
     <?php if ($summaryHeroImage !== ''): ?>
       <img class="multipodcast-hero-image" src="<?= esc($summaryHeroImage) ?>" alt="" aria-hidden="true">
     <?php endif; ?>

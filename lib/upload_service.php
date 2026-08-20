@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+/** Conserva únicamente esquema, host y puerto para que las URLs de medios no dependan del slug. */
+function mediaPublicBaseUrl(string $baseUrl): string
+{
+    $parts = parse_url(trim($baseUrl));
+    if (!is_array($parts) || !isset($parts['scheme'], $parts['host'])) {
+        return rtrim($baseUrl, '/');
+    }
+    $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+    return strtolower((string) $parts['scheme']) . '://' . $parts['host'] . $port;
+}
+
 require_once __DIR__ . '/episode_helpers.php';
 require_once __DIR__ . '/id3_service.php';
 
@@ -352,7 +363,7 @@ function handleNamedImageUpload(
         $fileName = basename($targetPath);
     }
 
-    return ['url' => rtrim($baseUrl, '/') . '/images/' . $fileName, 'error' => null];
+    return ['url' => mediaPublicBaseUrl($baseUrl) . '/images/' . $fileName, 'error' => null];
 }
 
 /**
@@ -429,7 +440,7 @@ function handleAudioUpload(array $fileData, array $form, array $podcastDefaults,
     }
 
     return [
-        'url'       => rtrim($baseUrl, '/') . '/audios/' . $fileName,
+        'url'       => mediaPublicBaseUrl($baseUrl) . '/audios/' . $fileName,
         // Si el sistema reportó MIME vacío, usamos el valor por defecto del estándar RSS.
         'mime'      => $mimeType !== '' ? $mimeType : 'audio/mpeg',
         'size'      => $fileSize,

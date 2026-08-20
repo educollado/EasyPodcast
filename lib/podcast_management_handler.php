@@ -340,7 +340,7 @@ function loadPodcastManagementData(string $dbPath): array
                             } elseif (!move_uploaded_file($tmpPath, $imagesDir . '/' . $fileName)) {
                                 $error = __('No se pudo guardar la imagen subida.');
                             } else {
-                                $form['image_url'] = rtrim(resolvePodcastFormBaseUrl($form, $pdo), '/') . '/images/' . $fileName;
+                                $form['image_url'] = mediaPublicBaseUrl(resolvePodcastFormBaseUrl($form, $pdo)) . '/images/' . $fileName;
                             }
                         }
                     }

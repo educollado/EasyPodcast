@@ -8,12 +8,13 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/upload_service.php';
 require_once __DIR__ . '/admin_theme.php';
 
-/** @return array{podcasts:array,primary_podcast:?array,settings:array,error:string,notice:string,backup_file:string} */
+/** @return array{podcasts:array,primary_podcast:?array,settings:array,error:string,notice:string,backup_file:string,backup_files:array<int,string>} */
 function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
 {
     $error = '';
     $notice = '';
     $backupFile = '';
+    $backupFiles = [];
     $pdo = openPodcastDatabase($dbPath);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -58,14 +59,16 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
                     if ($pdo->inTransaction()) {
                         $pdo->rollBack();
                     }
-                    removePodcastDirectory($projectRoot . '/audios/' . $slug);
-                    removePodcastDirectory($projectRoot . '/images/' . $slug);
                     throw $e;
                 }
                 clearWebCache();
                 $notice = __('Podcast creado correctamente.');
             } elseif ($action === 'save_settings') {
-                saveMultipodcastSettings($pdo, $projectRoot);
+                $settingsResult = saveMultipodcastSettings($pdo, $dbPath, $projectRoot);
+                $backupFiles = $settingsResult['backup_files'];
+                if ($backupFiles !== []) {
+                    $_SESSION['podcast_backup_files'] = $backupFiles;
+                }
                 clearWebCache();
                 $notice = __('Configuración multipodcast guardada correctamente.');
             } elseif ($action === 'rename_slug') {
@@ -98,6 +101,7 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
     return compact('podcasts', 'settings', 'error', 'notice') + [
         'primary_podcast' => $primaryPodcast,
         'backup_file' => $backupFile,
+        'backup_files' => $backupFiles,
     ];
 }
 
@@ -119,8 +123,8 @@ function requestBaseUrl(): string
 
 function ensurePodcastMediaDirectories(string $projectRoot, string $slug): void
 {
-    foreach (['audios', 'images', 'images/' . $slug . '/generated'] as $relative) {
-        $path = rtrim($projectRoot, '/') . '/' . ($relative === 'audios' || $relative === 'images' ? $relative . '/' . $slug : $relative);
+    foreach (['audios', 'images', 'images/generated'] as $relative) {
+        $path = rtrim($projectRoot, '/') . '/' . $relative;
         if (!is_dir($path) && !mkdir($path, 0775, true) && !is_dir($path)) {
             throw new RuntimeException(__('No se pudo crear el directorio de medios del podcast.'));
         }
@@ -129,29 +133,54 @@ function ensurePodcastMediaDirectories(string $projectRoot, string $slug): void
 
 function assertPodcastPathsAvailable(string $projectRoot, string $slug): void
 {
-    foreach ([$projectRoot . '/' . $slug, $projectRoot . '/audios/' . $slug, $projectRoot . '/images/' . $slug] as $path) {
+    foreach ([$projectRoot . '/' . $slug] as $path) {
         if (file_exists($path)) {
             throw new RuntimeException(__('Ese directorio está ocupado en el servidor. Elige otro.'));
         }
     }
 }
 
-function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
+/** @return array{backup_files:array<int,string>} */
+function saveMultipodcastSettings(PDO $pdo, string $dbPath, string $projectRoot): array
 {
     $enabled = isset($_POST['multipodcast_enabled']) ? 1 : 0;
-    $homepageId = ($_POST['homepage_podcast_id'] ?? '') !== '' ? (int) $_POST['homepage_podcast_id'] : null;
+    $homepageMode = (string) ($_POST['homepage_mode'] ?? '');
+    if (!in_array($homepageMode, ['summary', 'podcast'], true)) {
+        // Compatibilidad con formularios anteriores al selector explícito.
+        $homepageMode = ($_POST['homepage_podcast_id'] ?? '') !== '' ? 'podcast' : 'summary';
+    }
+    $homepageId = $homepageMode === 'podcast' ? (int) ($_POST['homepage_podcast_id'] ?? 0) : null;
     $currentSettings = loadAppSettings($pdo);
     $summaryHeroImageUrl = $currentSettings['summary_hero_image_url'];
     $summaryTitle = $currentSettings['summary_title'];
     $summarySubtitle = $currentSettings['summary_subtitle'];
     $summaryTheme = $currentSettings['summary_theme'];
-    if ($enabled === 1) {
-        $missing = (int) $pdo->query("SELECT COUNT(*) FROM podcast WHERE slug IS NULL OR slug = ''")->fetchColumn();
-        if ($missing > 0) {
-            throw new RuntimeException(__('Todos los podcasts deben tener un directorio antes de activar Multipodcast.'));
+    $backupFiles = [];
+    $wasEnabled = $currentSettings['multipodcast_enabled'] === 1;
+
+    if (!$wasEnabled && $enabled === 1) {
+        $primary = primaryPodcast($pdo);
+        if ($primary === null) {
+            throw new RuntimeException(__('El podcast principal no existe.'));
         }
+        $slug = normalizePodcastSlug((string) ($_POST['conversion_slug'] ?? ''));
+        $slugError = validatePodcastSlug($slug);
+        if ($slugError !== null) {
+            throw new RuntimeException($slugError);
+        }
+        setPrimaryPodcast($pdo, (int) $primary['id']);
+        renamePodcastSlug($pdo, $projectRoot, (int) $primary['id'], $slug);
+    } elseif ($wasEnabled && $enabled === 0) {
+        $backupFiles = deactivateMultipodcast(
+            $pdo,
+            $dbPath,
+            $projectRoot,
+            (string) ($_POST['disable_confirm_title'] ?? ''),
+            isset($_POST['confirm_disable'])
+        );
+        $homepageId = (int) (primaryPodcast($pdo)['id'] ?? 0) ?: null;
     }
-    if ($homepageId !== null && podcastById($pdo, $homepageId) === null) {
+    if ($homepageMode === 'podcast' && ($homepageId <= 0 || podcastById($pdo, $homepageId) === null)) {
         throw new RuntimeException(__('El podcast elegido para la portada no existe.'));
     }
 
@@ -190,6 +219,62 @@ function saveMultipodcastSettings(PDO $pdo, string $projectRoot): void
     $stmt->bindValue(':summary_subtitle', $summarySubtitle);
     $stmt->bindValue(':summary_theme', $summaryTheme);
     $stmt->execute();
+    return ['backup_files' => $backupFiles];
+}
+
+/** @return array<int,string> */
+function deactivateMultipodcast(
+    PDO $pdo,
+    string $dbPath,
+    string $projectRoot,
+    string $confirmation,
+    bool $confirmed
+): array {
+    $primary = primaryPodcast($pdo);
+    if ($primary === null) {
+        throw new RuntimeException(__('El podcast principal no existe.'));
+    }
+    if (!$confirmed || !hash_equals((string) $primary['title'], trim($confirmation))) {
+        throw new RuntimeException(__('Marca la confirmación y escribe exactamente el título del podcast principal para desactivar Multipodcast.'));
+    }
+
+    $slug = trim((string) ($primary['slug'] ?? ''));
+    $secondaryStmt = $pdo->prepare('SELECT id, title FROM podcast WHERE id != :primary_id ORDER BY id ASC');
+    $secondaryStmt->execute([':primary_id' => (int) $primary['id']]);
+    $secondaryPodcasts = $secondaryStmt->fetchAll();
+    $backupFiles = [];
+
+    foreach ($secondaryPodcasts as $secondary) {
+        $result = deletePodcastWithBackup(
+            $pdo,
+            $dbPath,
+            $projectRoot,
+            (int) $secondary['id'],
+            (string) $secondary['title']
+        );
+        $backupFiles[] = $result['backup_file'];
+    }
+
+    try {
+        $pdo->beginTransaction();
+        if ($slug !== '') {
+            $pdo->prepare('UPDATE episodes SET link = REPLACE(link, :from, :to) WHERE podcast_id = :podcast_id')
+                ->execute([':from' => '/' . $slug . '/', ':to' => '/', ':podcast_id' => (int) $primary['id']]);
+        }
+        $canonicalBase = extractBaseUrlFromLink((string) ($primary['link'] ?? '')) ?? requestBaseUrl();
+        $pdo->prepare("UPDATE podcast SET slug = NULL, link = :link, updated_at = datetime('now') WHERE id = :id")
+            ->execute([':link' => rtrim($canonicalBase, '/'), ':id' => (int) $primary['id']]);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION['active_podcast_id'] = (int) $primary['id'];
+    }
+    return $backupFiles;
 }
 
 function renamePodcastSlug(PDO $pdo, string $projectRoot, int $podcastId, string $requestedSlug): void
@@ -211,34 +296,9 @@ function renamePodcastSlug(PDO $pdo, string $projectRoot, int $podcastId, string
     $oldSlug = trim((string) ($podcast['slug'] ?? ''));
     if ($oldSlug === '' && $oldSlug !== $slug) {
         assertPodcastPathsAvailable($projectRoot, $slug);
-        migrateLegacyPodcastMedia($pdo, $projectRoot, $podcastId, $slug);
     }
     if ($oldSlug !== '' && $oldSlug !== $slug) {
         assertPodcastPathsAvailable($projectRoot, $slug);
-        foreach (['audios', 'images'] as $kind) {
-            $oldPath = $projectRoot . '/' . $kind . '/' . $oldSlug;
-            $newPath = $projectRoot . '/' . $kind . '/' . $slug;
-            if (is_dir($oldPath) && file_exists($newPath)) {
-                throw new RuntimeException(__('No se puede cambiar el directorio porque la ruta de medios de destino ya existe.'));
-            }
-            if (is_dir($oldPath) && !rename($oldPath, $newPath)) {
-                throw new RuntimeException(__('No se pudo mover el directorio de medios del podcast.'));
-            }
-        }
-        $replacements = [
-            ['/' . $oldSlug . '/audios/', '/' . $slug . '/audios/'],
-            ['/' . $oldSlug . '/images/', '/' . $slug . '/images/'],
-        ];
-        foreach ($replacements as [$from, $to]) {
-            foreach (['audio_url', 'image_url'] as $column) {
-                $pdo->prepare("UPDATE episodes SET $column = REPLACE($column, :from, :to) WHERE podcast_id = :podcast_id")
-                    ->execute([':from' => $from, ':to' => $to, ':podcast_id' => $podcastId]);
-            }
-            $pdo->prepare('UPDATE podcast SET image_url = REPLACE(image_url, :from, :to), hero_image_url = REPLACE(hero_image_url, :from, :to) WHERE id = :id')
-                ->execute([':from' => $from, ':to' => $to, ':id' => $podcastId]);
-            $pdo->prepare('UPDATE pages SET content = REPLACE(content, :from, :to) WHERE podcast_id = :podcast_id')
-                ->execute([':from' => $from, ':to' => $to, ':podcast_id' => $podcastId]);
-        }
         $pdo->prepare('UPDATE episodes SET link = REPLACE(link, :from, :to) WHERE podcast_id = :podcast_id')
             ->execute([
                 ':from' => '/' . $oldSlug . '/',
@@ -250,57 +310,6 @@ function renamePodcastSlug(PDO $pdo, string $projectRoot, int $podcastId, string
     $canonicalBase = extractBaseUrlFromLink((string) ($podcast['link'] ?? '')) ?? requestBaseUrl();
     $pdo->prepare("UPDATE podcast SET slug = :slug, link = :link, updated_at = datetime('now') WHERE id = :id")
         ->execute([':slug' => $slug, ':link' => rtrim($canonicalBase, '/') . '/' . $slug, ':id' => $podcastId]);
-}
-
-function migrateLegacyPodcastMedia(PDO $pdo, string $projectRoot, int $podcastId, string $slug): void
-{
-    ensurePodcastMediaDirectories($projectRoot, $slug);
-    $moves = [];
-    $sources = [
-        [$projectRoot . '/audios', $projectRoot . '/audios/' . $slug],
-        [$projectRoot . '/images', $projectRoot . '/images/' . $slug],
-        [$projectRoot . '/images/generated', $projectRoot . '/images/' . $slug . '/generated'],
-    ];
-    try {
-        foreach ($sources as [$sourceDir, $targetDir]) {
-            foreach (@scandir($sourceDir) ?: [] as $entry) {
-                if ($entry === '.' || $entry === '..' || $entry === '.htaccess' || $entry === $slug) {
-                    continue;
-                }
-                $source = $sourceDir . '/' . $entry;
-                $target = $targetDir . '/' . $entry;
-                if (!is_file($source)) {
-                    continue;
-                }
-                if (file_exists($target) || !rename($source, $target)) {
-                    throw new RuntimeException(__('No se pudo mover el directorio de medios del podcast.'));
-                }
-                $moves[] = [$source, $target];
-            }
-        }
-    } catch (Throwable $e) {
-        foreach (array_reverse($moves) as [$source, $target]) {
-            if (is_file($target)) {
-                @rename($target, $source);
-            }
-        }
-        removePodcastDirectory($projectRoot . '/audios/' . $slug);
-        removePodcastDirectory($projectRoot . '/images/' . $slug);
-        throw $e;
-    }
-
-    $replacements = [
-        ['/audios/', '/' . $slug . '/audios/'],
-        ['/images/', '/' . $slug . '/images/'],
-    ];
-    foreach ($replacements as [$from, $to]) {
-        $pdo->prepare('UPDATE episodes SET audio_url = REPLACE(audio_url, :from, :to), image_url = REPLACE(image_url, :from, :to) WHERE podcast_id = :podcast_id')
-            ->execute([':from' => $from, ':to' => $to, ':podcast_id' => $podcastId]);
-        $pdo->prepare('UPDATE podcast SET image_url = REPLACE(image_url, :from, :to), hero_image_url = REPLACE(hero_image_url, :from, :to) WHERE id = :podcast_id')
-            ->execute([':from' => $from, ':to' => $to, ':podcast_id' => $podcastId]);
-        $pdo->prepare('UPDATE pages SET content = REPLACE(content, :from, :to) WHERE podcast_id = :podcast_id')
-            ->execute([':from' => $from, ':to' => $to, ':podcast_id' => $podcastId]);
-    }
 }
 
 /** @return array{backup_file:string} */
@@ -321,6 +330,7 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
     $replacementStmt->execute([':id' => $podcastId]);
     $replacementPodcastId = (int) $replacementStmt->fetchColumn();
     $deletingPrimaryPodcast = loadAppSettings($pdo)['primary_podcast_id'] === $podcastId;
+    $mediaCandidates = podcastMediaBasenames($pdo, $podcastId);
     if (!class_exists('ZipArchive') || !class_exists('SQLite3')) {
         throw new RuntimeException(__('No se puede borrar sin crear antes una copia consistente porque ZipArchive o SQLite3 no están disponibles.'));
     }
@@ -348,8 +358,13 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
         throw new RuntimeException(__('No se pudo crear una copia consistente de la base de datos.'));
     }
     $zip->addFile($snapshotPath, 'podcast.sqlite');
-    foreach (['audios', 'images'] as $kind) {
-        addDirectoryToZip($zip, $projectRoot . '/' . $kind . '/' . $safeSlug, $kind . '/' . $safeSlug);
+    foreach ($mediaCandidates as $kind => $basenames) {
+        foreach ($basenames as $basename) {
+            foreach (podcastMediaCandidatePaths($projectRoot, $kind, $safeSlug, $basename) as $mediaPath) {
+                $zip->addFile($mediaPath, $kind . '/' . basename($mediaPath));
+                break;
+            }
+        }
     }
     $zipClosed = $zip->close();
     $snapshotRemoved = @unlink($snapshotPath);
@@ -377,11 +392,95 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
         @unlink($zipPath);
         throw $e;
     }
-    foreach (['audios', 'images'] as $kind) {
-        removePodcastDirectory($projectRoot . '/' . $kind . '/' . $safeSlug);
+    $remainingMedia = allPodcastMediaBasenames($pdo);
+    foreach ($mediaCandidates as $kind => $basenames) {
+        foreach ($basenames as $basename) {
+            if (isset($remainingMedia[$kind][$basename])) {
+                continue;
+            }
+            foreach (podcastMediaCandidatePaths($projectRoot, $kind, $safeSlug, $basename) as $mediaPath) {
+                @unlink($mediaPath);
+            }
+        }
     }
     $_SESSION['podcast_backup_file'] = $fileName;
     return ['backup_file' => $fileName];
+}
+
+/** @return array{audios:array<string,string>,images:array<string,string>} */
+function podcastMediaBasenames(PDO $pdo, int $podcastId): array
+{
+    $media = ['audios' => [], 'images' => []];
+    $episodeStmt = $pdo->prepare('SELECT audio_url, image_url, content FROM episodes WHERE podcast_id = :podcast_id');
+    $episodeStmt->execute([':podcast_id' => $podcastId]);
+    foreach ($episodeStmt->fetchAll() as $episode) {
+        addMediaUrlBasename($media['audios'], (string) ($episode['audio_url'] ?? ''), 'audios');
+        addMediaUrlBasename($media['images'], (string) ($episode['image_url'] ?? ''), 'images');
+        addMediaBasenamesFromHtml($media['images'], (string) ($episode['content'] ?? ''), 'images');
+    }
+    $podcast = podcastById($pdo, $podcastId) ?? [];
+    addMediaUrlBasename($media['images'], (string) ($podcast['image_url'] ?? ''), 'images');
+    addMediaUrlBasename($media['images'], (string) ($podcast['hero_image_url'] ?? ''), 'images');
+    $pageStmt = $pdo->prepare('SELECT content FROM pages WHERE podcast_id = :podcast_id');
+    $pageStmt->execute([':podcast_id' => $podcastId]);
+    foreach ($pageStmt->fetchAll(PDO::FETCH_COLUMN) as $content) {
+        addMediaBasenamesFromHtml($media['images'], (string) $content, 'images');
+    }
+    return $media;
+}
+
+/** @param array<string,string> $basenames */
+function addMediaUrlBasename(array &$basenames, string $url, string $kind): void
+{
+    $path = parse_url(trim($url), PHP_URL_PATH);
+    if (!is_string($path) || !str_contains($path, '/' . $kind . '/')) {
+        return;
+    }
+    $basename = basename(rawurldecode($path));
+    if ($basename !== '' && $basename !== '.' && $basename !== '..') {
+        $basenames[$basename] = $basename;
+    }
+}
+
+/** @param array<string,string> $basenames */
+function addMediaBasenamesFromHtml(array &$basenames, string $html, string $kind): void
+{
+    if (preg_match_all('#/(?:[a-z0-9-]+/)?' . preg_quote($kind, '#') . '/([^"\'<>?\s/]+)#i', $html, $matches)) {
+        foreach ($matches[1] as $encodedName) {
+            $basename = basename(rawurldecode((string) $encodedName));
+            if ($basename !== '' && $basename !== '.' && $basename !== '..') {
+                $basenames[$basename] = $basename;
+            }
+        }
+    }
+}
+
+/** @return array{audios:array<string,true>,images:array<string,true>} */
+function allPodcastMediaBasenames(PDO $pdo): array
+{
+    $all = ['audios' => [], 'images' => []];
+    $podcastIds = $pdo->query('SELECT id FROM podcast')->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($podcastIds as $podcastId) {
+        $podcastMedia = podcastMediaBasenames($pdo, (int) $podcastId);
+        foreach (['audios', 'images'] as $kind) {
+            foreach ($podcastMedia[$kind] as $basename) {
+                $all[$kind][$basename] = true;
+            }
+        }
+    }
+    addMediaUrlBasename($all['images'], loadAppSettings($pdo)['summary_hero_image_url'], 'images');
+    return $all;
+}
+
+/** @return array<int,string> */
+function podcastMediaCandidatePaths(string $projectRoot, string $kind, string $slug, string $basename): array
+{
+    $safeBasename = basename($basename);
+    $paths = [rtrim($projectRoot, '/') . '/' . $kind . '/' . $safeBasename];
+    if ($slug !== '') {
+        $paths[] = rtrim($projectRoot, '/') . '/' . $kind . '/' . $slug . '/' . $safeBasename;
+    }
+    return array_values(array_filter($paths, static fn (string $path): bool => is_file($path) && !is_link($path)));
 }
 
 function addDirectoryToZip(ZipArchive $zip, string $directory, string $prefix): void

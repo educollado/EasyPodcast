@@ -669,12 +669,11 @@ function downloadFile(
         $mime  = (string) $finfo->file($localPath);
         $size  = (int) filesize($localPath);
 
-        // URL pública local: la ruta física incluye el slug (/images/<slug>),
-        // pero la URL ya lo lleva en $baseUrl y debe quedar /<slug>/images/<fichero>.
+        // La URL pública de medios siempre cuelga del origen, nunca del slug del podcast.
         $projectRoot = dirname(__DIR__);
         $normalizedPath = str_replace('\\', '/', $localPath);
         $kind = str_starts_with($normalizedPath, str_replace('\\', '/', $projectRoot . '/images/')) ? 'images' : 'audios';
-        $localUrl = rtrim($baseUrl, '/') . '/' . $kind . '/' . rawurlencode(basename($localPath));
+        $localUrl = mediaPublicBaseUrl($baseUrl) . '/' . $kind . '/' . rawurlencode(basename($localPath));
 
         return [
             'localPath' => $localPath,

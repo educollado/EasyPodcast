@@ -8,7 +8,7 @@ require_once __DIR__ . '/view_helpers.php';
 require_once __DIR__ . '/i18n.php';
 
 /**
- * Regenera las variantes de imagen para todos los episodios y el podcast.
+ * Regenera las variantes de imagen para todos los podcasts y episodios.
  * Devuelve el número de imágenes procesadas (origen único, no variantes).
  */
 function regenerateAllImages(PDO $pdo): int
@@ -16,19 +16,14 @@ function regenerateAllImages(PDO $pdo): int
     $sizes = [80, 144, 220];
     $count = 0;
 
-    // Imagen del podcast
-    $podcast = activePodcast($pdo);
-    $podcastId = (int) ($podcast['id'] ?? 0);
-    if ($podcast && (string) ($podcast['image_url'] ?? '') !== '') {
-        foreach ($sizes as $size) {
-            ensureSquareImageVariant((string) $podcast['image_url'], $size);
-        }
-        $count++;
-    }
-
-    // Imágenes de episodios (distintas y no vacías)
-    $stmt = $pdo->prepare("SELECT DISTINCT image_url FROM episodes WHERE podcast_id = :podcast_id AND image_url IS NOT NULL AND image_url != '' ORDER BY id DESC");
-    $stmt->execute([':podcast_id' => $podcastId]);
+    // El directorio de variantes es global: tras vaciarlo hay que reconstruir
+    // las imágenes de todos los podcasts, no solo las del podcast activo.
+    $stmt = $pdo->query(
+        "SELECT image_url FROM podcast WHERE image_url IS NOT NULL AND image_url != ''
+         UNION
+         SELECT image_url FROM episodes WHERE image_url IS NOT NULL AND image_url != ''
+         ORDER BY image_url"
+    );
     while ($row = $stmt->fetch()) {
         $url = (string) ($row['image_url'] ?? '');
         if ($url === '') {

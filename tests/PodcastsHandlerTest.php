@@ -46,7 +46,7 @@ test('ajustes multipodcast guardan el hero cuando se elige la portada resumen', 
     $_FILES = [];
 
     try {
-        saveMultipodcastSettings($pdo, sys_get_temp_dir());
+        saveMultipodcastSettings($pdo, sys_get_temp_dir() . '/unused.sqlite', sys_get_temp_dir());
     } finally {
         $_POST = $oldPost;
         $_FILES = $oldFiles;
@@ -73,7 +73,7 @@ test('ajustes multipodcast conservan el hero del resumen al elegir un podcast', 
     $_FILES = [];
 
     try {
-        saveMultipodcastSettings($pdo, sys_get_temp_dir());
+        saveMultipodcastSettings($pdo, sys_get_temp_dir() . '/unused.sqlite', sys_get_temp_dir());
     } finally {
         $_POST = $oldPost;
         $_FILES = $oldFiles;
@@ -96,4 +96,94 @@ test('setPrimaryPodcast cambia el podcast que queda visible en modo sencillo', f
 
     assert_eq(2, (int) $pdo->query('SELECT primary_podcast_id FROM app_settings')->fetchColumn());
     assert_eq('secundario', primaryPodcast($pdo)['slug'] ?? null);
+});
+
+function podcastsHandlerIntegrationDatabase(string $root): array
+{
+    mkdir($root, 0775, true);
+    mkdir($root . '/audios', 0775, true);
+    mkdir($root . '/images', 0775, true);
+    $dbPath = $root . '/podcast.sqlite';
+    $pdo = openPodcastDatabase($dbPath);
+    $schema = file_get_contents(__DIR__ . '/../schema.sql');
+    if ($schema === false) {
+        throw new RuntimeException('No se pudo leer schema.sql');
+    }
+    $pdo->exec($schema);
+    return [$pdo, $dbPath];
+}
+
+test('activar Multipodcast asigna el directorio sin mover medios ni cambiar sus URLs', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+        return;
+    }
+    $root = sys_get_temp_dir() . '/easypodcast-enable-' . bin2hex(random_bytes(4));
+    [$pdo, $dbPath] = podcastsHandlerIntegrationDatabase($root);
+    $pdo->exec("INSERT INTO podcast (id, title, description, link, image_url) VALUES (1, 'Áratos', '', 'https://example.com', '/images/cover.jpg')");
+    $pdo->exec("UPDATE app_settings SET primary_podcast_id = 1");
+    $pdo->exec("UPDATE app_settings SET summary_hero_image_url = '/images/summary.jpg'");
+    file_put_contents($root . '/images/cover.jpg', 'image');
+    file_put_contents($root . '/images/summary.jpg', 'summary');
+    file_put_contents($root . '/audios/episode.mp3', 'audio');
+    $oldPost = $_POST;
+    $oldFiles = $_FILES;
+    $_POST = ['multipodcast_enabled' => '1', 'conversion_slug' => 'áratos', 'homepage_podcast_id' => '1'];
+    $_FILES = [];
+    try {
+        saveMultipodcastSettings($pdo, $dbPath, $root);
+        assert_true(is_file($root . '/images/cover.jpg'));
+        assert_true(is_file($root . '/images/summary.jpg'));
+        assert_true(is_file($root . '/audios/episode.mp3'));
+        assert_eq('aratos', $pdo->query('SELECT slug FROM podcast WHERE id = 1')->fetchColumn());
+        assert_eq('/images/cover.jpg', $pdo->query('SELECT image_url FROM podcast WHERE id = 1')->fetchColumn());
+        assert_eq(1, (int) $pdo->query('SELECT multipodcast_enabled FROM app_settings')->fetchColumn());
+    } finally {
+        $_POST = $oldPost;
+        $_FILES = $oldFiles;
+        removePodcastDirectory($root);
+    }
+});
+
+test('desactivar Multipodcast respalda y borra secundarios sin cambiar los medios del principal', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true) || !class_exists('ZipArchive') || !class_exists('SQLite3')) {
+        return;
+    }
+    $root = sys_get_temp_dir() . '/easypodcast-disable-' . bin2hex(random_bytes(4));
+    [$pdo, $dbPath] = podcastsHandlerIntegrationDatabase($root);
+    $pdo->exec("INSERT INTO podcast (id, title, description, link, image_url, slug) VALUES (1, 'Principal', '', 'https://example.com/principal', '/images/principal.jpg', 'principal')");
+    $pdo->exec("INSERT INTO podcast (id, title, description, link, image_url, slug) VALUES (2, 'Secundario', '', 'https://example.com/secundario', '/images/secundario.jpg', 'secundario')");
+    $pdo->exec("INSERT INTO episodes (id, podcast_id, guid, title, content, audio_url, audio_mime_type, audio_size_bytes, image_url) VALUES (1, 1, 'p1', 'Principal', '', '/audios/principal.mp3', 'audio/mpeg', 9, '/images/shared.jpg')");
+    $pdo->exec("INSERT INTO episodes (id, podcast_id, guid, title, content, audio_url, audio_mime_type, audio_size_bytes, image_url) VALUES (2, 2, 'p2', 'Secundario', '', '/audios/secundario.mp3', 'audio/mpeg', 10, '/images/shared.jpg')");
+    $pdo->exec("UPDATE app_settings SET multipodcast_enabled = 1, primary_podcast_id = 1, homepage_podcast_id = 1");
+    file_put_contents($root . '/images/principal.jpg', 'principal');
+    file_put_contents($root . '/images/secundario.jpg', 'secondary');
+    file_put_contents($root . '/images/shared.jpg', 'shared');
+    file_put_contents($root . '/audios/principal.mp3', 'principal');
+    file_put_contents($root . '/audios/secundario.mp3', 'secondary');
+    $oldPost = $_POST;
+    $oldFiles = $_FILES;
+    $_POST = [
+        'homepage_podcast_id' => '1',
+        'confirm_disable' => '1',
+        'disable_confirm_title' => 'Principal',
+    ];
+    $_FILES = [];
+    try {
+        $result = saveMultipodcastSettings($pdo, $dbPath, $root);
+        assert_eq(1, count($result['backup_files']));
+        assert_true(is_file($root . '/backups/' . $result['backup_files'][0]));
+        assert_eq(1, (int) $pdo->query('SELECT COUNT(*) FROM podcast')->fetchColumn());
+        assert_null($pdo->query('SELECT slug FROM podcast WHERE id = 1')->fetchColumn());
+        assert_eq('/images/principal.jpg', $pdo->query('SELECT image_url FROM podcast WHERE id = 1')->fetchColumn());
+        assert_true(is_file($root . '/images/principal.jpg'));
+        assert_true(is_file($root . '/images/shared.jpg'));
+        assert_true(is_file($root . '/audios/principal.mp3'));
+        assert_true(!is_file($root . '/images/secundario.jpg'));
+        assert_true(!is_file($root . '/audios/secundario.mp3'));
+        assert_eq(0, (int) $pdo->query('SELECT multipodcast_enabled FROM app_settings')->fetchColumn());
+    } finally {
+        $_POST = $oldPost;
+        $_FILES = $oldFiles;
+        removePodcastDirectory($root);
+    }
 });

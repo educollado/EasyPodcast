@@ -17,11 +17,29 @@ $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
+if (isset($_GET['download_backup']) && isset($_SESSION['podcast_backup_files']) && is_array($_SESSION['podcast_backup_files'])) {
+    $requestedBackup = basename((string) $_GET['download_backup']);
+    $allowedBackups = array_map('basename', $_SESSION['podcast_backup_files']);
+    if (in_array($requestedBackup, $allowedBackups, true)) {
+        $backupPath = __DIR__ . '/backups/' . $requestedBackup;
+        if (is_file($backupPath)) {
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $requestedBackup . '"');
+            header('Content-Length: ' . filesize($backupPath));
+            readfile($backupPath);
+            exit;
+        }
+    }
+}
+
 $data = loadPodcastsManagementData($dbPath, __DIR__);
 extract($data);
 $summaryTitleValue = $settings['summary_title'] !== '' ? $settings['summary_title'] : __('Todos nuestros podcasts, en un solo lugar.');
 $summarySubtitleValue = $settings['summary_subtitle'] !== '' ? $settings['summary_subtitle'] : __('Descubre todos los podcasts disponibles y sus feeds RSS.');
 $primaryPodcastTitle = trim((string) ($primary_podcast['title'] ?? ''));
+$primaryPodcastSlug = trim((string) ($primary_podcast['slug'] ?? ''));
+$conversionSlug = $primaryPodcastSlug !== '' ? $primaryPodcastSlug : normalizePodcastSlug($primaryPodcastTitle);
+$secondaryPodcastCount = max(0, count($podcasts) - 1);
 $multipodcastTheme = isset(ADMIN_THEMES[$settings['summary_theme']]) ? $settings['summary_theme'] : 'easypodcast';
 ?>
 <!doctype html>
@@ -40,26 +58,69 @@ $multipodcastTheme = isset(ADMIN_THEMES[$settings['summary_theme']]) ? $settings
   <h1><?= __('Multipodcast') ?></h1>
   <?php if ($error !== ''): ?><div class="error"><?= esc($error) ?></div><?php endif; ?>
   <?php if ($notice !== ''): ?><div class="notice"><?= esc($notice) ?></div><?php endif; ?>
+  <?php if ($backup_files !== []): ?>
+    <div class="notice">
+      <p><?= __('Se ha creado una copia de seguridad de cada podcast secundario eliminado:') ?></p>
+      <?php foreach ($backup_files as $deletedBackup): ?>
+        <p><a class="button" href="multipodcast_management.php?download_backup=<?= esc(rawurlencode($deletedBackup)) ?>"><?= esc(__('Descargar %s', $deletedBackup)) ?></a></p>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 
   <h2><?= __('Configuración Multipodcast') ?></h2>
   <form method="post" action="multipodcast_management.php" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
     <label class="inline-checkbox multipodcast-toggle">
-      <input id="multipodcast_enabled" type="checkbox" name="multipodcast_enabled" value="1" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
+      <input id="multipodcast_enabled" type="checkbox" name="multipodcast_enabled" value="1" data-initial-enabled="<?= $settings['multipodcast_enabled'] === 1 ? '1' : '0' ?>" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
       <span><?= __('Activar Multipodcast') ?></span>
     </label>
     <div class="multipodcast-warning" data-multipodcast-warning role="status" aria-live="polite" hidden>
-      <p data-multipodcast-enabled-warning hidden><?= __('Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada.') ?></p>
-      <p data-multipodcast-disabled-warning hidden><?= esc(__('Al desactivar Multipodcast, solo se mostrará el podcast principal «%s». Los demás podcasts y sus datos se conservarán, pero no serán accesibles públicamente hasta volver a activar Multipodcast.', $primaryPodcastTitle)) ?></p>
+      <p data-multipodcast-enabled-warning hidden><?= __('Al activarlo, cada podcast tendrá su propio directorio para páginas, episodios y feeds. Las URLs de imágenes y audios no cambiarán.') ?></p>
+      <p data-multipodcast-disabled-warning hidden><?= esc(__('Al desactivar Multipodcast, «%s» volverá a ser el único podcast. Se crearán copias de seguridad y se borrarán definitivamente los otros %d podcasts junto con sus datos y medios.', $primaryPodcastTitle, $secondaryPodcastCount)) ?></p>
     </div>
-    <label for="homepage_podcast_id"><?= __('Contenido de la portada principal') ?></label>
-    <select id="homepage_podcast_id" name="homepage_podcast_id">
-      <option value=""><?= __('Resumen de todos los podcasts') ?></option>
-      <?php foreach ($podcasts as $podcast): ?>
-        <option value="<?= (int) $podcast['id'] ?>" <?= $settings['homepage_podcast_id'] === (int) $podcast['id'] ? 'selected' : '' ?>><?= esc((string) $podcast['title']) ?></option>
-      <?php endforeach; ?>
-    </select>
+    <section data-multipodcast-enable-settings hidden>
+      <h3><?= __('Convertir el podcast actual a Multipodcast') ?></h3>
+      <p><?= esc(__('«%s» será el podcast principal. Sus imágenes, audios y URLs multimedia se conservarán sin cambios.', $primaryPodcastTitle)) ?></p>
+      <label for="conversion_slug"><?= __('Directorio del podcast principal') ?></label>
+      <div class="input-prefix"><span>/</span><input id="conversion_slug" name="conversion_slug" value="<?= esc($conversionSlug) ?>" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" autocomplete="off"><span>/</span></div>
+      <small><?= __('Debe estar libre y solo puede contener letras minúsculas, números y guiones.') ?></small>
+    </section>
+    <section data-multipodcast-disable-settings hidden>
+      <h3><?= __('Confirmar la desactivación de Multipodcast') ?></h3>
+      <p><?= esc(__('Las imágenes, audios y URLs multimedia de «%s» no cambiarán. Los podcasts secundarios se borrarán después de crear sus copias ZIP.', $primaryPodcastTitle)) ?></p>
+      <label class="inline-checkbox">
+        <input type="checkbox" name="confirm_disable" value="1" data-disable-confirm-checkbox>
+        <span><?= __('Entiendo que los podcasts secundarios se borrarán definitivamente.') ?></span>
+      </label>
+      <label for="disable_confirm_title"><?= __('Escribe el título del podcast principal para confirmar') ?></label>
+      <input id="disable_confirm_title" name="disable_confirm_title" autocomplete="off" data-disable-confirm-title>
+    </section>
+    <fieldset class="homepage-choice">
+      <legend><?= __('¿Qué quieres mostrar en la portada principal?') ?></legend>
+      <label class="homepage-choice-option">
+        <input type="radio" name="homepage_mode" value="summary" <?= $settings['homepage_podcast_id'] === null ? 'checked' : '' ?>>
+        <span>
+          <strong><?= __('Resumen de todos los podcasts') ?></strong>
+          <small><?= __('Muestra los podcasts publicados ordenados por última actualización.') ?></small>
+        </span>
+      </label>
+      <label class="homepage-choice-option">
+        <input type="radio" name="homepage_mode" value="podcast" <?= $settings['homepage_podcast_id'] !== null ? 'checked' : '' ?>>
+        <span>
+          <strong><?= __('Un único podcast') ?></strong>
+          <small><?= __('Muestra la portada del podcast seleccionado.') ?></small>
+        </span>
+      </label>
+      <div data-homepage-podcast-settings <?= $settings['homepage_podcast_id'] === null ? 'hidden' : '' ?>>
+        <label for="homepage_podcast_id"><?= __('Podcast que se mostrará') ?></label>
+        <select id="homepage_podcast_id" name="homepage_podcast_id">
+          <?php foreach ($podcasts as $podcast): ?>
+            <option value="<?= (int) $podcast['id'] ?>" <?= $settings['homepage_podcast_id'] === (int) $podcast['id'] ? 'selected' : '' ?>><?= esc((string) $podcast['title']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    </fieldset>
 
     <section
       class="summary-hero-settings"

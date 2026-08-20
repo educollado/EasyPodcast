@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/upload_service.php';
 
+test('mediaPublicBaseUrl elimina el directorio del podcast de las URLs multimedia', function () {
+    assert_eq('https://example.com', mediaPublicBaseUrl('https://example.com/aratos'));
+    assert_eq('https://example.com:8443', mediaPublicBaseUrl('https://example.com:8443/otro/feed.xml'));
+});
+
 test('handleHeroImageUpload: no seleccionar hero no produce error', function () {
     $result = handleHeroImageUpload(
         ['error' => UPLOAD_ERR_NO_FILE],

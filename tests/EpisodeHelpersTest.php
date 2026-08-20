@@ -8,8 +8,9 @@ function createImageUsageTestPdo(): PDO
 {
     $pdo = new PDO('sqlite::memory:');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, image_url TEXT)');
+    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, image_url TEXT, hero_image_url TEXT)');
     $pdo->exec('CREATE TABLE episodes (id INTEGER PRIMARY KEY, image_url TEXT)');
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, summary_hero_image_url TEXT)');
 
     return $pdo;
 }

@@ -5,6 +5,31 @@ declare(strict_types=1);
 require_once __DIR__ . '/podcast_context.php';
 
 /**
+ * Activa el contexto del podcast propietario del episodio solicitado.
+ * Permite mantener /track en la raíz en modo Multipodcast sin mezclar estadísticas.
+ */
+function activateEpisodePodcastContext(PDO $pdo, int $episodeId): bool
+{
+    try {
+        $stmt = $pdo->prepare('SELECT podcast_id FROM episodes WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $episodeId]);
+        $podcastId = (int) $stmt->fetchColumn();
+        if ($podcastId <= 0) {
+            return false;
+        }
+        $podcast = podcastById($pdo, $podcastId);
+        if ($podcast === null) {
+            return false;
+        }
+        activatePodcastContext($podcast, multipodcastEnabled($pdo));
+        return true;
+    } catch (Throwable $e) {
+        error_log('Error al resolver el podcast del episodio: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Registra una accion (descarga o reproduccion) de episodio en la base de datos.
  *
  * @param PDO $pdo Conexión a la base de datos

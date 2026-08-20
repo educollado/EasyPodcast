@@ -199,7 +199,5 @@ function podcastPath(array $podcast, string $path, bool $multipodcastEnabled = t
 
 function podcastStorageDirectory(string $projectRoot, string $kind, array $podcast, bool $multipodcastEnabled): string
 {
-    $base = rtrim($projectRoot, '/') . '/' . $kind;
-    $slug = trim((string) ($podcast['slug'] ?? ''));
-    return $multipodcastEnabled && $slug !== '' ? $base . '/' . $slug : $base;
+    return rtrim($projectRoot, '/') . '/' . $kind;
 }

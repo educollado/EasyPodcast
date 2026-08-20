@@ -163,7 +163,11 @@ function resolveFeedSelfHref(PDO $pdo): string
  */
 function buildFeedTrackingUrl(string $baseUrl, int $episodeId): string
 {
-    return rtrim($baseUrl, '/') . '/track.php?' . http_build_query([
+    // El endpoint de audio permanece en la raíz de la instalación aunque el
+    // feed y los episodios públicos estén bajo el slug del podcast. Así la URL
+    // del enclosure no cambia al activar o desactivar Multipodcast.
+    $origin = extractBaseUrlFromLink($baseUrl) ?? rtrim($baseUrl, '/');
+    return rtrim($origin, '/') . '/track?' . http_build_query([
         'episode_id' => $episodeId,
         'action' => 'feed',
     ]);
@@ -175,10 +179,7 @@ function buildFeedTrackingUrl(string $baseUrl, int $episodeId): string
  */
 function resolveFeedTrackingUrl(PDO $pdo, int $episodeId): string
 {
-    return rtrim(resolveBaseUrl($pdo), '/') . '/track?' . http_build_query([
-        'episode_id' => $episodeId,
-        'action' => 'feed',
-    ]);
+    return buildFeedTrackingUrl(resolveBaseUrl($pdo), $episodeId);
 }
 
 function resolveEpisodeLinkForFeed(PDO $pdo, array $episode): string

@@ -109,8 +109,7 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         $usedImages = [];
 
         // Audios usados en episodios (acepta URLs relativas /audios/... y absolutas https://.../audios/...)
-        $stmt = $pdo->prepare('SELECT audio_url FROM episodes WHERE podcast_id = :podcast_id');
-        $stmt->execute([':podcast_id' => $podcastId]);
+        $stmt = $pdo->query('SELECT audio_url FROM episodes');
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($rows as $url) {
             if (is_string($url) && str_contains($url, '/audios/')) {
@@ -119,8 +118,7 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes usadas en episodios (acepta URLs relativas y absolutas)
-        $stmt = $pdo->prepare("SELECT image_url FROM episodes WHERE podcast_id = :podcast_id AND image_url != ''");
-        $stmt->execute([':podcast_id' => $podcastId]);
+        $stmt = $pdo->query("SELECT image_url FROM episodes WHERE image_url != ''");
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($rows as $url) {
             if (is_string($url) && str_contains($url, '/images/')) {
@@ -129,11 +127,12 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes de portada y hero del canal.
-        $podcastImages = $contextPodcast;
-        foreach (['image_url', 'hero_image_url'] as $imageColumn) {
-            $podcastImage = $podcastImages[$imageColumn] ?? null;
-            if (is_string($podcastImage) && str_contains($podcastImage, '/images/')) {
-                $usedImages[] = basename($podcastImage);
+        foreach ($pdo->query('SELECT image_url, hero_image_url FROM podcast')->fetchAll() as $podcastImages) {
+            foreach (['image_url', 'hero_image_url'] as $imageColumn) {
+                $podcastImage = $podcastImages[$imageColumn] ?? null;
+                if (is_string($podcastImage) && str_contains($podcastImage, '/images/')) {
+                    $usedImages[] = basename($podcastImage);
+                }
             }
         }
 
@@ -144,10 +143,19 @@ function loadMediaCleanupData(string $dbPath, string $projectDir): array
         }
 
         // Imágenes embebidas en el contenido HTML de las páginas
-        $pageStmt = $pdo->prepare('SELECT content FROM pages WHERE podcast_id = :podcast_id');
-        $pageStmt->execute([':podcast_id' => $podcastId]);
+        $pageStmt = $pdo->query('SELECT content FROM pages');
         $pageContents = $pageStmt->fetchAll(PDO::FETCH_COLUMN);
         foreach ($pageContents as $html) {
+            if (is_string($html) && $html !== '') {
+                foreach (extractImageBasenamesFromHtml($html) as $basename) {
+                    $usedImages[] = $basename;
+                }
+            }
+        }
+
+        // Imágenes embebidas en el contenido HTML de episodios de cualquier podcast.
+        $episodeContents = $pdo->query('SELECT content FROM episodes')->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($episodeContents as $html) {
             if (is_string($html) && $html !== '') {
                 foreach (extractImageBasenamesFromHtml($html) as $basename) {
                     $usedImages[] = $basename;
