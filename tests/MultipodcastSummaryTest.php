@@ -34,10 +34,24 @@ test('multipodcast.php presenta las herramientas globales como tarjetas', functi
 
     assert_true(is_string($source));
     assert_contains('href="multipodcast_management.php"', $source);
+    assert_contains('href="podcasts_management.php"', $source);
     assert_contains('href="cache_management.php"', $source);
     assert_contains('href="update.php"', $source);
     assert_contains('href="change_password.php"', $source);
     assert_contains('href="twofa_management.php"', $source);
     assert_contains('href="backups.php"', $source);
     assert_contains('href="api_tokens.php"', $source);
+});
+
+test('la gestión de podcasts crea primero y lista después fuera de la configuración', function () {
+    $podcastsSource = file_get_contents(__DIR__ . '/../podcasts_management.php');
+    $settingsSource = file_get_contents(__DIR__ . '/../multipodcast_management.php');
+
+    assert_true(is_string($podcastsSource));
+    assert_true(is_string($settingsSource));
+    $createPosition = strpos($podcastsSource, "__('Crear un podcast nuevo')");
+    $listPosition = strpos($podcastsSource, "__('Podcasts disponibles')");
+    assert_true(is_int($createPosition) && is_int($listPosition) && $createPosition < $listPosition);
+    assert_true(!str_contains($settingsSource, "__('Crear un podcast nuevo')"));
+    assert_true(!str_contains($settingsSource, "__('Podcasts disponibles')"));
 });

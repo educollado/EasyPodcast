@@ -8,9 +8,9 @@ require_once __DIR__ . '/lib/podcast_context.php';
 $_navPage = $currentAdminPage ?? '';
 $navPodcast = $GLOBALS['_active_podcast'] ?? null;
 $navMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
-$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
+$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'podcasts', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
 $navPodcastScopedMultipodcastPages = ['cache', 'api_tokens', 'api_docs'];
-$navIsMultipodcastArea = in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true)
+$navIsMultipodcastArea = in_array($_navPage, ['multipodcast', 'multipodcast_settings', 'podcasts'], true)
     || ($navMultipodcastEnabled && in_array($_navPage, $navMultipodcastPages, true));
 $navUsesPodcastContext = $navIsMultipodcastArea
     && in_array($_navPage, $navPodcastScopedMultipodcastPages, true);

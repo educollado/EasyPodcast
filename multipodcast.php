@@ -43,6 +43,11 @@ $multipodcastDashboardTheme = isset(ADMIN_THEMES[$multipodcastDashboardSettings[
         <a class="admin-card" href="multipodcast_management.php">
           <div class="admin-card-icon">🎧</div>
           <h2><?= __('Multipodcast') ?></h2>
+          <p><?= __('Configuración Multipodcast') ?></p>
+        </a>
+        <a class="admin-card" href="podcasts_management.php">
+          <div class="admin-card-icon">🎙️</div>
+          <h2><?= __('Podcasts') ?></h2>
           <p><?= __('Crea, selecciona y configura los podcasts de la instalación') ?></p>
         </a>
         <a class="admin-card" href="cache_management.php">
