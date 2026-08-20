@@ -44,6 +44,7 @@ $baseUrl .= podcastBasePath(activePodcast($apiDocsPdo) ?? [], multipodcastEnable
       <p><?= __('Incluye tu token en la cabecera') ?> <code class="inline">Authorization</code>:</p>
       <pre>Authorization: Bearer &lt;tu-token&gt;</pre>
       <p><?= __('Gestiona tus tokens en') ?> <a href="api_tokens.php"><?= __('Tokens de API') ?></a>.</p>
+      <p><?= __('Cada token hereda los permisos de su usuario. Los usuarios de podcast solo pueden usarlo en los podcasts que tienen asignados; el administrador global puede usar un token administrativo en cualquier podcast indicando su directorio en la URL.') ?></p>
       <p><?= __('Los tokens con alcance') ?> <code class="inline">content</code> <?= __('cubren la API de contenidos y mantenimiento habitual. El endpoint') ?> <code class="inline">/api/v1/system/update</code> <?= __('requiere un token con alcance') ?> <code class="inline">admin</code>.</p>
 
       <h2><?= __('Formato de respuesta') ?></h2>
@@ -73,6 +74,7 @@ $baseUrl .= podcastBasePath(activePodcast($apiDocsPdo) ?? [], multipodcastEnable
         <a href="#cache"><?= __('Caché') ?></a>
         <a href="#stats"><?= __('Estadísticas') ?></a>
         <a href="#feed"><?= __('Feed') ?></a>
+        <a href="#users"><?= __('Usuarios') ?></a>
         <a href="#system"><?= __('Sistema') ?></a>
       </div>
 
@@ -337,6 +339,60 @@ curl -s -H "Authorization: Bearer TOKEN" "<?= esc($baseUrl) ?>/api/v1/stats?year
           <pre>curl -s -X POST \
   -H "Authorization: Bearer TOKEN" \
   "<?= esc($baseUrl) ?>/api/v1/feed/regenerate"</pre>
+        </div>
+      </div>
+
+      <!-- ================================================================ -->
+      <div class="api-section" id="users">
+        <h2><?= __('Usuarios') ?></h2>
+        <p><?= __('La gestión de usuarios exige un token admin del administrador global. Los tokens de usuarios de podcast no pueden usar estos endpoints.') ?></p>
+
+        <div class="endpoint-block">
+          <p><span class="method method-get">GET</span> <code class="inline">/api/v1/users/podcasts</code> — <?= __('Listar podcasts asignables') ?></p>
+          <pre>curl -s -H "Authorization: Bearer TOKEN" \
+  "<?= esc($baseUrl) ?>/api/v1/users/podcasts"</pre>
+        </div>
+
+        <div class="endpoint-block">
+          <p><span class="method method-get">GET</span> <code class="inline">/api/v1/users</code> — <?= __('Listar usuarios') ?></p>
+          <p><span class="method method-get">GET</span> <code class="inline">/api/v1/users/{id}</code> — <?= __('Obtener usuario') ?></p>
+          <p><?= __('Las respuestas incluyen los podcasts asignados, pero nunca incluyen contraseñas.') ?></p>
+        </div>
+
+        <div class="endpoint-block">
+          <p><span class="method method-post">POST</span> <code class="inline">/api/v1/users</code> — <?= __('Crear usuario y asignar podcasts') ?></p>
+          <table class="params-table">
+            <tr><th><?= __('Campo') ?></th><th><?= __('Req.') ?></th><th><?= __('Descripción') ?></th></tr>
+            <tr><td>first_name</td><td>✓</td><td><?= __('Nombre') ?></td></tr>
+            <tr><td>last_name</td><td>✓</td><td><?= __('Apellidos') ?></td></tr>
+            <tr><td>email</td><td>✓</td><td><?= __('Email') ?></td></tr>
+            <tr><td>password</td><td>✓</td><td><?= __('Mínimo 8 caracteres') ?></td></tr>
+            <tr><td>is_active</td><td></td><td><code class="inline">true</code> <?= __('o') ?> <code class="inline">false</code> (<?= __('defecto') ?>: <code class="inline">true</code>)</td></tr>
+            <tr><td>podcast_ids</td><td>✓*</td><td><?= __('Lista de IDs de podcasts') ?></td></tr>
+            <tr><td>podcast_slugs</td><td>✓*</td><td><?= __('Lista de directorios de podcasts; puede usarse en lugar de podcast_ids') ?></td></tr>
+          </table>
+          <pre>curl -s -X POST \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"first_name":"Ana","last_name":"García","email":"ana@example.com","password":"contraseña-segura","podcast_slugs":["podcast-uno","podcast-dos"],"is_active":true}' \
+  "<?= esc($baseUrl) ?>/api/v1/users"</pre>
+        </div>
+
+        <div class="endpoint-block">
+          <p><span class="method method-post">POST</span> <code class="inline">/api/v1/users/{id}</code> — <?= __('Actualizar usuario y sus asignaciones') ?></p>
+          <p><?= __('Solo se modifican los campos enviados. Una contraseña vacía conserva la contraseña actual; las listas de podcasts sustituyen todas las asignaciones anteriores.') ?></p>
+          <pre>curl -s -X POST \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"podcast_ids":[1,3],"is_active":true}' \
+  "<?= esc($baseUrl) ?>/api/v1/users/5"</pre>
+        </div>
+
+        <div class="endpoint-block">
+          <p><span class="method method-delete">DELETE</span> <code class="inline">/api/v1/users/{id}</code> — <?= __('Borrar usuario y sus tokens API') ?></p>
+          <pre>curl -s -X DELETE \
+  -H "Authorization: Bearer TOKEN" \
+  "<?= esc($baseUrl) ?>/api/v1/users/5"</pre>
         </div>
       </div>
 

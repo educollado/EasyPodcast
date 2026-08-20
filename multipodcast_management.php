@@ -15,6 +15,7 @@ if (!isset($_SESSION['admin_user'])) {
 }
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+requireGlobalAdminAccess();
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 if (isset($_GET['download_backup']) && isset($_SESSION['podcast_backup_files']) && is_array($_SESSION['podcast_backup_files'])) {
@@ -71,6 +72,25 @@ $multipodcastTheme = isset(ADMIN_THEMES[$settings['summary_theme']]) ? $settings
   <form method="post" action="multipodcast_management.php" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
+    <?php
+      $multipodcastLocaleLabels = [
+          'ca_ES' => 'Català', 'de_DE' => 'Deutsch', 'en_US' => 'English', 'es_ES' => 'Español',
+          'fr_FR' => 'Français', 'gl_ES' => 'Galego', 'it_IT' => 'Italiano', 'pt_PT' => 'Português',
+      ];
+      $multipodcastLocaleFiles = glob(__DIR__ . '/locale/*.po') ?: [];
+      sort($multipodcastLocaleFiles);
+    ?>
+    <label>
+      <?= __('Idioma de Multipodcast') ?>
+      <select name="summary_language">
+        <?php foreach ($multipodcastLocaleFiles as $multipodcastLocaleFile):
+          $multipodcastLocale = basename($multipodcastLocaleFile, '.po');
+        ?>
+          <option value="<?= esc($multipodcastLocale) ?>" <?= $settings['summary_language'] === $multipodcastLocale ? 'selected' : '' ?>><?= esc($multipodcastLocaleLabels[$multipodcastLocale] ?? $multipodcastLocale) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <small><?= __('Se aplica a la portada-resumen y al panel global. Cada podcast conserva su propio idioma.') ?></small>
+    </label>
     <label class="inline-checkbox multipodcast-toggle">
       <input id="multipodcast_enabled" type="checkbox" name="multipodcast_enabled" value="1" data-initial-enabled="<?= $settings['multipodcast_enabled'] === 1 ? '1' : '0' ?>" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
       <span><?= __('Activar Multipodcast') ?></span>

@@ -21,10 +21,11 @@ function podcastsHandlerSettingsDatabase(): PDO
           summary_title TEXT,
           summary_subtitle TEXT,
           summary_theme TEXT NOT NULL DEFAULT 'easypodcast',
+          summary_language TEXT NOT NULL DEFAULT 'es_ES',
           primary_podcast_id INTEGER
         )"
     );
-    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, 'https://example.com/old.jpg', 'Título anterior', 'Subtítulo anterior', 'corporate', 1)");
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, 'https://example.com/old.jpg', 'Título anterior', 'Subtítulo anterior', 'corporate', 'es_ES', 1)");
     return $pdo;
 }
 
@@ -42,6 +43,7 @@ test('ajustes multipodcast guardan el hero cuando se elige la portada resumen', 
         'summary_title' => 'Todos mis programas',
         'summary_subtitle' => 'Escucha el que prefieras',
         'summary_theme' => 'monokai',
+        'summary_language' => 'gl_ES',
     ];
     $_FILES = [];
 
@@ -56,6 +58,7 @@ test('ajustes multipodcast guardan el hero cuando se elige la portada resumen', 
     assert_eq('Todos mis programas', $pdo->query('SELECT summary_title FROM app_settings')->fetchColumn());
     assert_eq('Escucha el que prefieras', $pdo->query('SELECT summary_subtitle FROM app_settings')->fetchColumn());
     assert_eq('monokai', $pdo->query('SELECT summary_theme FROM app_settings')->fetchColumn());
+    assert_eq('gl_ES', $pdo->query('SELECT summary_language FROM app_settings')->fetchColumn());
 });
 
 test('ajustes multipodcast conservan el hero del resumen al elegir un podcast', function () {

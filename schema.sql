@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS app_settings (
   summary_title TEXT,
   summary_subtitle TEXT,
   summary_theme TEXT NOT NULL DEFAULT 'easypodcast',
+  summary_language TEXT NOT NULL DEFAULT 'es_ES',
   primary_podcast_id INTEGER,
   FOREIGN KEY(homepage_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL,
   FOREIGN KEY(primary_podcast_id) REFERENCES podcast(id) ON DELETE SET NULL
@@ -139,12 +140,26 @@ CREATE TABLE IF NOT EXISTS management (
   id INTEGER PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
+  first_name TEXT NOT NULL DEFAULT '',
+  last_name TEXT NOT NULL DEFAULT '',
+  email TEXT UNIQUE,
+  is_global INTEGER NOT NULL DEFAULT 0,
+  is_active INTEGER NOT NULL DEFAULT 1,
   totp_secret TEXT,
   totp_enabled INTEGER NOT NULL DEFAULT 0,
   totp_recovery_codes TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS management_podcasts (
+  management_id INTEGER NOT NULL,
+  podcast_id INTEGER NOT NULL,
+  PRIMARY KEY (management_id, podcast_id),
+  FOREIGN KEY(management_id) REFERENCES management(id) ON DELETE CASCADE,
+  FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_management_podcasts_podcast ON management_podcasts(podcast_id);
 
 -- Estadísticas: datos brutos de descargas (solo 7 días)
 CREATE TABLE IF NOT EXISTS estadisticas (
@@ -215,4 +230,4 @@ BEGIN
   ON CONFLICT(podcast_id, episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 25;
+PRAGMA user_version = 27;

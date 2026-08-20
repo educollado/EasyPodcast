@@ -45,7 +45,7 @@ function apiTokenHasScope(array $auth, string $requiredScope): bool
 {
     $scope = normalizeApiTokenScope($auth['scope'] ?? '');
     if ($requiredScope === 'admin') {
-        return $scope === 'admin';
+        return $scope === 'admin' && (bool) ($auth['owner_is_global'] ?? true);
     }
 
     return in_array($scope, ['content', 'admin'], true);
@@ -87,9 +87,11 @@ function apiAuth(PDO $pdo): array|false
 
     $tokenHash = hashApiTokenValue($token);
     $stmt = $pdo->prepare(
-        "SELECT id, podcast_id, scope FROM api_tokens
-         WHERE token_hash = :token_hash
-           AND (expires_at IS NULL OR expires_at > datetime('now'))
+        "SELECT t.id, t.podcast_id, t.user_id, t.scope, COALESCE(m.is_global, 0) AS owner_is_global,
+                COALESCE(m.is_active, 0) AS owner_is_active
+         FROM api_tokens t LEFT JOIN management m ON m.id = t.user_id
+         WHERE t.token_hash = :token_hash
+           AND (t.expires_at IS NULL OR t.expires_at > datetime('now'))
          LIMIT 1"
     );
     $stmt->execute([':token_hash' => $tokenHash]);
@@ -97,9 +99,11 @@ function apiAuth(PDO $pdo): array|false
 
     if (!$row) {
         $legacyStmt = $pdo->prepare(
-            "SELECT id, podcast_id, token, scope FROM api_tokens
-             WHERE token = :token
-               AND (expires_at IS NULL OR expires_at > datetime('now'))
+            "SELECT t.id, t.podcast_id, t.user_id, t.token, t.scope, COALESCE(m.is_global, 0) AS owner_is_global,
+                    COALESCE(m.is_active, 0) AS owner_is_active
+             FROM api_tokens t LEFT JOIN management m ON m.id = t.user_id
+             WHERE t.token = :token
+               AND (t.expires_at IS NULL OR t.expires_at > datetime('now'))
              LIMIT 1"
         );
         $legacyStmt->execute([':token' => $token]);
@@ -124,7 +128,7 @@ function apiAuth(PDO $pdo): array|false
         }
     }
 
-    if (!$row) {
+    if (!$row || (int) ($row['owner_is_active'] ?? 0) !== 1) {
         return false;
     }
 
@@ -132,10 +136,20 @@ function apiAuth(PDO $pdo): array|false
     $upd = $pdo->prepare("UPDATE api_tokens SET last_used_at = datetime('now') WHERE id = :id");
     $upd->execute([':id' => (int) $row['id']]);
 
+    $assignedPodcastIds = [];
+    if ((int) ($row['owner_is_global'] ?? 0) !== 1) {
+        $assigned = $pdo->prepare('SELECT podcast_id FROM management_podcasts WHERE management_id = :user_id ORDER BY podcast_id');
+        $assigned->execute([':user_id' => (int) ($row['user_id'] ?? 0)]);
+        $assignedPodcastIds = array_map('intval', $assigned->fetchAll(PDO::FETCH_COLUMN));
+    }
+
     return [
         'id' => (int) $row['id'],
+        'user_id' => (int) ($row['user_id'] ?? 0),
         'podcast_id' => (int) ($row['podcast_id'] ?? 0),
         'scope' => normalizeApiTokenScope((string) ($row['scope'] ?? '')),
+        'owner_is_global' => (int) ($row['owner_is_global'] ?? 0) === 1,
+        'assigned_podcast_ids' => $assignedPodcastIds,
     ];
 }
 

@@ -1,7 +1,13 @@
 # Changelog
 
-## Siguiente release
+## 2.0.0
 
+- **Navegación global simplificada**: la barra superior de Multipodcast deja las herramientas globales secundarias únicamente como tarjetas del panel principal.
+- **Idioma independiente de Multipodcast**: incorpora un selector rápido para la portada-resumen y las pantallas globales; cambiar el idioma de un podcast solo afecta a ese podcast.
+- **Cuenta administradora global**: el panel Multipodcast permite definir su usuario de acceso, nombre, apellidos y email, confirmando el cambio con la contraseña actual.
+- **Usuarios desde la API**: la API administrativa permite listar, crear, actualizar y borrar usuarios, además de asignarles uno o varios podcasts por ID o directorio.
+- **Usuarios con acceso por podcast**: el administrador global puede crear cuentas con nombre, apellidos, email y contraseña, asignarlas a uno o varios podcasts y mantener ocultas para ellas las herramientas globales; sus tokens API heredan las mismas restricciones.
+- **Limpieza global**: la detección y borrado de medios huérfanos pasa al panel Multipodcast y queda reservada al administrador global.
 - **Caché de la portada Multipodcast**: el resumen público se almacena y sirve desde la caché del podcast principal; los cambios en podcasts, episodios o configuración Multipodcast invalidan la portada para regenerarla en la siguiente visita.
 - **Referencia a la instalación**: el pie de cada podcast indica la URL base enlazada donde fue creado, omitiendo esa referencia en la portada-resumen Multipodcast.
 - **Conversión Multipodcast reversible**: al activarlo se solicita en la misma pantalla el directorio del podcast actual, que queda como principal; imágenes, audios y URLs de enclosure permanecen globales y estables, y la regeneración de imágenes abarca todos los podcasts. Al desactivarlo se exige confirmación reforzada y se crean ZIP de los secundarios antes de borrar sus datos y medios exclusivos.

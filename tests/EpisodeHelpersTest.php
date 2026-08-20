@@ -10,7 +10,7 @@ function createImageUsageTestPdo(): PDO
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, image_url TEXT, hero_image_url TEXT)');
     $pdo->exec('CREATE TABLE episodes (id INTEGER PRIMARY KEY, image_url TEXT)');
-    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, summary_hero_image_url TEXT)');
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, summary_hero_image_url TEXT, multipodcast_enabled INTEGER DEFAULT 0, homepage_podcast_id INTEGER, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT DEFAULT "easypodcast", summary_language TEXT DEFAULT "es_ES", primary_podcast_id INTEGER)');
 
     return $pdo;
 }

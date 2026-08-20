@@ -6,7 +6,7 @@ const RESERVED_PODCAST_SLUGS = [
     'admin', 'api', 'assets', 'audios', 'images', 'cache', 'locale', 'lib', 'tests', 'tools',
     'feed', 'feed.xml', 'sitemap', 'sitemap.xml', 'robots', 'robots.txt', 'search', 'track',
     'index', 'episode', 'page', 'podcast', 'podcasts', 'multipodcast', 'backups', 'update', 'stats', 'login',
-    'import-feed', 'media-cleanup', 'pages', 'social', 'favicon.ico',
+    'import-feed', 'media-cleanup', 'pages', 'social', 'users', 'favicon.ico',
 ];
 
 function openPodcastDatabase(string $dbPath): PDO
@@ -18,10 +18,10 @@ function openPodcastDatabase(string $dbPath): PDO
     return $pdo;
 }
 
-/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string,summary_title:string,summary_subtitle:string,summary_theme:string,primary_podcast_id:?int} */
+/** @return array{multipodcast_enabled:int,homepage_podcast_id:?int,summary_hero_image_url:string,summary_title:string,summary_subtitle:string,summary_theme:string,summary_language:string,primary_podcast_id:?int} */
 function loadAppSettings(PDO $pdo): array
 {
-    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url, summary_title, summary_subtitle, summary_theme, primary_podcast_id FROM app_settings WHERE id = 1')->fetch();
+    $row = $pdo->query('SELECT multipodcast_enabled, homepage_podcast_id, summary_hero_image_url, summary_title, summary_subtitle, summary_theme, summary_language, primary_podcast_id FROM app_settings WHERE id = 1')->fetch();
     return [
         'multipodcast_enabled' => (int) ($row['multipodcast_enabled'] ?? 0),
         'homepage_podcast_id' => isset($row['homepage_podcast_id']) ? (int) $row['homepage_podcast_id'] : null,
@@ -29,6 +29,7 @@ function loadAppSettings(PDO $pdo): array
         'summary_title' => trim((string) ($row['summary_title'] ?? '')),
         'summary_subtitle' => trim((string) ($row['summary_subtitle'] ?? '')),
         'summary_theme' => trim((string) ($row['summary_theme'] ?? '')) ?: 'easypodcast',
+        'summary_language' => trim((string) ($row['summary_language'] ?? '')) ?: 'es_ES',
         'primary_podcast_id' => isset($row['primary_podcast_id']) ? (int) $row['primary_podcast_id'] : null,
     ];
 }
@@ -116,6 +117,26 @@ function resolvePublicPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
 
 function resolveAdminPodcast(PDO $pdo, ?string $requestedSlug = null): ?array
 {
+    if (isset($_SESSION['admin_user']) && (int) ($_SESSION['admin_is_global'] ?? 0) !== 1) {
+        $assignedPodcastIds = array_values(array_filter(array_map('intval', (array) ($_SESSION['admin_podcast_ids'] ?? []))));
+        if ($requestedSlug !== null && $requestedSlug !== '') {
+            $requestedPodcast = podcastBySlug($pdo, $requestedSlug);
+            if ($requestedPodcast !== null && in_array((int) $requestedPodcast['id'], $assignedPodcastIds, true)) {
+                $_SESSION['active_podcast_id'] = (int) $requestedPodcast['id'];
+                return $requestedPodcast;
+            }
+        }
+        $activeId = (int) ($_SESSION['active_podcast_id'] ?? 0);
+        if (in_array($activeId, $assignedPodcastIds, true)) {
+            return podcastById($pdo, $activeId);
+        }
+        $firstAssignedId = $assignedPodcastIds[0] ?? 0;
+        if ($firstAssignedId > 0) {
+            $_SESSION['active_podcast_id'] = $firstAssignedId;
+            return podcastById($pdo, $firstAssignedId);
+        }
+        return null;
+    }
     if ($requestedSlug !== null && $requestedSlug !== '') {
         $podcast = podcastBySlug($pdo, $requestedSlug);
         if ($podcast !== null && session_status() === PHP_SESSION_ACTIVE) {

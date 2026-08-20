@@ -2332,3 +2332,159 @@ msgstr "Mostra la portada del pòdcast seleccionat."
 
 msgid "Podcast que se mostrará"
 msgstr "Pòdcast que es mostrarà"
+
+msgid "Usuarios"
+msgstr "Usuaris"
+msgid "Asigna a cada usuario uno o varios podcasts"
+msgstr "Assigna un o diversos pòdcasts a cada usuari"
+msgid "Crea cuentas limitadas a la gestión de uno o varios podcasts."
+msgstr "Crea comptes limitats a la gestió d'un o diversos pòdcasts."
+msgid "Crear usuario"
+msgstr "Crear usuari"
+msgid "Apellidos"
+msgstr "Cognoms"
+msgid "Email"
+msgstr "Correu electrònic"
+msgid "Podcasts que puede gestionar"
+msgstr "Pòdcasts que pot gestionar"
+msgid "Usuario activo"
+msgstr "Usuari actiu"
+msgid "Usuarios existentes"
+msgstr "Usuaris existents"
+msgid "Todavía no hay usuarios de podcast."
+msgstr "Encara no hi ha usuaris de pòdcast."
+msgid "Nueva contraseña (opcional)"
+msgstr "Contrasenya nova (opcional)"
+msgid "Eliminar usuario"
+msgstr "Eliminar usuari"
+msgid "¿Eliminar este usuario y todos sus tokens API?"
+msgstr "Voleu eliminar aquest usuari i tots els seus tokens API?"
+msgid "Usuario guardado correctamente."
+msgstr "Usuari desat correctament."
+msgid "Usuario eliminado correctamente."
+msgstr "Usuari eliminat correctament."
+msgid "Nombre, apellidos y email válido son obligatorios."
+msgstr "El nom, els cognoms i un correu electrònic vàlid són obligatoris."
+msgid "Selecciona al menos un podcast."
+msgstr "Selecciona almenys un pòdcast."
+msgid "Selecciona únicamente podcasts válidos."
+msgstr "Selecciona només pòdcasts vàlids."
+msgid "Ya existe un usuario con ese email."
+msgstr "Ja existeix un usuari amb aquest correu electrònic."
+msgid "El usuario no existe."
+msgstr "L'usuari no existeix."
+msgid "No se puede borrar un podcast que tiene usuarios asignados. Reasígnalos primero."
+msgstr "No es pot eliminar un pòdcast amb usuaris assignats. Reassigna'ls primer."
+msgid "Cada token hereda los permisos de su usuario. Los usuarios de podcast solo pueden usarlo en los podcasts que tienen asignados; el administrador global puede usar un token administrativo en cualquier podcast indicando su directorio en la URL."
+msgstr "Cada token hereta els permisos del seu usuari. Els usuaris de pòdcast només poden utilitzar-lo als pòdcasts assignats; l'administrador global pot usar un token administratiu en qualsevol pòdcast indicant-ne el directori a l'URL."
+msgid "Usuario o email"
+msgstr "Usuari o correu electrònic"
+msgid "Tus tokens heredan tu acceso y solo pueden actuar sobre el podcast seleccionado."
+msgstr "Els teus tokens hereten el teu accés i només poden actuar sobre el pòdcast seleccionat."
+msgid "La gestión de usuarios exige un token admin del administrador global. Los tokens de usuarios de podcast no pueden usar estos endpoints."
+msgstr "La gestió d'usuaris exigeix un token admin de l'administrador global. Els tokens d'usuaris de podcast no poden utilitzar aquests endpoints."
+
+msgid "Listar podcasts asignables"
+msgstr "Llistar podcasts assignables"
+
+msgid "Listar usuarios"
+msgstr "Llistar usuaris"
+
+msgid "Obtener usuario"
+msgstr "Obtenir usuari"
+
+msgid "Las respuestas incluyen los podcasts asignados, pero nunca incluyen contraseñas."
+msgstr "Les respostes inclouen els podcasts assignats, però mai no inclouen contrasenyes."
+
+msgid "Crear usuario y asignar podcasts"
+msgstr "Crear un usuari i assignar podcasts"
+
+msgid "Mínimo 8 caracteres"
+msgstr "Mínim 8 caràcters"
+
+msgid "Lista de IDs de podcasts"
+msgstr "Llista d'IDs de podcasts"
+
+msgid "Lista de directorios de podcasts; puede usarse en lugar de podcast_ids"
+msgstr "Llista de directoris de podcasts; es pot utilitzar en lloc de podcast_ids"
+
+msgid "Actualizar usuario y sus asignaciones"
+msgstr "Actualitzar un usuari i les seves assignacions"
+
+msgid "Solo se modifican los campos enviados. Una contraseña vacía conserva la contraseña actual; las listas de podcasts sustituyen todas las asignaciones anteriores."
+msgstr "Només es modifiquen els camps enviats. Una contrasenya buida conserva la contrasenya actual; les llistes de podcasts substitueixen totes les assignacions anteriors."
+
+msgid "Borrar usuario y sus tokens API"
+msgstr "Esborrar un usuari i els seus tokens API"
+msgid "No se pudo crear el usuario."
+msgstr "No s'ha pogut crear l'usuari."
+
+msgid "No se pudo actualizar el usuario."
+msgstr "No s'ha pogut actualitzar l'usuari."
+
+msgid "No se pudo eliminar el usuario."
+msgstr "No s'ha pogut eliminar l'usuari."
+
+msgid "Debes asignar al menos un podcast."
+msgstr "Has d'assignar almenys un podcast."
+
+msgid "podcast_ids debe ser una lista."
+msgstr "podcast_ids ha de ser una llista."
+
+msgid "La lista contiene podcasts no válidos."
+msgstr "La llista conté podcasts no vàlids."
+
+msgid "podcast_slugs debe ser una lista."
+msgstr "podcast_slugs ha de ser una llista."
+
+msgid "is_active debe ser true o false."
+msgstr "is_active ha de ser true o false."
+msgid "Administrador global"
+msgstr "Administrador global"
+
+msgid "Configura la cuenta que administra toda la instalación"
+msgstr "Configura el compte que administra tota la instal·lació"
+
+msgid "Cuenta del administrador global"
+msgstr "Compte de l'administrador global"
+
+msgid "Define el usuario de acceso y los datos de la cuenta con control completo sobre el Multipodcast."
+msgstr "Defineix l'usuari d'accés i les dades del compte amb control complet sobre el Multipodcast."
+
+msgid "Usuario de acceso"
+msgstr "Usuari d'accés"
+
+msgid "Contraseña actual para confirmar"
+msgstr "Contrasenya actual per confirmar"
+
+msgid "Guardar administrador"
+msgstr "Desar administrador"
+
+msgid "La cuenta administradora global no existe."
+msgstr "El compte administrador global no existeix."
+
+msgid "El usuario de acceso y la contraseña actual son obligatorios."
+msgstr "L'usuari d'accés i la contrasenya actual són obligatoris."
+
+msgid "El usuario de acceso es demasiado largo."
+msgstr "L'usuari d'accés és massa llarg."
+
+msgid "El email del administrador no es válido."
+msgstr "L'email de l'administrador no és vàlid."
+
+msgid "Ya existe una cuenta con ese usuario o email."
+msgstr "Ja existeix un compte amb aquest usuari o email."
+
+msgid "Datos del administrador actualizados correctamente."
+msgstr "Dades de l'administrador actualitzades correctament."
+
+msgid "No se pudo guardar la cuenta administradora."
+msgstr "No s'ha pogut desar el compte administrador."
+msgid "Idioma de Multipodcast"
+msgstr "Idioma de Multipodcast"
+
+msgid "Se aplica a la portada-resumen y al panel global. Cada podcast conserva su propio idioma."
+msgstr "S'aplica a la portada-resum i al panell global. Cada podcast conserva el seu idioma."
+
+msgid "El idioma de Multipodcast no es válido."
+msgstr "L'idioma de Multipodcast no és vàlid."

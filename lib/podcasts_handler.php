@@ -65,6 +65,7 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
                 $notice = __('Podcast creado correctamente.');
             } elseif ($action === 'save_settings') {
                 $settingsResult = saveMultipodcastSettings($pdo, $dbPath, $projectRoot);
+                i18n_load($settingsResult['summary_language']);
                 $backupFiles = $settingsResult['backup_files'];
                 if ($backupFiles !== []) {
                     $_SESSION['podcast_backup_files'] = $backupFiles;
@@ -140,7 +141,7 @@ function assertPodcastPathsAvailable(string $projectRoot, string $slug): void
     }
 }
 
-/** @return array{backup_files:array<int,string>} */
+/** @return array{backup_files:array<int,string>,summary_language:string} */
 function saveMultipodcastSettings(PDO $pdo, string $dbPath, string $projectRoot): array
 {
     $enabled = isset($_POST['multipodcast_enabled']) ? 1 : 0;
@@ -155,6 +156,11 @@ function saveMultipodcastSettings(PDO $pdo, string $dbPath, string $projectRoot)
     $summaryTitle = $currentSettings['summary_title'];
     $summarySubtitle = $currentSettings['summary_subtitle'];
     $summaryTheme = $currentSettings['summary_theme'];
+    $summaryLanguage = trim((string) ($_POST['summary_language'] ?? $currentSettings['summary_language']));
+    if (!preg_match('/^[a-z]{2}_[A-Z]{2}$/', $summaryLanguage)
+        || !is_file(dirname(__DIR__) . '/locale/' . $summaryLanguage . '.po')) {
+        throw new RuntimeException(__('El idioma de Multipodcast no es válido.'));
+    }
     $backupFiles = [];
     $wasEnabled = $currentSettings['multipodcast_enabled'] === 1;
 
@@ -211,15 +217,16 @@ function saveMultipodcastSettings(PDO $pdo, string $dbPath, string $projectRoot)
         }
     }
 
-    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage, summary_hero_image_url = :summary_hero, summary_title = :summary_title, summary_subtitle = :summary_subtitle, summary_theme = :summary_theme WHERE id = 1');
+    $stmt = $pdo->prepare('UPDATE app_settings SET multipodcast_enabled = :enabled, homepage_podcast_id = :homepage, summary_hero_image_url = :summary_hero, summary_title = :summary_title, summary_subtitle = :summary_subtitle, summary_theme = :summary_theme, summary_language = :summary_language WHERE id = 1');
     $stmt->bindValue(':enabled', $enabled, PDO::PARAM_INT);
     $stmt->bindValue(':homepage', $homepageId, $homepageId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue(':summary_hero', $summaryHeroImageUrl);
     $stmt->bindValue(':summary_title', $summaryTitle);
     $stmt->bindValue(':summary_subtitle', $summarySubtitle);
     $stmt->bindValue(':summary_theme', $summaryTheme);
+    $stmt->bindValue(':summary_language', $summaryLanguage);
     $stmt->execute();
-    return ['backup_files' => $backupFiles];
+    return ['backup_files' => $backupFiles, 'summary_language' => $summaryLanguage];
 }
 
 /** @return array<int,string> */
@@ -321,6 +328,11 @@ function deletePodcastWithBackup(PDO $pdo, string $dbPath, string $projectRoot, 
     }
     if (!hash_equals((string) $podcast['title'], trim($confirmation))) {
         throw new RuntimeException(__('Escribe exactamente el título del podcast para confirmar el borrado.'));
+    }
+    $assignedUsers = $pdo->prepare('SELECT COUNT(*) FROM management_podcasts WHERE podcast_id = :podcast_id');
+    $assignedUsers->execute([':podcast_id' => $podcastId]);
+    if ((int) $assignedUsers->fetchColumn() > 0) {
+        throw new RuntimeException(__('No se puede borrar un podcast que tiene usuarios asignados. Reasígnalos primero.'));
     }
     $count = (int) $pdo->query('SELECT COUNT(*) FROM podcast')->fetchColumn();
     if ($count <= 1) {

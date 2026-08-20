@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-1.9.11-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-2.0.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -117,9 +117,11 @@ La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una b
 
 ### Multipodcast
 
-El modo Multipodcast se administra desde el dashboard global `multipodcast.php`; su configuración se abre en `multipodcast_management.php`. Conserva una sola base de datos y un único administrador, pero aísla episodios, páginas, redes, tokens y estadísticas mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
+El modo Multipodcast se administra desde el dashboard global `multipodcast.php`; su configuración se abre en `multipodcast_management.php`. Conserva una sola base de datos y una cuenta administradora global, que puede crear usuarios y asignarles uno o varios podcasts. Esos usuarios solo ven y gestionan sus podcasts, mientras episodios, páginas, redes, tokens y estadísticas permanecen aislados mediante `podcast_id`. Cada podcast recibe un directorio único (`/mi-podcast/`), con portada, búsqueda, páginas, feed, sitemap y tracking propios.
 
 La raíz `/` puede mostrar un resumen de todos los podcasts o la portada de uno destacado. El resumen permite configurar desde `multipodcast_management.php` su imagen hero, título, subtítulo y tema visual propios. El podcast principal que permanecerá visible si se desactiva Multipodcast se elige en `podcasts_management.php`. Cuando se destaca un podcast, `/feed.xml` y `/sitemap.xml` actúan como alias del podcast seleccionado, mientras que sus enlaces canónicos permanecen bajo `/mi-podcast/...`. Los medios de todos los podcasts se almacenan conjuntamente en `audios/` e `images/`; así sus URLs permanecen estables al activar o desactivar Multipodcast y al cambiar el podcast principal.
+
+Multipodcast tiene un idioma independiente para la portada-resumen y el panel global. Cada podcast conserva su propio `app_language`, de modo que cambiarlo desde su panel no modifica los demás podcasts.
 
 ### Feed RSS
 
@@ -171,6 +173,9 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 | `multipodcast.php` | Dashboard global de Multipodcast, caché, actualizaciones, seguridad, backups y API |
 | `multipodcast_management.php` | Activación y configuración de la portada Multipodcast |
 | `podcasts_management.php` | Creación, selección, cambio de directorio y borrado seguro de podcasts |
+| `users_management.php` | Creación de usuarios y asignación de uno o varios podcasts |
+| `admin_account.php` | Configuración de la cuenta administradora global |
+| `media_cleanup.php` | Limpieza global de audios e imágenes huérfanos |
 | `podcast_management.php` | Metadatos del canal |
 | `episodes_management.php` | CRUD de episodios con borrado seguro de imágenes compartidas con la portada del podcast |
 | `add_episode.php` | Alta/edición con editor visual HTML (Jodit), grabación con preescucha Web Audio y subida de imágenes con orientación EXIF |
@@ -207,7 +212,8 @@ Las imágenes y los audios importados se validan por su MIME real. Los ZIP solo 
 | `podcast` | Metadatos y directorio único de cada canal |
 | `app_settings` | Configuración global de Multipodcast y de la portada-resumen |
 | `episodes` | Episodios, podcast propietario y estado de publicación |
-| `management` | Credenciales y configuración 2FA (TOTP) |
+| `management` | Credenciales, rol global y configuración 2FA (TOTP) |
+| `management_podcasts` | Podcasts que puede gestionar cada usuario |
 | `social` | Enlaces a redes sociales aislados por podcast |
 | `pages` | Páginas estáticas por podcast con jerarquía padre/hijo |
 | `api_tokens` | Tokens de API aislados por podcast |
@@ -225,19 +231,19 @@ Edita `lib/migration_runner.php`:
 
 ```php
 // 1. Bloque condicional en runMigrations()
-if ($version < 26) {
-    migration_v26($pdo);
-    $pdo->exec('PRAGMA user_version = 26');
+if ($version < 27) {
+    migration_v27($pdo);
+    $pdo->exec('PRAGMA user_version = 27');
 }
 
 // 2. Función de migración
-function migration_v26(PDO $pdo): void
+function migration_v27(PDO $pdo): void
 {
     $pdo->exec('ALTER TABLE episodes ADD COLUMN nueva_columna TEXT');
 }
 ```
 
-Y actualiza `schema.sql` con `PRAGMA user_version = 26`.
+Y actualiza `schema.sql` con `PRAGMA user_version = 27`.
 
 #### Historial de versiones
 
@@ -268,6 +274,8 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 26`.
 | 23 | Añade título, subtítulo y tema propios a la portada-resumen |
 | 24 | Permite elegir explícitamente el podcast principal de la instalación |
 | 25 | Permite decidir qué podcasts aparecen en la portada-resumen |
+| 26 | Añade usuarios de podcast, asignaciones múltiples y permisos heredados por los tokens API |
+| 27 | Añade un idioma independiente para la portada y el panel global Multipodcast |
 
 ---
 
@@ -343,6 +351,8 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 26`.
 │   ├── api_social_handler.php       # Handler API de redes sociales
 │   ├── api_system_handler.php       # Handler API del sistema
 │   ├── api_tokens_handler.php       # Handler API de tokens
+│   ├── api_users_handler.php        # Gestión API global de usuarios y asignaciones
+│   ├── admin_account_handler.php     # Cuenta administradora global
 │   ├── import_feed_handler.php      # Parser de feed externo
 │   ├── backup_handler.php           # Exportación/importación de datos
 │   ├── cache_management_handler.php # Gestor de configuración de caché
@@ -452,6 +462,8 @@ Al entrar en `admin.php`, EasyPodcast consulta como máximo una vez al día si e
 | Robots | `/robots.txt` |
 
 Con Multipodcast activo, cada recurso queda bajo `/<podcast>/`: `/<podcast>/YYYY/MM/slug`, `/<podcast>/feed.xml`, `/<podcast>/sitemap.xml`, `/<podcast>/search` y `/<podcast>/api/v1/...`.
+
+Cada token API pertenece al usuario que lo crea. Los usuarios de podcast solo pueden utilizarlo con alguno de sus podcasts asignados. Un token administrativo del administrador global puede operar sobre cualquier podcast indicando su directorio en la URL; las operaciones que afectan a toda la instalación requieren ese alcance global. Ese token también permite gestionar usuarios y sus asignaciones mediante `/api/v1/users`.
 
 ---
 

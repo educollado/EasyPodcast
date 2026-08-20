@@ -71,7 +71,7 @@ if ($isTotpPending) {
 $data = loadAdminData($dbPath);
 extract($data); // adminCount, isSetupMode, error, notice
 
-if (isset($_SESSION['admin_user']) && !isset($_GET['manage'])) {
+if (isset($_SESSION['admin_user']) && adminSessionIsGlobal() && !isset($_GET['manage'])) {
     try {
         $contextPdo = openPodcastDatabase($dbPath);
         $multipodcastIsEnabled = loadAppSettings($contextPdo)['multipodcast_enabled'] === 1;
@@ -95,7 +95,9 @@ $activeAdminPodcast = null;
 if ($isLoggedIn) {
     // Esta comprobación puede abrir una transacción de escritura. Debe ejecutarse
     // antes de mantener cursores de lectura abiertos en otra conexión SQLite.
-    $adminUpdateStatus = loadDailyAdminUpdateStatus($dbPath);
+    if (adminSessionIsGlobal()) {
+        $adminUpdateStatus = loadDailyAdminUpdateStatus($dbPath);
+    }
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
         $podcastId = activePodcastId($pdo);
@@ -188,12 +190,7 @@ if ($isLoggedIn) {
             <h2><?= __('Importar feed RSS') ?></h2>
             <p><?= __('Importa episodios desde una URL de feed RSS externo') ?></p>
           </a>
-          <a class="admin-card" href="media_cleanup.php">
-            <div class="admin-card-icon">🧹</div>
-            <h2><?= __('Limpiar') ?></h2>
-            <p><?= __('Borra audios e imágenes que no usa ningún episodio') ?></p>
-          </a>
-          <?php if (!$adminMultipodcastEnabled): ?>
+          <?php if (!$adminMultipodcastEnabled && adminSessionIsGlobal()): ?>
           <a class="admin-card" href="multipodcast.php">
             <div class="admin-card-icon">🎧</div>
             <h2><?= __('Multipodcast') ?></h2>
@@ -229,6 +226,11 @@ if ($isLoggedIn) {
             <h2>API Tokens</h2>
             <p><?= __('Genera y revoca tokens para la API REST') ?></p>
           </a>
+          <?php endif; ?>
+          <?php if ($adminMultipodcastEnabled && !adminSessionIsGlobal()): ?>
+          <a class="admin-card" href="api_tokens.php"><div class="admin-card-icon">🔌</div><h2>API</h2><p><?= __('Genera y revoca tokens para la API REST') ?></p></a>
+          <a class="admin-card" href="change_password.php"><div class="admin-card-icon">🔑</div><h2><?= __('Contraseña') ?></h2><p><?= __('Cambia la contraseña de acceso al panel') ?></p></a>
+          <a class="admin-card" href="twofa_management.php"><div class="admin-card-icon">🔐</div><h2><?= __('2FA') ?></h2><p><?= __('Autenticación en dos pasos con código TOTP') ?></p></a>
           <?php endif; ?>
           <a class="admin-card" href="<?= esc($activeAdminPodcast !== null ? podcastPath($activeAdminPodcast, '', multipodcastEnabled(openPodcastDatabase($dbPath))) : '/') ?>" target="_blank" rel="noopener">
             <div class="admin-card-icon">🌐</div>
@@ -340,7 +342,7 @@ if ($isLoggedIn) {
       <form method="post" action="admin.php" autocomplete="off" class="form-stack">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <label>
-          <?= __('Usuario') ?>
+          <?= $isSetupMode ? __('Usuario') : __('Usuario o email') ?>
           <input type="text" name="username" maxlength="120" required>
         </label>
         <label>

@@ -12,6 +12,7 @@ require_once __DIR__ . '/totp.php';
 require_once __DIR__ . '/i18n.php';
 require_once __DIR__ . '/auth_security.php';
 require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/access_control.php';
 
 /**
  * Construye un mensaje uniforme de espera tras bloqueo temporal.
@@ -97,14 +98,20 @@ function loadAdminData(string $dbPath): array
                     $error = __('La contraseña debe tener al menos 8 caracteres.');
                 } else {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare('INSERT INTO management (username, password) VALUES (:username, :password)');
+                    $stmt = $pdo->prepare('INSERT INTO management (username, email, password, is_global) VALUES (:username, :email, :password, 1)');
                     $stmt->execute([
                         ':username' => $username,
+                        ':email' => $username,
                         ':password' => $hash,
                     ]);
 
                     session_regenerate_id(true);
-                    $_SESSION['admin_user'] = $username;
+                    establishAdminSession([
+                        'id' => (int) $pdo->lastInsertId(),
+                        'username' => $username,
+                        'is_global' => 1,
+                        'podcast_ids' => [],
+                    ]);
                     authClearThrottle('login', $username);
                     $notice = __('Usuario administrador creado correctamente.');
                     $adminCount = 1;
@@ -114,11 +121,11 @@ function loadAdminData(string $dbPath): array
                 if ($username === '' || $password === '') {
                     $error = __('Introduce usuario y contraseña.');
                 } else {
-                    $stmt = $pdo->prepare('SELECT id, username, password, totp_enabled, totp_secret, totp_recovery_codes FROM management WHERE username = :username LIMIT 1');
-                    $stmt->execute([':username' => $username]);
+                    $stmt = $pdo->prepare('SELECT id, username, password, is_global, is_active, totp_enabled, totp_secret, totp_recovery_codes FROM management WHERE username = :username OR email = :email LIMIT 1');
+                    $stmt->execute([':username' => $username, ':email' => strtolower($username)]);
                     $row = $stmt->fetch();
 
-                    if (!$row) {
+                    if (!$row || (int) ($row['is_active'] ?? 1) !== 1) {
                         $error = $throttleState['retry_after'] > 0
                             ? authThrottleErrorMessage($throttleState['retry_after'])
                             : __('Credenciales inválidas.');
@@ -135,6 +142,9 @@ function loadAdminData(string $dbPath): array
                                 $error = __('Credenciales inválidas.');
                             }
                         } else {
+                            $assigned = $pdo->prepare('SELECT podcast_id FROM management_podcasts WHERE management_id = :id ORDER BY podcast_id');
+                            $assigned->execute([':id' => (int) $row['id']]);
+                            $row['podcast_ids'] = array_map('intval', $assigned->fetchAll(PDO::FETCH_COLUMN));
                             authClearThrottle('login', $username);
                             // Si una contraseña legacy coincide por fallback, se rehashea de forma transparente.
                             if (!password_verify($password, $stored)) {
@@ -152,7 +162,7 @@ function loadAdminData(string $dbPath): array
                                 if (isTrustedDevice((string) $row['username'], (string) $row['totp_secret'])) {
                                     session_regenerate_id(true);
                                     unset($_SESSION['totp_pending_user']);
-                                    $_SESSION['admin_user'] = (string) $row['username'];
+                                    establishAdminSession($row);
                                     header('Location: admin.php');
                                     exit;
                                 }
@@ -166,7 +176,7 @@ function loadAdminData(string $dbPath): array
 
                             session_regenerate_id(true);
                             unset($_SESSION['totp_pending_user']);
-                            $_SESSION['admin_user'] = (string) $row['username'];
+                            establishAdminSession($row);
                             header('Location: admin.php');
                             exit;
                         }
@@ -221,15 +231,24 @@ function verifyTotpLogin(string $dbPath): string
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-        $stmt = $pdo->prepare('SELECT id, totp_secret, totp_recovery_codes FROM management WHERE username = :u LIMIT 1');
+        $stmt = $pdo->prepare('SELECT id, username, is_global, is_active, totp_secret, totp_recovery_codes FROM management WHERE username = :u LIMIT 1');
         $stmt->execute([':u' => $pendingUser]);
         $row = $stmt->fetch();
+        if ($row) {
+            $assigned = $pdo->prepare('SELECT podcast_id FROM management_podcasts WHERE management_id = :id ORDER BY podcast_id');
+            $assigned->execute([':id' => (int) $row['id']]);
+            $row['podcast_ids'] = array_map('intval', $assigned->fetchAll(PDO::FETCH_COLUMN));
+        }
 
-        if (!$row || (string) ($row['totp_secret'] ?? '') === '') {
+        if (!$row || (int) ($row['is_active'] ?? 1) !== 1) {
+            unset($_SESSION['totp_pending_user']);
+            return __('Credenciales inválidas.');
+        }
+        if ((string) ($row['totp_secret'] ?? '') === '') {
             // Situación anómala: el usuario ya no tiene 2FA configurado.
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
-            $_SESSION['admin_user'] = $pendingUser;
+            establishAdminSession($row);
             header('Location: admin.php');
             exit;
         }
@@ -241,7 +260,7 @@ function verifyTotpLogin(string $dbPath): string
             authClearThrottle('totp', $pendingUser);
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
-            $_SESSION['admin_user'] = $pendingUser;
+            establishAdminSession($row);
             if (!empty($_POST['remember_device'])) {
                 setTrustedDeviceCookie($pendingUser, $secret);
             }
@@ -258,7 +277,7 @@ function verifyTotpLogin(string $dbPath): string
             $upd->execute([':rc' => $updatedJson, ':id' => (int) $row['id']]);
             unset($_SESSION['totp_pending_user']);
             session_regenerate_id(true);
-            $_SESSION['admin_user'] = $pendingUser;
+            establishAdminSession($row);
             if (!empty($_POST['remember_device'])) {
                 setTrustedDeviceCookie($pendingUser, $secret);
             }

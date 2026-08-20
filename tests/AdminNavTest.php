@@ -26,12 +26,14 @@ test('barra multipodcast general oculta las opciones internas y permite elegir p
     assert_contains('class="admin-nav-podcast-selector"', $html);
     assert_contains('name="podcast"', $html);
     assert_contains('data-navigation-url="multipodcast.php" selected>Multipodcast</option>', $html);
-    assert_contains('href="cache_management.php"', $html);
     assert_contains('href="update.php"', $html);
-    assert_contains('href="change_password.php"', $html);
-    assert_contains('href="twofa_management.php"', $html);
     assert_contains('href="backups.php"', $html);
-    assert_contains('href="api_tokens.php"', $html);
+    assert_true(!str_contains($html, 'href="admin_account.php"'));
+    assert_true(!str_contains($html, 'href="media_cleanup.php"'));
+    assert_true(!str_contains($html, 'href="cache_management.php"'));
+    assert_true(!str_contains($html, 'href="change_password.php"'));
+    assert_true(!str_contains($html, 'href="twofa_management.php"'));
+    assert_true(!str_contains($html, 'href="api_tokens.php"'));
     assert_contains('>Administración<', $html);
     assert_contains('href="podcasts_management.php">Podcasts</a>', $html);
     assert_contains('Ver podcasts ↗', $html);
@@ -72,12 +74,12 @@ test('barra de un podcast muestra sus opciones de administración', function () 
     unset($GLOBALS['_multipodcast_enabled'], $GLOBALS['_active_podcast']);
 });
 
-test('caché permanece en el menú Multipodcast y cambia de podcast sin salir', function () {
+test('caché mantiene el selector Multipodcast pero no aparece en el menú superior', function () {
     $html = renderAdminNavFixture('cache', ['id' => 2, 'slug' => 'demo']);
 
     assert_contains('action="cache_management.php"', $html);
     assert_contains('href="multipodcast.php"', $html);
-    assert_contains('class="admin-nav-link active" href="cache_management.php"', $html);
+    assert_true(!str_contains($html, 'href="cache_management.php"'));
     assert_true(!str_contains($html, '>Panel<'));
     assert_true(!str_contains($html, '>Capítulos<'));
 
@@ -88,7 +90,7 @@ test('el panel de podcast no duplica las herramientas globales de Multipodcast',
     $source = file_get_contents(__DIR__ . '/../admin.php');
 
     assert_true(is_string($source));
-    assert_contains('<?php if (!$adminMultipodcastEnabled): ?>', $source);
+    assert_contains('<?php if (!$adminMultipodcastEnabled && adminSessionIsGlobal()): ?>', $source);
     assert_contains('<a class="admin-card" href="backups.php">', $source);
     assert_contains('<a class="admin-card" href="api_tokens.php">', $source);
 });
@@ -101,4 +103,19 @@ test('los dashboards identifican el ámbito administrado en el encabezado', func
     assert_true(is_string($multipodcastDashboard));
     assert_contains('Panel de administración del Podcast %s', $podcastDashboard);
     assert_contains('Panel de administración del Multipodcast', $multipodcastDashboard);
+});
+
+test('un usuario de podcast no ve opciones globales de Multipodcast', function () {
+    $_SESSION['admin_is_global'] = 0;
+    $_SESSION['admin_podcast_ids'] = [2, 3];
+    $html = renderAdminNavFixture('podcast', ['id' => 2, 'slug' => 'demo']);
+
+    assert_contains('href="admin.php">EasyPodcast', $html);
+    assert_true(!str_contains($html, 'data-navigation-url="multipodcast.php"'));
+    assert_true(!str_contains($html, 'href="podcasts_management.php"'));
+    assert_true(!str_contains($html, 'href="users_management.php"'));
+    assert_true(!str_contains($html, 'href="admin_account.php"'));
+    assert_true(!str_contains($html, 'href="media_cleanup.php"'));
+    assert_contains('href="api_tokens.php"', $html);
+    unset($_SESSION['admin_is_global'], $_SESSION['admin_podcast_ids']);
 });

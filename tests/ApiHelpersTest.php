@@ -22,6 +22,7 @@ function apiHelpersTestCreateDatabase(): array
     $pdo->exec(
         "CREATE TABLE api_tokens (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             token TEXT NOT NULL DEFAULT '',
             token_hash TEXT NOT NULL DEFAULT '',
             token_suffix TEXT NOT NULL DEFAULT '',
@@ -33,6 +34,9 @@ function apiHelpersTestCreateDatabase(): array
             created_at TEXT DEFAULT (datetime('now'))
         )"
     );
+    $pdo->exec('CREATE TABLE management (id INTEGER PRIMARY KEY, is_global INTEGER NOT NULL DEFAULT 0, is_active INTEGER NOT NULL DEFAULT 1)');
+    $pdo->exec('CREATE TABLE management_podcasts (management_id INTEGER, podcast_id INTEGER)');
+    $pdo->exec('INSERT INTO management (id, is_global) VALUES (1, 1)');
 
     return ['pdo' => $pdo, 'dbPath' => $dbPath];
 }
@@ -51,6 +55,7 @@ test('apiTokenHasScope: admin cubre content y content no cubre admin', function 
     assert_true(apiTokenHasScope(['id' => 1, 'scope' => 'admin'], 'admin'));
     assert_true(apiTokenHasScope(['id' => 2, 'scope' => 'content'], 'content'));
     assert_true(!apiTokenHasScope(['id' => 2, 'scope' => 'content'], 'admin'));
+    assert_true(!apiTokenHasScope(['id' => 3, 'scope' => 'admin', 'owner_is_global' => false], 'admin'));
 });
 
 test('apiAuth: autentica tokens hash y actualiza last_used_at', function () {
@@ -78,7 +83,10 @@ test('apiAuth: autentica tokens hash y actualiza last_used_at', function () {
         $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $token;
         $auth = apiAuth($pdo);
 
-        assert_eq(['id' => 1, 'scope' => 'content'], $auth);
+        assert_eq(1, (int) ($auth['id'] ?? 0));
+        assert_eq(1, (int) ($auth['podcast_id'] ?? 0));
+        assert_eq('content', (string) ($auth['scope'] ?? ''));
+        assert_true((bool) ($auth['owner_is_global'] ?? false));
 
         $row = $pdo->query('SELECT last_used_at FROM api_tokens WHERE id = 1')->fetch(PDO::FETCH_ASSOC);
         assert_true(!empty($row['last_used_at']), 'Se esperaba last_used_at actualizado.');
@@ -113,7 +121,9 @@ test('apiAuth: migra tokens legacy en claro a hash y conserva el alcance', funct
         $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] = 'Bearer ' . $token;
         $auth = apiAuth($pdo);
 
-        assert_eq(['id' => 1, 'scope' => 'admin'], $auth);
+        assert_eq(1, (int) ($auth['id'] ?? 0));
+        assert_eq('admin', (string) ($auth['scope'] ?? ''));
+        assert_true((bool) ($auth['owner_is_global'] ?? false));
 
         $row = $pdo->query('SELECT token, token_hash, token_suffix, scope, last_used_at FROM api_tokens WHERE id = 1')->fetch(PDO::FETCH_ASSOC);
         assert_eq('', (string) ($row['token'] ?? ''));

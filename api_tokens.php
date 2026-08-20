@@ -58,7 +58,9 @@ $apiPodcast = activePodcast(openPodcastDatabase($dbPath));
       <!-- Formulario para generar nuevo token -->
       <section>
         <h2><?= __('Generar nuevo token') ?></h2>
-        <p class="muted"><?= __('Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación.') ?></p>
+        <p class="muted"><?= adminSessionIsGlobal()
+            ? __('Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación.')
+            : __('Tus tokens heredan tu acceso y solo pueden actuar sobre el podcast seleccionado.') ?></p>
         <form method="post" action="api_tokens.php" autocomplete="off">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
           <input type="hidden" name="action" value="generate">

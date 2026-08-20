@@ -57,12 +57,15 @@ test('multipodcast.php presenta las herramientas globales como tarjetas', functi
     assert_true(is_string($source));
     assert_contains('href="multipodcast_management.php"', $source);
     assert_contains('href="podcasts_management.php"', $source);
+    assert_contains('href="admin_account.php"', $source);
     assert_contains('href="cache_management.php"', $source);
     assert_contains('href="update.php"', $source);
     assert_contains('href="change_password.php"', $source);
     assert_contains('href="twofa_management.php"', $source);
     assert_contains('href="backups.php"', $source);
     assert_contains('href="api_tokens.php"', $source);
+    assert_contains('name="summary_language"', $source);
+    assert_contains('set_summary_language', $source);
 });
 
 test('la gestión de podcasts crea primero y lista después fuera de la configuración', function () {

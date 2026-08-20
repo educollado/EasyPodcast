@@ -7,6 +7,7 @@ require_once __DIR__ . '/lib/podcast_context.php';
 require_once __DIR__ . '/lib/i18n.php';
 require_once __DIR__ . '/lib/admin_theme.php';
 require_once __DIR__ . '/lib/csp.php';
+require_once __DIR__ . '/lib/access_control.php';
 i18n_load('es_ES');
 sendContentSecurityPolicyHeaders();
 
@@ -37,14 +38,45 @@ function loadAppLocale(string $dbPath): void
 {
     try {
         $pdo = openPodcastDatabase($dbPath);
-        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
-        $appLang = $podcast['app_language'] ?? null;
+        $settings = loadAppSettings($pdo);
+        $podcast = activePodcast($pdo);
+        $appLang = requestUsesMultipodcastLocale($settings, $podcast)
+            ? $settings['summary_language']
+            : (($podcast ?? firstPodcast($pdo))['app_language'] ?? null);
         if (is_string($appLang) && $appLang !== '') {
             i18n_load($appLang);
         }
     } catch (Throwable $e) {
         // Silencioso: mantiene el idioma por defecto.
     }
+}
+
+/** Decide si la petición actual pertenece a la portada o al panel global Multipodcast. */
+function requestUsesMultipodcastLocale(array $settings, ?array $podcast): bool
+{
+    if (($settings['multipodcast_enabled'] ?? 0) === 1 && $podcast === null) {
+        return true;
+    }
+    if (!isset($_SESSION['admin_user'])
+        || !adminSessionIsGlobal()) {
+        return false;
+    }
+
+    $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? ''));
+    $multipodcastOnlyScripts = [
+        'multipodcast.php', 'multipodcast_management.php', 'podcasts_management.php',
+        'users_management.php', 'admin_account.php', 'media_cleanup.php',
+    ];
+    if (in_array($script, $multipodcastOnlyScripts, true)) {
+        return true;
+    }
+
+    $sharedGlobalScripts = [
+        'cache_management.php', 'update.php', 'change_password.php', 'twofa_management.php',
+        'backups.php', 'api_tokens.php', 'api_docs.php',
+    ];
+    return ($settings['multipodcast_enabled'] ?? 0) === 1
+        && in_array($script, $sharedGlobalScripts, true);
 }
 
 /**
@@ -59,6 +91,10 @@ function enforceCanonicalHostFromPodcastLink(string $dbPath): void
     if (PHP_SAPI !== 'cli') {
         runMigrations($dbPath);
         if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['admin_user'])) {
+            if (!refreshAdminSession(openPodcastDatabase($dbPath))) {
+                header('Location: admin.php');
+                exit;
+            }
             activateAdminPodcastContext($dbPath, isset($_GET['podcast']) ? (string) $_GET['podcast'] : null);
         } else {
             activatePublicPodcastContext($dbPath, isset($_GET['podcast_slug']) ? (string) $_GET['podcast_slug'] : null);

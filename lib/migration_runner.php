@@ -163,6 +163,65 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 25');
         $version = 25;
     }
+
+    if ($version < 26) {
+        migration_v26($pdo);
+        $pdo->exec('PRAGMA user_version = 26');
+        $version = 26;
+    }
+
+    if ($version < 27) {
+        migration_v27($pdo);
+        $pdo->exec('PRAGMA user_version = 27');
+        $version = 27;
+    }
+}
+
+/** Migración v27: idioma independiente para la portada y el panel Multipodcast. */
+function migration_v27(PDO $pdo): void
+{
+    $columns = array_column($pdo->query('PRAGMA table_info(app_settings)')->fetchAll(), 'name');
+    if (!in_array('summary_language', $columns, true)) {
+        $pdo->exec("ALTER TABLE app_settings ADD COLUMN summary_language TEXT NOT NULL DEFAULT 'es_ES'");
+        $pdo->exec(
+            "UPDATE app_settings
+                SET summary_language = COALESCE(
+                    (SELECT app_language FROM podcast WHERE id = app_settings.primary_podcast_id),
+                    (SELECT app_language FROM podcast ORDER BY id ASC LIMIT 1),
+                    'es_ES'
+                )"
+        );
+    }
+}
+
+/** Migración v26: cuentas globales o limitadas a un podcast. */
+function migration_v26(PDO $pdo): void
+{
+    $columns = array_column($pdo->query('PRAGMA table_info(management)')->fetchAll(), 'name');
+    $additions = [
+        'first_name' => "ALTER TABLE management ADD COLUMN first_name TEXT NOT NULL DEFAULT ''",
+        'last_name' => "ALTER TABLE management ADD COLUMN last_name TEXT NOT NULL DEFAULT ''",
+        'email' => "ALTER TABLE management ADD COLUMN email TEXT",
+        'is_global' => 'ALTER TABLE management ADD COLUMN is_global INTEGER NOT NULL DEFAULT 1',
+        'is_active' => 'ALTER TABLE management ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1',
+    ];
+    foreach ($additions as $column => $sql) {
+        if (!in_array($column, $columns, true)) {
+            $pdo->exec($sql);
+        }
+    }
+    $pdo->exec("UPDATE management SET email = username WHERE email IS NULL OR email = ''");
+    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_management_email ON management(email) WHERE email IS NOT NULL AND email != ''");
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS management_podcasts (
+          management_id INTEGER NOT NULL,
+          podcast_id INTEGER NOT NULL,
+          PRIMARY KEY (management_id, podcast_id),
+          FOREIGN KEY(management_id) REFERENCES management(id) ON DELETE CASCADE,
+          FOREIGN KEY(podcast_id) REFERENCES podcast(id) ON DELETE CASCADE
+        )'
+    );
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_management_podcasts_podcast ON management_podcasts(podcast_id)');
 }
 
 /**

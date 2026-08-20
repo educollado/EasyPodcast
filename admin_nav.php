@@ -5,16 +5,19 @@
 
 require_once __DIR__ . '/lib/version.php';
 require_once __DIR__ . '/lib/podcast_context.php';
+require_once __DIR__ . '/lib/access_control.php';
 $_navPage = $currentAdminPage ?? '';
+$navIsGlobalAdmin = adminSessionIsGlobal();
 $navPodcast = $GLOBALS['_active_podcast'] ?? null;
 $navMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
-$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'podcasts', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
+$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'cleanup', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
 $navPodcastScopedMultipodcastPages = ['cache', 'api_tokens', 'api_docs'];
-$navIsMultipodcastArea = in_array($_navPage, ['multipodcast', 'multipodcast_settings', 'podcasts'], true)
-    || ($navMultipodcastEnabled && in_array($_navPage, $navMultipodcastPages, true));
+$navIsMultipodcastArea = $navIsGlobalAdmin && (in_array($_navPage, ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'cleanup'], true)
+    || ($navMultipodcastEnabled && in_array($_navPage, $navMultipodcastPages, true)));
 $navUsesPodcastContext = $navIsMultipodcastArea
     && in_array($_navPage, $navPodcastScopedMultipodcastPages, true);
-$navMulti = $navMultipodcastEnabled || $navIsMultipodcastArea;
+$navAssignedPodcastIds = adminSessionPodcastIds();
+$navMulti = $navIsMultipodcastArea || ($navMultipodcastEnabled && ($navIsGlobalAdmin || count($navAssignedPodcastIds) > 1));
 $navPublicUrl = !$navIsMultipodcastArea && is_array($navPodcast) ? podcastPath($navPodcast, '', true) : '/';
 $navSelectorAction = match ($_navPage) {
     'cache' => 'cache_management.php',
@@ -29,6 +32,9 @@ if ($navMulti && isset($dbPath) && is_string($dbPath)) {
         $navPodcasts = $navPdo->query(
             "SELECT id, title, slug FROM podcast WHERE slug IS NOT NULL AND slug != '' ORDER BY title COLLATE NOCASE ASC"
         )->fetchAll();
+        if (!$navIsGlobalAdmin) {
+            $navPodcasts = array_values(array_filter($navPodcasts, static fn (array $podcast): bool => in_array((int) $podcast['id'], $navAssignedPodcastIds, true)));
+        }
         $navPdo = null;
     } catch (Throwable $e) {
         $navPodcasts = [];
@@ -45,13 +51,13 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
   data-file-empty-label="<?= esc(__('No se ha seleccionado ningún archivo')) ?>"
   data-file-multiple-label="<?= esc(__('%d archivos seleccionados')) ?>"
 >
-  <a class="admin-nav-brand" href="<?= $navMulti ? 'multipodcast.php' : 'admin.php' ?>">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
+  <a class="admin-nav-brand" href="<?= $navIsGlobalAdmin && $navMulti ? 'multipodcast.php' : 'admin.php' ?>">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
   <div class="admin-nav-links">
     <?php if ($navMulti): ?>
       <form class="admin-nav-podcast-selector" method="get" action="<?= esc($navSelectorAction) ?>">
         <?php if (!$navUsesPodcastContext): ?><input type="hidden" name="manage" value="1"><?php endif; ?>
         <select name="podcast" data-submit-on-change="1" aria-label="<?= esc(__('Elegir podcast')) ?>">
-          <option value="" data-navigation-url="multipodcast.php" <?= $navActivePodcastId === 0 ? 'selected' : '' ?>><?= __('Multipodcast') ?></option>
+          <?php if ($navIsGlobalAdmin): ?><option value="" data-navigation-url="multipodcast.php" <?= $navActivePodcastId === 0 ? 'selected' : '' ?>><?= __('Multipodcast') ?></option><?php endif; ?>
           <?php foreach ($navPodcasts as $navPodcastOption): ?>
             <option value="<?= esc((string) $navPodcastOption['slug']) ?>" <?= $navActivePodcastId === (int) $navPodcastOption['id'] ? 'selected' : '' ?>><?= esc((string) $navPodcastOption['title']) ?></option>
           <?php endforeach; ?>
@@ -61,18 +67,18 @@ $navActivePodcastId = (!$navIsMultipodcastArea || $navUsesPodcastContext) && is_
     <?php if ($navIsMultipodcastArea): ?>
     <a class="admin-nav-link <?= in_array($_navPage, ['multipodcast', 'multipodcast_settings'], true) ? 'active' : '' ?>" href="multipodcast.php"><?= __('Administración') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'podcasts' ? 'active' : '' ?>" href="podcasts_management.php"><?= __('Podcasts') ?></a>
-    <a class="admin-nav-link <?= $_navPage === 'cache' ? 'active' : '' ?>" href="cache_management.php"><?= __('Caché') ?></a>
+    <a class="admin-nav-link <?= $_navPage === 'users' ? 'active' : '' ?>" href="users_management.php"><?= __('Usuarios') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'update' ? 'active' : '' ?>" href="update.php"><?= __('Actualizar') ?></a>
-    <a class="admin-nav-link <?= $_navPage === 'password' ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
-    <a class="admin-nav-link <?= $_navPage === 'twofa' ? 'active' : '' ?>" href="twofa_management.php"><?= __('2FA') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'backups' ? 'active' : '' ?>" href="backups.php"><?= __('Backups') ?></a>
-    <a class="admin-nav-link <?= in_array($_navPage, ['api_tokens', 'api_docs'], true) ? 'active' : '' ?>" href="api_tokens.php">API</a>
     <?php else: ?>
     <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php<?= $navMulti ? '?manage=1' : '' ?>"><?= __('Administración') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'podcast'   ? 'active' : '' ?>" href="podcast_management.php"><?= __('Podcast') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'episodes'  ? 'active' : '' ?>" href="episodes_management.php"><?= __('Capítulos') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'add'       ? 'active' : '' ?>" href="add_episode.php"><?= __('Añadir') ?></a>
     <a class="admin-nav-link <?= $_navPage === 'stats' ? 'active' : '' ?>" href="stats.php"><?= __('Estadísticas') ?></a>
+    <a class="admin-nav-link <?= in_array($_navPage, ['api_tokens', 'api_docs'], true) ? 'active' : '' ?>" href="api_tokens.php">API</a>
+    <a class="admin-nav-link <?= $_navPage === 'password' ? 'active' : '' ?>" href="change_password.php"><?= __('Contraseña') ?></a>
+    <a class="admin-nav-link <?= $_navPage === 'twofa' ? 'active' : '' ?>" href="twofa_management.php"><?= __('2FA') ?></a>
     <?php endif; ?>
     <a class="admin-nav-link" href="<?= esc($navPublicUrl) ?>" target="_blank" rel="noopener"><?= $navIsMultipodcastArea ? __('Ver podcasts ↗') : __('Ver podcast ↗') ?></a>
   </div>

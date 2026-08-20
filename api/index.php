@@ -18,8 +18,10 @@ require_once dirname(__DIR__) . '/lib/api_pages_handler.php';
 require_once dirname(__DIR__) . '/lib/api_social_handler.php';
 require_once dirname(__DIR__) . '/lib/api_misc_handlers.php';
 require_once dirname(__DIR__) . '/lib/api_system_handler.php';
+require_once dirname(__DIR__) . '/lib/api_users_handler.php';
 require_once dirname(__DIR__) . '/lib/migration_runner.php';
 require_once dirname(__DIR__) . '/lib/podcast_context.php';
+require_once dirname(__DIR__) . '/lib/i18n.php';
 
 // Cabeceras de respuesta.
 header('Content-Type: application/json; charset=UTF-8');
@@ -53,15 +55,22 @@ $apiToken = apiAuth($pdo);
 if ($apiToken === false) {
     apiError('Token de autenticación inválido o ausente.', 401);
 }
-$tokenPodcast = podcastById($pdo, (int) ($apiToken['podcast_id'] ?? 0));
+$requestedPodcastSlug = trim((string) ($_GET['podcast_slug'] ?? ''));
+$tokenPodcast = !empty($apiToken['owner_is_global']) && $requestedPodcastSlug !== ''
+    ? podcastBySlug($pdo, $requestedPodcastSlug)
+    : podcastById($pdo, (int) ($apiToken['podcast_id'] ?? 0));
 if ($tokenPodcast === null) {
     apiError('El podcast asociado al token ya no existe.', 401);
 }
-$requestedPodcastSlug = trim((string) ($_GET['podcast_slug'] ?? ''));
+if (empty($apiToken['owner_is_global'])
+    && !in_array((int) $tokenPodcast['id'], (array) ($apiToken['assigned_podcast_ids'] ?? []), true)) {
+    apiError('El usuario ya no tiene acceso al podcast asociado al token.', 403);
+}
 if ($requestedPodcastSlug !== '' && !hash_equals((string) ($tokenPodcast['slug'] ?? ''), $requestedPodcastSlug)) {
     apiError('El token no pertenece al podcast solicitado.', 403);
 }
 activatePodcastContext($tokenPodcast, loadAppSettings($pdo)['multipodcast_enabled'] === 1);
+i18n_load((string) ($tokenPodcast['app_language'] ?? 'es_ES'));
 
 // Parsear la ruta: eliminar /api/v1 y dividir en segmentos.
 $uri    = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
@@ -125,8 +134,8 @@ switch ($resource) {
 
     // --- Caché ---
     case 'cache':
-        if ($method === 'POST' && $subpath === 'clear')             { apiClearCache(); }
-        elseif ($method === 'POST' && $subpath === 'regenerate-images') { apiRegenerateImages($pdo); }
+        if ($method === 'POST' && $subpath === 'clear')             { apiRequireScope($apiToken, 'admin'); apiClearCache(); }
+        elseif ($method === 'POST' && $subpath === 'regenerate-images') { apiRequireScope($apiToken, 'admin'); apiRegenerateImages($pdo); }
         else { apiError('Ruta de caché no encontrada.', 404); }
         break;
 
@@ -140,6 +149,18 @@ switch ($resource) {
     case 'feed':
         if ($method === 'POST' && $subpath === 'regenerate') { apiFeedRegenerate($pdo); }
         else { apiError('Ruta de feed no encontrada.', 404); }
+        break;
+
+    // --- Usuarios (solo administrador global) ---
+    case 'users':
+        apiRequireScope($apiToken, 'admin');
+        if ($method === 'GET' && $subpath === 'podcasts') { apiListUserAssignablePodcasts($pdo); }
+        elseif ($method === 'GET' && $id === null) { apiListUsers($pdo); }
+        elseif ($method === 'GET' && $id !== null) { apiGetUser($pdo, $id); }
+        elseif ($method === 'POST' && $id === null) { apiCreateUser($pdo, $body); }
+        elseif ($method === 'POST' && $id !== null) { apiUpdateUser($pdo, $id, $body); }
+        elseif ($method === 'DELETE' && $id !== null) { apiDeleteUser($pdo, $id); }
+        else { apiError('Método no permitido.', 405); }
         break;
 
     // --- Sistema ---

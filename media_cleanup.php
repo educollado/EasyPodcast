@@ -17,6 +17,7 @@ if (!isset($_SESSION['admin_user'])) {
 
 $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
+requireGlobalAdminAccess();
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 
 $data = loadMediaCleanupData($dbPath, __DIR__);
@@ -36,7 +37,7 @@ $totalImageBytes = array_sum($orphanImages);
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
-  <?php $currentAdminPage = 'dashboard'; require __DIR__ . '/admin_nav.php'; ?>
+  <?php $currentAdminPage = 'cleanup'; require __DIR__ . '/admin_nav.php'; ?>
   <div class="admin-wrap">
   <main class="card">
     <h1><?= __('Limpiar archivos huérfanos') ?></h1>

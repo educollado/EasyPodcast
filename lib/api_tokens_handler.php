@@ -5,16 +5,18 @@ declare(strict_types=1);
 require_once __DIR__ . '/api_helpers.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/access_control.php';
 
 /**
  * @return array<string, string>
  */
 function apiTokenScopeOptions(): array
 {
-    return [
-        'content' => __('Contenido'),
-        'admin' => __('Administración total'),
-    ];
+    $options = ['content' => __('Contenido')];
+    if (adminSessionIsGlobal()) {
+        $options['admin'] = __('Administración total');
+    }
+    return $options;
 }
 
 /**
@@ -49,8 +51,8 @@ function loadApiTokensData(string $dbPath): array
             ->fetchColumn();
 
         if ($tableExists) {
-            $tokensStmt = $pdo->prepare("SELECT id, name, token_suffix, scope, expires_at, created_at, last_used_at FROM api_tokens WHERE podcast_id = :podcast_id ORDER BY created_at DESC");
-            $tokensStmt->execute([':podcast_id' => activePodcastId($pdo)]);
+            $tokensStmt = $pdo->prepare("SELECT id, name, token_suffix, scope, expires_at, created_at, last_used_at FROM api_tokens WHERE podcast_id = :podcast_id AND user_id = :user_id ORDER BY created_at DESC");
+            $tokensStmt->execute([':podcast_id' => activePodcastId($pdo), ':user_id' => adminSessionUserId()]);
             $tokens = $tokensStmt->fetchAll();
         }
 
@@ -73,7 +75,7 @@ function loadApiTokensData(string $dbPath): array
             if ($action === 'generate') {
                 $name      = trim((string) ($_POST['token_name'] ?? ''));
                 $expiresAt = trim((string) ($_POST['expires_at'] ?? ''));
-                $scope     = normalizeApiTokenScope((string) ($_POST['token_scope'] ?? 'content'));
+                $scope     = adminSessionIsGlobal() ? normalizeApiTokenScope((string) ($_POST['token_scope'] ?? 'content')) : 'content';
 
                 if ($name === '') {
                     $error = __('El nombre del token es obligatorio.');
@@ -118,7 +120,7 @@ function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $sc
 
     $stmt = $pdo->prepare(
         "INSERT INTO api_tokens (podcast_id, token, token_hash, token_suffix, scope, name, user_id, expires_at, created_at)
-         VALUES (:podcast_id, :token, :token_hash, :token_suffix, :scope, :name, 1, :expires_at, datetime('now'))"
+         VALUES (:podcast_id, :token, :token_hash, :token_suffix, :scope, :name, :user_id, :expires_at, datetime('now'))"
     );
     $stmt->execute([
         ':podcast_id' => activePodcastId($pdo),
@@ -127,6 +129,7 @@ function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $sc
         ':token_suffix' => $tokenSuffix,
         ':scope'      => $scope,
         ':name'       => $name,
+        ':user_id' => adminSessionUserId(),
         ':expires_at' => $expiresAt,
     ]);
 
@@ -138,6 +141,6 @@ function generateApiToken(PDO $pdo, string $name, ?string $expiresAt, string $sc
  */
 function revokeApiToken(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare('DELETE FROM api_tokens WHERE id = :id AND podcast_id = :podcast_id');
-    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo)]);
+    $stmt = $pdo->prepare('DELETE FROM api_tokens WHERE id = :id AND podcast_id = :podcast_id AND user_id = :user_id');
+    $stmt->execute([':id' => $id, ':podcast_id' => activePodcastId($pdo), ':user_id' => adminSessionUserId()]);
 }

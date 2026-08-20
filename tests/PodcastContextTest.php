@@ -38,8 +38,8 @@ test('resolvePublicPodcast usa el podcast principal cuando Multipodcast está de
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, title TEXT)');
     $pdo->exec("INSERT INTO podcast VALUES (1, 'Primero'), (2, 'Principal')");
-    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)');
-    $pdo->exec("INSERT INTO app_settings VALUES (1, 0, NULL, NULL, NULL, NULL, 'easypodcast', 2)");
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, summary_language TEXT, primary_podcast_id INTEGER)');
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 0, NULL, NULL, NULL, NULL, 'easypodcast', 'es_ES', 2)");
 
     assert_eq(2, (int) (resolvePublicPodcast($pdo)['id'] ?? 0));
 });
@@ -54,10 +54,26 @@ test('resolveFeedPodcast usa el principal en la raíz y respeta el directorio so
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, title TEXT, slug TEXT)');
     $pdo->exec("INSERT INTO podcast VALUES (1, 'Principal', 'principal'), (2, 'Secundario', 'secundario')");
-    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)');
-    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, 2, NULL, NULL, NULL, 'easypodcast', 1)");
+    $pdo->exec('CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, summary_language TEXT, primary_podcast_id INTEGER)');
+    $pdo->exec("INSERT INTO app_settings VALUES (1, 1, 2, NULL, NULL, NULL, 'easypodcast', 'es_ES', 1)");
 
     assert_eq(1, (int) (resolveFeedPodcast($pdo)['id'] ?? 0));
     assert_eq(2, (int) (resolveFeedPodcast($pdo, 'secundario')['id'] ?? 0));
     assert_null(resolveFeedPodcast($pdo, 'inexistente'));
+});
+
+test('resolveAdminPodcast limita el selector a los podcasts asignados', function () {
+    if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) { return; }
+    $pdo = new PDO('sqlite::memory:');
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->exec('CREATE TABLE podcast (id INTEGER PRIMARY KEY, title TEXT, slug TEXT)');
+    $pdo->exec("INSERT INTO podcast VALUES (1, 'Uno', 'uno'), (2, 'Dos', 'dos'), (3, 'Tres', 'tres')");
+    $_SESSION['admin_user'] = 'user@example.com';
+    $_SESSION['admin_is_global'] = 0;
+    $_SESSION['admin_podcast_ids'] = [1, 3];
+    unset($_SESSION['active_podcast_id']);
+
+    assert_eq(3, (int) (resolveAdminPodcast($pdo, 'tres')['id'] ?? 0));
+    assert_eq(3, (int) (resolveAdminPodcast($pdo, 'dos')['id'] ?? 0));
+    unset($_SESSION['admin_user'], $_SESSION['admin_is_global'], $_SESSION['admin_podcast_ids'], $_SESSION['active_podcast_id']);
 });

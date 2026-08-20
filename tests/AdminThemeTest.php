@@ -76,8 +76,8 @@ test('loadAdminTheme: usa el tema propio de la portada resumen multipodcast', fu
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->exec("CREATE TABLE podcast (id INTEGER PRIMARY KEY, admin_theme TEXT, public_theme_mode_auto INTEGER)");
         $pdo->exec("INSERT INTO podcast VALUES (1, 'corporate', 1)");
-        $pdo->exec("CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, primary_podcast_id INTEGER)");
-        $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, NULL, NULL, NULL, 'monokai', 1)");
+        $pdo->exec("CREATE TABLE app_settings (id INTEGER PRIMARY KEY, multipodcast_enabled INTEGER, homepage_podcast_id INTEGER, summary_hero_image_url TEXT, summary_title TEXT, summary_subtitle TEXT, summary_theme TEXT, summary_language TEXT, primary_podcast_id INTEGER)");
+        $pdo->exec("INSERT INTO app_settings VALUES (1, 1, NULL, NULL, NULL, NULL, 'monokai', 'es_ES', 1)");
         $GLOBALS['_active_podcast'] = null;
 
         loadAdminTheme($dbPath);
@@ -99,4 +99,11 @@ test('la gestión Multipodcast aplica y previsualiza el tema propio del resumen'
     assert_contains("data-theme=\"<?= esc(\$multipodcastTheme) ?>\"", $pageSource);
     assert_contains('data-summary-theme-selector', $pageSource);
     assert_contains('document.documentElement.dataset.theme = themeSelect.value', $scriptSource);
+});
+
+test('la gestión Multipodcast permite elegir un idioma independiente', function () {
+    $source = file_get_contents(__DIR__ . '/../multipodcast_management.php');
+    assert_true(is_string($source));
+    assert_contains('name="summary_language"', $source);
+    assert_contains("\$settings['summary_language']", $source);
 });
