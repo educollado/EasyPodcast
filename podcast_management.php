@@ -31,6 +31,7 @@ extract($data);  // form, error, notice
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= __('Gestión Podcast') ?></title>
   <link rel="stylesheet" href="/assets/css/admin-common.css">
+  <link rel="stylesheet" href="/assets/css/podcast-management.css?v=<?= (int) filemtime(__DIR__ . '/assets/css/podcast-management.css') ?>">
   <link rel="stylesheet" href="/assets/css/themes.css">
 </head>
 <body>
@@ -280,25 +281,6 @@ extract($data);  // form, error, notice
               <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>>Sí</option>
             </select>
           </label>
-          <label>
-            <?= __('Imagen del podcast (URL)') ?>
-            <input type="url" name="image_url" value="<?= esc($form['image_url']) ?>">
-          </label>
-          <label>
-            <?= __('O subir imagen del podcast') ?>
-            <input type="file" name="image_file" accept="image/*">
-          </label>
-          <label>
-            <?= __('Imagen del hero (URL)') ?>
-            <input type="url" name="hero_image_url" value="<?= esc($form['hero_image_url']) ?>">
-            <small><?= __('Déjala vacía para mantener la cabecera actual sin hero.') ?></small>
-          </label>
-          <label>
-            <?= __('O subir imagen para el hero') ?>
-            <input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/gif,image/webp">
-            <small><?= __('La imagen subida se recorta y optimiza automáticamente para la cabecera.') ?></small>
-            <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
-          </label>
           <label class="align-start">
             <?= __('Tipo iTunes') ?>
             <select name="itunes_type">
@@ -323,6 +305,77 @@ extract($data);  // form, error, notice
           </label>
         </div>
 
+        <section class="podcast-images grid-section" aria-label="<?= esc(__('Imágenes del podcast')) ?>">
+          <article class="podcast-image-card">
+            <h2><?= __('Imagen del podcast') ?></h2>
+            <div class="podcast-image-preview podcast-image-preview-cover">
+              <img
+                id="podcast-image-preview"
+                <?php if ($form['image_url'] !== ''): ?>src="<?= esc($form['image_url']) ?>"<?php endif; ?>
+                alt="<?= esc(__('Vista previa de la imagen del podcast')) ?>"
+                <?= $form['image_url'] === '' ? 'hidden' : '' ?>
+              >
+              <span id="podcast-image-placeholder" <?= $form['image_url'] !== '' ? 'hidden' : '' ?>>
+                <?= __('Sin imagen') ?>
+              </span>
+            </div>
+            <label>
+              <?= __('Imagen del podcast (URL)') ?>
+              <input
+                type="url"
+                name="image_url"
+                value="<?= esc($form['image_url']) ?>"
+                data-image-preview="podcast-image-preview"
+              >
+            </label>
+            <label>
+              <?= __('O subir imagen del podcast') ?>
+              <input
+                type="file"
+                name="image_file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                data-image-preview="podcast-image-preview"
+              >
+            </label>
+          </article>
+
+          <article class="podcast-image-card">
+            <h2><?= __('Imagen del hero') ?></h2>
+            <div class="podcast-image-preview podcast-image-preview-hero">
+              <img
+                id="hero-image-preview"
+                <?php if ($form['hero_image_url'] !== ''): ?>src="<?= esc($form['hero_image_url']) ?>"<?php endif; ?>
+                alt="<?= esc(__('Vista previa de la imagen del hero')) ?>"
+                <?= $form['hero_image_url'] === '' ? 'hidden' : '' ?>
+              >
+              <span id="hero-image-placeholder" <?= $form['hero_image_url'] !== '' ? 'hidden' : '' ?>>
+                <?= __('Sin imagen') ?>
+              </span>
+            </div>
+            <label>
+              <?= __('Imagen del hero (URL)') ?>
+              <input
+                type="url"
+                name="hero_image_url"
+                value="<?= esc($form['hero_image_url']) ?>"
+                data-image-preview="hero-image-preview"
+              >
+              <small><?= __('Déjala vacía para mantener la cabecera actual sin hero.') ?></small>
+            </label>
+            <label>
+              <?= __('O subir imagen para el hero') ?>
+              <input
+                type="file"
+                name="hero_image_file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                data-image-preview="hero-image-preview"
+              >
+              <small><?= __('La imagen subida se recorta y optimiza automáticamente para la cabecera.') ?></small>
+              <small><?= __('La imagen se recortará para cubrir la cabecera sin cambiar su tamaño.') ?></small>
+            </label>
+          </article>
+        </section>
+
         <div class="grid grid-section">
           <label>
             <?= __('Copyright') ?>
@@ -336,6 +389,6 @@ extract($data);  // form, error, notice
       </form>
     </main>
   </div>
-  <script src="/assets/js/podcast_management.js"></script>
+  <script src="/assets/js/podcast_management.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/podcast_management.js') ?>"></script>
 </body>
 </html>

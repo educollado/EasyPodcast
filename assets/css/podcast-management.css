@@ -1,0 +1,83 @@
+/* Imágenes del canal: portada y hero se editan en bloques paralelos. */
+.podcast-images {
+  display: grid;
+  gap: .85rem;
+}
+
+.podcast-image-card {
+  display: grid;
+  grid-template-rows: auto 190px minmax(5.6rem, auto) auto;
+  align-content: start;
+  gap: .75rem;
+  min-width: 0;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.podcast-image-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.podcast-image-preview {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(45deg, rgba(107, 101, 96, .06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(107, 101, 96, .06) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(107, 101, 96, .06) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(107, 101, 96, .06) 75%);
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.podcast-image-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* La portada conserva su formato cuadrado; el hero ocupa el marco panorámico. */
+.podcast-image-preview-cover {
+  width: 190px;
+  max-width: 100%;
+  justify-self: center;
+}
+
+.podcast-image-card > label {
+  align-content: start;
+}
+
+/* Evita que los campos se estiren cuando su pareja de fila tiene más contenido. */
+.grid.two > label {
+  align-content: start;
+}
+
+.podcast-image-preview span {
+  padding: .5rem;
+  color: var(--muted);
+  font-size: .85rem;
+  text-align: center;
+}
+
+.podcast-image-preview [hidden] {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .podcast-images {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
