@@ -1319,6 +1319,9 @@ msgstr "El contingut al qual estàs intentant accedir està prohibit i no tens p
 msgid "Volver al inicio"
 msgstr "Tornar a l'inici"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast creat dins de"
+
 msgid "Página no encontrada"
 msgstr "Pàgina no trobada"
 

@@ -16,6 +16,13 @@ test('buildFeedTrackingUrl: mantiene el tracking en la raíz si la base contiene
     assert_eq('https://example.com/track?episode_id=7&action=feed', $url);
 });
 
+test('applicationHomeUrlFromBaseUrl: elimina el directorio del podcast', function () {
+    assert_eq(
+        'https://podcasts.example:8443',
+        applicationHomeUrlFromBaseUrl('https://podcasts.example:8443/tecnologia')
+    );
+});
+
 test('normalizeEnclosureMime: usa el MIME original aunque la URL de tracking no tenga extensión', function () {
     $mime = normalizeEnclosureMime('audio/mpeg', 'https://example.com/track.php?episode_id=7&action=feed');
 

@@ -135,6 +135,7 @@ test('las cadenas de Multipodcast están traducidas en todos los idiomas', funct
         'Las imágenes, audios y URLs multimedia de «%s» no cambiarán. Los podcasts secundarios se borrarán después de crear sus copias ZIP.',
         'Entiendo que los podcasts secundarios se borrarán definitivamente.',
         'Escribe el título del podcast principal para confirmar',
+        'Podcast creado dentro de',
     ];
 
     foreach (glob(__DIR__ . '/../locale/*.po') ?: [] as $localeFile) {

@@ -150,6 +150,19 @@ function resolveBaseUrl(PDO $pdo): string
 }
 
 /**
+ * Devuelve la portada común de la instalación, sin el directorio del podcast.
+ */
+function applicationHomeUrlFromBaseUrl(string $baseUrl): string
+{
+    return extractBaseUrlFromLink($baseUrl) ?? runtimeBaseUrl();
+}
+
+function resolveApplicationHomeUrl(PDO $pdo): string
+{
+    return applicationHomeUrlFromBaseUrl(resolveBaseUrl($pdo));
+}
+
+/**
  * Devuelve la URL canónica del feed (base + /feed.xml) para la etiqueta atom:link rel="self".
  */
 function resolveFeedSelfHref(PDO $pdo): string

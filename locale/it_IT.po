@@ -1189,6 +1189,9 @@ msgstr "Il contenuto a cui stai cercando di accedere è vietato e non hai il per
 msgid "Volver al inicio"
 msgstr "Torna all'inizio"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast creato all'interno di"
+
 msgid "Página no encontrada"
 msgstr "Pagina non trovata"
 

@@ -31,6 +31,13 @@ test('cacheDirectoryPath: devuelve ruta consistente', function () {
     assert_eq($path1, $path2);
 });
 
+test('isWebCacheEnabled: la portada resumen usa el podcast principal', function () {
+    $source = file_get_contents(__DIR__ . '/../lib/cache_service.php');
+
+    assert_true(is_string($source));
+    assert_contains('activePodcast($pdo) ?? primaryPodcast($pdo)', $source);
+});
+
 // =============================================================================
 // ensureCacheDirectory
 // =============================================================================

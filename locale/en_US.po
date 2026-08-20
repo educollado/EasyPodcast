@@ -1319,6 +1319,9 @@ msgstr "The content you're trying to access is forbidden and you don't have perm
 msgid "Volver al inicio"
 msgstr "Back to home"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast created within"
+
 msgid "Página no encontrada"
 msgstr "Page not found"
 

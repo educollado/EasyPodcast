@@ -57,7 +57,9 @@ function isWebCacheEnabled(string $dbPath): bool
             return false;
         }
 
-        $podcast = activePodcast($pdo) ?? firstPodcast($pdo);
+        // En la portada-resumen no hay podcast activo: su caché sigue la
+        // configuración del podcast principal de la instalación.
+        $podcast = activePodcast($pdo) ?? primaryPodcast($pdo);
         $value = $podcast['cache_enabled'] ?? 0;
         return ((int) $value) === 1;
     } catch (Throwable $e) {

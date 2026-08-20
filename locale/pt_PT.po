@@ -1319,6 +1319,9 @@ msgstr "O conteúdo a que está a tentar aceder é proibido e não tem permissã
 msgid "Volver al inicio"
 msgstr "Voltar ao início"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast criado dentro de"
+
 msgid "Página no encontrada"
 msgstr "Página não encontrada"
 

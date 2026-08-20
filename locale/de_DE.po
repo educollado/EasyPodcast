@@ -1189,6 +1189,9 @@ msgstr "Der Inhalt, auf den du zugreifen möchtest, ist verboten und du hast kei
 msgid "Volver al inicio"
 msgstr "Zurück zum Start"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast erstellt innerhalb von"
+
 msgid "Página no encontrada"
 msgstr "Seite nicht gefunden"
 

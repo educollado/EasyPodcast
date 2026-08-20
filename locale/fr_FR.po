@@ -1319,6 +1319,9 @@ msgstr "Le contenu auquel vous essayez d'accéder est interdit et vous n'avez pa
 msgid "Volver al inicio"
 msgstr "Retour à l'accueil"
 
+msgid "Podcast creado dentro de"
+msgstr "Podcast créé au sein de"
+
 msgid "Página no encontrada"
 msgstr "Page introuvable"
 

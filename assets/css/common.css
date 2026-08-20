@@ -432,6 +432,8 @@ h1 a:hover { color: var(--accent); }
 
 .site-footer p { margin: 0; }
 
+.site-footer .footer-home-link { margin-top: .4rem; }
+
 .footer-social {
   display: flex;
   justify-content: center;

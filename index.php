@@ -20,7 +20,16 @@ $dbPath = getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite';
 enforceCanonicalHostFromPodcastLink($dbPath);
 $contextPdo = openPodcastDatabase($dbPath);
 if (multipodcastEnabled($contextPdo) && activePodcast($contextPdo) === null) {
+    if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {
+        exit;
+    }
+    ob_start();
     require __DIR__ . '/multipodcast_home.php';
+    $cachedOutput = ob_get_contents();
+    if (is_string($cachedOutput)) {
+        storeWebCache($dbPath, $cachedOutput);
+    }
+    ob_end_flush();
     exit;
 }
 if (tryServeWebCache($dbPath, 'text/html; charset=UTF-8')) {

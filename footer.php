@@ -1,9 +1,18 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/lib/social_handler.php';
+require_once __DIR__ . '/feed_builder.php';
 $_footerDbPath = isset($dbPath) ? $dbPath : (getenv('PODCAST_DB_PATH') ?: __DIR__ . '/podcast.sqlite');
 $_footerSocial = getSocialLinks($_footerDbPath);
 $_footerIcons  = getSocialIcons();
+try {
+    $_footerPdo = openPodcastDatabase($_footerDbPath);
+    $_footerHomeUrl = resolveApplicationHomeUrl($_footerPdo);
+    $_footerShowHomeLink = !(multipodcastEnabled($_footerPdo) && activePodcast($_footerPdo) === null);
+} catch (Throwable $e) {
+    $_footerHomeUrl = runtimeBaseUrl();
+    $_footerShowHomeLink = true;
+}
 ?>
 <footer class="site-footer">
   <?php
@@ -28,5 +37,8 @@ $_footerIcons  = getSocialIcons();
     '<strong>Europa</strong>',
     '<a href="https://www.eduardocollado.com" target="_blank" rel="noopener noreferrer">Eduardo Collado</a>'
   ) ?></p>
+  <?php if ($_footerShowHomeLink): ?>
+    <p class="footer-home-link"><?= esc(__('Podcast creado dentro de')) ?> <a href="<?= esc($_footerHomeUrl) ?>"><?= esc($_footerHomeUrl) ?></a></p>
+  <?php endif; ?>
 </footer>
 <script src="/assets/js/public.js"></script>

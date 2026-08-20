@@ -9,6 +9,28 @@ test('la portada resumen filtra los podcasts ocultos', function () {
     assert_contains('p.include_in_summary = 1', $source);
 });
 
+test('el pie oculta la referencia a la instalación en la portada resumen', function () {
+    $source = file_get_contents(__DIR__ . '/../footer.php');
+
+    assert_true(is_string($source));
+    assert_contains('multipodcastEnabled($_footerPdo) && activePodcast($_footerPdo) === null', $source);
+    assert_contains('if ($_footerShowHomeLink)', $source);
+});
+
+test('la portada resumen se sirve y se guarda en la caché pública', function () {
+    $source = file_get_contents(__DIR__ . '/../index.php');
+
+    assert_true(is_string($source));
+    $summaryBranch = strpos($source, 'if (multipodcastEnabled($contextPdo) && activePodcast($contextPdo) === null)');
+    $cacheRead = strpos($source, "tryServeWebCache(\$dbPath, 'text/html; charset=UTF-8')", $summaryBranch ?: 0);
+    $summaryRender = strpos($source, "require __DIR__ . '/multipodcast_home.php'", $summaryBranch ?: 0);
+    $cacheWrite = strpos($source, 'storeWebCache($dbPath, $cachedOutput)', $summaryRender ?: 0);
+
+    assert_true(is_int($summaryBranch));
+    assert_true(is_int($cacheRead) && is_int($summaryRender) && $cacheRead < $summaryRender);
+    assert_true(is_int($cacheWrite) && $summaryRender < $cacheWrite);
+});
+
 test('la gestión del podcast ofrece el selector de visibilidad dentro del formulario', function () {
     $source = file_get_contents(__DIR__ . '/../podcast_management.php');
 

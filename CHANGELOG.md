@@ -2,6 +2,8 @@
 
 ## Siguiente release
 
+- **Caché de la portada Multipodcast**: el resumen público se almacena y sirve desde la caché del podcast principal; los cambios en podcasts, episodios o configuración Multipodcast invalidan la portada para regenerarla en la siguiente visita.
+- **Referencia a la instalación**: el pie de cada podcast indica la URL base enlazada donde fue creado, omitiendo esa referencia en la portada-resumen Multipodcast.
 - **Conversión Multipodcast reversible**: al activarlo se solicita en la misma pantalla el directorio del podcast actual, que queda como principal; imágenes, audios y URLs de enclosure permanecen globales y estables, y la regeneración de imágenes abarca todos los podcasts. Al desactivarlo se exige confirmación reforzada y se crean ZIP de los secundarios antes de borrar sus datos y medios exclusivos.
 - **Portada Multipodcast más clara**: la configuración muestra dos opciones visibles para elegir entre el resumen de todos los podcasts o la portada de un único podcast.
 - **Enlaces del resumen integrados con el tema**: los títulos de los podcasts dejan de usar el azul subrayado del navegador y adoptan los colores y estados de enlace del tema elegido.
