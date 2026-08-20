@@ -490,7 +490,7 @@ small {
 
 /* Gestión Multipodcast: tarjetas amplias que evitan solapes entre contenido y formularios. */
 .podcast-admin-list {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.2rem;
 }
 
@@ -612,6 +612,12 @@ small {
 
 .podcast-admin-delete .btn:hover {
   background: #991b1b;
+}
+
+@media (max-width: 820px) {
+  .podcast-admin-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* =========================================================
