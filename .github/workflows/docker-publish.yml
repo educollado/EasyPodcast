@@ -32,7 +32,7 @@ jobs:
         run: php tools/validate_release.php "${GITHUB_REF_NAME#v}"
 
       - name: Configurar QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
