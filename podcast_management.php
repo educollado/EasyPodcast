@@ -40,6 +40,12 @@ extract($data);  // form, error, notice
     <main class="card">
       <h1><?= __('Gestión Podcast') ?></h1>
       <p><?= __('Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>.') ?></p>
+      <?php if ($showSummaryVisibilityOption): ?>
+        <label class="inline-checkbox summary-visibility-option">
+          <input type="checkbox" name="include_in_summary" value="1" form="podcast-metadata-form" <?= $form['include_in_summary'] === '1' ? 'checked' : '' ?>>
+          <span><?= __('Mostrar este podcast en la página principal de resumen.') ?></span>
+        </label>
+      <?php endif; ?>
 
       <?php if ($error !== ''): ?>
         <div class="error"><?= esc($error) ?></div>
@@ -49,7 +55,7 @@ extract($data);  // form, error, notice
         <div class="notice"><?= esc($notice) ?></div>
       <?php endif; ?>
 
-      <form method="post" action="podcast_management.php" autocomplete="off" enctype="multipart/form-data">
+      <form id="podcast-metadata-form" method="post" action="podcast_management.php" autocomplete="off" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
         <div class="grid two">
           <label>

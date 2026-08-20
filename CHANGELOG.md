@@ -19,6 +19,7 @@
 - **Marca del panel**: la esquina superior izquierda vuelve a mostrar EasyPodcast también cuando está activo el modo Multipodcast, conservando el enlace a su gestión.
 - **Feed principal estable**: `/feed.xml` sirve siempre como alias del feed del podcast marcado como principal, aunque la portada muestre el resumen u otro podcast; el RSS mantiene como URL canónica `/<directorio>/feed.xml`.
 - **Tema coherente en Multipodcast**: `multipodcast.php` usa siempre el tema configurado para el resumen y permite previsualizarlo al instante desde su selector, sin heredar el tema de un podcast.
+- **Visibilidad en el resumen**: cada podcast puede decidir desde su gestión si aparece en la portada-resumen Multipodcast; la opción solo se muestra cuando esa portada está activa y conserva por defecto la visibilidad existente.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

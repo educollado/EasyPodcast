@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS podcast (
   last_update_check_date TEXT,
   latest_version_checked TEXT,
   slug TEXT,
+  include_in_summary INTEGER NOT NULL DEFAULT 1,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
@@ -214,4 +215,4 @@ BEGIN
   ON CONFLICT(podcast_id, episode_id, anio) DO UPDATE SET descargas = descargas + 1;
 END;
 
-PRAGMA user_version = 24;
+PRAGMA user_version = 25;

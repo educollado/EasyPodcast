@@ -188,6 +188,7 @@ function loadPodcastManagementData(string $dbPath): array
         'write_audio_metadata' => '0',
         'cache_enabled'       => '0',
         'app_language'        => 'es_ES',
+        'include_in_summary'  => '1',
     ];
 
     try {
@@ -218,7 +219,8 @@ function loadPodcastManagementData(string $dbPath): array
               cache_enabled INTEGER NOT NULL DEFAULT 0,
               app_language TEXT NOT NULL DEFAULT 'es_ES',
               admin_theme TEXT NOT NULL DEFAULT 'default',
-              public_theme_mode_auto INTEGER NOT NULL DEFAULT 0
+              public_theme_mode_auto INTEGER NOT NULL DEFAULT 0,
+              include_in_summary INTEGER NOT NULL DEFAULT 1
             )"
         );
 
@@ -229,6 +231,9 @@ function loadPodcastManagementData(string $dbPath): array
                 $form[$key] = (string) ($existing[$key] ?? $value);
             }
         }
+        $appSettings = loadAppSettings($pdo);
+        $showSummaryVisibilityOption = $appSettings['multipodcast_enabled'] === 1
+            && $appSettings['homepage_podcast_id'] === null;
         // Si el link está vacío (instalación nueva o campo no guardado), sugerir el host actual.
         if ($form['link'] === '') {
             $form['link'] = runtimeBaseUrl();
@@ -256,6 +261,12 @@ function loadPodcastManagementData(string $dbPath): array
                 }
                 if ($key === 'cache_enabled') {
                     // Gestionado desde cache_management.php; preservar valor de BD.
+                    continue;
+                }
+                if ($key === 'include_in_summary') {
+                    if ($showSummaryVisibilityOption) {
+                        $form[$key] = isset($_POST[$key]) ? '1' : '0';
+                    }
                     continue;
                 }
                 if ($key === 'app_language') {
@@ -376,8 +387,10 @@ function loadPodcastManagementData(string $dbPath): array
                         ':write_audio_metadata' => (int) $form['write_audio_metadata'],
                         ':cache_enabled'        => (int) $form['cache_enabled'],
                         ':app_language'         => $form['app_language'],
+                        ':include_in_summary'   => (int) $form['include_in_summary'],
                     ];
 
+                    $savedPodcastId = 0;
                     if ($existing) {
                         // Actualiza la fila única del podcast.
                         $stmt = $pdo->prepare(
@@ -399,21 +412,24 @@ function loadPodcastManagementData(string $dbPath): array
                                  home_items_per_page = :home_items_per_page,
                                  write_audio_metadata = :write_audio_metadata,
                                  cache_enabled = :cache_enabled,
-                                 app_language = :app_language
+                                 app_language = :app_language,
+                                 include_in_summary = :include_in_summary
                              WHERE id = :id'
                         );
                         $params[':id'] = (int) $existing['id'];
                         $stmt->execute($params);
+                        $savedPodcastId = (int) $existing['id'];
                         $notice = __('Podcast actualizado correctamente.');
                     } else {
                         // Inserción inicial cuando aún no existe fila de podcast (primera configuración).
                         $stmt = $pdo->prepare(
                             'INSERT INTO podcast
-                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, hero_image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language, admin_theme)
+                             (title, description, link, language, author, owner_name, owner_email, category, explicit, image_url, hero_image_url, copyright, itunes_type, rss_item_limit, home_items_per_page, write_audio_metadata, cache_enabled, app_language, admin_theme, include_in_summary)
                              VALUES
-                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :hero_image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language, \'easypodcast\')'
+                             (:title, :description, :link, :language, :author, :owner_name, :owner_email, :category, :explicit, :image_url, :hero_image_url, :copyright, :itunes_type, :rss_item_limit, :home_items_per_page, :write_audio_metadata, :cache_enabled, :app_language, \'easypodcast\', :include_in_summary)'
                         );
                         $stmt->execute($params);
+                        $savedPodcastId = (int) $pdo->lastInsertId();
                         $notice = __('Podcast guardado correctamente.');
                     }
 
@@ -434,8 +450,9 @@ function loadPodcastManagementData(string $dbPath): array
                     }
 
                     // Recarga el formulario con los datos persistidos.
-                    $existing = activePodcast($pdo);
+                    $existing = podcastById($pdo, $savedPodcastId);
                     if ($existing) {
+                        activatePodcastContext($existing, multipodcastEnabled($pdo));
                         foreach ($form as $key => $value) {
                             $form[$key] = (string) ($existing[$key] ?? $value);
                         }
@@ -450,5 +467,5 @@ function loadPodcastManagementData(string $dbPath): array
         exit;
     }
 
-    return compact('form', 'error', 'notice');
+    return compact('form', 'error', 'notice', 'showSummaryVisibilityOption');
 }

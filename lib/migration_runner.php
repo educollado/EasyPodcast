@@ -157,6 +157,12 @@ function runMigrations(string $dbPath): void
         $pdo->exec('PRAGMA user_version = 24');
         $version = 24;
     }
+
+    if ($version < 25) {
+        migration_v25($pdo);
+        $pdo->exec('PRAGMA user_version = 25');
+        $version = 25;
+    }
 }
 
 /**
@@ -824,6 +830,20 @@ function migration_v24(PDO $pdo): void
              SET primary_podcast_id = (SELECT id FROM podcast ORDER BY id ASC LIMIT 1)
              WHERE primary_podcast_id IS NULL'
         );
+    }
+}
+
+/**
+ * Migración v25: permite ocultar podcasts de la portada-resumen.
+ */
+function migration_v25(PDO $pdo): void
+{
+    $existing = array_column(
+        $pdo->query('PRAGMA table_info(podcast)')->fetchAll(),
+        'name'
+    );
+    if (!in_array('include_in_summary', $existing, true)) {
+        $pdo->exec('ALTER TABLE podcast ADD COLUMN include_in_summary INTEGER NOT NULL DEFAULT 1');
     }
 }
 

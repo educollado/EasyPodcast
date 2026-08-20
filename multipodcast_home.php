@@ -9,7 +9,7 @@ $podcasts = $aggregatePdo->query(
             COUNT(e.id) AS episode_count, MAX(CASE WHEN e.status = 'published' THEN e.pub_date END) AS latest_pub_date
      FROM podcast p
      LEFT JOIN episodes e ON e.podcast_id = p.id
-     WHERE p.slug IS NOT NULL AND p.slug != ''
+     WHERE p.slug IS NOT NULL AND p.slug != '' AND p.include_in_summary = 1
      GROUP BY p.id
      ORDER BY latest_pub_date IS NULL ASC, latest_pub_date DESC, p.title COLLATE NOCASE ASC"
 )->fetchAll();
