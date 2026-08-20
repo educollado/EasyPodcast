@@ -76,6 +76,7 @@ test('las cadenas de Multipodcast están traducidas en todos los idiomas', funct
         'Descargar copia de seguridad',
         'Configuración Multipodcast',
         'Activar Multipodcast',
+        'Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada.',
         'Contenido de la portada principal',
         'Resumen de todos los podcasts',
         'Podcasts disponibles',

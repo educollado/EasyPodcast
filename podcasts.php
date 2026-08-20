@@ -55,7 +55,11 @@ extract($data);
   <form method="post" action="podcasts.php">
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
-    <label><input type="checkbox" name="multipodcast_enabled" value="1" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>> <?= __('Activar Multipodcast') ?></label>
+    <label class="inline-checkbox multipodcast-toggle">
+      <input type="checkbox" name="multipodcast_enabled" value="1" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
+      <span><?= __('Activar Multipodcast') ?></span>
+    </label>
+    <p class="multipodcast-warning" role="note"><?= __('Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada.') ?></p>
     <label for="homepage_podcast_id"><?= __('Contenido de la portada principal') ?></label>
     <select id="homepage_podcast_id" name="homepage_podcast_id">
       <option value=""><?= __('Resumen de todos los podcasts') ?></option>

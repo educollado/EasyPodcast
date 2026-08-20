@@ -228,6 +228,21 @@ label.inline-checkbox small {
   font-weight: 400;
 }
 
+.multipodcast-toggle {
+  width: fit-content;
+}
+
+.multipodcast-warning {
+  margin: .45rem 0 1rem;
+  padding: .65rem .8rem;
+  color: var(--danger);
+  background: #fff0f0;
+  border-left: 3px solid var(--danger);
+  border-radius: 6px;
+  font-size: .86rem;
+  font-weight: 500;
+}
+
 input,
 textarea,
 select {
