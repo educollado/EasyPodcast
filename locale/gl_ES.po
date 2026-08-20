@@ -2124,3 +2124,24 @@ msgstr "Non se seleccionou ningún ficheiro"
 
 msgid "%d archivos seleccionados"
 msgstr "%d ficheiros seleccionados"
+
+msgid "Alcance"
+msgstr "Ámbito"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Usa o ámbito content para automatizacións normais. Reserva admin só para operacións sensibles como a actualización da aplicación."
+
+msgid "Los tokens con alcance"
+msgstr "Os tokens con ámbito"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "cobren a API de contidos e o mantemento habitual. O endpoint"
+
+msgid "requiere un token con alcance"
+msgstr "require un token con ámbito"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "Este endpoint require un token con ámbito"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "Se está baleiro, xérase automaticamente."

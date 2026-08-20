@@ -1994,3 +1994,24 @@ msgstr "Keine Datei ausgewählt"
 
 msgid "%d archivos seleccionados"
 msgstr "%d Dateien ausgewählt"
+
+msgid "Alcance"
+msgstr "Berechtigungsbereich"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Verwenden Sie den Berechtigungsbereich content für normale Automatisierungen. Reservieren Sie admin nur für sensible Vorgänge wie die Aktualisierung der Anwendung."
+
+msgid "Los tokens con alcance"
+msgstr "Tokens mit dem Berechtigungsbereich"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "decken die Inhalts-API und die übliche Wartung ab. Der Endpunkt"
+
+msgid "requiere un token con alcance"
+msgstr "erfordert ein Token mit dem Berechtigungsbereich"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "Dieser Endpunkt erfordert ein Token mit dem Berechtigungsbereich"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "Wenn leer, wird er automatisch generiert."

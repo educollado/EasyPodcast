@@ -2124,3 +2124,24 @@ msgstr "No file selected"
 
 msgid "%d archivos seleccionados"
 msgstr "%d files selected"
+
+msgid "Alcance"
+msgstr "Scope"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Use the content scope for normal automations. Reserve admin only for sensitive operations such as updating the application."
+
+msgid "Los tokens con alcance"
+msgstr "Tokens with scope"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "cover the content API and routine maintenance. The endpoint"
+
+msgid "requiere un token con alcance"
+msgstr "requires a token with scope"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "This endpoint requires a token with scope"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "If left empty, it is generated automatically."

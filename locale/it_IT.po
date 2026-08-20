@@ -1994,3 +1994,24 @@ msgstr "Nessun file selezionato"
 
 msgid "%d archivos seleccionados"
 msgstr "%d file selezionati"
+
+msgid "Alcance"
+msgstr "Ambito"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Usa l'ambito content per le automazioni normali. Riserva admin solo alle operazioni sensibili, come l'aggiornamento dell'applicazione."
+
+msgid "Los tokens con alcance"
+msgstr "I token con ambito"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "coprono l'API dei contenuti e la manutenzione ordinaria. L'endpoint"
+
+msgid "requiere un token con alcance"
+msgstr "richiede un token con ambito"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "Questo endpoint richiede un token con ambito"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "Se vuoto, viene generato automaticamente."

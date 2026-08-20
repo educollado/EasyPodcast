@@ -3,7 +3,7 @@
 ## Siguiente release
 
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
-- **Traducciones**: completadas las cadenas del hero, el campo explícito, la paginación de estadísticas y los selectores de archivos en los ocho idiomas soportados.
+- **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.
 - **Proceso de release**: el changelog mantiene las novedades bajo `Siguiente release` y GitHub Actions valida que ese encabezado se sustituya por la versión del tag y coincida con `APP_VERSION` antes de publicar paquetes o imágenes Docker.
 

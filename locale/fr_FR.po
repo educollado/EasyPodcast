@@ -2124,3 +2124,24 @@ msgstr "Aucun fichier sélectionné"
 
 msgid "%d archivos seleccionados"
 msgstr "%d fichiers sélectionnés"
+
+msgid "Alcance"
+msgstr "Portée"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Utilisez la portée content pour les automatisations normales. Réservez admin uniquement aux opérations sensibles comme la mise à jour de l’application."
+
+msgid "Los tokens con alcance"
+msgstr "Les jetons avec la portée"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "couvrent l’API de contenu et la maintenance habituelle. Le point de terminaison"
+
+msgid "requiere un token con alcance"
+msgstr "nécessite un jeton avec la portée"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "Ce point de terminaison exige un jeton avec la portée"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "S’il est vide, il est généré automatiquement."

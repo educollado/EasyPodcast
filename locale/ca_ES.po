@@ -2124,3 +2124,24 @@ msgstr "No s'ha seleccionat cap fitxer"
 
 msgid "%d archivos seleccionados"
 msgstr "%d fitxers seleccionats"
+
+msgid "Alcance"
+msgstr "Abast"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "Utilitza l'abast content per a automatitzacions normals. Reserva admin només per a operacions sensibles com l'actualització de l'aplicació."
+
+msgid "Los tokens con alcance"
+msgstr "Els tokens amb abast"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "cobreixen l'API de continguts i el manteniment habitual. L'endpoint"
+
+msgid "requiere un token con alcance"
+msgstr "requereix un token amb abast"
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "Aquest endpoint exigeix un token amb abast"
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "Si està buit, es genera automàticament"

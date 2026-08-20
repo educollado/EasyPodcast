@@ -61,7 +61,7 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
         <div class="grid two">
           <label>
             <?= __('GUID (opcional)') ?>
-            <input type="text" name="guid" value="<?= esc($form['guid']) ?>" placeholder="Si está vacío se genera automáticamente">
+            <input type="text" name="guid" value="<?= esc($form['guid']) ?>" placeholder="<?= esc(__('Si está vacío se genera automáticamente')) ?>">
           </label>
           <label>
             <?= __('Estado') ?>

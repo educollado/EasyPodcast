@@ -60,11 +60,11 @@ extract($data);  // form, isEditing, editingPageId, topLevelPages, error, notice
 
         <div class="grid two">
           <label>
-            Título *
+            <?= __('Título *') ?>
             <input id="page_title" type="text" name="title" value="<?= esc($form['title']) ?>" required>
           </label>
           <label>
-            Estado
+            <?= __('Estado') ?>
             <select name="status">
               <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
               <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>

@@ -20,6 +20,13 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
         'Seleccionar archivo',
         'No se ha seleccionado ningún archivo',
         '%d archivos seleccionados',
+        'Alcance',
+        'Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación.',
+        'Los tokens con alcance',
+        'cubren la API de contenidos y mantenimiento habitual. El endpoint',
+        'requiere un token con alcance',
+        'Este endpoint exige un token con alcance',
+        'Si está vacío se genera automáticamente',
     ];
     $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
 
