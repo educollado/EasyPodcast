@@ -249,6 +249,62 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(181, 71, 14, .1);
 }
 
+.translated-file-control {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  min-height: 2.7rem;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.translated-file-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  opacity: 0;
+}
+
+.translated-file-button {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  padding: .55rem .75rem;
+  color: var(--text);
+  background: rgba(107, 101, 96, .08);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  font-size: .88rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.translated-file-button:hover {
+  color: var(--accent);
+  background: rgba(181, 71, 14, .08);
+}
+
+.translated-file-button:focus,
+.translated-file-button.is-focused {
+  outline: 0;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.translated-file-status {
+  min-width: 0;
+  padding: .55rem .75rem;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 textarea {
   min-height: 120px;
   resize: vertical;

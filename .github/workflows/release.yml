@@ -15,6 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Validar versión y changelog
+        shell: bash
+        run: php tools/validate_release.php "${GITHUB_REF_NAME#v}"
+
       - name: Construir paquete verificable
         shell: bash
         run: |

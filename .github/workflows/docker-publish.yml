@@ -18,6 +18,10 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v7
 
+      - name: Validar versión y changelog
+        shell: bash
+        run: php tools/validate_release.php "${GITHUB_REF_NAME#v}"
+
       - name: Configurar QEMU
         uses: docker/setup-qemu-action@v3
 

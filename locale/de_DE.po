@@ -1948,3 +1948,49 @@ msgstr "Eine neue Version von EasyPodcast ist verfügbar:"
 
 msgid "Actualizar ahora"
 msgstr "Jetzt aktualisieren"
+
+# ---------------------------------------------------------------------------
+# podcast_management.php, stats.php und Dateiauswahl
+# ---------------------------------------------------------------------------
+
+msgid "Imágenes del podcast"
+msgstr "Podcast-Bilder"
+
+msgid "Imagen del podcast"
+msgstr "Podcast-Bild"
+
+msgid "Vista previa de la imagen del podcast"
+msgstr "Vorschau des Podcast-Bildes"
+
+msgid "Imagen del hero"
+msgstr "Hero-Bild"
+
+msgid "Vista previa de la imagen del hero"
+msgstr "Vorschau des Hero-Bildes"
+
+msgid "Imagen del hero (URL)"
+msgstr "Hero-Bild (URL)"
+
+msgid "O subir imagen para el hero"
+msgstr "Oder Hero-Bild hochladen"
+
+msgid "Déjala vacía para mantener la cabecera actual sin hero."
+msgstr "Lassen Sie das Feld leer, um die aktuelle Kopfzeile ohne Hero-Bild beizubehalten."
+
+msgid "La imagen subida se recorta y optimiza automáticamente para la cabecera."
+msgstr "Das hochgeladene Bild wird automatisch für die Kopfzeile zugeschnitten und optimiert."
+
+msgid "La imagen se recortará para cubrir la cabecera sin cambiar su tamaño."
+msgstr "Das Bild wird zugeschnitten, damit es die Kopfzeile ausfüllt, ohne seine Größe zu ändern."
+
+msgid "Mostrando %d-%d de %d"
+msgstr "Anzeige %d-%d von %d"
+
+msgid "Seleccionar archivo"
+msgstr "Datei auswählen"
+
+msgid "No se ha seleccionado ningún archivo"
+msgstr "Keine Datei ausgewählt"
+
+msgid "%d archivos seleccionados"
+msgstr "%d Dateien ausgewählt"

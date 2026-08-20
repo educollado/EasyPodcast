@@ -1,5 +1,12 @@
 # Changelog
 
+## Siguiente release
+
+- **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
+- **Traducciones**: completadas las cadenas del hero, el campo explícito, la paginación de estadísticas y los selectores de archivos en los ocho idiomas soportados.
+- **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.
+- **Proceso de release**: el changelog mantiene las novedades bajo `Siguiente release` y GitHub Actions valida que ese encabezado se sustituya por la versión del tag y coincida con `APP_VERSION` antes de publicar paquetes o imágenes Docker.
+
 ## 1.9.11
 
 - **Docker multi-arquitectura**: el workflow de publicación construye una única imagen compatible con `linux/amd64` y `linux/arm64` mediante QEMU y Docker Buildx, reutiliza la caché de GitHub Actions y obtiene dinámicamente el namespace de GHCR. Mejora basada en la contribución de Damián Muraña y validada originalmente en una Raspberry Pi 4 con ARM64.

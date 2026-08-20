@@ -2078,3 +2078,49 @@ msgstr "Hi ha una nova versió d'EasyPodcast disponible:"
 
 msgid "Actualizar ahora"
 msgstr "Actualitza ara"
+
+# ---------------------------------------------------------------------------
+# podcast_management.php, stats.php i selectors de fitxers
+# ---------------------------------------------------------------------------
+
+msgid "Imágenes del podcast"
+msgstr "Imatges del pòdcast"
+
+msgid "Imagen del podcast"
+msgstr "Imatge del pòdcast"
+
+msgid "Vista previa de la imagen del podcast"
+msgstr "Vista prèvia de la imatge del pòdcast"
+
+msgid "Imagen del hero"
+msgstr "Imatge hero"
+
+msgid "Vista previa de la imagen del hero"
+msgstr "Vista prèvia de la imatge hero"
+
+msgid "Imagen del hero (URL)"
+msgstr "Imatge hero (URL)"
+
+msgid "O subir imagen para el hero"
+msgstr "O pujar una imatge per al hero"
+
+msgid "Déjala vacía para mantener la cabecera actual sin hero."
+msgstr "Deixa-la buida per mantenir la capçalera actual sense imatge hero."
+
+msgid "La imagen subida se recorta y optimiza automáticamente para la cabecera."
+msgstr "La imatge pujada es retalla i s'optimitza automàticament per a la capçalera."
+
+msgid "La imagen se recortará para cubrir la cabecera sin cambiar su tamaño."
+msgstr "La imatge es retallarà per cobrir la capçalera sense canviar-ne la mida."
+
+msgid "Mostrando %d-%d de %d"
+msgstr "Mostrant %d-%d de %d"
+
+msgid "Seleccionar archivo"
+msgstr "Selecciona un fitxer"
+
+msgid "No se ha seleccionado ningún archivo"
+msgstr "No s'ha seleccionat cap fitxer"
+
+msgid "%d archivos seleccionados"
+msgstr "%d fitxers seleccionats"

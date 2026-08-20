@@ -6,7 +6,13 @@
 require_once __DIR__ . '/lib/version.php';
 $_navPage = $currentAdminPage ?? '';
 ?>
-<nav class="admin-nav" aria-label="<?= esc(__('Navegación del panel')) ?>">
+<nav
+  class="admin-nav"
+  aria-label="<?= esc(__('Navegación del panel')) ?>"
+  data-file-select-label="<?= esc(__('Seleccionar archivo')) ?>"
+  data-file-empty-label="<?= esc(__('No se ha seleccionado ningún archivo')) ?>"
+  data-file-multiple-label="<?= esc(__('%d archivos seleccionados')) ?>"
+>
   <a class="admin-nav-brand" href="admin.php">EasyPodcast <small>v<?= APP_VERSION ?></small></a>
   <div class="admin-nav-links">
     <a class="admin-nav-link <?= $_navPage === 'dashboard' ? 'active' : '' ?>" href="admin.php"><?= __('Panel') ?></a>
@@ -22,4 +28,4 @@ $_navPage = $currentAdminPage ?? '';
     <button type="submit" class="admin-nav-logout"><?= __('Salir') ?></button>
   </form>
 </nav>
-<script src="/assets/js/admin.js"></script>
+<script src="/assets/js/admin.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/admin.js') ?>"></script>

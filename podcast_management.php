@@ -275,10 +275,10 @@ extract($data);  // form, error, notice
             </div>
           </div>
           <label class="align-start">
-            Explícito
+            <?= __('Explícito') ?>
             <select name="explicit">
-              <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>>No</option>
-              <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>>Sí</option>
+              <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>><?= __('No') ?></option>
+              <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>><?= __('Sí') ?></option>
             </select>
           </label>
           <label class="align-start">
