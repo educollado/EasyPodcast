@@ -111,6 +111,20 @@ body.login-page .card {
   font-weight: 600;
 }
 
+.admin-nav-podcast-selector {
+  flex: 0 0 auto;
+  margin-right: .35rem;
+}
+
+.admin-nav-podcast-selector select {
+  width: auto;
+  max-width: 220px;
+  min-height: 2.1rem;
+  padding: .35rem 1.9rem .35rem .6rem;
+  font-size: .84rem;
+  text-overflow: ellipsis;
+}
+
 .admin-nav-logout-form {
   margin-left: auto;
   flex-shrink: 0;
@@ -1892,7 +1906,12 @@ code.inline {
 }
 
 @media (max-width: 600px) {
-  .admin-nav-brand { display: none; }
+  .admin-nav:not(.is-multipodcast) .admin-nav-brand { display: none; }
+  .admin-nav.is-multipodcast .admin-nav-brand {
+    margin-right: .5rem;
+  }
+  .admin-nav.is-multipodcast .admin-nav-brand small { display: none; }
+  .admin-nav-podcast-selector select { max-width: 145px; }
   .actions { flex-direction: column; }
   .actions .btn { width: 100%; justify-content: center; }
   .pagination { gap: .5rem; align-items: flex-start; }
