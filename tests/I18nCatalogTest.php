@@ -58,6 +58,7 @@ test('las cadenas de Multipodcast están traducidas en todos los idiomas', funct
         'Subtítulo del resumen',
         'Tema del resumen',
         'El tema del resumen no es válido.',
+        'Al desactivar Multipodcast, solo se mostrará el podcast principal «%s». Los demás podcasts y sus datos se conservarán, pero no serán accesibles públicamente hasta volver a activar Multipodcast.',
         'Podcasts',
         'Crea, selecciona y configura los podcasts de la instalación',
         'El directorio debe contener únicamente letras minúsculas, números y guiones.',

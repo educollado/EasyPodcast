@@ -8,7 +8,7 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/upload_service.php';
 require_once __DIR__ . '/admin_theme.php';
 
-/** @return array{podcasts:array,settings:array,error:string,notice:string,backup_file:string} */
+/** @return array{podcasts:array,primary_podcast:?array,settings:array,error:string,notice:string,backup_file:string} */
 function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
 {
     $error = '';
@@ -89,8 +89,12 @@ function loadPodcastsManagementData(string $dbPath, string $projectRoot): array
          FROM podcast p LEFT JOIN episodes e ON e.podcast_id = p.id
          GROUP BY p.id ORDER BY p.title COLLATE NOCASE ASC"
     )->fetchAll();
+    $primaryPodcast = firstPodcast($pdo);
     $settings = loadAppSettings($pdo);
-    return compact('podcasts', 'settings', 'error', 'notice') + ['backup_file' => $backupFile];
+    return compact('podcasts', 'settings', 'error', 'notice') + [
+        'primary_podcast' => $primaryPodcast,
+        'backup_file' => $backupFile,
+    ];
 }
 
 function requestBaseUrl(): string

@@ -243,6 +243,14 @@ label.inline-checkbox small {
   font-weight: 500;
 }
 
+.multipodcast-warning p {
+  margin: 0;
+}
+
+.multipodcast-warning [hidden] {
+  display: none;
+}
+
 input,
 textarea,
 select {

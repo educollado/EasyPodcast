@@ -15,9 +15,31 @@
     updateVisibility();
   }
 
+  function initMultipodcastWarning() {
+    var enabledCheckbox = document.getElementById('multipodcast_enabled');
+    var enabledWarning = document.querySelector('[data-multipodcast-enabled-warning]');
+    var disabledWarning = document.querySelector('[data-multipodcast-disabled-warning]');
+
+    if (!enabledCheckbox || !enabledWarning || !disabledWarning) {
+      return;
+    }
+
+    function updateWarning() {
+      enabledWarning.hidden = !enabledCheckbox.checked;
+      disabledWarning.hidden = enabledCheckbox.checked;
+    }
+
+    enabledCheckbox.addEventListener('change', updateWarning);
+    updateWarning();
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSummaryHeroSettings);
+    document.addEventListener('DOMContentLoaded', function () {
+      initSummaryHeroSettings();
+      initMultipodcastWarning();
+    });
   } else {
     initSummaryHeroSettings();
+    initMultipodcastWarning();
   }
 }());

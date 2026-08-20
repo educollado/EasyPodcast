@@ -11,6 +11,7 @@
 - **Acceso e identidad Multipodcast**: la gestión pasa a `multipodcast.php`, el menú adopta ese nombre y la portada-resumen incorpora un hero propio.
 - **Hero configurable del resumen**: cuando la portada principal muestra todos los podcasts, su imagen hero puede elegirse por URL o subirse desde la gestión Multipodcast, con vista previa, recorte y optimización.
 - **Portada-resumen personalizable**: permite elegir título, subtítulo y tema propios; simplifica y reduce el hero y añade separación entre las tarjetas de podcasts.
+- **Aviso de activación reversible**: el panel explica en tiempo real qué ocurrirá al activar o desactivar Multipodcast e identifica el podcast principal que permanecerá visible.
 - **Gestión de imágenes**: reorganizadas las imágenes del podcast y del hero en bloques alineados, con miniaturas diferenciadas, vista previa inmediata y visualización completa sin recortes.
 - **Traducciones**: completadas las cadenas de los formularios de episodios y páginas, el hero, el campo explícito, la paginación de estadísticas, los tokens y la documentación de la API, y los selectores de archivos en los ocho idiomas soportados.
 - **Selector de archivos**: sustituido el texto nativo del navegador por un control traducible que muestra el archivo seleccionado.

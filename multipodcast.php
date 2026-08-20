@@ -35,6 +35,7 @@ $data = loadPodcastsManagementData($dbPath, __DIR__);
 extract($data);
 $summaryTitleValue = $settings['summary_title'] !== '' ? $settings['summary_title'] : __('Todos nuestros podcasts, en un solo lugar.');
 $summarySubtitleValue = $settings['summary_subtitle'] !== '' ? $settings['summary_subtitle'] : __('Descubre todos los podcasts disponibles y sus feeds RSS.');
+$primaryPodcastTitle = trim((string) ($primary_podcast['title'] ?? ''));
 ?>
 <!doctype html>
 <html lang="<?= esc(i18n_html_lang()) ?>" data-theme="<?= esc(adminTheme()) ?>">
@@ -59,10 +60,13 @@ $summarySubtitleValue = $settings['summary_subtitle'] !== '' ? $settings['summar
     <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
     <input type="hidden" name="action" value="save_settings">
     <label class="inline-checkbox multipodcast-toggle">
-      <input type="checkbox" name="multipodcast_enabled" value="1" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
+      <input id="multipodcast_enabled" type="checkbox" name="multipodcast_enabled" value="1" <?= $settings['multipodcast_enabled'] === 1 ? 'checked' : '' ?>>
       <span><?= __('Activar Multipodcast') ?></span>
     </label>
-    <p class="multipodcast-warning" role="note"><?= __('Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada.') ?></p>
+    <div class="multipodcast-warning" role="status" aria-live="polite">
+      <p data-multipodcast-enabled-warning <?= $settings['multipodcast_enabled'] !== 1 ? 'hidden' : '' ?>><?= __('Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada.') ?></p>
+      <p data-multipodcast-disabled-warning <?= $settings['multipodcast_enabled'] === 1 ? 'hidden' : '' ?>><?= esc(__('Al desactivar Multipodcast, solo se mostrará el podcast principal «%s». Los demás podcasts y sus datos se conservarán, pero no serán accesibles públicamente hasta volver a activar Multipodcast.', $primaryPodcastTitle)) ?></p>
+    </div>
     <label for="homepage_podcast_id"><?= __('Contenido de la portada principal') ?></label>
     <select id="homepage_podcast_id" name="homepage_podcast_id">
       <option value=""><?= __('Resumen de todos los podcasts') ?></option>
