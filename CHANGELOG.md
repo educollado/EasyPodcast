@@ -1,5 +1,9 @@
 # Changelog
 
+## Siguiente release
+
+- **Publicación de releases reparada**: el validador usado por GitHub Actions queda incluido en el repositorio y la imagen Docker puede relanzarse manualmente para una versión concreta conservando el código exacto de su tag.
+
 ## 2.0.0
 
 - **Multipodcast opcional**: una única instalación puede alojar varios podcasts aislados por directorio, con selector administrativo, portada agregada o podcast destacado, feeds y sitemaps propios, y alias compatibles en la raíz.

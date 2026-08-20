@@ -6,6 +6,7 @@ CLAUDE.md
 .claude
 *.zip
 deploy.sh
-tools/
+tools/*
+!tools/validate_release.php
 .insyncdl
 .codex
