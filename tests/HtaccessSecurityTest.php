@@ -29,5 +29,5 @@ test('htaccess bloquea ejecutables también en medios de podcasts', function () 
 test('htaccess redirige el antiguo gestor al nuevo nombre multipodcast', function () {
     $contents = file_get_contents(__DIR__ . '/../.htaccess');
     assert_true(is_string($contents));
-    assert_true(str_contains($contents, 'RewriteRule ^podcasts\\.php$ multipodcast.php [R=301,L]'));
+    assert_true(str_contains($contents, 'RewriteRule ^podcasts\\.php$ /multipodcast.php [R=301,L]'));
 });
