@@ -79,6 +79,18 @@ test('buildHomeSeoData: canonicalUrl page > 1 incluye ?page=N', function () {
     assert_eq('https://example.com/?page=3', $seo['canonicalUrl']);
 });
 
+test('buildHomeSeoData: paginación usa la raíz en modo podcast único', function () {
+    $podcast = ['link' => 'https://example.com', '_multipodcast_enabled' => false];
+    $seo = buildHomeSeoData($podcast, 1, 3, '');
+    assert_eq('/', $seo['paginationPath']);
+});
+
+test('buildHomeSeoData: paginación usa el directorio en Multipodcast', function () {
+    $podcast = ['link' => 'https://example.com', 'slug' => 'mi-podcast', '_multipodcast_enabled' => true];
+    $seo = buildHomeSeoData($podcast, 1, 3, '');
+    assert_eq('/mi-podcast/', $seo['paginationPath']);
+});
+
 test('buildHomeSeoData: JSON-LD contiene @type PodcastSeries', function () {
     $podcast = ['title' => 'Mi podcast', 'link' => 'https://example.com'];
     $seo = buildHomeSeoData($podcast, 1, 1, '');

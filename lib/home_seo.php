@@ -8,7 +8,7 @@ require_once __DIR__ . '/seo_helpers.php';
  * Construye todas las variables SEO/JSON-LD para la portada. Función pura (sin acceso a BD).
  * Las páginas de paginación y errores se marcan con robots noindex.
  *
- * @return array{podcastTitle:string, podcastAuthor:string, podcastDescription:string, podcastImage:string, baseSeoUrl:string, canonicalUrl:string, robotsContent:string, prevUrl:?string, nextUrl:?string, metaDescription:string, ogImage:string, rssUrl:string, seriesJsonLd:string}
+ * @return array{podcastTitle:string, podcastAuthor:string, podcastDescription:string, podcastImage:string, baseSeoUrl:string, paginationPath:string, canonicalUrl:string, robotsContent:string, prevUrl:?string, nextUrl:?string, metaDescription:string, ogImage:string, rssUrl:string, seriesJsonLd:string}
  */
 function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $error): array
 {
@@ -24,6 +24,7 @@ function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $e
     $podcastImage       = trim((string) ($p['image_url'] ?? ''));
     $baseSeoUrl         = resolveSeoBaseUrl((string) ($p['link'] ?? ''));
     $homePath           = podcastSeoPath($p);
+    $paginationPath     = $homePath;
     $canonicalPath      = $page > 1 ? $homePath . '?page=' . $page : $homePath;
     $canonicalUrl       = toAbsoluteSeoUrl($canonicalPath, $baseSeoUrl);
     $robotsContent      = $error !== '' ? 'noindex,follow' : ($page > 1 ? 'noindex,follow' : 'index,follow');
@@ -71,7 +72,7 @@ function buildHomeSeoData(?array $podcast, int $page, int $totalPages, string $e
 
     return compact(
         'podcastTitle', 'podcastAuthor', 'podcastDescription', 'podcastImage',
-        'baseSeoUrl', 'canonicalUrl', 'robotsContent', 'prevUrl', 'nextUrl',
+        'baseSeoUrl', 'paginationPath', 'canonicalUrl', 'robotsContent', 'prevUrl', 'nextUrl',
         'metaDescription', 'ogImage', 'rssUrl', 'seriesJsonLd'
     );
 }

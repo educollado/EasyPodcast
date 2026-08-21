@@ -27,6 +27,11 @@
   align-items: flex-start;
 }
 
+/* Permite que el contenido importado se ajuste sin ensanchar la cuadrícula. */
+.detail > div {
+  min-width: 0;
+}
+
 .cover {
   width: 196px;
   height: 196px;
@@ -95,6 +100,17 @@
 }
 
 .detail .desc a:hover { text-decoration: underline; }
+
+/* Los feeds externos suelen incluir dimensiones fijas de WordPress. */
+.detail .desc img {
+  max-width: 100%;
+  height: auto;
+}
+
+.detail .desc figure {
+  max-width: 100%;
+  margin: 1rem 0;
+}
 
 /* =========================================================
    Audio

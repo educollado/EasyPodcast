@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../lib/import_feed_handler.php';
 
+test('el importador carga la función que construye las URLs públicas de medios', function () {
+    assert_true(function_exists('mediaPublicBaseUrl'));
+    $source = file_get_contents(__DIR__ . '/../lib/import_feed_handler.php');
+    assert_true(is_string($source));
+    assert_contains("require_once __DIR__ . '/upload_service.php';", $source);
+});
+
 test('buildCurlResolveEntry fija IPv4 y puerto HTTPS', function () {
     assert_eq('example.com:443:93.184.216.34', buildCurlResolveEntry(
         'https://example.com/feed.xml',

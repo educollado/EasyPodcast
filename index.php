@@ -145,13 +145,13 @@ if ($error !== '') {
             <span>Página <?= (int) $page ?> de <?= (int) $totalPages ?></span>
             <div class="links">
               <?php if ($page > 1): ?>
-                <a class="page-link" href="index.php?page=<?= $page - 1 ?>"><?= __('Anterior') ?></a>
+                <a class="page-link" href="<?= esc($paginationPath) ?>?page=<?= $page - 1 ?>"><?= __('Anterior') ?></a>
               <?php endif; ?>
               <?php for ($p = 1; $p <= $totalPages; $p++): ?>
-                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="index.php?page=<?= $p ?>"><?= $p ?></a>
+                <a class="page-link<?= $p === $page ? ' active' : '' ?>" href="<?= esc($paginationPath) ?>?page=<?= $p ?>"><?= $p ?></a>
               <?php endfor; ?>
               <?php if ($page < $totalPages): ?>
-                <a class="page-link" href="index.php?page=<?= $page + 1 ?>"><?= __('Siguiente') ?></a>
+                <a class="page-link" href="<?= esc($paginationPath) ?>?page=<?= $page + 1 ?>"><?= __('Siguiente') ?></a>
               <?php endif; ?>
             </div>
           </nav>

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/episode_helpers.php';   // buildSafeFileName, buildEpisodePublicLink, normalizeDateTime, resolveAudioExtension, generateGuid
+require_once __DIR__ . '/upload_service.php';    // mediaPublicBaseUrl()
 require_once __DIR__ . '/view_helpers.php';       // esc()
 require_once __DIR__ . '/cache_service.php';      // clearWebCache()
 require_once __DIR__ . '/sitemap_builder.php';    // writePodcastSitemapFile()

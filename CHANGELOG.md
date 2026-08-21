@@ -2,6 +2,9 @@
 
 ## 2.0.0
 
+- **Imágenes importadas adaptables**: las imágenes y figuras incluidas en el contenido de feeds respetan el ancho del episodio y conservan su proporción en cualquier pantalla.
+- **Importación de feeds reparada**: la descarga de imágenes vuelve a completar la importación al cargar explícitamente el constructor de URLs públicas de medios.
+- **Paginación Multipodcast**: los botones de la portada navegan por la ruta pública del podcast y dejan de generar enlaces rotos a `index.php`.
 - **Navegación global simplificada**: la barra superior de Multipodcast deja las herramientas globales secundarias únicamente como tarjetas del panel principal.
 - **Idioma independiente de Multipodcast**: incorpora un selector rápido para la portada-resumen y las pantallas globales; cambiar el idioma de un podcast solo afecta a ese podcast.
 - **Cuenta administradora global**: el panel Multipodcast permite definir su usuario de acceso, nombre, apellidos y email, confirmando el cambio con la contraseña actual.
