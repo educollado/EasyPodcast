@@ -1,5 +1,9 @@
 # Changelog
 
+## Siguiente release
+
+- **Manual de usuario**: nueva guía independiente para configurar el podcast, publicar e importar capítulos, gestionar páginas, estadísticas, backups, seguridad, Multipodcast, API, actualizaciones y resolver incidencias frecuentes.
+
 ## 2.0.0
 
 - **Imágenes importadas adaptables**: las imágenes y figuras incluidas en el contenido de feeds respetan el ancho del episodio y conservan su proporción en cualquier pantalla.
