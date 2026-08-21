@@ -98,10 +98,10 @@ docker run -d \
   -v $(pwd)/data/audios:/var/www/html/audios \
   -v $(pwd)/data/images:/var/www/html/images \
   -v $(pwd)/data/cache:/var/www/html/cache \
-  ghcr.io/educollado/easypodcast:latest
+  ghcr.io/educollado/easypodcast:2.0.0
 ```
 
-La imagen del proyecto se publica para `linux/amd64` y `linux/arm64` sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
+La etiqueta `2.0.0` fija esta release; usa `latest` si prefieres seguir automáticamente la versión estable más reciente. Ambas imágenes se publican para `linux/amd64` y `linux/arm64` sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
 
 ---
 
@@ -129,6 +129,7 @@ Multipodcast tiene un idioma independiente para la portada-resumen y el panel gl
 - `rss_item_limit`: número máximo de episodios en el feed (`0` = sin límite).
 - `home_items_per_page`: episodios por página en portada y búsqueda (mínimo 1, por defecto 20).
 - La publicación programada usa la hora local configurada en PHP y se activa en la siguiente petición web; los administradores pueden previsualizar episodios `scheduled` antes de su publicación.
+- Las imágenes incluidas en el contenido importado se adaptan al ancho del episodio sin deformarse, aunque el feed indique dimensiones fijas.
 
 ### SEO
 
@@ -463,7 +464,7 @@ Al entrar en `admin.php`, EasyPodcast consulta como máximo una vez al día si e
 
 Con Multipodcast activo, cada recurso queda bajo `/<podcast>/`: `/<podcast>/YYYY/MM/slug`, `/<podcast>/feed.xml`, `/<podcast>/sitemap.xml`, `/<podcast>/search` y `/<podcast>/api/v1/...`.
 
-Cada token API pertenece al usuario que lo crea. Los usuarios de podcast solo pueden utilizarlo con alguno de sus podcasts asignados. Un token administrativo del administrador global puede operar sobre cualquier podcast indicando su directorio en la URL; las operaciones que afectan a toda la instalación requieren ese alcance global. Ese token también permite gestionar usuarios y sus asignaciones mediante `/api/v1/users`.
+Cada token API pertenece al usuario y al podcast desde el que se crea. Un usuario de podcast necesita un token distinto para cada podcast que tenga asignado y recibe `403` si intenta utilizarlo con otro directorio. Un token del administrador global puede operar sobre cualquier podcast indicando su directorio en la URL; el alcance `admin` es obligatorio para las operaciones globales y permite gestionar usuarios y asignaciones mediante `/api/v1/users`.
 
 ---
 
