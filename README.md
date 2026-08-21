@@ -8,7 +8,9 @@
 
 Aplicación en **PHP + SQLite** para publicar un podcast con web pública, feed RSS, SEO y panel de administración. Sin dependencias externas ni composer.
 
-¿Ya lo tienes instalado? Consulta el [manual de usuario](MANUAL_USUARIO.md) para configurar el canal, publicar capítulos y utilizar todas las herramientas del panel.
+> 📘 **[Manual de usuario de EasyPodcast](MANUAL_USUARIO.md)**
+>
+> Guía paso a paso para configurar el canal, publicar capítulos y utilizar todas las herramientas del panel.
 
 ---
 

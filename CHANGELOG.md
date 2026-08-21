@@ -2,7 +2,7 @@
 
 ## Siguiente release
 
-- **Manual de usuario**: nueva guía independiente para configurar el podcast, publicar e importar capítulos, gestionar páginas, estadísticas, backups, seguridad, Multipodcast, API, actualizaciones y resolver incidencias frecuentes.
+- **Manual de usuario**: nueva guía independiente, enlazada de forma destacada desde el README, para configurar el podcast, publicar e importar capítulos, gestionar páginas, estadísticas, backups, seguridad, Multipodcast, API, actualizaciones y resolver incidencias frecuentes.
 
 ## 2.0.0
 
