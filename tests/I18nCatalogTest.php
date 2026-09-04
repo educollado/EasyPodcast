@@ -48,6 +48,52 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
     }
 });
 
+test('las cadenas de seguridad por IP están traducidas en todos los idiomas', function () {
+    $messages = [
+        'Seguridad',
+        'Restringe el acceso administrativo por dirección IP',
+        'Configura restricciones adicionales para proteger el acceso administrativo.',
+        'Estas direcciones o rangos no son válidos: %s',
+        'Se ha desactivado el bloqueo de acceso a admin.php por IP.',
+        'El bloqueo de acceso a admin.php por IP se ha actualizado correctamente.',
+        'Bloqueo de IP a admin.php',
+        'Solo las direcciones indicadas podrán abrir la página de acceso. Se admiten direcciones y rangos CIDR en IPv4 e IPv6.',
+        'Direcciones IP o rangos permitidos',
+        'Añade una dirección o rango por línea. Para desactivar el bloqueo, deja la lista vacía y guarda.',
+        'Importante: incluye tu IP actual antes de guardar para no perder el acceso a admin.php.',
+        'Guardar seguridad',
+        'Añade al menos una dirección IP o rango antes de habilitar el bloqueo.',
+        'La confirmación ha caducado o la lista ha cambiado. Vuelve a iniciar la activación.',
+        'El bloqueo de acceso a admin.php por IP se ha habilitado correctamente.',
+        'La acción de seguridad solicitada no es válida.',
+        'Habilitado',
+        'Deshabilitado',
+        'Añade una dirección o rango por línea.',
+        'Has solicitado habilitar el bloqueo por IP. Esta medida puede impedirte volver a acceder a admin.php. La habilitas voluntariamente y bajo tu propia responsabilidad. Comprueba que has incluido tu IP actual y pulsa «Estoy seguro» para confirmar.',
+        'Estoy seguro',
+        'Guardar cambios',
+        'Deshabilitar bloqueo',
+        'Habilitar bloqueo',
+    ];
+    $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
+
+    assert_eq(8, count($localeFiles));
+    foreach ($localeFiles as $localeFile) {
+        $translations = i18n_parse_po($localeFile);
+        foreach ($messages as $message) {
+            assert_true(
+                isset($translations[$message]) && $translations[$message] !== '',
+                basename($localeFile) . ' no traduce: ' . $message
+            );
+            assert_eq(
+                substr_count($message, '%s'),
+                substr_count($translations[$message], '%s'),
+                basename($localeFile) . ' no conserva los marcadores de: ' . $message
+            );
+        }
+    }
+});
+
 test('las cadenas de Multipodcast están traducidas en todos los idiomas', function () {
     $messages = [
         'Multipodcast',

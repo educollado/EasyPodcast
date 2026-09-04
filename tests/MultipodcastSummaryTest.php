@@ -58,6 +58,7 @@ test('multipodcast.php presenta las herramientas globales como tarjetas', functi
     assert_contains('href="multipodcast_management.php"', $source);
     assert_contains('href="podcasts_management.php"', $source);
     assert_contains('href="admin_account.php"', $source);
+    assert_contains('href="security.php"', $source);
     assert_contains('href="cache_management.php"', $source);
     assert_contains('href="update.php"', $source);
     assert_contains('href="change_password.php"', $source);
@@ -66,6 +67,23 @@ test('multipodcast.php presenta las herramientas globales como tarjetas', functi
     assert_contains('href="api_tokens.php"', $source);
     assert_contains('name="summary_language"', $source);
     assert_contains('set_summary_language', $source);
+});
+
+test('la seguridad por IP está deshabilitada por defecto y exige confirmación doble', function () {
+    $source = file_get_contents(__DIR__ . '/../security.php');
+
+    assert_true(is_string($source));
+    assert_contains('$securityEnabled = $securityEntries !== []', $source);
+    assert_contains('value="request_enable"', $source);
+    assert_contains('value="confirm_enable"', $source);
+    assert_contains('prepareAdminIpConfirmation(', $source);
+    assert_contains('consumeAdminIpConfirmation(', $source);
+    assert_contains('bajo tu propia responsabilidad', $source);
+    assert_contains('writeAdminIpEntries($securityHtaccessPath, [])', $source);
+    assert_contains('192.0.2.10', $source);
+    assert_contains('198.51.100.0/24', $source);
+    assert_contains('2001:db8:1234::/48', $source);
+    assert_true(!str_contains($source, '31.24.120.43'));
 });
 
 test('la gestión de podcasts crea primero y lista después fuera de la configuración', function () {

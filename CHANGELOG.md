@@ -1,5 +1,10 @@
 # Changelog
 
+## Siguiente release
+
+- **Seguridad por IP**: el panel Multipodcast permite limitar el acceso a `admin.php` a varias direcciones o rangos CIDR IPv4 e IPv6 mediante un bloque administrado en `.htaccess`, deshabilitado por defecto y con confirmación explícita de responsabilidad en dos pasos.
+- **Recuperación de acceso**: el manual explica cómo retirar de `.htaccess` el bloque de restricción por IP si una configuración incorrecta impide volver a abrir `admin.php`.
+
 ## 2.0.1
 
 - **Contexto administrativo conservado**: al cambiar el idioma o la apariencia desde el panel de un podcast, la navegación permanece en ese podcast en lugar de volver al panel global Multipodcast.

@@ -31,3 +31,13 @@ test('htaccess redirige el antiguo gestor al nuevo nombre multipodcast', functio
     assert_true(is_string($contents));
     assert_true(str_contains($contents, 'RewriteRule ^podcasts\\.php$ /multipodcast.php [R=301,L]'));
 });
+
+test('el manual explica cómo retirar por completo el bloqueo de admin por IP', function () {
+    $manual = file_get_contents(__DIR__ . '/../MANUAL_USUARIO.md');
+
+    assert_true(is_string($manual));
+    assert_contains('Recuperar el acceso si te has bloqueado por error', $manual);
+    assert_contains('# BEGIN EasyPodcast: bloqueo por IP de admin.php', $manual);
+    assert_contains('# END EasyPodcast: bloqueo por IP de admin.php', $manual);
+    assert_contains('elimina **únicamente el bloque completo**', $manual);
+});

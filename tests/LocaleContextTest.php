@@ -18,6 +18,9 @@ test('el idioma Multipodcast se limita a la portada resumen y al panel global', 
         $_SERVER['SCRIPT_NAME'] = '/multipodcast_management.php';
         assert_true(requestUsesMultipodcastLocale(['multipodcast_enabled' => 0], ['id' => 1]));
 
+        $_SERVER['SCRIPT_NAME'] = '/security.php';
+        assert_true(requestUsesMultipodcastLocale(['multipodcast_enabled' => 0], ['id' => 1]));
+
         $_SERVER['SCRIPT_NAME'] = '/cache_management.php';
         assert_true(requestUsesMultipodcastLocale($settings, ['id' => 2]));
 

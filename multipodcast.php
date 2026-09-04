@@ -95,6 +95,11 @@ $multipodcastDashboardTheme = isset(ADMIN_THEMES[$multipodcastDashboardSettings[
           <h2><?= __('Administrador global') ?></h2>
           <p><?= __('Configura la cuenta que administra toda la instalación') ?></p>
         </a>
+        <a class="admin-card" href="security.php">
+          <div class="admin-card-icon">🔒</div>
+          <h2><?= __('Seguridad') ?></h2>
+          <p><?= __('Restringe el acceso administrativo por dirección IP') ?></p>
+        </a>
         <a class="admin-card" href="media_cleanup.php">
           <div class="admin-card-icon">🧹</div>
           <h2><?= __('Limpiar') ?></h2>

@@ -65,7 +65,7 @@ function requestUsesMultipodcastLocale(array $settings, ?array $podcast): bool
     $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? ''));
     $multipodcastOnlyScripts = [
         'multipodcast.php', 'multipodcast_management.php', 'podcasts_management.php',
-        'users_management.php', 'admin_account.php', 'media_cleanup.php',
+        'users_management.php', 'admin_account.php', 'security.php', 'media_cleanup.php',
     ];
     if (in_array($script, $multipodcastOnlyScripts, true)) {
         return true;

@@ -10,9 +10,9 @@ $_navPage = $currentAdminPage ?? '';
 $navIsGlobalAdmin = adminSessionIsGlobal();
 $navPodcast = $GLOBALS['_active_podcast'] ?? null;
 $navMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
-$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'cleanup', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
+$navMultipodcastPages = ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'security', 'cleanup', 'cache', 'update', 'password', 'twofa', 'backups', 'api_tokens', 'api_docs'];
 $navPodcastScopedMultipodcastPages = ['cache', 'api_tokens', 'api_docs'];
-$navIsMultipodcastArea = $navIsGlobalAdmin && (in_array($_navPage, ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'cleanup'], true)
+$navIsMultipodcastArea = $navIsGlobalAdmin && (in_array($_navPage, ['multipodcast', 'multipodcast_settings', 'podcasts', 'users', 'admin_account', 'security', 'cleanup'], true)
     || ($navMultipodcastEnabled && in_array($_navPage, $navMultipodcastPages, true)));
 $navUsesPodcastContext = $navIsMultipodcastArea
     && in_array($_navPage, $navPodcastScopedMultipodcastPages, true);

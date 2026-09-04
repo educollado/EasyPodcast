@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 test('las herramientas globales exigen administrador global', function () {
-    foreach (['multipodcast.php', 'multipodcast_management.php', 'podcasts_management.php', 'users_management.php', 'admin_account.php', 'media_cleanup.php', 'cache_management.php', 'backups.php', 'update.php'] as $file) {
+    foreach (['multipodcast.php', 'multipodcast_management.php', 'podcasts_management.php', 'users_management.php', 'admin_account.php', 'security.php', 'media_cleanup.php', 'cache_management.php', 'backups.php', 'update.php'] as $file) {
         $source = file_get_contents(__DIR__ . '/../' . $file);
         assert_true(is_string($source));
         assert_contains('requireGlobalAdminAccess();', $source, $file . ' no restringe el acceso global');

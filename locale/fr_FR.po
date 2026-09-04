@@ -2488,3 +2488,76 @@ msgstr "Elle s'applique à la page d'accueil récapitulative et au panneau globa
 
 msgid "El idioma de Multipodcast no es válido."
 msgstr "La langue de Multipodcast n'est pas valide."
+
+# security.php
+msgid "Seguridad"
+msgstr "Sécurité"
+
+msgid "Restringe el acceso administrativo por dirección IP"
+msgstr "Restreint l'accès administratif par adresse IP"
+
+msgid "Configura restricciones adicionales para proteger el acceso administrativo."
+msgstr "Configurez des restrictions supplémentaires pour protéger l'accès administratif."
+
+msgid "Estas direcciones o rangos no son válidos: %s"
+msgstr "Ces adresses ou plages ne sont pas valides : %s"
+
+msgid "Se ha desactivado el bloqueo de acceso a admin.php por IP."
+msgstr "La restriction d'accès à admin.php par IP a été désactivée."
+
+msgid "El bloqueo de acceso a admin.php por IP se ha actualizado correctamente."
+msgstr "La restriction d'accès à admin.php par IP a été mise à jour."
+
+msgid "Bloqueo de IP a admin.php"
+msgstr "Restriction IP pour admin.php"
+
+msgid "Solo las direcciones indicadas podrán abrir la página de acceso. Se admiten direcciones y rangos CIDR en IPv4 e IPv6."
+msgstr "Seules les adresses indiquées pourront ouvrir la page de connexion. Les adresses et plages CIDR IPv4 et IPv6 sont acceptées."
+
+msgid "Direcciones IP o rangos permitidos"
+msgstr "Adresses IP ou plages autorisées"
+
+msgid "Añade una dirección o rango por línea. Para desactivar el bloqueo, deja la lista vacía y guarda."
+msgstr "Ajoutez une adresse ou une plage par ligne. Pour désactiver la restriction, videz la liste et enregistrez."
+
+msgid "Importante: incluye tu IP actual antes de guardar para no perder el acceso a admin.php."
+msgstr "Important : ajoutez votre IP actuelle avant d'enregistrer pour ne pas perdre l'accès à admin.php."
+
+msgid "Guardar seguridad"
+msgstr "Enregistrer la sécurité"
+
+msgid "Añade al menos una dirección IP o rango antes de habilitar el bloqueo."
+msgstr "Ajoutez au moins une adresse IP ou plage avant d'activer la restriction."
+
+msgid "La confirmación ha caducado o la lista ha cambiado. Vuelve a iniciar la activación."
+msgstr "La confirmation a expiré ou la liste a changé. Relancez l'activation."
+
+msgid "El bloqueo de acceso a admin.php por IP se ha habilitado correctamente."
+msgstr "La restriction d'accès à admin.php par IP a été activée."
+
+msgid "La acción de seguridad solicitada no es válida."
+msgstr "L'action de sécurité demandée n'est pas valide."
+
+msgid "Habilitado"
+msgstr "Activé"
+
+msgid "Deshabilitado"
+msgstr "Désactivé"
+
+msgid "Añade una dirección o rango por línea."
+msgstr "Ajoutez une adresse ou plage par ligne."
+
+msgid "Has solicitado habilitar el bloqueo por IP. Esta medida puede impedirte volver a acceder a admin.php. La habilitas voluntariamente y bajo tu propia responsabilidad. Comprueba que has incluido tu IP actual y pulsa «Estoy seguro» para confirmar."
+msgstr "Vous avez demandé l'activation de la restriction IP. Cette mesure peut vous empêcher d'accéder à nouveau à admin.php. Vous l'activez volontairement et sous votre responsabilité. Vérifiez votre IP actuelle et cliquez sur « Je suis sûr » pour confirmer."
+
+msgid "Estoy seguro"
+msgstr "Je suis sûr"
+
+msgid "Guardar cambios"
+msgstr "Enregistrer les modifications"
+
+msgid "Deshabilitar bloqueo"
+msgstr "Désactiver la restriction"
+
+msgid "Habilitar bloqueo"
+msgstr "Activer la restriction"

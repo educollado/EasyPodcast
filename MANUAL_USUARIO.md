@@ -241,6 +241,29 @@ Abre **Contraseña**, introduce la contraseña actual y la nueva siguiendo las i
 
 Cada código de recuperación se usa una sola vez. Puedes regenerarlos o desactivar 2FA confirmando la operación con tu contraseña. En el acceso es posible recordar un dispositivo durante siete días.
 
+### Restringir el acceso a `admin.php` por IP
+
+El administrador global puede abrir **Multipodcast > Seguridad** para permitir el acceso a `admin.php` únicamente desde determinadas direcciones IPv4, IPv6 o rangos CIDR. El bloqueo está deshabilitado por defecto y debe habilitarse expresamente en dos pasos. Antes de confirmar, incluye siempre la IP desde la que administras EasyPodcast: una configuración incorrecta puede dejarte sin acceso al panel.
+
+La activación es voluntaria y queda bajo la responsabilidad del usuario. Después de pulsar **Habilitar bloqueo**, revisa el aviso rojo y pulsa **Estoy seguro** únicamente si has comprobado la lista.
+
+#### Recuperar el acceso si te has bloqueado por error
+
+Si ya no puedes abrir `admin.php`, accede a los archivos del servidor mediante SSH, SFTP o el administrador de archivos de tu alojamiento. Abre el archivo `.htaccess` situado en el directorio principal de EasyPodcast y elimina **únicamente el bloque completo**, desde la línea `# BEGIN` hasta la línea `# END`, ambas incluidas:
+
+```apache
+# BEGIN EasyPodcast: bloqueo por IP de admin.php
+# Bloqueo al admin.php
+<Files "admin.php">
+    Order Deny,Allow
+    Deny from all
+    Allow from x.x.x.x
+</Files>
+# END EasyPodcast: bloqueo por IP de admin.php
+```
+
+Guarda `.htaccess` sin modificar las demás reglas y vuelve a abrir `admin.php`. Al retirar ese bloque, la restricción por IP queda deshabilitada. Si había varias líneas `Allow from`, debes eliminar también todas ellas como parte del mismo bloque.
+
 ### Usuarios de podcast
 
 En modo Multipodcast, el administrador global puede abrir **Usuarios** para crear cuentas y asignarles uno o varios podcasts. Un usuario limitado solo ve y administra los podcasts asignados; no puede acceder a las herramientas globales.
