@@ -222,6 +222,10 @@ La caché pública guarda el HTML de la portada, los capítulos, el feed y el si
 
 Los cambios públicos normales ya invalidan la caché automáticamente. Bórrala manualmente si observas contenido antiguo después de una restauración o de una incidencia.
 
+### Regenerar `.htaccess`
+
+La sección **.htaccess generado** permite restaurar este fichero con las reglas predeterminadas de EasyPodcast. Esta acción elimina cualquier regla personalizada y deshabilita el bloqueo por IP de `admin.php`; úsala únicamente si quieres volver a la configuración original.
+
 ### Archivos huérfanos
 
 En instalaciones Multipodcast, el administrador global dispone de **Limpiar**, que busca audios e imágenes no utilizados por ningún capítulo. Revisa la selección antes de pulsar **Borrar seleccionados**: la eliminación no se puede deshacer.

@@ -300,6 +300,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 27`.
 ├── admin.php                        # Login/logout admin
 ├── canonical_redirect.php           # Redirección canónica 301
 ├── .htaccess                        # Reglas Apache
+├── .htaccess.default                # Plantilla para regenerar .htaccess
 ├── schema.sql                       # Esquema de base de datos
 ├── podcast.sqlite                   # Base de datos SQLite
 ├── favicon.ico                      # Icono del sitio
@@ -316,6 +317,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 27`.
 ├── social_management.php           # Gestión de redes sociales
 ├── backups.php                      # Exportar/importar datos
 ├── cache_management.php            # Configuración de caché
+├── security.php                     # Restricción de admin.php por IP
 ├── change_password.php              # Cambio de contraseña
 ├── import_feed.php                  # Importar desde feed externo
 ├── media_cleanup.php                # Limpieza de archivos huérfanos
@@ -361,6 +363,7 @@ Y actualiza `schema.sql` con `PRAGMA user_version = 27`.
 │   ├── import_feed_handler.php      # Parser de feed externo
 │   ├── backup_handler.php           # Exportación/importación de datos
 │   ├── cache_management_handler.php # Gestor de configuración de caché
+│   ├── admin_ip_restriction.php     # Gestión segura de reglas IP en .htaccess
 │   ├── change_password_handler.php  # Gestor de cambio de contraseña
 │   ├── download_handler.php         # Gestor de descargas
 │   ├── media_cleanup_handler.php    # Limpieza de archivos

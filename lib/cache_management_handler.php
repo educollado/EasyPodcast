@@ -6,6 +6,7 @@ require_once __DIR__ . '/cache_service.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/view_helpers.php';
 require_once __DIR__ . '/i18n.php';
+require_once __DIR__ . '/admin_ip_restriction.php';
 
 /**
  * Regenera las variantes de imagen para todos los podcasts y episodios.
@@ -40,7 +41,8 @@ function regenerateAllImages(PDO $pdo): int
 
 /**
  * Carga y procesa los datos del panel de gestión de caché.
- * Maneja tres acciones POST: save_settings, clear_cache, regenerate_images.
+ * Maneja cuatro acciones POST: save_settings, clear_cache, regenerate_images,
+ * regenerate_htaccess.
  *
  * @return array{cacheEnabled:string, error:string, notice:string}
  */
@@ -92,6 +94,16 @@ function loadCacheManagementData(string $dbPath): array
                 } else {
                     $count  = regenerateAllImages($pdo);
                     $notice = __('Imágenes regeneradas: %d fuente(s) procesada(s).', $count);
+                }
+            } elseif ($action === 'regenerate_htaccess') {
+                try {
+                    restoreDefaultHtaccess(
+                        dirname(__DIR__) . '/.htaccess',
+                        dirname(__DIR__) . '/.htaccess.default'
+                    );
+                    $notice = __('El fichero .htaccess se ha regenerado con la configuración predeterminada.');
+                } catch (Throwable $e) {
+                    $error = __('No se pudo regenerar el fichero .htaccess: %s', $e->getMessage());
                 }
             }
         }

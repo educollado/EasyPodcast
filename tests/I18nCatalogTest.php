@@ -74,6 +74,12 @@ test('las cadenas de seguridad por IP están traducidas en todos los idiomas', f
         'Guardar cambios',
         'Deshabilitar bloqueo',
         'Habilitar bloqueo',
+        '.htaccess generado',
+        'Regenera el fichero .htaccess con la configuración predeterminada de EasyPodcast. Se eliminarán las reglas personalizadas y se deshabilitará el bloqueo de acceso a admin.php por IP.',
+        'Regenerar .htaccess',
+        'El fichero .htaccess se ha regenerado con la configuración predeterminada.',
+        'No se pudo regenerar el fichero .htaccess: %s',
+        '¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?',
     ];
     $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
 

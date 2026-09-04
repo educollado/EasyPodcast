@@ -118,10 +118,6 @@ function readAdminIpEntries(string $htaccessPath): array
 /** @param list<string> $entries */
 function writeAdminIpEntries(string $htaccessPath, array $entries): void
 {
-    if (is_link($htaccessPath)) {
-        throw new RuntimeException('No se puede modificar un .htaccess que sea un enlace simbólico.');
-    }
-
     $contents = @file_get_contents($htaccessPath);
     if ($contents === false) {
         throw new RuntimeException('No se pudo leer el archivo .htaccess.');
@@ -144,6 +140,36 @@ function writeAdminIpEntries(string $htaccessPath, array $entries): void
         return;
     }
 
+    replaceHtaccessContents($htaccessPath, $updated);
+}
+
+function restoreDefaultHtaccess(string $htaccessPath, string $templatePath): void
+{
+    if (is_link($templatePath)) {
+        throw new RuntimeException('La plantilla predeterminada de .htaccess no puede ser un enlace simbólico.');
+    }
+    $contents = @file_get_contents($templatePath);
+    if ($contents === false || $contents === '') {
+        throw new RuntimeException('No se pudo leer la plantilla predeterminada de .htaccess.');
+    }
+    if (str_contains($contents, ADMIN_IP_BLOCK_START) || str_contains($contents, ADMIN_IP_BLOCK_END)) {
+        throw new RuntimeException('La plantilla predeterminada de .htaccess contiene un bloqueo por IP.');
+    }
+    foreach (['RewriteEngine on', 'podcast\.sqlite', 'Options -Indexes'] as $requiredRule) {
+        if (!str_contains($contents, $requiredRule)) {
+            throw new RuntimeException('La plantilla predeterminada de .htaccess está incompleta.');
+        }
+    }
+
+    replaceHtaccessContents($htaccessPath, $contents);
+}
+
+function replaceHtaccessContents(string $htaccessPath, string $contents): void
+{
+    if (is_link($htaccessPath)) {
+        throw new RuntimeException('No se puede modificar un .htaccess que sea un enlace simbólico.');
+    }
+
     $directory = dirname($htaccessPath);
     $temporaryPath = tempnam($directory, '.htaccess-easypodcast-');
     if ($temporaryPath === false) {
@@ -151,7 +177,7 @@ function writeAdminIpEntries(string $htaccessPath, array $entries): void
     }
 
     try {
-        if (file_put_contents($temporaryPath, $updated, LOCK_EX) !== strlen($updated)) {
+        if (file_put_contents($temporaryPath, $contents, LOCK_EX) !== strlen($contents)) {
             throw new RuntimeException('No se pudo escribir la actualización de .htaccess.');
         }
         $permissions = @fileperms($htaccessPath);

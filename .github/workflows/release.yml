@@ -31,6 +31,7 @@ jobs:
             --output="${archive}" \
             HEAD
           tar -tzf "${archive}" "EasyPodcast-${version}/.htaccess"
+          tar -tzf "${archive}" "EasyPodcast-${version}/.htaccess.default"
           sha256sum "${archive}" > "${archive}.sha256"
 
       - name: Release

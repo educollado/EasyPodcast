@@ -72,3 +72,23 @@ test('actualiza solo su bloque de htaccess y permite retirar el bloqueo', functi
         @rmdir($directory);
     }
 });
+
+test('restaura htaccess desde una plantilla válida y elimina reglas personalizadas', function () {
+    $directory = sys_get_temp_dir() . '/ep-htaccess-restore-' . bin2hex(random_bytes(6));
+    mkdir($directory, 0700);
+    $path = $directory . '/.htaccess';
+    $templatePath = $directory . '/.htaccess.default';
+    $template = "RewriteEngine on\nRewriteRule ^podcast\\.sqlite$ - [F,L]\nOptions -Indexes\n";
+    file_put_contents($path, "RewriteEngine on\nCustomRule enabled\n" . buildAdminIpBlock(['192.0.2.10']) . "\n");
+    file_put_contents($templatePath, $template);
+
+    try {
+        restoreDefaultHtaccess($path, $templatePath);
+        assert_eq($template, file_get_contents($path));
+        assert_true(!str_contains((string) file_get_contents($path), ADMIN_IP_BLOCK_START));
+    } finally {
+        @unlink($path);
+        @unlink($templatePath);
+        @rmdir($directory);
+    }
+});

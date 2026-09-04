@@ -86,6 +86,19 @@ $cachePodcast = activePodcast(openPodcastDatabase($dbPath));
           </div>
         </form>
       </section>
+
+      <section class="section-gap-lg">
+        <h2><?= __('.htaccess generado') ?></h2>
+        <p><?= __('Regenera el fichero .htaccess con la configuración predeterminada de EasyPodcast. Se eliminarán las reglas personalizadas y se deshabilitará el bloqueo de acceso a admin.php por IP.') ?></p>
+
+        <form method="post" action="cache_management.php" data-confirm-message="<?= esc(__('¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?')) ?>">
+          <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
+          <input type="hidden" name="cache_action" value="regenerate_htaccess">
+          <div class="actions">
+            <button class="btn" type="submit"><?= __('Regenerar .htaccess') ?></button>
+          </div>
+        </form>
+      </section>
     </main>
   </div>
 </body>

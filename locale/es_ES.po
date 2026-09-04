@@ -2564,3 +2564,21 @@ msgstr "Deshabilitar bloqueo"
 
 msgid "Habilitar bloqueo"
 msgstr "Habilitar bloqueo"
+
+msgid ".htaccess generado"
+msgstr ".htaccess generado"
+
+msgid "Regenera el fichero .htaccess con la configuración predeterminada de EasyPodcast. Se eliminarán las reglas personalizadas y se deshabilitará el bloqueo de acceso a admin.php por IP."
+msgstr "Regenera el fichero .htaccess con la configuración predeterminada de EasyPodcast. Se eliminarán las reglas personalizadas y se deshabilitará el bloqueo de acceso a admin.php por IP."
+
+msgid "Regenerar .htaccess"
+msgstr "Regenerar .htaccess"
+
+msgid "El fichero .htaccess se ha regenerado con la configuración predeterminada."
+msgstr "El fichero .htaccess se ha regenerado con la configuración predeterminada."
+
+msgid "No se pudo regenerar el fichero .htaccess: %s"
+msgstr "No se pudo regenerar el fichero .htaccess: %s"
+
+msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
+msgstr "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
