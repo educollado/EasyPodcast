@@ -20,13 +20,38 @@ test('la grabadora permite pausar y reanudar sin contar el tiempo detenido', fun
     assert_matches('/#btn-pause\s*\{[^}]*background:\s*#dc2626;/s', $styleSource);
 });
 
-test('los textos de pausa de la grabadora están traducidos', function () {
+test('todos los controles y mensajes de la grabadora están traducidos', function () {
+    $messages = [
+        'Tu navegador no soporta grabación de audio.',
+        'No se pudo acceder al micrófono: ',
+        'Codificando MP3…',
+        'Codificando MP3 (grabación larga, puede tardar)…',
+        'Error al decodificar el audio grabado.',
+        'No se pudo reproducir la grabación.',
+        'Error al subir: ',
+        'Audio guardado correctamente.',
+        'Error de red al subir el audio. Inténtalo de nuevo.',
+        'Grabar desde micrófono',
+        'Grabar',
+        'Pausar',
+        'Reanudar',
+        'Parar',
+        'Escuchar grabación',
+        'Parar escucha',
+        'Usar esta grabación',
+        'Subiendo grabación…',
+        'Grabación subida',
+    ];
     $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
 
     assert_eq(8, count($localeFiles));
     foreach ($localeFiles as $localeFile) {
         $translations = i18n_parse_po($localeFile);
-        assert_true(!empty($translations['Pausar']), basename($localeFile) . ' no traduce: Pausar');
-        assert_true(!empty($translations['Reanudar']), basename($localeFile) . ' no traduce: Reanudar');
+        foreach ($messages as $message) {
+            assert_true(
+                isset($translations[$message]) && $translations[$message] !== '',
+                basename($localeFile) . ' no traduce: ' . $message
+            );
+        }
     }
 });

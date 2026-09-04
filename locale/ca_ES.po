@@ -2585,3 +2585,54 @@ msgstr "Pausa"
 
 msgid "Reanudar"
 msgstr "Reprèn"
+
+msgid "Tu navegador no soporta grabación de audio."
+msgstr "El teu navegador no admet la gravació d'àudio."
+
+msgid "No se pudo acceder al micrófono: "
+msgstr "No s'ha pogut accedir al micròfon: "
+
+msgid "Codificando MP3…"
+msgstr "Codificant MP3…"
+
+msgid "Codificando MP3 (grabación larga, puede tardar)…"
+msgstr "Codificant MP3 (gravació llarga, pot trigar)…"
+
+msgid "Error al decodificar el audio grabado."
+msgstr "Error en descodificar l'àudio gravat."
+
+msgid "No se pudo reproducir la grabación."
+msgstr "No s'ha pogut reproduir la gravació."
+
+msgid "Error al subir: "
+msgstr "Error en pujar: "
+
+msgid "Audio guardado correctamente."
+msgstr "Àudio desat correctament."
+
+msgid "Error de red al subir el audio. Inténtalo de nuevo."
+msgstr "Error de xarxa en pujar l'àudio. Torna-ho a provar."
+
+msgid "Grabar desde micrófono"
+msgstr "Grava des del micròfon"
+
+msgid "Grabar"
+msgstr "Grava"
+
+msgid "Parar"
+msgstr "Atura"
+
+msgid "Escuchar grabación"
+msgstr "Escolta la gravació"
+
+msgid "Parar escucha"
+msgstr "Atura la reproducció"
+
+msgid "Usar esta grabación"
+msgstr "Utilitza aquesta gravació"
+
+msgid "Subiendo grabación…"
+msgstr "S'està pujant la gravació…"
+
+msgid "Grabación subida"
+msgstr "Gravació pujada"

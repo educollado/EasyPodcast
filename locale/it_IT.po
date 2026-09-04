@@ -2455,3 +2455,54 @@ msgstr "Pausa"
 
 msgid "Reanudar"
 msgstr "Riprendi"
+
+msgid "Tu navegador no soporta grabación de audio."
+msgstr "Il tuo browser non supporta la registrazione audio."
+
+msgid "No se pudo acceder al micrófono: "
+msgstr "Impossibile accedere al microfono: "
+
+msgid "Codificando MP3…"
+msgstr "Codifica MP3…"
+
+msgid "Codificando MP3 (grabación larga, puede tardar)…"
+msgstr "Codifica MP3 (registrazione lunga, potrebbe richiedere tempo)…"
+
+msgid "Error al decodificar el audio grabado."
+msgstr "Errore durante la decodifica dell’audio registrato."
+
+msgid "No se pudo reproducir la grabación."
+msgstr "Impossibile riprodurre la registrazione."
+
+msgid "Error al subir: "
+msgstr "Errore durante il caricamento: "
+
+msgid "Audio guardado correctamente."
+msgstr "Audio salvato correttamente."
+
+msgid "Error de red al subir el audio. Inténtalo de nuevo."
+msgstr "Errore di rete durante il caricamento dell’audio. Riprova."
+
+msgid "Grabar desde micrófono"
+msgstr "Registra dal microfono"
+
+msgid "Grabar"
+msgstr "Registra"
+
+msgid "Parar"
+msgstr "Ferma"
+
+msgid "Escuchar grabación"
+msgstr "Ascolta la registrazione"
+
+msgid "Parar escucha"
+msgstr "Ferma l’ascolto"
+
+msgid "Usar esta grabación"
+msgstr "Usa questa registrazione"
+
+msgid "Subiendo grabación…"
+msgstr "Caricamento della registrazione…"
+
+msgid "Grabación subida"
+msgstr "Registrazione caricata"

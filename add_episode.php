@@ -151,12 +151,12 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
                 <span id="rec-status"></span>
               </div>
               <button type="button" id="btn-preview-recording" class="btn" hidden
-                      data-label-play="<?= esc(__('▶ Escuchar grabación')) ?>"
-                      data-label-stop="<?= esc(__('■ Parar escucha')) ?>">▶ <?= __('Escuchar grabación') ?></button>
+                      data-label-play="<?= esc('▶ ' . __('Escuchar grabación')) ?>"
+                      data-label-stop="<?= esc('■ ' . __('Parar escucha')) ?>">▶ <?= __('Escuchar grabación') ?></button>
               <button type="button" id="btn-use-recording" class="btn" hidden
-                      data-label-default="<?= esc(__('✓ Usar esta grabación')) ?>"
-                      data-label-uploading="<?= esc(__('⏳ Subiendo grabación…')) ?>"
-                      data-label-uploaded="<?= esc(__('✓ Grabación subida')) ?>">✓ <?= __('Usar esta grabación') ?></button>
+                      data-label-default="<?= esc('✓ ' . __('Usar esta grabación')) ?>"
+                      data-label-uploading="<?= esc('⏳ ' . __('Subiendo grabación…')) ?>"
+                      data-label-uploaded="<?= esc('✓ ' . __('Grabación subida')) ?>">✓ <?= __('Usar esta grabación') ?></button>
             </div>
           </details>
           <label>

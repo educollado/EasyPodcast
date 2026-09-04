@@ -2585,3 +2585,54 @@ msgstr "Pause"
 
 msgid "Reanudar"
 msgstr "Reprendre"
+
+msgid "Tu navegador no soporta grabación de audio."
+msgstr "Votre navigateur ne prend pas en charge l’enregistrement audio."
+
+msgid "No se pudo acceder al micrófono: "
+msgstr "Impossible d’accéder au microphone : "
+
+msgid "Codificando MP3…"
+msgstr "Encodage MP3…"
+
+msgid "Codificando MP3 (grabación larga, puede tardar)…"
+msgstr "Encodage MP3 (enregistrement long, cela peut prendre du temps)…"
+
+msgid "Error al decodificar el audio grabado."
+msgstr "Erreur lors du décodage de l’audio enregistré."
+
+msgid "No se pudo reproducir la grabación."
+msgstr "Impossible de lire l’enregistrement."
+
+msgid "Error al subir: "
+msgstr "Erreur lors de l’envoi : "
+
+msgid "Audio guardado correctamente."
+msgstr "Audio enregistré correctement."
+
+msgid "Error de red al subir el audio. Inténtalo de nuevo."
+msgstr "Erreur réseau lors de l’envoi de l’audio. Réessayez."
+
+msgid "Grabar desde micrófono"
+msgstr "Enregistrer depuis le microphone"
+
+msgid "Grabar"
+msgstr "Enregistrer"
+
+msgid "Parar"
+msgstr "Arrêter"
+
+msgid "Escuchar grabación"
+msgstr "Écouter l’enregistrement"
+
+msgid "Parar escucha"
+msgstr "Arrêter l’écoute"
+
+msgid "Usar esta grabación"
+msgstr "Utiliser cet enregistrement"
+
+msgid "Subiendo grabación…"
+msgstr "Envoi de l’enregistrement…"
+
+msgid "Grabación subida"
+msgstr "Enregistrement envoyé"

@@ -2588,3 +2588,54 @@ msgstr "Pausar"
 
 msgid "Reanudar"
 msgstr "Reanudar"
+
+msgid "Tu navegador no soporta grabación de audio."
+msgstr "Tu navegador no soporta grabación de audio."
+
+msgid "No se pudo acceder al micrófono: "
+msgstr "No se pudo acceder al micrófono: "
+
+msgid "Codificando MP3…"
+msgstr "Codificando MP3…"
+
+msgid "Codificando MP3 (grabación larga, puede tardar)…"
+msgstr "Codificando MP3 (grabación larga, puede tardar)…"
+
+msgid "Error al decodificar el audio grabado."
+msgstr "Error al decodificar el audio grabado."
+
+msgid "No se pudo reproducir la grabación."
+msgstr "No se pudo reproducir la grabación."
+
+msgid "Error al subir: "
+msgstr "Error al subir: "
+
+msgid "Audio guardado correctamente."
+msgstr "Audio guardado correctamente."
+
+msgid "Error de red al subir el audio. Inténtalo de nuevo."
+msgstr "Error de red al subir el audio. Inténtalo de nuevo."
+
+msgid "Grabar desde micrófono"
+msgstr "Grabar desde micrófono"
+
+msgid "Grabar"
+msgstr "Grabar"
+
+msgid "Parar"
+msgstr "Parar"
+
+msgid "Escuchar grabación"
+msgstr "Escuchar grabación"
+
+msgid "Parar escucha"
+msgstr "Parar escucha"
+
+msgid "Usar esta grabación"
+msgstr "Usar esta grabación"
+
+msgid "Subiendo grabación…"
+msgstr "Subiendo grabación…"
+
+msgid "Grabación subida"
+msgstr "Grabación subida"
