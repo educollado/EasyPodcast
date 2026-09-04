@@ -1,6 +1,6 @@
 # EasyPodcast
 
-[![Versión](https://img.shields.io/badge/versión-2.0.0-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-2.0.1-blue)](https://github.com/educollado/EasyPodcast/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?logo=docker&logoColor=white)](https://github.com/educollado/EasyPodcast/pkgs/container/easypodcast)
@@ -102,10 +102,10 @@ docker run -d \
   -v $(pwd)/data/audios:/var/www/html/audios \
   -v $(pwd)/data/images:/var/www/html/images \
   -v $(pwd)/data/cache:/var/www/html/cache \
-  ghcr.io/educollado/easypodcast:2.0.0
+  ghcr.io/educollado/easypodcast:2.0.1
 ```
 
-La etiqueta `2.0.0` fija esta release; usa `latest` si prefieres seguir automáticamente la versión estable más reciente. Ambas imágenes se publican para `linux/amd64` y `linux/arm64` sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
+La etiqueta `2.0.1` fija esta release; usa `latest` si prefieres seguir automáticamente la versión estable más reciente. Ambas imágenes se publican para `linux/amd64` y `linux/arm64` sobre una base PHP/Apache fijada a una versión concreta, no sobre una etiqueta flotante. Así las actualizaciones de seguridad del contenedor pasan a ser cambios explícitos y revisables.
 
 ---
 
