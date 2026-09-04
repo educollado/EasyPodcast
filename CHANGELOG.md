@@ -2,6 +2,8 @@
 
 ## Siguiente release
 
+- **Contexto administrativo conservado**: al cambiar el idioma o la apariencia desde el panel de un podcast, la navegación permanece en ese podcast en lugar de volver al panel global Multipodcast.
+- **Instalación automática reparada**: el paquete `tar.gz` de cada release vuelve a incluir `.htaccess`, necesario para que Apache aplique las rutas amigables, la protección de archivos sensibles y el resto de reglas tras una instalación nueva.
 - **Manual de usuario**: nueva guía independiente, enlazada de forma destacada desde el README, para configurar el podcast, publicar e importar capítulos, gestionar páginas, estadísticas, backups, seguridad, Multipodcast, API, actualizaciones y resolver incidencias frecuentes.
 
 ## 2.0.0

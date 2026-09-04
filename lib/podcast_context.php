@@ -218,6 +218,17 @@ function podcastPath(array $podcast, string $path, bool $multipodcastEnabled = t
     return podcastBasePath($podcast, $multipodcastEnabled) . '/' . ltrim($path, '/');
 }
 
+/** URL del dashboard que conserva explícitamente el podcast administrado. */
+function adminPodcastDashboardUrl(?array $podcast, bool $multipodcastEnabled): string
+{
+    $slug = trim((string) ($podcast['slug'] ?? ''));
+    if (!$multipodcastEnabled || $slug === '') {
+        return 'admin.php';
+    }
+
+    return 'admin.php?podcast=' . rawurlencode($slug) . '&manage=1';
+}
+
 function podcastStorageDirectory(string $projectRoot, string $kind, array $podcast, bool $multipodcastEnabled): string
 {
     return rtrim($projectRoot, '/') . '/' . $kind;

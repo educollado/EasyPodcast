@@ -95,6 +95,14 @@ test('el panel de podcast no duplica las herramientas globales de Multipodcast',
     assert_contains('<a class="admin-card" href="api_tokens.php">', $source);
 });
 
+test('los ajustes rápidos conservan el contexto del podcast tras guardar', function () {
+    $source = file_get_contents(__DIR__ . '/../admin.php');
+
+    assert_true(is_string($source));
+    assert_contains('header(\'Location: \' . $adminDashboardUrl);', $source);
+    assert_contains('action="<?= esc($adminDashboardUrl) ?>"', $source);
+});
+
 test('los dashboards identifican el ámbito administrado en el encabezado', function () {
     $podcastDashboard = file_get_contents(__DIR__ . '/../admin.php');
     $multipodcastDashboard = file_get_contents(__DIR__ . '/../multipodcast.php');

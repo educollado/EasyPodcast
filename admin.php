@@ -24,6 +24,10 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 $isLoggedIn    = isset($_SESSION['admin_user']);
 $isTotpPending = !$isLoggedIn && isset($_SESSION['totp_pending_user']);
 $adminMultipodcastEnabled = (bool) ($GLOBALS['_multipodcast_enabled'] ?? false);
+$adminContextPodcast = is_array($GLOBALS['_active_podcast'] ?? null)
+    ? $GLOBALS['_active_podcast']
+    : null;
+$adminDashboardUrl = adminPodcastDashboardUrl($adminContextPodcast, $adminMultipodcastEnabled);
 
 // Cambio de tema visual desde el panel.
 if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'set_theme') {
@@ -42,7 +46,7 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ??
         ]);
         clearWebCache();
     }
-    header('Location: admin.php');
+    header('Location: ' . $adminDashboardUrl);
     exit;
 }
 
@@ -58,7 +62,7 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ??
         $stmt->execute([':lang' => $lang, ':podcast_id' => $podcastId]);
         clearWebCache();
     }
-    header('Location: admin.php');
+    header('Location: ' . $adminDashboardUrl);
     exit;
 }
 
@@ -251,7 +255,7 @@ if ($isLoggedIn) {
             $localeFiles = glob(__DIR__ . '/locale/*.po') ?: [];
             sort($localeFiles);
           ?>
-          <form method="post" action="admin.php" class="admin-card admin-card-form">
+          <form method="post" action="<?= esc($adminDashboardUrl) ?>" class="admin-card admin-card-form">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="set_language">
             <div class="admin-card-icon">🌐</div>
@@ -266,7 +270,7 @@ if ($isLoggedIn) {
             </select>
           </form>
 
-          <form method="post" action="admin.php" class="admin-card admin-card-form">
+          <form method="post" action="<?= esc($adminDashboardUrl) ?>" class="admin-card admin-card-form">
             <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">
             <input type="hidden" name="action" value="set_theme">
             <div class="admin-card-icon">🎨</div>

@@ -28,6 +28,14 @@ test('podcastPath añade el directorio únicamente en modo multipodcast', functi
     assert_eq('/feed.xml', podcastPath($podcast, 'feed.xml', false));
 });
 
+test('adminPodcastDashboardUrl conserva el podcast administrado en Multipodcast', function () {
+    $podcast = ['slug' => 'redes y más'];
+
+    assert_eq('admin.php?podcast=redes%20y%20m%C3%A1s&manage=1', adminPodcastDashboardUrl($podcast, true));
+    assert_eq('admin.php', adminPodcastDashboardUrl($podcast, false));
+    assert_eq('admin.php', adminPodcastDashboardUrl(null, true));
+});
+
 test('resolvePublicPodcast usa el podcast principal cuando Multipodcast está desactivado', function () {
     if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
         return;
