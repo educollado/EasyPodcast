@@ -2449,3 +2449,9 @@ msgstr "Die .htaccess-Datei konnte nicht neu erstellt werden: %s"
 
 msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
 msgstr ".htaccess neu erstellen und alle benutzerdefinierten Regeln einschließlich der IP-Beschränkung entfernen?"
+
+msgid "Pausar"
+msgstr "Pause"
+
+msgid "Reanudar"
+msgstr "Fortsetzen"

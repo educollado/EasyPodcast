@@ -1394,6 +1394,7 @@ code.inline {
   animation: rec-pulse .85s ease-in-out infinite;
 }
 
+#btn-pause,
 #btn-stop {
   display: inline-flex;
   align-items: center;
@@ -1409,6 +1410,18 @@ code.inline {
   transition: border-color .12s, color .12s;
 }
 
+#btn-pause {
+  border-color: #dc2626;
+  background: #dc2626;
+  color: #fff;
+}
+
+#btn-pause:not(:disabled):hover {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #fff;
+}
+
 #btn-stop:not(:disabled):hover {
   border-color: var(--accent);
   color: var(--accent);
@@ -1417,6 +1430,32 @@ code.inline {
 #btn-stop:disabled {
   opacity: .38;
   cursor: not-allowed;
+}
+
+#btn-pause:disabled {
+  border-color: #f87171;
+  background: #f87171;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.rec-pause-icon {
+  display: inline-block;
+  width: .65rem;
+  height: .65rem;
+  border-left: .2rem solid currentColor;
+  border-right: .2rem solid currentColor;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+#btn-pause.is-paused .rec-pause-icon {
+  width: 0;
+  height: 0;
+  border: 0;
+  border-top: .38rem solid transparent;
+  border-bottom: .38rem solid transparent;
+  border-left: .65rem solid currentColor;
 }
 
 .rec-stop-sq {

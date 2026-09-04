@@ -2449,3 +2449,9 @@ msgstr "Non è stato possibile rigenerare il file .htaccess: %s"
 
 msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
 msgstr "Rigenerare .htaccess ed eliminare tutte le regole personalizzate, inclusa la restrizione IP?"
+
+msgid "Pausar"
+msgstr "Pausa"
+
+msgid "Reanudar"
+msgstr "Riprendi"

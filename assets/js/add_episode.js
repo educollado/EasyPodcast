@@ -139,6 +139,7 @@
   function initRecorder() {
     var details = document.getElementById('recorder-section');
     var btnRecord = document.getElementById('btn-record');
+    var btnPause = document.getElementById('btn-pause');
     var btnStop = document.getElementById('btn-stop');
     var btnPreview = document.getElementById('btn-preview-recording');
     var btnUse = document.getElementById('btn-use-recording');
@@ -146,7 +147,7 @@
     var recStatus = document.getElementById('rec-status');
     var audioFileInput = document.getElementById('audio_file');
 
-    if (!details || !btnRecord || !btnStop || !btnPreview || !btnUse || !recTimer || !recStatus || !audioFileInput) {
+    if (!details || !btnRecord || !btnPause || !btnStop || !btnPreview || !btnUse || !recTimer || !recStatus || !audioFileInput) {
       return;
     }
 
@@ -155,6 +156,7 @@
     var stream = null;
     var timerInterval = null;
     var startTime = 0;
+    var elapsedRecordingTime = 0;
     var mp3Blob = null;
     var audioDuration = 0;
     var decodedAudioBuffer = null;
@@ -195,12 +197,22 @@
       return padTwo(hours) + ':' + padTwo(minutes) + ':' + padTwo(seconds);
     }
 
-    function startTimer() {
+    function updateTimer() {
+      var elapsed = elapsedRecordingTime;
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        elapsed += Date.now() - startTime;
+      }
+      recTimer.textContent = formatTime(Math.floor(elapsed / 1000));
+    }
+
+    function startTimer(reset) {
+      stopTimer();
+      if (reset) {
+        elapsedRecordingTime = 0;
+        recTimer.textContent = formatTime(0);
+      }
       startTime = Date.now();
-      timerInterval = setInterval(function () {
-        var elapsed = Math.floor((Date.now() - startTime) / 1000);
-        recTimer.textContent = formatTime(elapsed);
-      }, 1000);
+      timerInterval = setInterval(updateTimer, 1000);
     }
 
     function stopTimer() {
@@ -208,6 +220,15 @@
         clearInterval(timerInterval);
         timerInterval = null;
       }
+    }
+
+    function setPauseButtonState(paused) {
+      var label = btnPause.querySelector('.rec-pause-label');
+      if (label) {
+        label.textContent = paused ? btnPause.dataset.labelResume : btnPause.dataset.labelPause;
+      }
+      btnPause.classList.toggle('is-paused', paused);
+      btnPause.setAttribute('aria-pressed', paused ? 'true' : 'false');
     }
 
     function float32ToInt16(buffer) {
@@ -322,17 +343,47 @@
         mediaRecorder.onstop = encodeToMp3;
         mediaRecorder.start();
 
-        startTimer();
+        startTimer(true);
         btnRecord.disabled = true;
         btnRecord.classList.add('is-recording');
         recTimer.classList.add('is-running');
+        btnPause.disabled = false;
+        setPauseButtonState(false);
         btnStop.disabled = false;
       }).catch(function (error) {
         alert(messages.microphoneErrorPrefix + error.message);
       });
     });
 
+    btnPause.addEventListener('click', function () {
+      if (!mediaRecorder) {
+        return;
+      }
+
+      if (mediaRecorder.state === 'recording') {
+        elapsedRecordingTime += Date.now() - startTime;
+        mediaRecorder.pause();
+        stopTimer();
+        updateTimer();
+        setPauseButtonState(true);
+        btnRecord.classList.remove('is-recording');
+        recTimer.classList.remove('is-running');
+        return;
+      }
+
+      if (mediaRecorder.state === 'paused') {
+        mediaRecorder.resume();
+        startTimer(false);
+        setPauseButtonState(false);
+        btnRecord.classList.add('is-recording');
+        recTimer.classList.add('is-running');
+      }
+    });
+
     btnStop.addEventListener('click', function () {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        elapsedRecordingTime += Date.now() - startTime;
+      }
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
       }
@@ -345,9 +396,12 @@
       }
 
       stopTimer();
+      updateTimer();
       btnRecord.classList.remove('is-recording');
       recTimer.classList.remove('is-running');
       recStatus.textContent = messages.encoding;
+      btnPause.disabled = true;
+      setPauseButtonState(false);
       btnStop.disabled = true;
     });
 

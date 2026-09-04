@@ -136,6 +136,13 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
                   <span class="rec-dot"></span>
                   <?= __('Grabar') ?>
                 </button>
+                <button type="button" id="btn-pause" disabled
+                        data-label-pause="<?= esc(__('Pausar')) ?>"
+                        data-label-resume="<?= esc(__('Reanudar')) ?>"
+                        aria-pressed="false">
+                  <span class="rec-pause-icon" aria-hidden="true"></span>
+                  <span class="rec-pause-label"><?= __('Pausar') ?></span>
+                </button>
                 <button type="button" id="btn-stop" disabled>
                   <span class="rec-stop-sq"></span>
                   <?= __('Parar') ?>

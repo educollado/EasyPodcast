@@ -2579,3 +2579,9 @@ msgstr "No s'ha pogut regenerar el fitxer .htaccess: %s"
 
 msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
 msgstr "Vols regenerar .htaccess i eliminar totes les regles personalitzades, inclòs el bloqueig per IP?"
+
+msgid "Pausar"
+msgstr "Pausa"
+
+msgid "Reanudar"
+msgstr "Reprèn"

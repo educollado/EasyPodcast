@@ -2579,3 +2579,9 @@ msgstr "Non se puido rexenerar o ficheiro .htaccess: %s"
 
 msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
 msgstr "Rexenerar .htaccess e eliminar todas as regras personalizadas, incluído o bloqueo por IP?"
+
+msgid "Pausar"
+msgstr "Pausar"
+
+msgid "Reanudar"
+msgstr "Continuar"
