@@ -14,7 +14,7 @@ test('cacheDirectoryPath: devuelve ruta absoluta del directorio de caché', func
     assert_not_null($path);
     assert_true(is_string($path));
     assert_contains('cache', $path);
-    assert_contains('EasyPodcast', $path);
+    assert_eq(dirname(__DIR__) . '/cache', $path);
 });
 
 test('cacheDirectoryPath: ruta termina con cache', function () {
