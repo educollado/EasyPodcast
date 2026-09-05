@@ -1,6 +1,6 @@
 # Changelog
 
-## Siguiente release
+## 2.0.2
 
 - **Grabadora mejorada**: permite pausar y reanudar una grabación sin incluir el intervalo detenido en el contador ni en el audio final, y traduce todos sus controles y mensajes al idioma seleccionado.
 - **Seguridad por IP**: el panel Multipodcast permite limitar el acceso a `admin.php` a varias direcciones o rangos CIDR IPv4 e IPv6 mediante un bloque administrado en `.htaccess`, deshabilitado por defecto y con confirmación explícita de responsabilidad en dos pasos.
