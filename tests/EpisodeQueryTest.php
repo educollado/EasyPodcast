@@ -29,6 +29,7 @@ function createEpisodeQueryTestDb(): string
     $pdo->exec(
         "CREATE TABLE episodes (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             guid TEXT NOT NULL UNIQUE,
             title TEXT NOT NULL,
             content TEXT NOT NULL,

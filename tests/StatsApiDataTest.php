@@ -34,6 +34,7 @@ function statsApiTestCreateDatabase(): array
     $pdo->exec(
         'CREATE TABLE episodes (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             guid TEXT NOT NULL,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
@@ -48,6 +49,7 @@ function statsApiTestCreateDatabase(): array
     $pdo->exec(
         'CREATE TABLE estadisticas (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             episode_id INTEGER NOT NULL,
             episode_guid TEXT NOT NULL,
             episode_title TEXT NOT NULL,
@@ -62,6 +64,7 @@ function statsApiTestCreateDatabase(): array
     $pdo->exec(
         'CREATE TABLE estadisticas_mensuales (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             episode_id INTEGER NOT NULL,
             episode_title TEXT NOT NULL,
             anio INTEGER NOT NULL,
@@ -73,6 +76,7 @@ function statsApiTestCreateDatabase(): array
     $pdo->exec(
         'CREATE TABLE estadisticas_anuales (
             id INTEGER PRIMARY KEY,
+            podcast_id INTEGER NOT NULL DEFAULT 1,
             episode_id INTEGER NOT NULL,
             episode_title TEXT NOT NULL,
             anio INTEGER NOT NULL,
