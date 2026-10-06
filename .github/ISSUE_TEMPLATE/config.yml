@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Soporte General
+    url: https://github.com/educollado/EasyPodcast/discussions
+    about: Si tu solicitud no es un informe de error o una solicitud de función, utiliza Discussions.
