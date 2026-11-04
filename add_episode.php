@@ -66,9 +66,9 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
           <label>
             <?= __('Estado') ?>
             <select id="status_select" name="status">
-              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
-              <option value="scheduled" <?= $form['status'] === 'scheduled' ? 'selected' : '' ?>>scheduled</option>
-              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
+              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>><?= __('draft') ?></option>
+              <option value="scheduled" <?= $form['status'] === 'scheduled' ? 'selected' : '' ?>><?= __('scheduled') ?></option>
+              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>><?= __('published') ?></option>
             </select>
           </label>
         </div>
@@ -177,8 +177,8 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <?= __('Explícito') ?>
             <select name="explicit">
               <option value="" <?= $form['explicit'] === '' ? 'selected' : '' ?>><?= __('Heredar del podcast') ?></option>
-              <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>>No</option>
-              <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>>Sí</option>
+              <option value="0" <?= $form['explicit'] === '0' ? 'selected' : '' ?>><?= __('No') ?></option>
+              <option value="1" <?= $form['explicit'] === '1' ? 'selected' : '' ?>><?= __('Sí') ?></option>
             </select>
           </label>
           <label>
@@ -202,9 +202,9 @@ extract($data);  // form, isEditing, editingEpisodeId, error, notice
             <?= __('Tipo de episodio') ?>
             <select name="episode_type">
               <option value="" <?= $form['episode_type'] === '' ? 'selected' : '' ?>><?= __('Sin definir') ?></option>
-              <option value="full" <?= $form['episode_type'] === 'full' ? 'selected' : '' ?>>full</option>
-              <option value="trailer" <?= $form['episode_type'] === 'trailer' ? 'selected' : '' ?>>trailer</option>
-              <option value="bonus" <?= $form['episode_type'] === 'bonus' ? 'selected' : '' ?>>bonus</option>
+              <option value="full" <?= $form['episode_type'] === 'full' ? 'selected' : '' ?>><?= __('full') ?></option>
+              <option value="trailer" <?= $form['episode_type'] === 'trailer' ? 'selected' : '' ?>><?= __('trailer') ?></option>
+              <option value="bonus" <?= $form['episode_type'] === 'bonus' ? 'selected' : '' ?>><?= __('bonus') ?></option>
             </select>
           </label>
           <label>

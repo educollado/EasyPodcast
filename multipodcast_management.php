@@ -75,7 +75,7 @@ $multipodcastTheme = isset(ADMIN_THEMES[$settings['summary_theme']]) ? $settings
     <?php
       $multipodcastLocaleLabels = [
           'ca_ES' => 'Català', 'de_DE' => 'Deutsch', 'en_US' => 'English', 'es_ES' => 'Español',
-          'fr_FR' => 'Français', 'gl_ES' => 'Galego', 'it_IT' => 'Italiano', 'pt_PT' => 'Português',
+          'fr_FR' => 'Français', 'gl_ES' => 'Galego', 'it_IT' => 'Italiano', 'pt_PT' => 'Português', 'zh_CN' => '简体中文',
       ];
       $multipodcastLocaleFiles = glob(__DIR__ . '/locale/*.po') ?: [];
       sort($multipodcastLocaleFiles);
