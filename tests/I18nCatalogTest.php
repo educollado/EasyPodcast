@@ -30,7 +30,7 @@ test('las cadenas nuevas del panel están traducidas en todos los idiomas', func
     ];
     $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
 
-    assert_eq(8, count($localeFiles));
+    assert_eq(9, count($localeFiles));
 
     foreach ($localeFiles as $localeFile) {
         $translations = i18n_parse_po($localeFile);
@@ -83,7 +83,7 @@ test('las cadenas de seguridad por IP están traducidas en todos los idiomas', f
     ];
     $localeFiles = glob(__DIR__ . '/../locale/*.po') ?: [];
 
-    assert_eq(8, count($localeFiles));
+    assert_eq(9, count($localeFiles));
     foreach ($localeFiles as $localeFile) {
         $translations = i18n_parse_po($localeFile);
         foreach ($messages as $message) {

@@ -7,6 +7,23 @@
       .replace(/^-+|-+$/g, '') || '';
   }
 
+  function getEditorLanguage() {
+    var locale = ((document.documentElement && document.documentElement.lang) || 'es')
+      .toLowerCase().replace(/-/g, '_');
+    var candidates = [locale];
+    if (locale === 'pt_pt') {
+      candidates.push('pt_br');
+    }
+    candidates.push(locale.split('_')[0], 'es');
+    var languages = Jodit.lang || {};
+    for (var i = 0; i < candidates.length; i += 1) {
+      if (Object.prototype.hasOwnProperty.call(languages, candidates[i])) {
+        return candidates[i];
+      }
+    }
+    return 'es';
+  }
+
   function initEditor() {
     var contentArea = document.getElementById('page_content');
     if (!contentArea || typeof Jodit === 'undefined') {
@@ -14,7 +31,7 @@
     }
 
     Jodit.make(contentArea, {
-      language: 'es',
+      language: getEditorLanguage(),
       toolbar: true,
       buttons: 'paragraph,fontsize,|,bold,italic,underline,strikethrough,superscript,subscript,|,copyformat,eraser,clean,|,ul,ol,|,indent,outdent,|,left,center,right,justify,|,link,image,video,table,hr,|,undo,redo,|,find,preview,fullsize,source',
       toolbarAdaptive: false,
