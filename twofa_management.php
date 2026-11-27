@@ -66,13 +66,13 @@ extract($data); // state, newCodes, qrUri, pendingSecret, recoveryCount, error, 
           <?= __('Estado') ?>: <span class="twofa-badge off"><?= __('Configurando…') ?></span>
         </div>
 
-        <p><strong>Paso 1</strong> — Escanea este código QR con tu app de autenticación:</p>
+        <p><strong><?= __('Paso 1') ?></strong> — <?= __('Escanea este código QR con tu app de autenticación:') ?></p>
         <div id="qr-container" data-qr-uri="<?= esc($qrUri) ?>"></div>
 
         <p><?= __('¿No puedes escanear? Introduce esta clave manualmente en tu app:') ?></p>
         <div class="secret-text"><?= esc($pendingSecret) ?></div>
 
-        <p class="section-gap-md"><strong>Paso 2</strong> — Introduce el código de 6 dígitos que muestra la app para confirmar:</p>
+        <p class="section-gap-md"><strong><?= __('Paso 2') ?></strong> — <?= __('Introduce el código de 6 dígitos que muestra la app para confirmar:') ?></p>
 
         <form method="post" action="twofa_management.php" autocomplete="off">
           <input type="hidden" name="csrf_token" value="<?= esc(csrf_token()) ?>">

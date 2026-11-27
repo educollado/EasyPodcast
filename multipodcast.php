@@ -69,7 +69,7 @@ $multipodcastDashboardTheme = isset(ADMIN_THEMES[$multipodcastDashboardSettings[
         <?php
           $multipodcastDashboardLocaleLabels = [
               'ca_ES' => 'Català', 'de_DE' => 'Deutsch', 'en_US' => 'English', 'es_ES' => 'Español',
-              'fr_FR' => 'Français', 'gl_ES' => 'Galego', 'it_IT' => 'Italiano', 'pt_PT' => 'Português',
+              'fr_FR' => 'Français', 'gl_ES' => 'Galego', 'it_IT' => 'Italiano', 'pt_PT' => 'Português', 'zh_CN' => '简体中文',
           ];
           $multipodcastDashboardLocaleFiles = glob(__DIR__ . '/locale/*.po') ?: [];
           sort($multipodcastDashboardLocaleFiles);

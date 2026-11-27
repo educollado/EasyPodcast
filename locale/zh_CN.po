@@ -1,0 +1,3136 @@
+# EasyPodcast — 简体中文 (Simplified Chinese)
+# Base language: Spanish msgid; keep each msgid/msgstr on a single line.
+# Distributed under the same license as EasyPodcast.
+msgid ""
+msgstr ""
+"Project-Id-Version: EasyPodcast 2.0.3\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "El valor de explícito no es válido."
+msgstr "儿童不宜内容的设置值无效。"
+
+msgid "El estado debe ser draft o published."
+msgstr "状态必须为 draft 或 published。"
+
+msgid "El tipo de episodio debe ser full, trailer o bonus."
+msgstr "单集类型必须为 full、trailer 或 bonus。"
+
+msgid "Título y descripción son obligatorios."
+msgstr "标题和描述为必填项。"
+
+msgid "La fecha de publicación no es válida."
+msgstr "发布日期无效。"
+
+msgid "Revisa los campos numéricos: deben ser enteros positivos."
+msgstr "请检查数字字段：必须为正整数。"
+
+msgid "Debes indicar la URL de audio o subir un fichero de audio."
+msgstr "请填写音频 URL 或上传音频文件。"
+
+msgid "El MIME del audio es obligatorio."
+msgstr "音频 MIME 类型为必填项。"
+
+msgid "El tamaño del audio debe ser un entero mayor que 0."
+msgstr "音频大小必须为大于 0 的整数。"
+
+msgid "Capítulo actualizado correctamente."
+msgstr "单集已更新。"
+
+msgid "Capítulo guardado correctamente."
+msgstr "单集已保存。"
+
+msgid "(Aviso: no se pudo regenerar feed.xml/sitemap.xml)"
+msgstr "（警告：无法重新生成 feed.xml/sitemap.xml）"
+
+msgid "(Aviso: no se pudo limpiar completamente la caché)"
+msgstr "（警告：未能完全清除缓存）"
+
+msgid "Una página no puede ser su propia página padre."
+msgstr "页面不能将自身设为父页面。"
+
+msgid "El título es obligatorio."
+msgstr "标题为必填项。"
+
+msgid "El slug es obligatorio."
+msgstr "路径标识为必填项。"
+
+msgid "El slug solo puede contener letras minúsculas, números y guiones."
+msgstr "路径标识只能包含小写字母、数字和连字符。"
+
+msgid "La página padre seleccionada no existe."
+msgstr "所选父页面不存在。"
+
+msgid "El slug \"%s\" es una ruta reservada del sistema."
+msgstr "路径标识“%s”是系统保留路径。"
+
+msgid "Ya existe una página con la ruta \"%s\"."
+msgstr "已存在路径为“%s”的页面。"
+
+msgid "No se puede borrar una página que tiene subpáginas. Borra primero las subpáginas."
+msgstr "无法删除包含子页面的页面。请先删除子页面。"
+
+msgid "Página borrada correctamente."
+msgstr "页面已删除。"
+
+msgid "Error al cargar las páginas: %s"
+msgstr "加载页面时出错：%s"
+
+msgid "Página actualizada correctamente."
+msgstr "页面已更新。"
+
+msgid "Página creada correctamente."
+msgstr "页面已创建。"
+
+msgid "Página no encontrada."
+msgstr "未找到页面。"
+
+msgid "Error interno: %s"
+msgstr "内部错误：%s"
+
+msgid "Completa todos los campos."
+msgstr "请填写所有字段。"
+
+msgid "La nueva contraseña y su confirmación no coinciden."
+msgstr "新密码与确认密码不一致。"
+
+msgid "La nueva contraseña debe tener al menos 8 caracteres."
+msgstr "新密码至少需要 8 个字符。"
+
+msgid "Usuario no encontrado."
+msgstr "未找到用户。"
+
+msgid "La contraseña actual no es correcta."
+msgstr "当前密码不正确。"
+
+msgid "Contraseña actualizada correctamente."
+msgstr "密码已更新。"
+
+msgid "Configuración de caché guardada."
+msgstr "缓存设置已保存。"
+
+msgid "Caché borrada correctamente."
+msgstr "缓存已清除。"
+
+msgid "No se pudo borrar completamente la caché."
+msgstr "未能完全清除缓存。"
+
+msgid "No se pudo limpiar la caché de imágenes antes de regenerar."
+msgstr "重新生成前无法清除图片缓存。"
+
+msgid "Imágenes regeneradas: %d fuente(s) procesada(s)."
+msgstr "图片已重新生成：已处理 %d 张源图片。"
+
+msgid "No hay configuración de 2FA en curso. Vuelve a empezar."
+msgstr "当前没有正在进行的双重认证设置。请重新开始。"
+
+msgid "Código incorrecto. Asegúrate de que tu app está sincronizada y vuelve a intentarlo."
+msgstr "验证码不正确。请确认认证应用已同步后重试。"
+
+msgid "2FA activado correctamente. Guarda los códigos de recuperación en un lugar seguro."
+msgstr "双重认证已启用。请将恢复代码保存在安全的位置。"
+
+msgid "2FA ya está desactivado."
+msgstr "双重认证已处于关闭状态。"
+
+msgid "2FA desactivado."
+msgstr "双重认证已关闭。"
+
+msgid "2FA no está activo."
+msgstr "双重认证尚未启用。"
+
+msgid "Nuevos códigos de recuperación generados. Los anteriores ya no son válidos."
+msgstr "新的恢复代码已生成，旧代码已失效。"
+
+msgid "Error al cargar estadísticas: %s"
+msgstr "加载统计数据时出错：%s"
+
+msgid "El valor de \"%s\" no es una URL válida."
+msgstr "“%s”的值不是有效的 URL。"
+
+msgid "Redes sociales guardadas correctamente."
+msgstr "社交媒体链接已保存。"
+
+msgid "Título, descripción y enlace son obligatorios."
+msgstr "标题、描述和链接为必填项。"
+
+msgid "No se pueden seleccionar más de 3 categorías."
+msgstr "最多只能选择 3 个分类。"
+
+msgid "La cantidad de elementos del feed debe ser un entero igual o mayor que 0."
+msgstr "RSS 订阅源的条目数必须为大于或等于 0 的整数。"
+
+msgid "La cantidad de elementos de la portada debe ser un entero mayor o igual que 1."
+msgstr "首页条目数必须为大于或等于 1 的整数。"
+
+msgid "El tipo de podcast debe ser episodic o serial."
+msgstr "节目类型必须为 episodic 或 serial。"
+
+msgid "El email del propietario no es válido."
+msgstr "所有者的电子邮箱无效。"
+
+msgid "No se pudo subir la imagen del podcast."
+msgstr "无法上传节目封面。"
+
+msgid "El fichero debe ser una imagen válida (jpg, png, gif o webp)."
+msgstr "文件必须为有效的图片（jpg、png、gif 或 webp）。"
+
+msgid "No se pudo crear la carpeta de imágenes."
+msgstr "无法创建图片文件夹。"
+
+msgid "No se pudo guardar la imagen subida."
+msgstr "无法保存上传的图片。"
+
+msgid "Podcast actualizado correctamente."
+msgstr "节目已更新。"
+
+msgid "Podcast guardado correctamente."
+msgstr "节目已保存。"
+
+msgid "No se pudo generar favicon.ico (falta extension GD)."
+msgstr "无法生成 favicon.ico（缺少 GD 扩展）。"
+
+msgid "No se pudo generar favicon.ico (imagen del podcast no localizada en servidor)."
+msgstr "无法生成 favicon.ico（服务器上未找到节目封面）。"
+
+msgid "No se pudo generar favicon.ico (fallo al convertir imagen)."
+msgstr "无法生成 favicon.ico（图片转换失败）。"
+
+msgid "No se pudo escribir favicon.ico en disco."
+msgstr "无法将 favicon.ico 写入磁盘。"
+
+msgid "Aviso: %s"
+msgstr "警告：%s"
+
+msgid "Completa usuario, contraseña y confirmación."
+msgstr "请填写用户名、密码和确认密码。"
+
+msgid "Las contraseñas no coinciden."
+msgstr "两次输入的密码不一致。"
+
+msgid "La contraseña debe tener al menos 8 caracteres."
+msgstr "密码至少需要 8 个字符。"
+
+msgid "Usuario administrador creado correctamente."
+msgstr "管理员账号已创建。"
+
+msgid "Introduce usuario y contraseña."
+msgstr "请输入用户名和密码。"
+
+msgid "Credenciales inválidas."
+msgstr "用户名或密码不正确。"
+
+msgid "Introduce el código de verificación."
+msgstr "请输入验证码。"
+
+msgid "Código incorrecto. Inténtalo de nuevo."
+msgstr "验证码不正确。请重试。"
+
+msgid "Error interno al verificar el código."
+msgstr "验证代码时发生内部错误。"
+
+msgid "La URL debe usar http o https."
+msgstr "URL 必须使用 http 或 https。"
+
+msgid "Error al descargar el feed: %s"
+msgstr "下载 RSS 订阅源时出错：%s"
+
+msgid "El servidor devolvió HTTP %d."
+msgstr "服务器返回 HTTP %d。"
+
+msgid "El feed está vacío."
+msgstr "RSS 订阅源为空。"
+
+msgid "La URL del feed no es válida."
+msgstr "RSS 订阅源 URL 无效。"
+
+msgid "No se pudo parsear el XML del feed."
+msgstr "无法解析 RSS 订阅源的 XML。"
+
+msgid "El feed no contiene un elemento <channel>."
+msgstr "RSS 订阅源中没有 <channel> 元素。"
+
+msgid "URL no válida (debe ser http/https)."
+msgstr "URL 无效（必须使用 http/https）。"
+
+msgid "No se pudo crear el fichero destino."
+msgstr "无法创建目标文件。"
+
+msgid "Error cURL: %s"
+msgstr "cURL 错误：%s"
+
+msgid "El fichero descargado está vacío."
+msgstr "下载的文件为空。"
+
+msgid "MIME de imagen no válido: %s"
+msgstr "图片 MIME 类型无效：%s"
+
+msgid "MIME de audio no válido: %s"
+msgstr "音频 MIME 类型无效：%s"
+
+msgid "No se pudo preparar el archivo temporal para exportar."
+msgstr "无法准备导出所需的临时文件。"
+
+msgid "No se pudo crear el archivo ZIP de exportación."
+msgstr "无法创建导出 ZIP 文件。"
+
+msgid "No hay archivos para exportar en esta parte."
+msgstr "此分卷中没有可导出的文件。"
+
+msgid "No se encontró la base de datos para exportar."
+msgstr "未找到要导出的数据库。"
+
+msgid "La extensión ZipArchive no está disponible en este servidor."
+msgstr "此服务器未提供 ZipArchive 扩展。"
+
+msgid "Tipo de exportación inválido."
+msgstr "导出类型无效。"
+
+msgid "No hay archivos para exportar en %s/."
+msgstr "%s/ 中没有可导出的文件。"
+
+msgid "No hay ficheros exportables en ZIP para %s/. Descarga manualmente los que superan 127 MB desde la lista inferior."
+msgstr "%s/ 中没有可导出为 ZIP 的文件。请在下方列表中手动下载超过 127 MB 的文件。"
+
+msgid "La parte solicitada no existe para %s."
+msgstr "%s 中不存在所请求的分卷。"
+
+msgid "Selecciona un archivo de base de datos."
+msgstr "请选择数据库文件。"
+
+msgid "No se pudo subir el archivo."
+msgstr "无法上传文件。"
+
+msgid "El archivo debe tener extensión .sqlite o .db."
+msgstr "文件扩展名必须为 .sqlite 或 .db。"
+
+msgid "La base de datos importada no parece válida para EasyPodcast."
+msgstr "导入的数据库似乎不是有效的 EasyPodcast 数据库。"
+
+msgid "La extensión SQLite3 no está disponible en este servidor."
+msgstr "此服务器未提供 SQLite3 扩展。"
+
+msgid "No se pudo crear el directorio de backups."
+msgstr "无法创建备份目录。"
+
+msgid "No se pudo crear el backup previo de seguridad."
+msgstr "无法创建导入前的安全备份。"
+
+msgid "Falló la importación de la base de datos."
+msgstr "数据库导入失败。"
+
+msgid "Base de datos importada correctamente y feed.xml/sitemap.xml regenerados."
+msgstr "数据库已导入，feed.xml/sitemap.xml 已重新生成。"
+
+msgid "Base de datos importada correctamente, pero no se pudo regenerar feed.xml/sitemap.xml."
+msgstr "数据库已导入，但无法重新生成 feed.xml/sitemap.xml。"
+
+msgid "(Aviso: no se pudo borrar el backup temporal en /backups)"
+msgstr "（警告：无法删除 /backups 中的临时备份）"
+
+msgid "No se pudo validar/importar el archivo: %s"
+msgstr "无法验证或导入文件：%s"
+
+msgid "Todos los ficheros ZIP deben tener extensión .zip."
+msgstr "所有 ZIP 文件的扩展名都必须为 .zip。"
+
+msgid "No se pudo subir uno de los ZIP de ficheros."
+msgstr "其中一个 ZIP 文件上传失败。"
+
+msgid "No se pudo crear el directorio audios/."
+msgstr "无法创建 audios/ 目录。"
+
+msgid "No se pudo subir uno de los audios MP3."
+msgstr "其中一个 MP3 音频文件上传失败。"
+
+msgid "Todos los audios sueltos deben tener extensión .mp3."
+msgstr "所有单独上传的音频文件的扩展名都必须为 .mp3。"
+
+msgid "No se pudo guardar uno de los audios MP3 en audios/."
+msgstr "无法将其中一个 MP3 音频文件保存到 audios/。"
+
+msgid "Selecciona al menos un ZIP o un audio MP3."
+msgstr "请至少选择一个 ZIP 文件或一个 MP3 音频文件。"
+
+msgid "Importacion completada. ZIP procesados: %d. Archivos escritos desde ZIP: %d. Directorios creados: %d. Audios MP3 subidos: %d."
+msgstr "导入完成。已处理 ZIP：%d 个。已从 ZIP 写入文件：%d 个。已创建目录：%d 个。已上传 MP3 音频：%d 个。"
+
+msgid "(Aviso: no se pudo regenerar sitemap.xml)"
+msgstr "（警告：无法重新生成 sitemap.xml）"
+
+msgid "No se pudo abrir el ZIP para importar ficheros."
+msgstr "无法打开 ZIP 文件以导入其中的文件。"
+
+msgid "El ZIP contiene rutas no permitidas."
+msgstr "ZIP 文件包含不允许的路径。"
+
+msgid "No se pudo crear un directorio durante la importación."
+msgstr "导入过程中无法创建目录。"
+
+msgid "No se pudo preparar directorios para extraer ficheros."
+msgstr "无法准备解压文件所需的目录。"
+
+msgid "No se pudo leer un fichero dentro del ZIP."
+msgstr "无法读取 ZIP 中的文件。"
+
+msgid "No se pudo escribir un fichero en destino."
+msgstr "无法将文件写入目标位置。"
+
+msgid "Error al leer datos del ZIP."
+msgstr "读取 ZIP 数据时出错。"
+
+msgid "Error al guardar un fichero importado."
+msgstr "保存导入的文件时出错。"
+
+msgid "El ZIP no contiene rutas válidas de images/ o audios/."
+msgstr "ZIP 文件中没有有效的 images/ 或 audios/ 路径。"
+
+msgid "No se pudo conectar con GitHub (HTTP %d)."
+msgstr "无法连接 GitHub（HTTP %d）。"
+
+msgid "No se pudo conectar con GitHub."
+msgstr "无法连接 GitHub。"
+
+msgid "Respuesta inesperada de GitHub."
+msgstr "GitHub 返回了异常响应。"
+
+msgid "Versión no reconocida: %s."
+msgstr "无法识别版本：%s。"
+
+msgid "No se encontró el archivo .tar.gz en la release."
+msgstr "发布版本中未找到 .tar.gz 文件。"
+
+msgid "URL de descarga no permitida."
+msgstr "不允许使用此下载 URL。"
+
+msgid "La extensión phar no está disponible en este servidor. Actualiza manualmente."
+msgstr "此服务器未提供 phar 扩展。请手动更新。"
+
+msgid "No se pudo crear el archivo temporal."
+msgstr "无法创建临时文件。"
+
+msgid "No se pudo descargar el archivo de actualización."
+msgstr "无法下载更新文件。"
+
+msgid "Error al extraer el paquete: %s"
+msgstr "解压安装包时出错：%s"
+
+msgid "Actualización completada."
+msgstr "更新完成。"
+
+msgid "Capítulo no encontrado."
+msgstr "未找到单集。"
+
+msgid "No se pudo cargar el capítulo: %s"
+msgstr "无法加载单集：%s"
+
+msgid "Administración"
+msgstr "管理"
+
+msgid "Panel de administración"
+msgstr "管理后台"
+
+msgid "Panel de administración del Podcast %s"
+msgstr "节目 %s 的管理后台"
+
+msgid "Panel de administración del Multipodcast"
+msgstr "多节目管理后台"
+
+msgid "Sesión iniciada como"
+msgstr "当前登录用户"
+
+msgid "Verificación en dos pasos"
+msgstr "双重认证"
+
+msgid "Introduce el código de 6 dígitos de tu app de autenticación, o uno de tus códigos de recuperación."
+msgstr "请输入认证应用中的 6 位验证码，或输入一个恢复代码。"
+
+msgid "Código"
+msgstr "验证码"
+
+msgid "Verificar"
+msgstr "验证"
+
+msgid "Cancelar y volver al login"
+msgstr "取消并返回登录"
+
+msgid "Configuración inicial"
+msgstr "初始设置"
+
+msgid "Acceso administrador"
+msgstr "管理员登录"
+
+msgid "No hay usuario administrador. Crea el primero para proteger el panel."
+msgstr "尚无管理员账号。请创建第一个管理员以保护后台。"
+
+msgid "Introduce tus credenciales para entrar al panel de administración."
+msgstr "请输入账号和密码以登录管理后台。"
+
+msgid "Usuario"
+msgstr "用户名"
+
+msgid "Contraseña"
+msgstr "密码"
+
+msgid "Repite la contraseña"
+msgstr "再次输入密码"
+
+msgid "Crear usuario y entrar"
+msgstr "创建账号并登录"
+
+msgid "Entrar"
+msgstr "登录"
+
+msgid "Cerrar sesión"
+msgstr "退出登录"
+
+msgid "Metadatos del canal, imagen y categorías"
+msgstr "节目资料、封面和分类"
+
+msgid "Lista, edita y borra episodios"
+msgstr "查看、编辑和删除单集"
+
+msgid "Añadir capítulo"
+msgstr "添加单集"
+
+msgid "Sube un nuevo episodio al podcast"
+msgstr "为节目上传新的单集"
+
+msgid "Exporta e importa la base de datos"
+msgstr "导出和导入数据库"
+
+msgid "Habilita la caché, bórrala o regenera imágenes"
+msgstr "启用缓存、清除缓存或重新生成图片"
+
+msgid "Autenticación en dos pasos con código TOTP"
+msgstr "使用 TOTP 验证码进行双重认证"
+
+msgid "Cambia la contraseña de acceso al panel"
+msgstr "修改后台登录密码"
+
+msgid "Blog, LinkedIn, Mastodon, X y más"
+msgstr "博客、LinkedIn、Mastodon、X 等"
+
+msgid "Crea páginas estáticas tipo \"Acerca de\""
+msgstr "创建“关于”等静态页面"
+
+msgid "Episodios, borradores y tamaño de audios"
+msgstr "单集、草稿和音频大小"
+
+msgid "Comprueba e instala nuevas versiones"
+msgstr "检查并安装新版本"
+
+msgid "Importa episodios desde una URL de feed RSS externo"
+msgstr "通过外部 RSS 订阅源 URL 导入单集"
+
+msgid "Ver podcast"
+msgstr "查看节目"
+
+msgid "Abre la web pública en una pestaña nueva"
+msgstr "在新标签页中打开公开网站"
+
+msgid "Editar Capítulo"
+msgstr "编辑单集"
+
+msgid "Añadir Capítulo"
+msgstr "添加单集"
+
+msgid "Edita el capítulo seleccionado."
+msgstr "编辑所选单集。"
+
+msgid "Completa los datos para insertar un episodio en la tabla <strong>episodes</strong>."
+msgstr "请填写单集资料，以将其添加到 <strong>episodes</strong> 表中。"
+
+msgid "GUID (opcional)"
+msgstr "GUID（可选）"
+
+msgid "Estado"
+msgstr "状态"
+
+msgid "Fecha de publicación"
+msgstr "发布日期"
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar."
+msgstr "留空时，发布时将使用当前日期。"
+
+msgid "Título *"
+msgstr "标题 *"
+
+msgid "URL del capítulo (opcional)"
+msgstr "单集 URL（可选）"
+
+msgid "Generar URL"
+msgstr "生成 URL"
+
+msgid "Audio (URL)"
+msgstr "音频 URL"
+
+msgid "Si subes audio, esta URL se rellena automáticamente con /audios/fichero."
+msgstr "上传音频后，此 URL 会自动填入 /audios/fichero。"
+
+msgid "O subir audio del capítulo"
+msgstr "或上传单集音频"
+
+msgid "MIME audio *"
+msgstr "音频 MIME 类型 *"
+
+msgid "Tamaño audio en MB *"
+msgstr "音频大小（MB）*"
+
+msgid "Duración (HH:MM:SS)"
+msgstr "时长（HH:MM:SS）"
+
+msgid "Explícito"
+msgstr "儿童不宜内容"
+
+msgid "Heredar del podcast"
+msgstr "沿用节目设置"
+
+msgid "Temporada"
+msgstr "季"
+
+msgid "Número de episodio"
+msgstr "单集编号"
+
+msgid "Imagen del capítulo (URL)"
+msgstr "单集封面 URL"
+
+msgid "Si subes imagen, esta URL se rellena automáticamente con /images/fichero."
+msgstr "上传图片后，此 URL 会自动填入 /images/fichero。"
+
+msgid "O subir imagen del capítulo"
+msgstr "或上传单集封面"
+
+msgid "Tipo de episodio"
+msgstr "单集类型"
+
+msgid "Sin definir"
+msgstr "未指定"
+
+msgid "Autor"
+msgstr "作者"
+
+msgid "Vista previa"
+msgstr "预览"
+
+msgid "Actualizar metadatos del MP3 actual"
+msgstr "更新当前 MP3 的元数据"
+
+msgid "Actualizar capítulo"
+msgstr "更新单集"
+
+msgid "Guardar capítulo"
+msgstr "保存单集"
+
+msgid "Todavía no hay capítulos guardados."
+msgstr "尚未保存任何单集。"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Título"
+msgstr "标题"
+
+msgid "Publicación"
+msgstr "发布时间"
+
+msgid "Acción"
+msgstr "操作"
+
+msgid "Editar"
+msgstr "编辑"
+
+msgid "Borrar"
+msgstr "删除"
+
+msgid "Anterior"
+msgstr "上一页"
+
+msgid "Página %d de %d (%d capítulos)"
+msgstr "第 %d 页，共 %d 页（%d 个单集）"
+
+msgid "Siguiente"
+msgstr "下一页"
+
+msgid "Se borrará el capítulo de la base de datos. El audio y la imagen se eliminarán del servidor si ningún otro capítulo los usa. ¿Continuar?"
+msgstr "将从数据库中删除此单集。如果音频和图片未被其他单集使用，也会从服务器删除。是否继续？"
+
+msgid "Gestión Podcast"
+msgstr "节目管理"
+
+msgid "Completa los metadatos del canal para rellenar la tabla <strong>podcast</strong>."
+msgstr "请填写节目资料，以填充 <strong>podcast</strong> 表。"
+
+msgid "URL principal *"
+msgstr "主 URL *"
+
+msgid "Descripción *"
+msgstr "描述 *"
+
+msgid "Idioma"
+msgstr "语言"
+
+msgid "Idioma del panel"
+msgstr "后台语言"
+
+msgid "Idioma de la interfaz de administración y de las páginas públicas."
+msgstr "管理后台和公开页面的界面语言。"
+
+msgid "Autor (itunes:author)"
+msgstr "作者（itunes:author）"
+
+msgid "Owner name"
+msgstr "所有者姓名"
+
+msgid "Owner email"
+msgstr "所有者电子邮箱"
+
+msgid "Tipo iTunes"
+msgstr "iTunes 节目类型"
+
+msgid "Cantidad de elementos del Feed RSS"
+msgstr "RSS 订阅源条目数"
+
+msgid "Nota: 0 significa infinitos (sin límite)."
+msgstr "说明：0 表示不限制数量。"
+
+msgid "Cantidad de elementos de la portada"
+msgstr "首页条目数"
+
+msgid "Controla cuántos episodios se muestran por página en la portada."
+msgstr "控制首页每页显示的单集数量。"
+
+msgid "Escribir metadatos ID3 en MP3 al subir episodio"
+msgstr "上传单集时将 ID3 元数据写入 MP3"
+
+msgid "Usa datos del episodio/podcast para título, artista, álbum, fecha, comentario y pista."
+msgstr "使用单集或节目的资料填写标题、艺人、专辑、日期、备注和音轨编号。"
+
+msgid "Copyright"
+msgstr "版权"
+
+msgid "Guardar podcast"
+msgstr "保存节目"
+
+msgid "O subir imagen del podcast"
+msgstr "或上传节目封面"
+
+msgid "Imagen del podcast (URL)"
+msgstr "节目封面 URL"
+
+msgid "Copias de seguridad"
+msgstr "备份"
+
+msgid "Gestiona por separado la base de datos y los ficheros multimedia."
+msgstr "分别管理数据库与媒体文件。"
+
+msgid "Base de Datos"
+msgstr "数据库"
+
+msgid "Exporta o importa el archivo SQLite del podcast."
+msgstr "导出或导入节目的 SQLite 文件。"
+
+msgid "Exportar base de datos"
+msgstr "导出数据库"
+
+msgid "Importar base de datos"
+msgstr "导入数据库"
+
+msgid "Ficheros"
+msgstr "文件"
+
+msgid "Exportar imágenes"
+msgstr "导出图片"
+
+msgid "No hay ficheros en <code>images/</code>."
+msgstr "<code>images/</code> 中没有文件。"
+
+msgid "Exportar audios"
+msgstr "导出音频"
+
+msgid "No hay ficheros en <code>audios/</code>."
+msgstr "<code>audios/</code> 中没有文件。"
+
+msgid "Audios MP3 sueltos (opcional)"
+msgstr "单独上传 MP3 音频文件（可选）"
+
+msgid "Importar ZIP(s) y/o audios"
+msgstr "导入 ZIP 和/或音频文件"
+
+msgid "Cambiar contraseña"
+msgstr "修改密码"
+
+msgid "Contraseña actual"
+msgstr "当前密码"
+
+msgid "Nueva contraseña"
+msgstr "新密码"
+
+msgid "Repite la nueva contraseña"
+msgstr "再次输入新密码"
+
+msgid "Gestión de Caché"
+msgstr "缓存管理"
+
+msgid "Caché web"
+msgstr "网站缓存"
+
+msgid "Almacena la salida HTML de portada, episodios, feed y sitemap para servir respuestas más rápido."
+msgstr "缓存首页、单集页面、RSS 订阅源和 sitemap 的输出，以加快响应速度。"
+
+msgid "Habilitar caché pública en /cache"
+msgstr "启用 /cache 中的公开页面缓存"
+
+msgid "Aplica a portada, episodio, feed y sitemap."
+msgstr "适用于首页、单集页面、RSS 订阅源和 sitemap。"
+
+msgid "Guardar"
+msgstr "保存"
+
+msgid "Borrar caché"
+msgstr "清除缓存"
+
+msgid "Borrar caché web"
+msgstr "清除网站缓存"
+
+msgid "Caché web borrada correctamente."
+msgstr "网站缓存已清除。"
+
+msgid "No se pudo borrar la caché web."
+msgstr "无法清除网站缓存。"
+
+msgid "Imágenes generadas"
+msgstr "生成的图片"
+
+msgid "Regenerar imágenes"
+msgstr "重新生成图片"
+
+msgid "Autenticación en dos pasos (2FA)"
+msgstr "双重认证（2FA）"
+
+msgid "Desactivado"
+msgstr "已关闭"
+
+msgid "Activa la autenticación en dos pasos para proteger tu cuenta con Google Authenticator u otra app compatible con TOTP."
+msgstr "启用双重认证，使用 Google Authenticator 或其他支持 TOTP 的应用保护账号。"
+
+msgid "Activar 2FA"
+msgstr "启用双重认证"
+
+msgid "Configurando…"
+msgstr "正在设置…"
+
+msgid "¿No puedes escanear? Introduce esta clave manualmente en tu app:"
+msgstr "无法扫描？请在认证应用中手动输入此密钥："
+
+msgid "Código de verificación"
+msgstr "验证码"
+
+msgid "Cancelar"
+msgstr "取消"
+
+msgid "Confirmar y activar"
+msgstr "确认并启用"
+
+msgid "Activo"
+msgstr "已启用"
+
+msgid "Guarda estos códigos de recuperación ahora."
+msgstr "请立即保存这些恢复代码。"
+
+msgid "No volverán a mostrarse. Úsalos si pierdes acceso a tu app de autenticación."
+msgstr "这些代码不会再次显示。如果无法使用认证应用，可以用它们恢复访问。"
+
+msgid "Códigos de recuperación disponibles: <strong>%d</strong> de 8"
+msgstr "可用恢复代码：<strong>%d</strong> 个，共 8 个"
+
+msgid "Regenerar códigos de recuperación"
+msgstr "重新生成恢复代码"
+
+msgid "Los códigos actuales quedarán anulados."
+msgstr "当前的恢复代码将失效。"
+
+msgid "Regenerar códigos"
+msgstr "重新生成代码"
+
+msgid "Desactivar 2FA"
+msgstr "关闭双重认证"
+
+msgid "Se eliminará el secreto y los códigos de recuperación."
+msgstr "将删除认证密钥和恢复代码。"
+
+msgid "Estadísticas"
+msgstr "统计"
+
+msgid "Publicados"
+msgstr "已发布"
+
+msgid "episodios en el feed"
+msgstr "RSS订阅源中的单集"
+
+msgid "Borradores"
+msgstr "草稿"
+
+msgid "sin publicar"
+msgstr "尚未发布"
+
+msgid "Total"
+msgstr "总计"
+
+msgid "episodios en la BD"
+msgstr "数据库中的单集"
+
+msgid "Tamaño de audios"
+msgstr "音频大小"
+
+msgid "según metadatos de BD"
+msgstr "根据数据库元数据"
+
+msgid "Último publicado"
+msgstr "最近发布"
+
+msgid "Páginas en caché"
+msgstr "缓存页面"
+
+msgid "ficheros .cache"
+msgstr ".cache 文件"
+
+msgid "Tamaño de caché"
+msgstr "缓存大小"
+
+msgid "HTML cacheado"
+msgstr "已缓存的 HTML"
+
+msgid "Activa"
+msgstr "已启用"
+
+msgid "Inactiva"
+msgstr "已停用"
+
+msgid "Gestionar caché"
+msgstr "管理缓存"
+
+msgid "Estadísticas de descargas"
+msgstr "下载统计"
+
+msgid "Últimas %d descargas y reproducciones (hasta 7 días)"
+msgstr "最近 %d 条下载和播放记录（最多保留 7 天）"
+
+msgid "Aún no hay datos de descargas o reproducciones"
+msgstr "暂无下载或播放数据"
+
+msgid "Tipo"
+msgstr "类型"
+
+msgid "Reproducción"
+msgstr "播放"
+
+msgid "Descarga"
+msgstr "下载"
+
+msgid "Total de descargas y reproducciones por capítulo"
+msgstr "各单集下载和播放总次数"
+
+msgid "Aún no hay descargas ni reproducciones registradas"
+msgstr "暂无下载或播放记录"
+
+msgid "Año/Mes"
+msgstr "年/月"
+
+msgid "Año"
+msgstr "年份"
+
+msgid "Capítulo"
+msgstr "单集"
+
+msgid "Descargas"
+msgstr "下载次数"
+
+msgid "Todos los años"
+msgstr "所有年份"
+
+msgid "Filtrar"
+msgstr "筛选"
+
+msgid "Episodios, borradores, tamaño de audios y descargas/reproducciones"
+msgstr "单集、草稿、音频大小及下载/播放次数"
+
+msgid "Diario (7 días)"
+msgstr "每日（7 天）"
+
+msgid "Mensual"
+msgstr "每月"
+
+msgid "Anual"
+msgstr "每年"
+
+msgid "Resumen"
+msgstr "概览"
+
+msgid "Páginas"
+msgstr "页面"
+
+msgid "Todavía no hay páginas creadas."
+msgstr "尚未创建页面。"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Orden"
+msgstr "排序"
+
+msgid "Añadir Página"
+msgstr "添加页面"
+
+msgid "Editar Página"
+msgstr "编辑页面"
+
+msgid "Edita la página seleccionada."
+msgstr "编辑所选页面。"
+
+msgid "Crea una nueva página estática."
+msgstr "创建新的静态页面。"
+
+msgid "Slug *"
+msgstr "路径标识 *"
+
+msgid "Solo letras minúsculas, números y guiones. Se genera desde el título."
+msgstr "仅限小写字母、数字和连字符，根据标题自动生成。"
+
+msgid "Página padre"
+msgstr "父页面"
+
+msgid "— Sin padre (primer nivel) —"
+msgstr "— 无父页面（顶级）—"
+
+msgid "Orden (numérico, menor = antes)"
+msgstr "排序（数字越小越靠前）"
+
+msgid "Contenido"
+msgstr "内容"
+
+msgid "Volver a la lista"
+msgstr "返回列表"
+
+msgid "Actualizar página"
+msgstr "更新页面"
+
+msgid "Guardar página"
+msgstr "保存页面"
+
+msgid "Redes Sociales"
+msgstr "社交媒体"
+
+msgid "Los enlaces configurados aparecerán como iconos en la cabecera de la web pública."
+msgstr "配置的链接将以图标形式显示在公开网站的页眉中。"
+
+msgid "Guardar redes sociales"
+msgstr "保存社交媒体链接"
+
+msgid "Actualizar EasyPodcast"
+msgstr "更新 EasyPodcast"
+
+msgid "Comprueba si hay una nueva versión disponible y aplícala sin perder datos."
+msgstr "检查可用的新版本，并在保留数据的情况下安装更新。"
+
+msgid "Se recomienda hacer una copia de seguridad, al menos de la base de datos, antes de actualizar."
+msgstr "建议在更新前进行备份，至少备份数据库。"
+
+msgid "Ir a Copias de seguridad"
+msgstr "前往备份"
+
+msgid "EasyPodcast se ha actualizado correctamente. La base de datos, audios e imágenes no se han modificado."
+msgstr "EasyPodcast 已成功更新。数据库、音频和图片均未修改。"
+
+msgid "Instalada"
+msgstr "已安装版本"
+
+msgid "Última disponible"
+msgstr "最新可用版本"
+
+msgid "Ya tienes la última versión instalada."
+msgstr "当前已安装最新版本。"
+
+msgid "Importar feed RSS"
+msgstr "导入 RSS 订阅源"
+
+msgid "Importa episodios desde una URL de feed RSS externo. Los archivos MP3 e imágenes se descargarán localmente."
+msgstr "通过外部 RSS 订阅源 URL 导入单集，MP3 文件和图片将下载到本地。"
+
+msgid "La extensión cURL no está disponible."
+msgstr "cURL 扩展不可用。"
+
+msgid "La importación de feeds requiere cURL para descargar el feed, los audios y las imágenes. Habilita la extensión <code>curl</code> en tu instalación de PHP y recarga esta página para poder importar."
+msgstr "导入订阅源需要使用 cURL 下载订阅源、音频和图片。请在 PHP 环境中启用 <code>curl</code> 扩展，然后刷新此页面再导入。"
+
+msgid "URL del feed RSS"
+msgstr "RSS 订阅源 URL"
+
+msgid "Importar episodios aunque su GUID ya exista en la base de datos"
+msgstr "即使数据库中已存在相同 GUID，也导入单集"
+
+msgid "⚠ La importación puede tardar varios minutos dependiendo del número de episodios y el tamaño de los audios. No cierres esta página hasta que finalice."
+msgstr "⚠ 导入可能需要几分钟，具体取决于单集数量和音频大小。完成前请勿关闭此页面。"
+
+msgid "Iniciar importación"
+msgstr "开始导入"
+
+msgid "(sin título)"
+msgstr "（无标题）"
+
+msgid "Sin imagen"
+msgstr "无图片"
+
+msgid "Todavía no hay capítulos publicados."
+msgstr "尚无已发布的单集。"
+
+msgid "Leer más"
+msgstr "阅读全文"
+
+msgid "Tu navegador no soporta audio HTML5."
+msgstr "你的浏览器不支持 HTML5 音频。"
+
+msgid "Portada del capítulo"
+msgstr "单集封面"
+
+msgid "Escribe un término para buscar episodios."
+msgstr "请输入关键词搜索单集。"
+
+msgid "No hay resultados para \"%s\"."
+msgstr "没有找到“%s”的相关结果。"
+
+msgid "Resultados para \"%s\": %d"
+msgstr "“%s”的搜索结果：%d"
+
+msgid "Buscar"
+msgstr "搜索"
+
+msgid "Buscar episodios"
+msgstr "搜索单集"
+
+msgid "Ir a la página de inicio"
+msgstr "前往首页"
+
+msgid "Portada del podcast"
+msgstr "节目封面"
+
+msgid "Inicio"
+msgstr "首页"
+
+msgid "Descargar"
+msgstr "下载"
+
+msgid "Duración: %s"
+msgstr "时长：%s"
+
+msgid "Borrador — Esta página no está publicada y solo es visible para administradores."
+msgstr "草稿 — 此页面尚未发布，仅管理员可见。"
+
+msgid "Sin título"
+msgstr "无标题"
+
+msgid "Cambiar modo claro/oscuro"
+msgstr "切换浅色/深色模式"
+
+msgid "Feed RSS"
+msgstr "RSS 订阅源"
+
+msgid "Panel"
+msgstr "控制面板"
+
+msgid "Podcast"
+msgstr "播客"
+
+msgid "Capítulos"
+msgstr "单集"
+
+msgid "Añadir"
+msgstr "添加"
+
+msgid "Backups"
+msgstr "备份"
+
+msgid "Caché"
+msgstr "缓存"
+
+msgid "2FA"
+msgstr "双重认证"
+
+msgid "Redes"
+msgstr "社交媒体"
+
+msgid "Stats"
+msgstr "统计"
+
+msgid "Actualizar"
+msgstr "更新"
+
+msgid "Importar"
+msgstr "导入"
+
+msgid "Ver web ↗"
+msgstr "查看网站 ↗"
+
+msgid "Salir"
+msgstr "退出登录"
+
+msgid "Podcast creado con %s, hecho en %s con ❤️ por %s"
+msgstr "本播客使用 %s 创建，由位于 %s 的 %s 用 ❤️ 制作"
+
+msgid "Acceso prohibido"
+msgstr "禁止访问"
+
+msgid "El contenido al que estás tratando de acceder está prohibido y no tienes permiso para verlo."
+msgstr "你尝试访问的内容禁止访问，你没有查看权限。"
+
+msgid "Volver al inicio"
+msgstr "返回首页"
+
+msgid "Podcast creado dentro de"
+msgstr "播客创建于"
+
+msgid "Página no encontrada"
+msgstr "页面不存在"
+
+msgid "La página que estás buscando no existe o ha sido movida a otra dirección."
+msgstr "你要访问的页面不存在，或已移至其他地址。"
+
+msgid "Navegación del panel"
+msgstr "管理导航"
+
+msgid "Bloque base de datos"
+msgstr "数据库部分"
+
+msgid "Bloque ficheros"
+msgstr "文件部分"
+
+msgid "Exporta por separado <code>images/</code> y <code>audios/</code> en partes ZIP de hasta 127 MB."
+msgstr "分别导出 <code>images/</code> 和 <code>audios/</code>，拆分为每份不超过 127 MB 的 ZIP 文件。"
+
+msgid "Total: %d ficheros."
+msgstr "总计：%d 个文件。"
+
+msgid "Exportables en ZIP: %d en %d parte(s)."
+msgstr "可导出为 ZIP：%d 个文件，共 %d 份。"
+
+msgid "Descargar imágenes parte %d (%.2f MB)"
+msgstr "下载图片第 %d 份（%.2f MB）"
+
+msgid "Algunos ficheros de <code>images/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "<code>images/</code> 中部分文件超过 127 MB，未包含在 ZIP 中。"
+
+msgid "Descárgalos manualmente:"
+msgstr "请手动下载这些文件："
+
+msgid "y %d audios no exportables en ZIP."
+msgstr "另有 %d 个音频文件无法导出为 ZIP。"
+
+msgid "Descargar audios parte %d (%.2f MB)"
+msgstr "下载音频第 %d 份（%.2f MB）"
+
+msgid "Algunos ficheros de <code>audios/</code> superan 127 MB y no se incluyen en ZIP."
+msgstr "<code>audios/</code> 中部分文件超过 127 MB，未包含在 ZIP 中。"
+
+msgid "Importar ficheros (uno o varios ZIP o audios)"
+msgstr "导入文件（一个或多个 ZIP 或音频文件）"
+
+msgid "Categorías"
+msgstr "分类"
+
+msgid "(máx. 3 — Apple Podcasts)"
+msgstr "（最多 3 个 — Apple Podcasts）"
+
+msgid "Añadir categoría..."
+msgstr "添加分类…"
+
+msgid "Palabras clave (iTunes/iVoox)"
+msgstr "关键词（iTunes/iVoox）"
+
+msgid "Sepáralas por comas. Se publican en el feed como itunes:keywords."
+msgstr "请用逗号分隔。关键词将在订阅源中作为 itunes:keywords 发布。"
+
+msgid "Blog / Web personal"
+msgstr "博客 / 个人网站"
+
+msgid "¿Actualizar EasyPodcast a v%s?\n\nSe descargarán y extraerán los archivos de la aplicación.\nLa base de datos y los archivos de audio/imágenes no se modifican."
+msgstr "是否将 EasyPodcast 更新至 v%s？\n\n将下载并解压应用文件。\n数据库、音频和图片文件不会修改。"
+
+msgid "Actualizando…"
+msgstr "正在更新…"
+
+msgid "Hay una nueva versión disponible:"
+msgstr "有新版本可用："
+
+msgid "Actualizar a v%s"
+msgstr "更新至 v%s"
+
+msgid "La actualización descarga el paquete desde"
+msgstr "更新包下载自"
+
+msgid "GitHub Releases"
+msgstr "GitHub Releases"
+
+msgid "y extrae los archivos sobre la instalación actual."
+msgstr "，并将文件解压到当前安装目录。"
+
+msgid "La base de datos <code>podcast.sqlite</code>, los audios y las imágenes no se tocan."
+msgstr "数据库 <code>podcast.sqlite</code>、音频和图片均不会修改。"
+
+msgid "Descripción"
+msgstr "描述"
+
+msgid "Categoría"
+msgstr "分类"
+
+msgid "Imagen"
+msgstr "图片"
+
+msgid "Sí"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Metadatos del podcast"
+msgstr "节目元数据"
+
+msgid "Marca los campos que quieres sobreescribir con los valores del feed."
+msgstr "请选择要使用订阅源中的值覆盖的字段。"
+
+msgid "Seleccionar todos los campos"
+msgstr "选择所有字段"
+
+msgid "Campo"
+msgstr "字段"
+
+msgid "Valor actual"
+msgstr "当前值"
+
+msgid "Valor del feed"
+msgstr "订阅源中的值"
+
+msgid "Episodios encontrados (%d)"
+msgstr "找到的单集（%d）"
+
+msgid "Seleccionar todos los episodios"
+msgstr "选择所有单集"
+
+msgid "Fecha"
+msgstr "日期"
+
+msgid "Duración"
+msgstr "时长"
+
+msgid "Opciones de importación"
+msgstr "导入选项"
+
+msgid "Importando feed RSS"
+msgstr "正在导入 RSS 订阅源"
+
+msgid "Descargando y parseando el feed…"
+msgstr "正在下载并解析订阅源…"
+
+msgid "Volver"
+msgstr "返回"
+
+msgid "Feed parseado: <strong>%d episodios</strong> seleccionados para importar."
+msgstr "订阅源已解析：已选择 <strong>%d 个单集</strong>进行导入。"
+
+msgid "Descargando imagen del podcast…"
+msgstr "正在下载节目图片…"
+
+msgid "No se pudo descargar la imagen del podcast: %s"
+msgstr "无法下载节目图片：%s"
+
+msgid "Imagen del podcast descargada."
+msgstr "节目图片已下载。"
+
+msgid "Creando datos del podcast desde el feed (primera importación)…"
+msgstr "正在根据订阅源创建节目数据（首次导入）…"
+
+msgid "Datos del podcast creados correctamente."
+msgstr "节目数据已成功创建。"
+
+msgid "Actualizando metadatos del podcast (%d campos)…"
+msgstr "正在更新节目元数据（%d 个字段）…"
+
+msgid "Metadatos del podcast actualizados."
+msgstr "节目元数据已更新。"
+
+msgid "Metadatos del podcast: ningún campo seleccionado — se omite la actualización."
+msgstr "节目元数据：未选择任何字段，已跳过更新。"
+
+msgid "Episodios"
+msgstr "单集"
+
+msgid "saltado (GUID ya existe)"
+msgstr "已跳过（GUID 已存在）"
+
+msgid "sin enclosure de audio"
+msgstr "缺少音频 enclosure 标签"
+
+msgid "descargando audio…"
+msgstr "正在下载音频…"
+
+msgid "Error: %s"
+msgstr "错误：%s"
+
+msgid "Error BD: %s"
+msgstr "数据库错误：%s"
+
+msgid "Regenerando feed.xml y sitemap.xml…"
+msgstr "正在重新生成 feed.xml 和 sitemap.xml…"
+
+msgid "feed.xml y sitemap.xml regenerados."
+msgstr "feed.xml 和 sitemap.xml 已重新生成。"
+
+msgid "No se pudo regenerar feed/sitemap: %s"
+msgstr "无法重新生成 feed/sitemap：%s"
+
+msgid "Caché borrada."
+msgstr "缓存已清除。"
+
+msgid "Importación completada:"
+msgstr "导入完成："
+
+msgid "%d importados, %d saltados, %d errores."
+msgstr "已导入 %d 个，跳过 %d 个，发生 %d 个错误。"
+
+msgid "Ver episodios"
+msgstr "查看单集"
+
+msgid "Importar otro feed"
+msgstr "导入其他订阅源"
+
+msgid "El nombre del token es obligatorio."
+msgstr "令牌名称不能为空。"
+
+msgid "Token generado correctamente. Cópialo ahora: no se mostrará de nuevo."
+msgstr "令牌已成功生成。请立即复制保存，之后不会再次显示。"
+
+msgid "Token revocado correctamente."
+msgstr "令牌已撤销。"
+
+msgid "Error al gestionar tokens: %s"
+msgstr "管理令牌时出错：%s"
+
+msgid "Tokens API"
+msgstr "API 令牌"
+
+msgid "Tokens de API"
+msgstr "API 令牌"
+
+msgid "Genera tokens para autenticar peticiones a la API REST. Cada token solo se muestra una vez al crearlo."
+msgstr "生成令牌以验证 REST API 请求。每个令牌仅在创建时显示一次。"
+
+msgid "Token generado (guárdalo ahora):"
+msgstr "生成的令牌（请立即保存）："
+
+msgid "Generar nuevo token"
+msgstr "生成新令牌"
+
+msgid "Nombre del token *"
+msgstr "令牌名称 *"
+
+msgid "p.ej. integración-n8n"
+msgstr "例如：n8n 集成"
+
+msgid "Fecha de expiración (opcional)"
+msgstr "到期日期（可选）"
+
+msgid "Generar token"
+msgstr "生成令牌"
+
+msgid "Tokens activos"
+msgstr "有效令牌"
+
+msgid "No hay tokens creados."
+msgstr "尚未创建令牌。"
+
+msgid "Nombre"
+msgstr "名称"
+
+msgid "Token (últimos 8 chars)"
+msgstr "令牌（末尾 8 个字符）"
+
+msgid "Creado"
+msgstr "创建时间"
+
+msgid "Expira"
+msgstr "到期时间"
+
+msgid "Último uso"
+msgstr "最近使用"
+
+msgid "Sin expiración"
+msgstr "永不到期"
+
+msgid "Nunca"
+msgstr "从未使用"
+
+msgid "¿Revocar este token?"
+msgstr "是否撤销此令牌？"
+
+msgid "Revocar"
+msgstr "撤销"
+
+msgid "→ Ver documentación de la API"
+msgstr "→ 查看 API 文档"
+
+msgid "← Gestionar tokens"
+msgstr "← 管理令牌"
+
+msgid "Documentación API REST"
+msgstr "REST API 文档"
+
+msgid "La API REST permite gestionar el podcast de forma programática. Todas las peticiones requieren autenticación."
+msgstr "REST API 可让你通过程序管理播客。所有请求均需身份验证。"
+
+msgid "Autenticación"
+msgstr "身份验证"
+
+msgid "Incluye tu token en la cabecera"
+msgstr "请在请求头中加入令牌"
+
+msgid "Gestiona tus tokens en"
+msgstr "令牌管理位置："
+
+msgid "Formato de respuesta"
+msgstr "响应格式"
+
+msgid "Todas las respuestas son JSON:"
+msgstr "所有响应均为 JSON："
+
+msgid "En caso de error:"
+msgstr "发生错误时："
+
+msgid "Descripción del error"
+msgstr "错误描述"
+
+msgid "Lista paginada"
+msgstr "分页列表"
+
+msgid "Parámetro"
+msgstr "参数"
+
+msgid "Página (defecto: 1)"
+msgstr "页码（默认：1）"
+
+msgid "Resultados por página, máx. 100 (defecto: 20)"
+msgstr "每页结果数，最多 100 条（默认：20）"
+
+msgid "opcional"
+msgstr "可选"
+
+msgid "o"
+msgstr "或"
+
+msgid "sí"
+msgstr "是"
+
+msgid "no"
+msgstr "否"
+
+msgid "Obtener episodio"
+msgstr "获取单集"
+
+msgid "Crear episodio"
+msgstr "创建单集"
+
+msgid "Acepta"
+msgstr "支持"
+
+msgid "para subir ficheros"
+msgstr "以便上传文件"
+
+msgid "Req."
+msgstr "必填"
+
+msgid "Título del episodio"
+msgstr "单集标题"
+
+msgid "URL del audio (*o subir audio_file)"
+msgstr "音频 URL（*或上传 audio_file）"
+
+msgid "Tamaño en bytes (*si no se sube fichero)"
+msgstr "字节大小（*未上传文件时必填）"
+
+msgid "MIME del audio (defecto: audio/mpeg)"
+msgstr "音频 MIME 类型（默认：audio/mpeg）"
+
+msgid "defecto"
+msgstr "默认"
+
+msgid "Fecha ISO 8601 (auto-asignada al publicar)"
+msgstr "ISO 8601 日期（发布时自动设置）"
+
+msgid "Fichero de audio (multipart)"
+msgstr "音频文件（multipart）"
+
+msgid "Imagen del episodio (multipart)"
+msgstr "单集图片（multipart）"
+
+msgid "URL de imagen alternativa"
+msgstr "备用图片 URL"
+
+msgid "Número de temporada"
+msgstr "季编号"
+
+msgid "hereda del podcast"
+msgstr "沿用节目设置"
+
+msgid "Autor del episodio"
+msgstr "单集作者"
+
+msgid "Episodio de prueba"
+msgstr "测试单集"
+
+msgid "Actualizar episodio"
+msgstr "更新单集"
+
+msgid "Mismo formato que crear. Solo los campos enviados se modifican."
+msgstr "格式与创建时相同，仅修改所提交的字段。"
+
+msgid "Borrar episodio"
+msgstr "删除单集"
+
+msgid "Obtener metadatos del canal"
+msgstr "获取节目元数据"
+
+msgid "Actualizar metadatos"
+msgstr "更新元数据"
+
+msgid "Campos actualizables:"
+msgstr "可更新的字段："
+
+msgid "Para subir imagen del canal usa"
+msgstr "上传节目图片请使用"
+
+msgid "con el campo"
+msgstr "，并指定字段"
+
+msgid "Mi Podcast Actualizado"
+msgstr "我的播客（已更新）"
+
+msgid "Obtener página"
+msgstr "获取页面"
+
+msgid "Crear página"
+msgstr "创建页面"
+
+msgid "Título de la página"
+msgstr "页面标题"
+
+msgid "Slug URL (minúsculas, números y guiones)"
+msgstr "URL 路径标识（小写字母、数字和连字符）"
+
+msgid "Contenido HTML"
+msgstr "HTML 内容"
+
+msgid "ID de página padre (para subpáginas)"
+msgstr "父页面 ID（用于子页面）"
+
+msgid "Orden de aparición (defecto: 0)"
+msgstr "显示顺序（默认：0）"
+
+msgid "Sobre nosotros"
+msgstr "关于我们"
+
+msgid "Para cambiar el slug, envía también"
+msgstr "如需更改路径标识，还需提交"
+
+msgid "con la ruta actual."
+msgstr "，其值为当前路径。"
+
+msgid "Borrar página"
+msgstr "删除页面"
+
+msgid "Falla si la página tiene subpáginas hijas."
+msgstr "页面含有子页面时会失败。"
+
+msgid "Redes sociales"
+msgstr "社交媒体"
+
+msgid "Obtener enlaces"
+msgstr "获取链接"
+
+msgid "Actualizar enlaces"
+msgstr "更新链接"
+
+msgid "Campos:"
+msgstr "字段："
+
+msgid "Todos opcionales; los no enviados conservan su valor actual. URLs vacías eliminan el enlace."
+msgstr "所有字段均可选；未提交的字段保留当前值，空 URL 会移除链接。"
+
+msgid "Limpiar caché web e imágenes"
+msgstr "清除网页和图片缓存"
+
+msgid "Regenerar variantes de imagen"
+msgstr "重新生成图片变体"
+
+msgid "Feed"
+msgstr "RSS订阅源"
+
+msgid "Estadísticas del podcast"
+msgstr "节目统计"
+
+msgid "Resumen general, caché y estadísticas de descargas"
+msgstr "总体概览、缓存和下载统计"
+
+msgid "Incluye estas claves principales:"
+msgstr "包含以下主要键："
+
+msgid "resumen general de episodios y tamaño total de audio."
+msgstr "单集概览和音频总大小。"
+
+msgid "estado de la caché, número de ficheros y tamaño total."
+msgstr "缓存状态、文件数量和总大小。"
+
+msgid "últimos registros diarios con tipo de acción, IP, user agent y referer."
+msgstr "最近的每日记录，包含操作类型、IP、user agent 和 referer。"
+
+msgid "agregados mensuales por episodio; admite el filtro opcional year."
+msgstr "按单集汇总的每月统计，支持可选的 year 筛选参数。"
+
+msgid "agregados anuales por episodio."
+msgstr "按单集汇总的每年统计。"
+
+msgid "totales acumulados por episodio con descargas o reproducciones."
+msgstr "各单集累计下载或播放次数。"
+
+msgid "También se incluyen campos auxiliares de presentación como audio_size_human, size_human, display_date, action_type_label y period_label."
+msgstr "还包含辅助展示字段，例如 audio_size_human、size_human、display_date、action_type_label 和 period_label。"
+
+msgid "Se mantienen las claves anteriores de episodes y cache por compatibilidad."
+msgstr "为保持兼容性，保留了原有的 episodes 和 cache 键。"
+
+msgid "El parámetro opcional"
+msgstr "可选参数"
+
+msgid "filtra solo la colección mensual; el resto de bloques se devuelve completo."
+msgstr "仅筛选每月统计，其余部分会完整返回。"
+
+msgid "Regenerar feed.xml y sitemap.xml"
+msgstr "重新生成 feed.xml 和 sitemap.xml"
+
+msgid "Códigos de estado HTTP"
+msgstr "HTTP 状态码"
+
+msgid "Petición correcta"
+msgstr "请求成功"
+
+msgid "Recurso creado correctamente"
+msgstr "资源已成功创建"
+
+msgid "Respuesta a preflight OPTIONS"
+msgstr "OPTIONS 预检请求的响应"
+
+msgid "Datos inválidos o campos requeridos ausentes"
+msgstr "数据无效或缺少必填字段"
+
+msgid "Token ausente o inválido"
+msgstr "令牌缺失或无效"
+
+msgid "Recurso no encontrado"
+msgstr "资源不存在"
+
+msgid "Método HTTP no permitido"
+msgstr "不允许使用此 HTTP 方法"
+
+msgid "Error del servidor"
+msgstr "服务器错误"
+
+msgid "Mismos parámetros de paginación que episodios."
+msgstr "分页参数与单集相同。"
+
+msgid "Genera y revoca tokens para la API REST"
+msgstr "生成和撤销 REST API 令牌"
+
+msgid "Sistema"
+msgstr "系统"
+
+msgid "Consultar versión actual y disponible"
+msgstr "查询当前版本和可用版本"
+
+msgid "Si no se puede contactar con GitHub, el campo"
+msgstr "无法连接到 GitHub 时，字段"
+
+msgid "contendrá el motivo; la respuesta sigue siendo 200."
+msgstr "将包含具体原因；响应状态码仍为 200。"
+
+msgid "Actualizar la aplicación"
+msgstr "更新应用"
+
+msgid "Atención:"
+msgstr "注意："
+
+msgid "esta operación descarga e instala la última release desde GitHub y es irreversible. Asegúrate de tener una copia de seguridad antes de ejecutarla."
+msgstr "此操作会从 GitHub 下载并安装最新发布版本，且无法撤销。执行前请确保已有备份。"
+
+msgid "Códigos de error posibles:"
+msgstr "可能的错误代码："
+
+msgid "(ya en la versión más reciente)"
+msgstr "（已是最新版本）"
+
+msgid "(error al contactar GitHub)"
+msgstr "（连接 GitHub 失败）"
+
+msgid "(error durante la instalación)"
+msgstr "（安装过程中出错）"
+
+msgid "Contenido *"
+msgstr "内容 *"
+
+msgid "Descripción (sólo texto)"
+msgstr "简介（纯文本）"
+
+msgid "Máx. 4000 caracteres. Si está rellena, se muestra en portada en lugar del contenido."
+msgstr "最多 4000 个字符。填写后，首页将显示此简介，而非正文内容。"
+
+msgid "Máx. 10000 caracteres (incluyendo etiquetas HTML)."
+msgstr "最多 10000 个字符（包括 HTML 标签）。"
+
+msgid "Contenido HTML del episodio (máx. 10000 caracteres)"
+msgstr "单集 HTML 内容（最多 10000 个字符）"
+
+msgid "Descripción en texto plano (máx. 4000 caracteres). Se muestra en portada y en el feed RSS."
+msgstr "纯文本简介（最多 4000 个字符），显示在首页和 RSS 订阅源中。"
+
+msgid "Contenido HTML de la página"
+msgstr "页面 HTML 内容"
+
+msgid "Contenido del episodio"
+msgstr "单集内容"
+
+msgid "Limpiar archivos huérfanos"
+msgstr "清理未引用的文件"
+
+msgid "Archivos en <code>audios/</code> e <code>images/</code> que no están vinculados a ningún episodio."
+msgstr "<code>audios/</code> 和 <code>images/</code> 中未关联任何单集的文件。"
+
+msgid "No se encontraron archivos sin usar."
+msgstr "未发现未使用的文件。"
+
+msgid "Audios sin usar"
+msgstr "未使用的音频"
+
+msgid "Imágenes sin usar"
+msgstr "未使用的图片"
+
+msgid "Archivo"
+msgstr "文件"
+
+msgid "Tamaño"
+msgstr "大小"
+
+msgid "Seleccionar todo"
+msgstr "全选"
+
+msgid "Deseleccionar todo"
+msgstr "取消全选"
+
+msgid "Borrar seleccionados"
+msgstr "删除所选文件"
+
+msgid "Selecciona al menos un archivo."
+msgstr "请至少选择一个文件。"
+
+msgid "¿Borrar los archivos seleccionados? Esta acción no se puede deshacer."
+msgstr "确定删除所选文件吗？此操作无法撤销。"
+
+msgid "Limpiar"
+msgstr "清理"
+
+msgid "Borra audios e imágenes que no usa ningún episodio"
+msgstr "删除所有单集均未使用的音频和图片"
+
+msgid "%d archivo(s) eliminado(s), %s liberados."
+msgstr "已删除 %d 个文件，释放 %s 空间。"
+
+msgid "No se eliminó ningún archivo."
+msgstr "未删除任何文件。"
+
+msgid "Recordar este dispositivo durante 7 días"
+msgstr "在此设备上保持登录 7 天"
+
+msgid "Capítulos en Borrador"
+msgstr "草稿单集"
+
+msgid "Capítulos Publicados"
+msgstr "已发布单集"
+
+msgid "Limpiar búsqueda"
+msgstr "清除搜索"
+
+msgid "No se encontraron capítulos para \"%s\"."
+msgstr "未找到与“%s”相关的单集。"
+
+msgid "Capítulo borrado correctamente."
+msgstr "单集已删除。"
+
+msgid "No se encontró el capítulo que se intentó borrar."
+msgstr "未找到要删除的单集。"
+
+msgid "Metadatos ID3 revisados: el MP3 ya tenía esos valores."
+msgstr "已检查 ID3 元数据：MP3 中的值已与设置一致。"
+
+msgid "Metadatos ID3 actualizados en el MP3 existente."
+msgstr "现有 MP3 中的 ID3 元数据已更新。"
+
+msgid "Aviso: no se pudieron escribir etiquetas ID3 en el MP3 subido."
+msgstr "注意：无法将 ID3 标签写入已上传的 MP3。"
+
+msgid "Aviso: activa primero \"Escribir metadatos ID3 en MP3 al subir episodio\" en Gestión Podcast."
+msgstr "注意：请先在节目管理中启用“上传单集时将 ID3 元数据写入 MP3”。"
+
+msgid "Aviso: no se encontró un MP3 local en /audios/ para actualizar metadatos."
+msgstr "注意：在 /audios/ 中未找到可更新元数据的本地 MP3。"
+
+msgid "Aviso: la actualización manual de metadatos solo está disponible para MP3."
+msgstr "注意：仅 MP3 文件支持手动更新元数据。"
+
+msgid "Variantes redimensionadas de las imágenes del podcast y episodios, almacenadas en %s. Regenerarlas borra las actuales y las vuelve a crear en los tamaños 80, 144 y 220 px."
+msgstr "节目和单集图片的缩略图存储在 %s。重新生成将删除现有缩略图，并按 80、144 和 220 px 的尺寸重新创建。"
+
+msgid "Apariencia"
+msgstr "外观"
+
+msgid "Tema por defecto"
+msgstr "默认主题"
+
+msgid "El estado debe ser draft, published o scheduled."
+msgstr "状态必须为 draft、published 或 scheduled。"
+
+msgid "La fecha de publicación es obligatoria para programar un capítulo."
+msgstr "定时发布单集时必须填写发布日期。"
+
+msgid "Capítulos Programados"
+msgstr "定时发布单集"
+
+msgid "Publicación programada"
+msgstr "定时发布"
+
+msgid "Si se deja vacío se asigna la fecha actual al publicar. Para capítulos programados es obligatoria."
+msgstr "留空时，发布时将使用当前日期。定时发布单集必须填写此项。"
+
+msgid "Modo de visualización"
+msgstr "显示模式"
+
+msgid "Automático"
+msgstr "自动"
+
+msgid "Normal"
+msgstr "普通"
+
+msgid "Según sistema"
+msgstr "跟随系统"
+
+msgid "Tema:"
+msgstr "主题："
+
+msgid "Hay una nueva versión de EasyPodcast disponible:"
+msgstr "EasyPodcast 有新版本可用："
+
+msgid "Actualizar ahora"
+msgstr "立即更新"
+
+msgid "Imágenes del podcast"
+msgstr "节目图片"
+
+msgid "Imagen del podcast"
+msgstr "节目图片"
+
+msgid "Vista previa de la imagen del podcast"
+msgstr "节目图片预览"
+
+msgid "Imagen del hero"
+msgstr "页首横幅图"
+
+msgid "Vista previa de la imagen del hero"
+msgstr "页首横幅图预览"
+
+msgid "Imagen del hero (URL)"
+msgstr "页首横幅图（URL）"
+
+msgid "O subir imagen para el hero"
+msgstr "或上传页首横幅图"
+
+msgid "Déjala vacía para mantener la cabecera actual sin hero."
+msgstr "留空则保留当前页首，不添加横幅图。"
+
+msgid "La imagen subida se recorta y optimiza automáticamente para la cabecera."
+msgstr "上传的图片会自动裁剪并优化，以适配页首。"
+
+msgid "La imagen se recortará para cubrir la cabecera sin cambiar su tamaño."
+msgstr "图片将通过裁剪铺满页首，页首尺寸保持不变。"
+
+msgid "Mostrando %d-%d de %d"
+msgstr "显示第 %d-%d 项，共 %d 项"
+
+msgid "Seleccionar archivo"
+msgstr "选择文件"
+
+msgid "No se ha seleccionado ningún archivo"
+msgstr "未选择任何文件"
+
+msgid "%d archivos seleccionados"
+msgstr "已选择 %d 个文件"
+
+msgid "Alcance"
+msgstr "权限范围"
+
+msgid "Usa alcance content para automatizaciones normales. Reserva admin solo para operaciones sensibles como la actualización de la aplicación."
+msgstr "常规自动化请使用 content 权限范围。admin 仅用于更新应用等敏感操作。"
+
+msgid "Los tokens con alcance"
+msgstr "权限范围为"
+
+msgid "cubren la API de contenidos y mantenimiento habitual. El endpoint"
+msgstr "的令牌支持内容 API 和常规维护。端点"
+
+msgid "requiere un token con alcance"
+msgstr "要求令牌具有以下权限范围："
+
+msgid "Este endpoint exige un token con alcance"
+msgstr "此端点要求令牌具有以下权限范围："
+
+msgid "Si está vacío se genera automáticamente"
+msgstr "留空则自动生成"
+
+msgid "Podcasts"
+msgstr "节目列表"
+
+msgid "Crea, selecciona y configura los podcasts de la instalación"
+msgstr "创建、选择并配置此站点的节目"
+
+msgid "El directorio debe contener únicamente letras minúsculas, números y guiones."
+msgstr "目录名只能包含小写字母、数字和连字符。"
+
+msgid "Ese directorio está reservado por la aplicación."
+msgstr "此目录名由应用保留使用。"
+
+msgid "El título del podcast es obligatorio."
+msgstr "节目标题为必填项。"
+
+msgid "Ese directorio ya está siendo utilizado por otro podcast."
+msgstr "此目录已被其他节目使用。"
+
+msgid "Podcast creado correctamente."
+msgstr "节目已创建。"
+
+msgid "Configuración multipodcast guardada correctamente."
+msgstr "多节目模式设置已保存。"
+
+msgid "Directorio del podcast actualizado correctamente."
+msgstr "节目目录已更新。"
+
+msgid "Podcast borrado correctamente. Descarga y conserva su copia de seguridad."
+msgstr "节目已删除。请下载并妥善保存备份。"
+
+msgid "No se pudo crear el directorio de medios del podcast."
+msgstr "无法创建节目的媒体目录。"
+
+msgid "Todos los podcasts deben tener un directorio antes de activar Multipodcast."
+msgstr "启用多节目模式前，每个节目都必须设置目录。"
+
+msgid "El podcast elegido para la portada no existe."
+msgstr "所选首页节目不存在。"
+
+msgid "El podcast no existe."
+msgstr "节目不存在。"
+
+msgid "No se puede cambiar el directorio porque la ruta de medios de destino ya existe."
+msgstr "目标媒体路径已存在，无法更改目录。"
+
+msgid "No se pudo mover el directorio de medios del podcast."
+msgstr "无法移动节目的媒体目录。"
+
+msgid "Escribe exactamente el título del podcast para confirmar el borrado."
+msgstr "请准确输入节目标题，以确认删除。"
+
+msgid "No se puede borrar el único podcast de la instalación."
+msgstr "无法删除此站点中唯一的节目。"
+
+msgid "No se puede borrar sin crear antes una copia consistente porque ZipArchive o SQLite3 no están disponibles."
+msgstr "ZipArchive 或 SQLite3 不可用，无法先创建一致性备份，因此无法删除。"
+
+msgid "No se pudo crear la copia de seguridad del podcast."
+msgstr "无法创建节目备份。"
+
+msgid "No se pudo crear una copia consistente de la base de datos."
+msgstr "无法创建数据库的一致性备份。"
+
+msgid "No se pudo finalizar la copia de seguridad del podcast."
+msgstr "无法完成节目备份。"
+
+msgid "Descargar copia de seguridad"
+msgstr "下载备份"
+
+msgid "Configuración Multipodcast"
+msgstr "多节目模式设置"
+
+msgid "Activar Multipodcast"
+msgstr "启用多节目模式"
+
+msgid "Contenido de la portada principal"
+msgstr "站点首页内容"
+
+msgid "Resumen de todos los podcasts"
+msgstr "所有节目概览"
+
+msgid "Podcasts disponibles"
+msgstr "可收听的节目"
+
+msgid "Podcasts disponibles (ordenados por última actualización)"
+msgstr "可收听的节目（按最近更新时间排序）"
+
+msgid "Mostrar este podcast en la página principal de resumen."
+msgstr "在节目概览首页显示此节目。"
+
+msgid "Directorio:"
+msgstr "目录："
+
+msgid "%d capítulos"
+msgstr "%d 个单集"
+
+msgid "Administrar podcast"
+msgstr "管理节目"
+
+msgid "Directorio del podcast"
+msgstr "节目目录"
+
+msgid "Cambiar directorio"
+msgstr "更改目录"
+
+msgid "Se creará una copia ZIP y se borrarán definitivamente el podcast, sus capítulos, estadísticas y medios. ¿Continuar?"
+msgstr "系统将创建 ZIP 备份，然后永久删除此节目及其单集、统计数据和媒体文件。是否继续？"
+
+msgid "Escribe el título para confirmar"
+msgstr "输入标题以确认"
+
+msgid "Crear backup y borrar podcast"
+msgstr "创建备份并删除节目"
+
+msgid "Crear un podcast nuevo"
+msgstr "创建新节目"
+
+msgid "Crear podcast"
+msgstr "创建节目"
+
+msgid "Descubre todos los podcasts disponibles y sus feeds RSS."
+msgstr "浏览所有可收听的节目及其 RSS 订阅源。"
+
+msgid "Todos nuestros podcasts, en un solo lugar."
+msgstr "在同一处发现我们的所有节目。"
+
+msgid "Todavía no hay podcasts disponibles."
+msgstr "暂无可收听的节目。"
+
+msgid "No se pudo generar el sitemap."
+msgstr "无法生成站点地图。"
+
+msgid "No hay un podcast definido para el feed principal."
+msgstr "尚未为主 RSS 订阅源指定节目。"
+
+msgid "Ese directorio está ocupado en el servidor. Elige otro."
+msgstr "服务器上的此目录已被占用，请选择其他目录。"
+
+msgid "Al activarlo, cada podcast usará su propio directorio y cambiarán sus URLs públicas. La portada principal mostrará el resumen o el podcast elegido; las URLs antiguas de episodios solo se redirigirán si eliges un podcast para la portada."
+msgstr "启用后，每个节目将使用独立目录，其公开 URL 也会更改。站点首页将显示节目概览或所选节目；只有选择首页节目后，旧单集 URL 才会自动重定向。"
+
+msgid "Multipodcast"
+msgstr "多节目模式"
+
+msgid "Esta imagen se mostrará únicamente cuando la portada principal sea el resumen de todos los podcasts."
+msgstr "仅当站点首页设置为所有节目概览时，才会显示此图片。"
+
+msgid "La URL de la imagen del hero no es válida."
+msgstr "页首横幅图的 URL 无效。"
+
+msgid "No se pudo subir la imagen del hero: %s"
+msgstr "无法上传页首横幅图：%s"
+
+msgid "Título del resumen"
+msgstr "概览标题"
+
+msgid "Subtítulo del resumen"
+msgstr "概览副标题"
+
+msgid "Tema del resumen"
+msgstr "概览主题"
+
+msgid "El tema del resumen no es válido."
+msgstr "概览主题无效。"
+
+msgid "Al desactivar Multipodcast, solo se mostrará el podcast principal «%s». Los demás podcasts y sus datos se conservarán, pero no serán accesibles públicamente hasta volver a activar Multipodcast."
+msgstr "停用多节目模式后，仅显示主节目“%s”。其他节目及其数据将保留，但在重新启用多节目模式前无法公开访问。"
+
+msgid "Podcast principal"
+msgstr "主节目"
+
+msgid "Marcar como principal"
+msgstr "设为主节目"
+
+msgid "Podcast principal actualizado correctamente."
+msgstr "主节目已更新。"
+
+msgid "Elegir podcast"
+msgstr "选择节目"
+
+msgid "Ver podcasts ↗"
+msgstr "查看节目列表 ↗"
+
+msgid "Ver podcast ↗"
+msgstr "查看节目 ↗"
+
+msgid "El podcast principal no existe."
+msgstr "主节目不存在。"
+
+msgid "Marca la confirmación y escribe exactamente el título del podcast principal para desactivar Multipodcast."
+msgstr "请勾选确认项，并准确输入主节目标题，以停用多节目模式。"
+
+msgid "No se pueden trasladar medios porque el directorio contiene enlaces simbólicos."
+msgstr "目录包含符号链接，无法迁移媒体文件。"
+
+msgid "No se pueden devolver los medios porque ya existe un archivo con el mismo nombre en la ruta original."
+msgstr "原路径已存在同名文件，无法将媒体文件移回。"
+
+msgid "Se ha creado una copia de seguridad de cada podcast secundario eliminado:"
+msgstr "已为每个被删除的其他节目创建备份："
+
+msgid "Descargar %s"
+msgstr "下载 %s"
+
+msgid "Al desactivar Multipodcast, «%s» volverá a ser el único podcast. Se crearán copias de seguridad y se borrarán definitivamente los otros %d podcasts junto con sus datos y medios."
+msgstr "停用多节目模式后，“%s”将恢复为唯一的节目。系统将创建备份，并永久删除其他 %d 个节目及其数据和媒体文件。"
+
+msgid "Convertir el podcast actual a Multipodcast"
+msgstr "将当前节目转换为多节目模式"
+
+msgid "«%s» será el podcast principal. Sus imágenes y audios se trasladarán automáticamente al directorio elegido."
+msgstr "“%s”将成为主节目。其图片和音频将自动迁移至所选目录。"
+
+msgid "Directorio del podcast principal"
+msgstr "主节目目录"
+
+msgid "Debe estar libre y solo puede contener letras minúsculas, números y guiones."
+msgstr "目录必须尚未被占用，且只能包含小写字母、数字和连字符。"
+
+msgid "Confirmar la desactivación de Multipodcast"
+msgstr "确认停用多节目模式"
+
+msgid "Las imágenes y audios de «%s» volverán a sus rutas originales. Los podcasts secundarios se borrarán después de crear sus copias ZIP."
+msgstr "“%s”的图片和音频将移回原路径。其他节目将在创建 ZIP 备份后删除。"
+
+msgid "Entiendo que los podcasts secundarios se borrarán definitivamente."
+msgstr "我已了解其他节目将被永久删除。"
+
+msgid "Escribe el título del podcast principal para confirmar"
+msgstr "输入主节目标题以确认"
+
+msgid "Al activarlo, cada podcast tendrá su propio directorio para páginas, episodios y feeds. Las URLs de imágenes y audios no cambiarán."
+msgstr "启用后，每个节目都将有独立的页面、单集和 RSS 订阅源目录。图片和音频的 URL 保持不变。"
+
+msgid "«%s» será el podcast principal. Sus imágenes, audios y URLs multimedia se conservarán sin cambios."
+msgstr "“%s”将成为主节目。其图片、音频和媒体 URL 将保持不变。"
+
+msgid "Las imágenes, audios y URLs multimedia de «%s» no cambiarán. Los podcasts secundarios se borrarán después de crear sus copias ZIP."
+msgstr "“%s”的图片、音频和媒体 URL 将保持不变。其他节目将在创建 ZIP 备份后删除。"
+
+msgid "¿Qué quieres mostrar en la portada principal?"
+msgstr "站点首页要显示什么内容？"
+
+msgid "Muestra los podcasts publicados ordenados por última actualización."
+msgstr "显示已发布的节目，按最近更新时间排序。"
+
+msgid "Un único podcast"
+msgstr "单个节目"
+
+msgid "Muestra la portada del podcast seleccionado."
+msgstr "显示所选节目的首页。"
+
+msgid "Podcast que se mostrará"
+msgstr "要显示的节目"
+
+msgid "Usuarios"
+msgstr "用户"
+
+msgid "Asigna a cada usuario uno o varios podcasts"
+msgstr "为每位用户分配一个或多个节目"
+
+msgid "Crea cuentas limitadas a la gestión de uno o varios podcasts."
+msgstr "创建仅可管理一个或多个指定节目的账号。"
+
+msgid "Crear usuario"
+msgstr "创建用户"
+
+msgid "Apellidos"
+msgstr "姓氏"
+
+msgid "Email"
+msgstr "电子邮箱"
+
+msgid "Podcasts que puede gestionar"
+msgstr "可管理的节目"
+
+msgid "Usuario activo"
+msgstr "账号已启用"
+
+msgid "Usuarios existentes"
+msgstr "现有用户"
+
+msgid "Todavía no hay usuarios de podcast."
+msgstr "暂无节目用户。"
+
+msgid "Nueva contraseña (opcional)"
+msgstr "新密码（可选）"
+
+msgid "Eliminar usuario"
+msgstr "删除用户"
+
+msgid "¿Eliminar este usuario y todos sus tokens API?"
+msgstr "确定删除此用户及其所有 API 令牌吗？"
+
+msgid "Usuario guardado correctamente."
+msgstr "用户已保存。"
+
+msgid "Usuario eliminado correctamente."
+msgstr "用户已删除。"
+
+msgid "Nombre, apellidos y email válido son obligatorios."
+msgstr "名字、姓氏及有效的电子邮箱均为必填项。"
+
+msgid "Selecciona al menos un podcast."
+msgstr "请至少选择一个节目。"
+
+msgid "Selecciona únicamente podcasts válidos."
+msgstr "请选择有效的节目。"
+
+msgid "Ya existe un usuario con ese email."
+msgstr "已有用户使用此电子邮箱。"
+
+msgid "El usuario no existe."
+msgstr "用户不存在。"
+
+msgid "No se puede borrar un podcast que tiene usuarios asignados. Reasígnalos primero."
+msgstr "无法删除已分配给用户的节目。请先重新分配这些用户的节目。"
+
+msgid "Cada token hereda los permisos de su usuario. Los usuarios de podcast solo pueden usarlo en los podcasts que tienen asignados; el administrador global puede usar un token administrativo en cualquier podcast indicando su directorio en la URL."
+msgstr "每个令牌均继承所属用户的权限。节目用户只能在获分配的节目中使用令牌；全局管理员可在 URL 中指定节目目录，以在任意节目中使用管理令牌。"
+
+msgid "Usuario o email"
+msgstr "用户名或电子邮箱"
+
+msgid "Tus tokens heredan tu acceso y solo pueden actuar sobre el podcast seleccionado."
+msgstr "你的令牌继承你的访问权限，且仅能操作所选节目。"
+
+msgid "La gestión de usuarios exige un token admin del administrador global. Los tokens de usuarios de podcast no pueden usar estos endpoints."
+msgstr "用户管理需要全局管理员的 admin 令牌。节目用户的令牌无法调用这些端点。"
+
+msgid "Listar podcasts asignables"
+msgstr "列出可分配的节目"
+
+msgid "Listar usuarios"
+msgstr "列出用户"
+
+msgid "Obtener usuario"
+msgstr "获取用户"
+
+msgid "Las respuestas incluyen los podcasts asignados, pero nunca incluyen contraseñas."
+msgstr "响应包含分配给用户的节目，但不包含密码。"
+
+msgid "Crear usuario y asignar podcasts"
+msgstr "创建用户并分配节目"
+
+msgid "Mínimo 8 caracteres"
+msgstr "至少 8 个字符"
+
+msgid "Lista de IDs de podcasts"
+msgstr "节目 ID 列表"
+
+msgid "Lista de directorios de podcasts; puede usarse en lugar de podcast_ids"
+msgstr "节目目录列表；可替代 podcast_ids 使用"
+
+msgid "Actualizar usuario y sus asignaciones"
+msgstr "更新用户及其节目分配"
+
+msgid "Solo se modifican los campos enviados. Una contraseña vacía conserva la contraseña actual; las listas de podcasts sustituyen todas las asignaciones anteriores."
+msgstr "仅修改提交的字段。密码留空则保留当前密码；节目列表会替换此前的全部节目分配。"
+
+msgid "Borrar usuario y sus tokens API"
+msgstr "删除用户及其 API 令牌"
+
+msgid "No se pudo crear el usuario."
+msgstr "无法创建用户。"
+
+msgid "No se pudo actualizar el usuario."
+msgstr "无法更新用户。"
+
+msgid "No se pudo eliminar el usuario."
+msgstr "无法删除用户。"
+
+msgid "Debes asignar al menos un podcast."
+msgstr "必须至少分配一个节目。"
+
+msgid "podcast_ids debe ser una lista."
+msgstr "podcast_ids 必须为列表。"
+
+msgid "La lista contiene podcasts no válidos."
+msgstr "列表包含无效的节目。"
+
+msgid "podcast_slugs debe ser una lista."
+msgstr "podcast_slugs 必须为列表。"
+
+msgid "is_active debe ser true o false."
+msgstr "is_active 必须为 true 或 false。"
+
+msgid "Administrador global"
+msgstr "全局管理员"
+
+msgid "Configura la cuenta que administra toda la instalación"
+msgstr "配置管理整个站点的账号"
+
+msgid "Cuenta del administrador global"
+msgstr "全局管理员账号"
+
+msgid "Define el usuario de acceso y los datos de la cuenta con control completo sobre el Multipodcast."
+msgstr "设置登录用户名和账号资料，此账号具有多节目模式的完整管理权限。"
+
+msgid "Usuario de acceso"
+msgstr "登录用户名"
+
+msgid "Contraseña actual para confirmar"
+msgstr "输入当前密码以确认"
+
+msgid "Guardar administrador"
+msgstr "保存管理员"
+
+msgid "La cuenta administradora global no existe."
+msgstr "全局管理员账号不存在。"
+
+msgid "El usuario de acceso y la contraseña actual son obligatorios."
+msgstr "登录用户名和当前密码为必填项。"
+
+msgid "El usuario de acceso es demasiado largo."
+msgstr "登录用户名过长。"
+
+msgid "El email del administrador no es válido."
+msgstr "管理员的电子邮箱无效。"
+
+msgid "Ya existe una cuenta con ese usuario o email."
+msgstr "已有账号使用此用户名或电子邮箱。"
+
+msgid "Datos del administrador actualizados correctamente."
+msgstr "管理员资料已更新。"
+
+msgid "No se pudo guardar la cuenta administradora."
+msgstr "无法保存管理员账号。"
+
+msgid "Idioma de Multipodcast"
+msgstr "多节目模式语言"
+
+msgid "Se aplica a la portada-resumen y al panel global. Cada podcast conserva su propio idioma."
+msgstr "用于节目概览首页和全局管理面板。每个节目保留各自的语言设置。"
+
+msgid "El idioma de Multipodcast no es válido."
+msgstr "多节目模式的语言无效。"
+
+msgid "Seguridad"
+msgstr "安全"
+
+msgid "Restringe el acceso administrativo por dirección IP"
+msgstr "按 IP 地址限制后台访问"
+
+msgid "Configura restricciones adicionales para proteger el acceso administrativo."
+msgstr "配置额外限制，以保护后台访问。"
+
+msgid "Estas direcciones o rangos no son válidos: %s"
+msgstr "以下地址或地址范围无效：%s"
+
+msgid "Se ha desactivado el bloqueo de acceso a admin.php por IP."
+msgstr "已停用 admin.php 的 IP 访问限制。"
+
+msgid "El bloqueo de acceso a admin.php por IP se ha actualizado correctamente."
+msgstr "admin.php 的 IP 访问限制已更新。"
+
+msgid "Bloqueo de IP a admin.php"
+msgstr "admin.php 的 IP 访问限制"
+
+msgid "Solo las direcciones indicadas podrán abrir la página de acceso. Se admiten direcciones y rangos CIDR en IPv4 e IPv6."
+msgstr "仅指定的地址能够打开登录页面。支持 IPv4、IPv6 地址及 CIDR 地址范围。"
+
+msgid "Direcciones IP o rangos permitidos"
+msgstr "允许的 IP 地址或地址范围"
+
+msgid "Añade una dirección o rango por línea. Para desactivar el bloqueo, deja la lista vacía y guarda."
+msgstr "每行添加一个地址或地址范围。留空并保存即可停用访问限制。"
+
+msgid "Importante: incluye tu IP actual antes de guardar para no perder el acceso a admin.php."
+msgstr "重要：保存前请加入你当前的 IP，以免无法再访问 admin.php。"
+
+msgid "Guardar seguridad"
+msgstr "保存安全设置"
+
+msgid "Añade al menos una dirección IP o rango antes de habilitar el bloqueo."
+msgstr "启用访问限制前，请至少添加一个 IP 地址或地址范围。"
+
+msgid "La confirmación ha caducado o la lista ha cambiado. Vuelve a iniciar la activación."
+msgstr "确认已过期或列表已更改。请重新开始启用操作。"
+
+msgid "El bloqueo de acceso a admin.php por IP se ha habilitado correctamente."
+msgstr "已启用 admin.php 的 IP 访问限制。"
+
+msgid "La acción de seguridad solicitada no es válida."
+msgstr "请求的安全操作无效。"
+
+msgid "Habilitado"
+msgstr "已启用"
+
+msgid "Deshabilitado"
+msgstr "已停用"
+
+msgid "Añade una dirección o rango por línea."
+msgstr "每行添加一个地址或地址范围。"
+
+msgid "Has solicitado habilitar el bloqueo por IP. Esta medida puede impedirte volver a acceder a admin.php. La habilitas voluntariamente y bajo tu propia responsabilidad. Comprueba que has incluido tu IP actual y pulsa «Estoy seguro» para confirmar."
+msgstr "你已请求启用 IP 访问限制。此设置可能导致你无法再访问 admin.php。你将自行承担启用此限制的风险。请确认已加入你当前的 IP，然后点击“我已确认”以继续。"
+
+msgid "Estoy seguro"
+msgstr "我已确认"
+
+msgid "Guardar cambios"
+msgstr "保存更改"
+
+msgid "Deshabilitar bloqueo"
+msgstr "停用访问限制"
+
+msgid "Habilitar bloqueo"
+msgstr "启用访问限制"
+
+msgid ".htaccess generado"
+msgstr "生成的 .htaccess"
+
+msgid "Regenera el fichero .htaccess con la configuración predeterminada de EasyPodcast. Se eliminarán las reglas personalizadas y se deshabilitará el bloqueo de acceso a admin.php por IP."
+msgstr "使用 EasyPodcast 默认配置重新生成 .htaccess 文件。这将移除自定义规则，并停用 admin.php 的 IP 访问限制。"
+
+msgid "Regenerar .htaccess"
+msgstr "重新生成 .htaccess"
+
+msgid "El fichero .htaccess se ha regenerado con la configuración predeterminada."
+msgstr "已使用默认配置重新生成 .htaccess 文件。"
+
+msgid "No se pudo regenerar el fichero .htaccess: %s"
+msgstr "无法重新生成 .htaccess 文件：%s"
+
+msgid "¿Regenerar .htaccess y eliminar todas las reglas personalizadas, incluido el bloqueo por IP?"
+msgstr "确定重新生成 .htaccess 并移除所有自定义规则（包括 IP 访问限制）吗？"
+
+msgid "Pausar"
+msgstr "暂停"
+
+msgid "Reanudar"
+msgstr "继续"
+
+msgid "Tu navegador no soporta grabación de audio."
+msgstr "你的浏览器不支持录音。"
+
+msgid "No se pudo acceder al micrófono: "
+msgstr "无法访问麦克风： "
+
+msgid "Codificando MP3…"
+msgstr "正在编码 MP3…"
+
+msgid "Codificando MP3 (grabación larga, puede tardar)…"
+msgstr "正在编码 MP3（录音较长，可能需要一些时间）…"
+
+msgid "Error al decodificar el audio grabado."
+msgstr "解码录音时出错。"
+
+msgid "No se pudo reproducir la grabación."
+msgstr "无法播放录音。"
+
+msgid "Error al subir: "
+msgstr "上传出错： "
+
+msgid "Audio guardado correctamente."
+msgstr "音频已保存。"
+
+msgid "Error de red al subir el audio. Inténtalo de nuevo."
+msgstr "上传音频时发生网络错误，请重试。"
+
+msgid "Grabar desde micrófono"
+msgstr "使用麦克风录音"
+
+msgid "Grabar"
+msgstr "录音"
+
+msgid "Parar"
+msgstr "停止"
+
+msgid "Escuchar grabación"
+msgstr "试听录音"
+
+msgid "Parar escucha"
+msgstr "停止播放"
+
+msgid "Usar esta grabación"
+msgstr "使用此录音"
+
+msgid "Subiendo grabación…"
+msgstr "正在上传录音…"
+
+msgid "Grabación subida"
+msgstr "录音已上传"
+
+msgid "Fecha ISO 8601 (auto-asignada al publicar; obligatoria para scheduled)"
+msgstr "ISO 8601 格式的日期（发布时自动填写；scheduled 状态下必填）"
+
+msgid "Para subir imágenes del canal usa"
+msgstr "上传节目图片时，请使用"
+
+msgid "con los campos"
+msgstr "并附带以下字段："
+
+msgid "y"
+msgstr "和"
+
+msgid "El token autenticado no tiene permisos suficientes"
+msgstr "当前令牌的权限不足"
+
+msgid "Selecciona al menos un episodio para importar."
+msgstr "请至少选择一个要导入的单集。"
+
+msgid "Importando…"
+msgstr "正在导入…"
+
+msgid "Guardar configuración"
+msgstr "保存设置"
+
+msgid "¿Borrar la página «%s»?"
+msgstr "确定删除页面“%s”吗？"
+
+msgid "IP"
+msgstr "IP 地址"
+
+msgid "Aún no hay datos mensuales"
+msgstr "暂无月度数据"
+
+msgid "Aún no hay datos anuales"
+msgstr "暂无年度数据"
+
+msgid "¿Actualizar EasyPodcast a v%s?\\n\\nSe descargarán y extraerán los archivos de la aplicación.\\nLa base de datos y los archivos de audio/imágenes no se modifican."
+msgstr "确定将 EasyPodcast 更新至 v%s 吗？\n\n系统将下载并解压应用文件。\n数据库和音频、图片文件不会被修改。"
+
+msgid "Novedades v%s"
+msgstr "v%s 更新内容"
+
+msgid "Demasiados intentos fallidos. Espera %d minuto(s) antes de volver a intentarlo."
+msgstr "登录失败次数过多。请等待 %d 分钟后再试。"
+
+msgid "Administración total"
+msgstr "全部管理权限"
+
+msgid "El ZIP contiene rutas o ficheros ocultos no permitidos."
+msgstr "ZIP 包含不允许的路径或隐藏文件。"
+
+msgid "El ZIP contiene una ruta fuera de images/ o audios/."
+msgstr "ZIP 包含 images/ 或 audios/ 目录之外的路径。"
+
+msgid "Un fichero del ZIP supera el máximo permitido de 128 MiB."
+msgstr "ZIP 中某个文件超过允许的 128 MiB 上限。"
+
+msgid "El contenido descomprimido del ZIP supera el máximo permitido de 512 MiB."
+msgstr "ZIP 解压后的总大小超过允许的 512 MiB 上限。"
+
+msgid "El ZIP contiene una entrada con tamaño comprimido inválido."
+msgstr "ZIP 中某个条目的压缩大小无效。"
+
+msgid "El ZIP contiene una entrada con una compresión potencialmente peligrosa."
+msgstr "ZIP 中某个条目的压缩比例可能存在风险。"
+
+msgid "El ZIP contiene un tipo de fichero no permitido."
+msgstr "ZIP 包含不允许的文件类型。"
+
+msgid "El ZIP supera el máximo de %d entradas."
+msgstr "ZIP 中的条目数超过 %d 条上限。"
+
+msgid "El ZIP intenta escribir fuera del directorio multimedia permitido."
+msgstr "ZIP 尝试写入允许的媒体目录之外。"
+
+msgid "El tamaño real de una entrada ZIP no coincide con el declarado."
+msgstr "ZIP 中某个条目的实际大小与声明大小不一致。"
+
+msgid "El MIME de un fichero del ZIP no coincide con su extensión."
+msgstr "ZIP 中某个文件的 MIME 类型与扩展名不匹配。"
+
+msgid "No se pudo mover un fichero multimedia validado a su destino."
+msgstr "无法将已验证的媒体文件移动到目标位置。"
+
+msgid "No se pudo generar la instantánea de la base de datos."
+msgstr "无法生成数据库快照。"
+
+msgid "La URL remota no es válida."
+msgstr "远程 URL 无效。"
+
+msgid "La URL remota no puede incluir credenciales."
+msgstr "远程 URL 不能包含登录凭据。"
+
+msgid "La URL remota apunta a un host no permitido."
+msgstr "远程 URL 指向不允许访问的主机。"
+
+msgid "No se pudo resolver el host remoto."
+msgstr "无法解析远程主机。"
+
+msgid "La URL remota apunta a una red privada o reservada y ha sido bloqueada."
+msgstr "远程 URL 指向私有或保留网络，已被阻止。"
+
+msgid "No se pudo fijar la resolución segura del host remoto."
+msgstr "无法固定远程主机的安全解析结果。"
+
+msgid "El feed supera el tamaño máximo permitido de 10 MiB."
+msgstr "RSS订阅源超过允许的 10 MiB 大小上限。"
+
+msgid "La respuesta remota devolvió una redirección inválida."
+msgstr "远程响应返回了无效的重定向。"
+
+msgid "La URL remota superó el número máximo de redirecciones permitidas."
+msgstr "远程 URL 的重定向次数超过允许上限。"
+
+msgid "El fichero remoto supera el tamaño máximo permitido."
+msgstr "远程文件超过允许的大小上限。"
+
+msgid "No se pudo finalizar el fichero descargado."
+msgstr "无法完成下载文件的保存。"
+
+msgid "No se pudo asignar una extensión segura al fichero descargado."
+msgstr "无法为下载的文件指定安全的扩展名。"
+
+msgid "La release no contiene el paquete verificable %s."
+msgstr "该发行版本不包含可验证的安装包 %s。"
+
+msgid "La release no contiene el checksum SHA-256 de %s."
+msgstr "该发行版本不包含 %s 的 SHA-256 校验值。"
+
+msgid "Las URLs del paquete y su checksum no son válidas."
+msgstr "安装包或其校验值的 URL 无效。"
+
+msgid "No se pudo descargar el checksum de la actualización."
+msgstr "无法下载更新的校验值。"
+
+msgid "El checksum de la actualización no es válido."
+msgstr "更新的校验值无效。"
+
+msgid "La verificación SHA-256 del paquete ha fallado. No se ha instalado ningún archivo."
+msgstr "安装包的 SHA-256 校验失败，未安装任何文件。"
+
+msgid "draft"
+msgstr "草稿"
+
+msgid "scheduled"
+msgstr "定时发布"
+
+msgid "published"
+msgstr "已发布"
+
+msgid "full"
+msgstr "完整单集"
+
+msgid "trailer"
+msgstr "预告"
+
+msgid "bonus"
+msgstr "加更单集"
+
+msgid "Paso 1"
+msgstr "第 1 步"
+
+msgid "Paso 2"
+msgstr "第 2 步"
+
+msgid "Escanea este código QR con tu app de autenticación:"
+msgstr "使用身份验证器 App 扫描此二维码："
+
+msgid "Introduce el código de 6 dígitos que muestra la app para confirmar:"
+msgstr "输入 App 显示的 6 位验证码以确认："
+
+msgid "Ene"
+msgstr "1月"
+
+msgid "Feb"
+msgstr "2月"
+
+msgid "Mar"
+msgstr "3月"
+
+msgid "Abr"
+msgstr "4月"
+
+msgid "May"
+msgstr "5月"
+
+msgid "Jun"
+msgstr "6月"
+
+msgid "Jul"
+msgstr "7月"
+
+msgid "Ago"
+msgstr "8月"
+
+msgid "Sep"
+msgstr "9月"
+
+msgid "Oct"
+msgstr "10月"
+
+msgid "Nov"
+msgstr "11月"
+
+msgid "Dic"
+msgstr "12月"
+
+msgid "Mes %d"
+msgstr "%d月"
+
+msgid "%1$s %2$d"
+msgstr "%2$d年%1$s"
+
+msgid "Arts"
+msgstr "艺术"
+
+msgid "Books"
+msgstr "图书"
+
+msgid "Design"
+msgstr "设计"
+
+msgid "Fashion & Beauty"
+msgstr "时尚与美容"
+
+msgid "Food"
+msgstr "美食"
+
+msgid "Performing Arts"
+msgstr "表演艺术"
+
+msgid "Visual Arts"
+msgstr "视觉艺术"
+
+msgid "Business"
+msgstr "商业"
+
+msgid "Careers"
+msgstr "职业发展"
+
+msgid "Entrepreneurship"
+msgstr "创业"
+
+msgid "Investing"
+msgstr "投资"
+
+msgid "Management"
+msgstr "管理"
+
+msgid "Marketing"
+msgstr "市场营销"
+
+msgid "Non-Profit"
+msgstr "非营利组织"
+
+msgid "Comedy"
+msgstr "喜剧"
+
+msgid "Comedy Interviews"
+msgstr "喜剧访谈"
+
+msgid "Improv"
+msgstr "即兴喜剧"
+
+msgid "Stand-Up"
+msgstr "单口喜剧"
+
+msgid "Education"
+msgstr "教育"
+
+msgid "Courses"
+msgstr "课程"
+
+msgid "How To"
+msgstr "技能学习"
+
+msgid "Language Learning"
+msgstr "语言学习"
+
+msgid "Self-Improvement"
+msgstr "自我提升"
+
+msgid "Fiction"
+msgstr "虚构故事"
+
+msgid "Comedy Fiction"
+msgstr "喜剧故事"
+
+msgid "Drama"
+msgstr "剧情故事"
+
+msgid "Science Fiction"
+msgstr "科幻故事"
+
+msgid "Government"
+msgstr "政府"
+
+msgid "History"
+msgstr "历史"
+
+msgid "Health & Fitness"
+msgstr "健康与健身"
+
+msgid "Alternative Health"
+msgstr "替代健康疗法"
+
+msgid "Fitness"
+msgstr "健身"
+
+msgid "Medicine"
+msgstr "医学"
+
+msgid "Mental Health"
+msgstr "心理健康"
+
+msgid "Nutrition"
+msgstr "营养"
+
+msgid "Sexuality"
+msgstr "性健康"
+
+msgid "Kids & Family"
+msgstr "儿童与家庭"
+
+msgid "Education for Kids"
+msgstr "儿童教育"
+
+msgid "Parenting"
+msgstr "育儿"
+
+msgid "Pets & Animals"
+msgstr "宠物与动物"
+
+msgid "Stories for Kids"
+msgstr "儿童故事"
+
+msgid "Leisure"
+msgstr "休闲"
+
+msgid "Animation & Manga"
+msgstr "动画与漫画"
+
+msgid "Automotive"
+msgstr "汽车"
+
+msgid "Aviation"
+msgstr "航空"
+
+msgid "Crafts"
+msgstr "手工艺"
+
+msgid "Games"
+msgstr "游戏"
+
+msgid "Hobbies"
+msgstr "兴趣爱好"
+
+msgid "Home & Garden"
+msgstr "家居与园艺"
+
+msgid "Video Games"
+msgstr "电子游戏"
+
+msgid "Music"
+msgstr "音乐"
+
+msgid "Music Commentary"
+msgstr "音乐评论"
+
+msgid "Music History"
+msgstr "音乐史"
+
+msgid "Music Interviews"
+msgstr "音乐访谈"
+
+msgid "News"
+msgstr "新闻"
+
+msgid "Business News"
+msgstr "商业新闻"
+
+msgid "Daily News"
+msgstr "每日新闻"
+
+msgid "Entertainment News"
+msgstr "娱乐新闻"
+
+msgid "News Commentary"
+msgstr "新闻评论"
+
+msgid "Politics"
+msgstr "政治"
+
+msgid "Sports News"
+msgstr "体育新闻"
+
+msgid "Tech News"
+msgstr "科技新闻"
+
+msgid "Religion & Spirituality"
+msgstr "宗教与灵性"
+
+msgid "Buddhism"
+msgstr "佛教"
+
+msgid "Christianity"
+msgstr "基督教"
+
+msgid "Hinduism"
+msgstr "印度教"
+
+msgid "Islam"
+msgstr "伊斯兰教"
+
+msgid "Judaism"
+msgstr "犹太教"
+
+msgid "Religion"
+msgstr "宗教"
+
+msgid "Spirituality"
+msgstr "灵性"
+
+msgid "Science"
+msgstr "科学"
+
+msgid "Astronomy"
+msgstr "天文学"
+
+msgid "Chemistry"
+msgstr "化学"
+
+msgid "Earth Sciences"
+msgstr "地球科学"
+
+msgid "Life Sciences"
+msgstr "生命科学"
+
+msgid "Mathematics"
+msgstr "数学"
+
+msgid "Natural Sciences"
+msgstr "自然科学"
+
+msgid "Nature"
+msgstr "自然"
+
+msgid "Physics"
+msgstr "物理学"
+
+msgid "Social Sciences"
+msgstr "社会科学"
+
+msgid "Society & Culture"
+msgstr "社会与文化"
+
+msgid "Documentary"
+msgstr "纪录片"
+
+msgid "Personal Journals"
+msgstr "个人日记"
+
+msgid "Philosophy"
+msgstr "哲学"
+
+msgid "Places & Travel"
+msgstr "目的地与旅行"
+
+msgid "Relationships"
+msgstr "人际关系"
+
+msgid "Sports"
+msgstr "体育"
+
+msgid "Baseball"
+msgstr "棒球"
+
+msgid "Basketball"
+msgstr "篮球"
+
+msgid "Cricket"
+msgstr "板球"
+
+msgid "Fantasy Sports"
+msgstr "梦幻体育"
+
+msgid "Football"
+msgstr "美式橄榄球"
+
+msgid "Golf"
+msgstr "高尔夫"
+
+msgid "Hockey"
+msgstr "曲棍球"
+
+msgid "Rugby"
+msgstr "英式橄榄球"
+
+msgid "Running"
+msgstr "跑步"
+
+msgid "Soccer"
+msgstr "足球"
+
+msgid "Swimming"
+msgstr "游泳"
+
+msgid "Tennis"
+msgstr "网球"
+
+msgid "Track"
+msgstr "田径"
+
+msgid "Volleyball"
+msgstr "排球"
+
+msgid "Wilderness"
+msgstr "户外运动"
+
+msgid "Wrestling"
+msgstr "摔跤"
+
+msgid "Technology"
+msgstr "科技"
+
+msgid "True Crime"
+msgstr "真实犯罪"
+
+msgid "TV & Film"
+msgstr "影视"
+
+msgid "After Shows"
+msgstr "剧集回顾"
+
+msgid "Film History"
+msgstr "电影史"
+
+msgid "Film Interviews"
+msgstr "电影访谈"
+
+msgid "Film Reviews"
+msgstr "影评"
+
+msgid "TV Reviews"
+msgstr "剧评"
+
+msgid "Eliminar categoría %s"
+msgstr "移除分类“%s”"

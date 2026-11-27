@@ -227,7 +227,7 @@ if ($isLoggedIn) {
           </a>
           <a class="admin-card" href="api_tokens.php">
             <div class="admin-card-icon">🔌</div>
-            <h2>API Tokens</h2>
+            <h2><?= __('Tokens API') ?></h2>
             <p><?= __('Genera y revoca tokens para la API REST') ?></p>
           </a>
           <?php endif; ?>
@@ -251,6 +251,7 @@ if ($isLoggedIn) {
                 'gl_ES' => 'Galego',
                 'it_IT' => 'Italiano',
                 'pt_PT' => 'Português',
+                'zh_CN' => '简体中文',
             ];
             $localeFiles = glob(__DIR__ . '/locale/*.po') ?: [];
             sort($localeFiles);

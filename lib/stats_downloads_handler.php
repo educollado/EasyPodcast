@@ -294,8 +294,8 @@ function formatMonthYear(int $year, int $month): string
         1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
         7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
     ];
-    $monthName = $months[$month] ?? 'Mes ' . $month;
-    return $monthName . ' ' . $year;
+    $monthName = isset($months[$month]) ? __($months[$month]) : __('Mes %d', $month);
+    return __('%1$s %2$d', $monthName, $year);
 }
 
 /**

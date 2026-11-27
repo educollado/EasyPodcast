@@ -92,6 +92,7 @@ extract($data);  // form, error, notice
                 'gl_ES' => 'Galego',
                 'it_IT' => 'Italiano',
                 'pt_PT' => 'Português (Portugal)',
+                'zh_CN' => '简体中文',
             ];
             sort($localeFiles);
           ?>
@@ -125,156 +126,156 @@ extract($data);  // form, error, notice
             <?= __('Categorías') ?> <small><?= __('(máx. 3 — Apple Podcasts)') ?></small>
             <div class="category-picker">
               <div class="category-chips" id="category-chips"></div>
-              <select id="category-select">
+              <select id="category-select" data-remove-label="<?= esc(__('Eliminar categoría %s')) ?>">
                 <option value=""><?= __('Añadir categoría...') ?></option>
-                <optgroup label="Arts">
-                  <option value="Arts">Arts</option>
-                  <option value="Books">Books</option>
-                  <option value="Design">Design</option>
-                  <option value="Fashion &amp; Beauty">Fashion &amp; Beauty</option>
-                  <option value="Food">Food</option>
-                  <option value="Performing Arts">Performing Arts</option>
-                  <option value="Visual Arts">Visual Arts</option>
+                <optgroup label="<?= esc(__('Arts')) ?>">
+                  <option value="Arts"><?= esc(__('Arts')) ?></option>
+                  <option value="Books"><?= esc(__('Books')) ?></option>
+                  <option value="Design"><?= esc(__('Design')) ?></option>
+                  <option value="Fashion &amp; Beauty"><?= esc(__('Fashion & Beauty')) ?></option>
+                  <option value="Food"><?= esc(__('Food')) ?></option>
+                  <option value="Performing Arts"><?= esc(__('Performing Arts')) ?></option>
+                  <option value="Visual Arts"><?= esc(__('Visual Arts')) ?></option>
                 </optgroup>
-                <optgroup label="Business">
-                  <option value="Business">Business</option>
-                  <option value="Careers">Careers</option>
-                  <option value="Entrepreneurship">Entrepreneurship</option>
-                  <option value="Investing">Investing</option>
-                  <option value="Management">Management</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Non-Profit">Non-Profit</option>
+                <optgroup label="<?= esc(__('Business')) ?>">
+                  <option value="Business"><?= esc(__('Business')) ?></option>
+                  <option value="Careers"><?= esc(__('Careers')) ?></option>
+                  <option value="Entrepreneurship"><?= esc(__('Entrepreneurship')) ?></option>
+                  <option value="Investing"><?= esc(__('Investing')) ?></option>
+                  <option value="Management"><?= esc(__('Management')) ?></option>
+                  <option value="Marketing"><?= esc(__('Marketing')) ?></option>
+                  <option value="Non-Profit"><?= esc(__('Non-Profit')) ?></option>
                 </optgroup>
-                <optgroup label="Comedy">
-                  <option value="Comedy">Comedy</option>
-                  <option value="Comedy Interviews">Comedy Interviews</option>
-                  <option value="Improv">Improv</option>
-                  <option value="Stand-Up">Stand-Up</option>
+                <optgroup label="<?= esc(__('Comedy')) ?>">
+                  <option value="Comedy"><?= esc(__('Comedy')) ?></option>
+                  <option value="Comedy Interviews"><?= esc(__('Comedy Interviews')) ?></option>
+                  <option value="Improv"><?= esc(__('Improv')) ?></option>
+                  <option value="Stand-Up"><?= esc(__('Stand-Up')) ?></option>
                 </optgroup>
-                <optgroup label="Education">
-                  <option value="Education">Education</option>
-                  <option value="Courses">Courses</option>
-                  <option value="How To">How To</option>
-                  <option value="Language Learning">Language Learning</option>
-                  <option value="Self-Improvement">Self-Improvement</option>
+                <optgroup label="<?= esc(__('Education')) ?>">
+                  <option value="Education"><?= esc(__('Education')) ?></option>
+                  <option value="Courses"><?= esc(__('Courses')) ?></option>
+                  <option value="How To"><?= esc(__('How To')) ?></option>
+                  <option value="Language Learning"><?= esc(__('Language Learning')) ?></option>
+                  <option value="Self-Improvement"><?= esc(__('Self-Improvement')) ?></option>
                 </optgroup>
-                <optgroup label="Fiction">
-                  <option value="Fiction">Fiction</option>
-                  <option value="Comedy Fiction">Comedy Fiction</option>
-                  <option value="Drama">Drama</option>
-                  <option value="Science Fiction">Science Fiction</option>
+                <optgroup label="<?= esc(__('Fiction')) ?>">
+                  <option value="Fiction"><?= esc(__('Fiction')) ?></option>
+                  <option value="Comedy Fiction"><?= esc(__('Comedy Fiction')) ?></option>
+                  <option value="Drama"><?= esc(__('Drama')) ?></option>
+                  <option value="Science Fiction"><?= esc(__('Science Fiction')) ?></option>
                 </optgroup>
-                <optgroup label="Government">
-                  <option value="Government">Government</option>
+                <optgroup label="<?= esc(__('Government')) ?>">
+                  <option value="Government"><?= esc(__('Government')) ?></option>
                 </optgroup>
-                <optgroup label="History">
-                  <option value="History">History</option>
+                <optgroup label="<?= esc(__('History')) ?>">
+                  <option value="History"><?= esc(__('History')) ?></option>
                 </optgroup>
-                <optgroup label="Health &amp; Fitness">
-                  <option value="Health &amp; Fitness">Health &amp; Fitness</option>
-                  <option value="Alternative Health">Alternative Health</option>
-                  <option value="Fitness">Fitness</option>
-                  <option value="Medicine">Medicine</option>
-                  <option value="Mental Health">Mental Health</option>
-                  <option value="Nutrition">Nutrition</option>
-                  <option value="Sexuality">Sexuality</option>
+                <optgroup label="<?= esc(__('Health & Fitness')) ?>">
+                  <option value="Health &amp; Fitness"><?= esc(__('Health & Fitness')) ?></option>
+                  <option value="Alternative Health"><?= esc(__('Alternative Health')) ?></option>
+                  <option value="Fitness"><?= esc(__('Fitness')) ?></option>
+                  <option value="Medicine"><?= esc(__('Medicine')) ?></option>
+                  <option value="Mental Health"><?= esc(__('Mental Health')) ?></option>
+                  <option value="Nutrition"><?= esc(__('Nutrition')) ?></option>
+                  <option value="Sexuality"><?= esc(__('Sexuality')) ?></option>
                 </optgroup>
-                <optgroup label="Kids &amp; Family">
-                  <option value="Kids &amp; Family">Kids &amp; Family</option>
-                  <option value="Education for Kids">Education for Kids</option>
-                  <option value="Parenting">Parenting</option>
-                  <option value="Pets &amp; Animals">Pets &amp; Animals</option>
-                  <option value="Stories for Kids">Stories for Kids</option>
+                <optgroup label="<?= esc(__('Kids & Family')) ?>">
+                  <option value="Kids &amp; Family"><?= esc(__('Kids & Family')) ?></option>
+                  <option value="Education for Kids"><?= esc(__('Education for Kids')) ?></option>
+                  <option value="Parenting"><?= esc(__('Parenting')) ?></option>
+                  <option value="Pets &amp; Animals"><?= esc(__('Pets & Animals')) ?></option>
+                  <option value="Stories for Kids"><?= esc(__('Stories for Kids')) ?></option>
                 </optgroup>
-                <optgroup label="Leisure">
-                  <option value="Leisure">Leisure</option>
-                  <option value="Animation &amp; Manga">Animation &amp; Manga</option>
-                  <option value="Automotive">Automotive</option>
-                  <option value="Aviation">Aviation</option>
-                  <option value="Crafts">Crafts</option>
-                  <option value="Games">Games</option>
-                  <option value="Hobbies">Hobbies</option>
-                  <option value="Home &amp; Garden">Home &amp; Garden</option>
-                  <option value="Video Games">Video Games</option>
+                <optgroup label="<?= esc(__('Leisure')) ?>">
+                  <option value="Leisure"><?= esc(__('Leisure')) ?></option>
+                  <option value="Animation &amp; Manga"><?= esc(__('Animation & Manga')) ?></option>
+                  <option value="Automotive"><?= esc(__('Automotive')) ?></option>
+                  <option value="Aviation"><?= esc(__('Aviation')) ?></option>
+                  <option value="Crafts"><?= esc(__('Crafts')) ?></option>
+                  <option value="Games"><?= esc(__('Games')) ?></option>
+                  <option value="Hobbies"><?= esc(__('Hobbies')) ?></option>
+                  <option value="Home &amp; Garden"><?= esc(__('Home & Garden')) ?></option>
+                  <option value="Video Games"><?= esc(__('Video Games')) ?></option>
                 </optgroup>
-                <optgroup label="Music">
-                  <option value="Music">Music</option>
-                  <option value="Music Commentary">Music Commentary</option>
-                  <option value="Music History">Music History</option>
-                  <option value="Music Interviews">Music Interviews</option>
+                <optgroup label="<?= esc(__('Music')) ?>">
+                  <option value="Music"><?= esc(__('Music')) ?></option>
+                  <option value="Music Commentary"><?= esc(__('Music Commentary')) ?></option>
+                  <option value="Music History"><?= esc(__('Music History')) ?></option>
+                  <option value="Music Interviews"><?= esc(__('Music Interviews')) ?></option>
                 </optgroup>
-                <optgroup label="News">
-                  <option value="News">News</option>
-                  <option value="Business News">Business News</option>
-                  <option value="Daily News">Daily News</option>
-                  <option value="Entertainment News">Entertainment News</option>
-                  <option value="News Commentary">News Commentary</option>
-                  <option value="Politics">Politics</option>
-                  <option value="Sports News">Sports News</option>
-                  <option value="Tech News">Tech News</option>
+                <optgroup label="<?= esc(__('News')) ?>">
+                  <option value="News"><?= esc(__('News')) ?></option>
+                  <option value="Business News"><?= esc(__('Business News')) ?></option>
+                  <option value="Daily News"><?= esc(__('Daily News')) ?></option>
+                  <option value="Entertainment News"><?= esc(__('Entertainment News')) ?></option>
+                  <option value="News Commentary"><?= esc(__('News Commentary')) ?></option>
+                  <option value="Politics"><?= esc(__('Politics')) ?></option>
+                  <option value="Sports News"><?= esc(__('Sports News')) ?></option>
+                  <option value="Tech News"><?= esc(__('Tech News')) ?></option>
                 </optgroup>
-                <optgroup label="Religion &amp; Spirituality">
-                  <option value="Religion &amp; Spirituality">Religion &amp; Spirituality</option>
-                  <option value="Buddhism">Buddhism</option>
-                  <option value="Christianity">Christianity</option>
-                  <option value="Hinduism">Hinduism</option>
-                  <option value="Islam">Islam</option>
-                  <option value="Judaism">Judaism</option>
-                  <option value="Religion">Religion</option>
-                  <option value="Spirituality">Spirituality</option>
+                <optgroup label="<?= esc(__('Religion & Spirituality')) ?>">
+                  <option value="Religion &amp; Spirituality"><?= esc(__('Religion & Spirituality')) ?></option>
+                  <option value="Buddhism"><?= esc(__('Buddhism')) ?></option>
+                  <option value="Christianity"><?= esc(__('Christianity')) ?></option>
+                  <option value="Hinduism"><?= esc(__('Hinduism')) ?></option>
+                  <option value="Islam"><?= esc(__('Islam')) ?></option>
+                  <option value="Judaism"><?= esc(__('Judaism')) ?></option>
+                  <option value="Religion"><?= esc(__('Religion')) ?></option>
+                  <option value="Spirituality"><?= esc(__('Spirituality')) ?></option>
                 </optgroup>
-                <optgroup label="Science">
-                  <option value="Science">Science</option>
-                  <option value="Astronomy">Astronomy</option>
-                  <option value="Chemistry">Chemistry</option>
-                  <option value="Earth Sciences">Earth Sciences</option>
-                  <option value="Life Sciences">Life Sciences</option>
-                  <option value="Mathematics">Mathematics</option>
-                  <option value="Natural Sciences">Natural Sciences</option>
-                  <option value="Nature">Nature</option>
-                  <option value="Physics">Physics</option>
-                  <option value="Social Sciences">Social Sciences</option>
+                <optgroup label="<?= esc(__('Science')) ?>">
+                  <option value="Science"><?= esc(__('Science')) ?></option>
+                  <option value="Astronomy"><?= esc(__('Astronomy')) ?></option>
+                  <option value="Chemistry"><?= esc(__('Chemistry')) ?></option>
+                  <option value="Earth Sciences"><?= esc(__('Earth Sciences')) ?></option>
+                  <option value="Life Sciences"><?= esc(__('Life Sciences')) ?></option>
+                  <option value="Mathematics"><?= esc(__('Mathematics')) ?></option>
+                  <option value="Natural Sciences"><?= esc(__('Natural Sciences')) ?></option>
+                  <option value="Nature"><?= esc(__('Nature')) ?></option>
+                  <option value="Physics"><?= esc(__('Physics')) ?></option>
+                  <option value="Social Sciences"><?= esc(__('Social Sciences')) ?></option>
                 </optgroup>
-                <optgroup label="Society &amp; Culture">
-                  <option value="Society &amp; Culture">Society &amp; Culture</option>
-                  <option value="Documentary">Documentary</option>
-                  <option value="Personal Journals">Personal Journals</option>
-                  <option value="Philosophy">Philosophy</option>
-                  <option value="Places &amp; Travel">Places &amp; Travel</option>
-                  <option value="Relationships">Relationships</option>
+                <optgroup label="<?= esc(__('Society & Culture')) ?>">
+                  <option value="Society &amp; Culture"><?= esc(__('Society & Culture')) ?></option>
+                  <option value="Documentary"><?= esc(__('Documentary')) ?></option>
+                  <option value="Personal Journals"><?= esc(__('Personal Journals')) ?></option>
+                  <option value="Philosophy"><?= esc(__('Philosophy')) ?></option>
+                  <option value="Places &amp; Travel"><?= esc(__('Places & Travel')) ?></option>
+                  <option value="Relationships"><?= esc(__('Relationships')) ?></option>
                 </optgroup>
-                <optgroup label="Sports">
-                  <option value="Sports">Sports</option>
-                  <option value="Baseball">Baseball</option>
-                  <option value="Basketball">Basketball</option>
-                  <option value="Cricket">Cricket</option>
-                  <option value="Fantasy Sports">Fantasy Sports</option>
-                  <option value="Football">Football</option>
-                  <option value="Golf">Golf</option>
-                  <option value="Hockey">Hockey</option>
-                  <option value="Rugby">Rugby</option>
-                  <option value="Running">Running</option>
-                  <option value="Soccer">Soccer</option>
-                  <option value="Swimming">Swimming</option>
-                  <option value="Tennis">Tennis</option>
-                  <option value="Track">Track</option>
-                  <option value="Volleyball">Volleyball</option>
-                  <option value="Wilderness">Wilderness</option>
-                  <option value="Wrestling">Wrestling</option>
+                <optgroup label="<?= esc(__('Sports')) ?>">
+                  <option value="Sports"><?= esc(__('Sports')) ?></option>
+                  <option value="Baseball"><?= esc(__('Baseball')) ?></option>
+                  <option value="Basketball"><?= esc(__('Basketball')) ?></option>
+                  <option value="Cricket"><?= esc(__('Cricket')) ?></option>
+                  <option value="Fantasy Sports"><?= esc(__('Fantasy Sports')) ?></option>
+                  <option value="Football"><?= esc(__('Football')) ?></option>
+                  <option value="Golf"><?= esc(__('Golf')) ?></option>
+                  <option value="Hockey"><?= esc(__('Hockey')) ?></option>
+                  <option value="Rugby"><?= esc(__('Rugby')) ?></option>
+                  <option value="Running"><?= esc(__('Running')) ?></option>
+                  <option value="Soccer"><?= esc(__('Soccer')) ?></option>
+                  <option value="Swimming"><?= esc(__('Swimming')) ?></option>
+                  <option value="Tennis"><?= esc(__('Tennis')) ?></option>
+                  <option value="Track"><?= esc(__('Track')) ?></option>
+                  <option value="Volleyball"><?= esc(__('Volleyball')) ?></option>
+                  <option value="Wilderness"><?= esc(__('Wilderness')) ?></option>
+                  <option value="Wrestling"><?= esc(__('Wrestling')) ?></option>
                 </optgroup>
-                <optgroup label="Technology">
-                  <option value="Technology">Technology</option>
+                <optgroup label="<?= esc(__('Technology')) ?>">
+                  <option value="Technology"><?= esc(__('Technology')) ?></option>
                 </optgroup>
-                <optgroup label="True Crime">
-                  <option value="True Crime">True Crime</option>
+                <optgroup label="<?= esc(__('True Crime')) ?>">
+                  <option value="True Crime"><?= esc(__('True Crime')) ?></option>
                 </optgroup>
-                <optgroup label="TV &amp; Film">
-                  <option value="TV &amp; Film">TV &amp; Film</option>
-                  <option value="After Shows">After Shows</option>
-                  <option value="Film History">Film History</option>
-                  <option value="Film Interviews">Film Interviews</option>
-                  <option value="Film Reviews">Film Reviews</option>
-                  <option value="TV Reviews">TV Reviews</option>
+                <optgroup label="<?= esc(__('TV & Film')) ?>">
+                  <option value="TV &amp; Film"><?= esc(__('TV & Film')) ?></option>
+                  <option value="After Shows"><?= esc(__('After Shows')) ?></option>
+                  <option value="Film History"><?= esc(__('Film History')) ?></option>
+                  <option value="Film Interviews"><?= esc(__('Film Interviews')) ?></option>
+                  <option value="Film Reviews"><?= esc(__('Film Reviews')) ?></option>
+                  <option value="TV Reviews"><?= esc(__('TV Reviews')) ?></option>
                 </optgroup>
               </select>
               <input type="hidden" name="category" id="category-hidden" value="<?= esc($form['category']) ?>">

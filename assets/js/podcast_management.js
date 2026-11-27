@@ -9,6 +9,14 @@
       return;
     }
 
+    var categoryLabels = {};
+    Array.prototype.forEach.call(select.options, function (option) {
+      if (option.value) {
+        categoryLabels[option.value] = option.text;
+      }
+    });
+    var removeLabel = select.getAttribute('data-remove-label') || 'Eliminar categoría %s';
+
     var selected = hidden.value
       ? hidden.value.split(',').map(function (value) { return value.trim(); }).filter(Boolean)
       : [];
@@ -26,13 +34,16 @@
       selected.forEach(function (category) {
         var chip = document.createElement('span');
         chip.className = 'chip';
-        chip.appendChild(document.createTextNode(category + ' '));
+        var label = Object.prototype.hasOwnProperty.call(categoryLabels, category)
+          ? categoryLabels[category]
+          : category;
+        chip.appendChild(document.createTextNode(label + ' '));
 
         var button = document.createElement('button');
         button.type = 'button';
         button.className = 'chip-remove';
         button.textContent = '×';
-        button.setAttribute('aria-label', 'Eliminar ' + category);
+        button.setAttribute('aria-label', removeLabel.replace('%s', function () { return label; }));
         button.addEventListener('click', function () {
           removeCategory(category);
         });

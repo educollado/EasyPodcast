@@ -68,8 +68,8 @@ $addPageBasePath = podcastBasePath(activePodcast($addPageContextPdo) ?? [], mult
           <label>
             <?= __('Estado') ?>
             <select name="status">
-              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>>draft</option>
-              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>>published</option>
+              <option value="draft" <?= $form['status'] === 'draft' ? 'selected' : '' ?>><?= __('draft') ?></option>
+              <option value="published" <?= $form['status'] === 'published' ? 'selected' : '' ?>><?= __('published') ?></option>
             </select>
           </label>
         </div>
@@ -126,6 +126,6 @@ $addPageBasePath = podcastBasePath(activePodcast($addPageContextPdo) ?? [], mult
     </main>
   </div>
   <script src="/assets/js/jodit.min.js"></script>
-  <script src="/assets/js/add_page.js"></script>
+  <script src="/assets/js/add_page.js?v=<?= (int) filemtime(__DIR__ . '/assets/js/add_page.js') ?>"></script>
 </body>
 </html>
